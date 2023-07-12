@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.micro-manager.lightsheetmanager</groupId>
     <artifactId>LightSheetManager</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <packaging>jar</packaging>
     <name>LightSheetManager plugin</name>
     <description>Java-based Micro-Manager plugin for controlling light sheet microscopes</description>

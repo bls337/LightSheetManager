@@ -34,6 +34,9 @@ jobs:
         id: find_artifact
         run: echo "ARTIFACT_NAME=$(ls ./target/LightSheetManager-*.jar | grep -v -e '-sources' -e '-javadoc')" >> $GITHUB_ENV
 
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
 
       - name: Create Release
         id: create_release
