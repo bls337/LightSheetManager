@@ -25,11 +25,14 @@ jobs:
           java-version: 8
           distribution: 'zulu'
 
+      - name: Extract version
+        id: pom
+        run: |
+          echo "POM_VERSION=$(mvn -B -Dexec.executable='echo' -Dexec.args='${project.version}' exec:exec -q)" >> $GITHUB_ENV
           
       - name: Compile Jar with maven
         run: mvn package
 
- 
       - name: Find artifact
         id: find_artifact
         run: |
@@ -39,13 +42,14 @@ jobs:
           echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
           echo "Artifact: $ARTIFACT_NAME"
 
-
-      - name: Get the version
-        id: get_version
+      - name: Create Git Tag
+        id: create_tag
         run: |
-          VERSION=${GITHUB_REF#refs/tags/}
-          echo ::set-output name=VERSION::$VERSION
-          echo "Version: $VERSION"
+          TAG_NAME="v${POM_VERSION}"
+          git tag $TAG_NAME
+          git push origin $TAG_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
 
       - name: Create Release
         id: create_release
@@ -53,8 +57,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ steps.get_version.outputs.VERSION }}
-          release_name: Release ${{ steps.get_version.outputs.VERSION }}
+          tag_name: v${{ env.POM_VERSION }}
+          release_name: Release v${{ env.POM_VERSION }}
           body: Auto-generated release from ${{ github.ref }}
           draft: false
           prerelease: false
