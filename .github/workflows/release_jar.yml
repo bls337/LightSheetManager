@@ -33,14 +33,17 @@ jobs:
       - name: Compile Jar with maven
         run: mvn package
 
-      - name: Find artifact
+      - name: Find artifact and get file name
         id: find_artifact
         run: |
           CMD="ls ./target/LightSheetManager-*.jar | grep -v -e '-sources' -e '-javadoc'"
           echo "Command: $CMD"
-          ARTIFACT_NAME=$(eval $CMD)
+          ARTIFACT_PATH=$(eval $CMD)
+          ARTIFACT_NAME=$(basename $ARTIFACT_PATH)
+          echo "ARTIFACT_PATH=$ARTIFACT_PATH" >> $GITHUB_ENV
           echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
-          echo "Artifact: $ARTIFACT_NAME"
+          echo "Artifact Path: $ARTIFACT_PATH"
+          echo "Artifact Name: $ARTIFACT_NAME"
 
       - name: Create Git Tag
         id: create_tag
@@ -70,6 +73,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
-          asset_path: ${{ env.ARTIFACT_NAME }}
-          asset_name: ${{ env.ARTIFACT_NAME | basename }}
+          asset_path: ${{ env.ARTIFACT_PATH }}
+          asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/java-archive
