@@ -33,9 +33,12 @@ jobs:
       - name: Find artifact
         id: find_artifact
         run: |
-          ls target
-          echo "ARTIFACT_NAME=$(ls ./target/LightSheetManager-*.jar | grep -v -e '-sources' -e '-javadoc')" >> $GITHUB_ENV
+          CMD="ls ./target/LightSheetManager-*.jar | grep -v -e '-sources' -e '-javadoc'"
+          echo "Command: $CMD"
+          ARTIFACT_NAME=$(eval $CMD)
+          echo "ARTIFACT_NAME=$ARTIFACT_NAME" >> $GITHUB_ENV
           echo "Artifact: $ARTIFACT_NAME"
+
 
       - name: Get the version
         id: get_version
