@@ -29,7 +29,6 @@ jobs:
       - name: Compile Jar with maven
         run: mvn package
 
-
  
       - name: Find artifact
         id: find_artifact
@@ -66,5 +65,3 @@ jobs:
           asset_path: ${{ env.ARTIFACT_NAME }}
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/java-archive
-
-In this modified version, both the Find arti
