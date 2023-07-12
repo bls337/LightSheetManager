@@ -30,13 +30,19 @@ jobs:
         run: mvn package
 
 
+ 
       - name: Find artifact
         id: find_artifact
-        run: echo "ARTIFACT_NAME=$(ls ./target/LightSheetManager-*.jar | grep -v -e '-sources' -e '-javadoc')" >> $GITHUB_ENV
+        run: |
+          echo "ARTIFACT_NAME=$(ls ./target/LightSheetManager-*.jar | grep -v -e '-sources' -e '-javadoc')" >> $GITHUB_ENV
+          echo "Artifact: $ARTIFACT_NAME"
 
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/}
+          echo ::set-output name=VERSION::$VERSION
+          echo "Version: $VERSION"
 
       - name: Create Release
         id: create_release
@@ -44,8 +50,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          release_name: Release ${{ steps.get_version.outputs.VERSION }}
           body: Auto-generated release from ${{ github.ref }}
           draft: false
           prerelease: false
@@ -60,3 +66,5 @@ jobs:
           asset_path: ${{ env.ARTIFACT_NAME }}
           asset_name: ${{ env.ARTIFACT_NAME }}
           asset_content_type: application/java-archive
+
+In this modified version, both the Find arti
