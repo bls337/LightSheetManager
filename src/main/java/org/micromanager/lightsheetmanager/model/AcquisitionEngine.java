@@ -401,7 +401,6 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 //        boolean demoMode = acqSettings_.demoMode();
 
         if (!demoMode) {
-            controller = new PLogicDISPIM(studio_, model_.devices(), asb_);
 
             if (isUsingPLC) {
                 controller = new PLogicDISPIM(studio_, model_.devices(), asb_);
@@ -674,7 +673,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                 // TODO: Cameras are now ready to receive triggers, so we can send (software) trigger
                 //  to the tiger to tell it to start outputting TTLs
 
-                if (controllerInstance != null) { // if not in demo mode
+                if (isUsingPLC && controllerInstance != null) { // if not in demo mode
                     int side = 0;
                     // TODO: enable 2 sided acquisition
                     controllerInstance.triggerControllerStartAcquisition(
@@ -820,7 +819,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         // want to do this, even with demo cameras, so we can test everything else
         // TODO: figure out if we really want to return piezos to 0 position (maybe center position,
         //   maybe not at all since we move when we switch to setup tab, something else??)
-        if (controller != null) {
+        if (isUsingPLC && controller != null) {
             controller.cleanUpControllerAfterAcquisition(acqSettings_, true);
         }
 
