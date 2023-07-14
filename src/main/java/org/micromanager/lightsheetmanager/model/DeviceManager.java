@@ -8,6 +8,7 @@ import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 import org.micromanager.lightsheetmanager.model.devices.Galvo;
 import org.micromanager.lightsheetmanager.model.devices.LightSheetDeviceManager;
+import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.Stage;
 import org.micromanager.lightsheetmanager.model.devices.XYStage;
 import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
@@ -146,11 +147,13 @@ public class DeviceManager {
                     addDevice(propertyName, deviceName, galvo);
                 }
             } else if (deviceType == DeviceType.ShutterDevice) {
-                // TODO: support a generic device
-                // Check if ASI PLogic is present
+                // Check if ASI PLogic or NIDAQ board is present
                 if (deviceLibrary.equals("ASITiger")) {
                     ASIPLogic plc = new ASIPLogic(studio_, deviceName);
                     addDevice(propertyName, deviceName, plc);
+                } else if (deviceLibrary.equals("NIDAQ")) {
+                    NIDAQ nidaq = new NIDAQ(studio_, deviceName);
+                    addDevice(propertyName, deviceName, nidaq);
                 }
             } else if (deviceType == DeviceType.CameraDevice) {
                 createCameraDevice(propertyName, deviceName,
