@@ -2,11 +2,8 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
-
-import java.lang.reflect.Type;
 
 // TODO: make public instead of abstract? use this in demo mode?
 

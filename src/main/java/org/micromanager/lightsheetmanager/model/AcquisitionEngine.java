@@ -10,6 +10,7 @@ import org.micromanager.Studio;
 import org.micromanager.acqj.api.AcquisitionHook;
 import org.micromanager.acqj.main.Acquisition;
 import org.micromanager.acqj.main.AcquisitionEvent;
+import org.micromanager.acquisition.SequenceSettings;
 import org.micromanager.acquisition.internal.MMAcquisition;
 import org.micromanager.acquisition.internal.MMAcquistionControlCallbacks;
 import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJMDADataSink;
@@ -86,9 +87,9 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     }
 
     @Override
-    public Future requestRun(boolean speedTest) {
+    public Future<?> requestRun(boolean speedTest) {
         // Run on a new thread, so it doesn't block the EDT
-        Future acqFinished = acquisitionExecutor_.submit(() -> {
+        Future<?> acqFinished = acquisitionExecutor_.submit(() -> {
             if (currentAcquisition_ != null) {
                 studio_.logs().showError("Acquisition is already running.");
                 return;
@@ -517,13 +518,18 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 
        currentAcquisition_ = new Acquisition(sink);
 
+        //currentAcquisition_.
         JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
         addMMSummaryMetadata(summaryMetadata, projectionMode);
+
+        // TODO(Brandon): where should i get this from?
+        SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
+        sequenceSettingsBuilder.shouldDisplayImages(true);
 
         // MMAcquisition
         MMAcquisition acq = new MMAcquisition(studio_,
               saveDir, saveName, summaryMetadata,
-              this, true);
+              this, sequenceSettingsBuilder.build());
         curStore_ = acq.getDatastore();
         curPipeline_ = acq.getPipeline();
         sink.setDatastore(curStore_);
