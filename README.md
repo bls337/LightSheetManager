@@ -35,6 +35,4 @@ The plugin will have a GUI (not yet described!) in Micro-Manager 2.0 to facilita
 
 Like Micro-Manager itself, we intend for LightSheetManager to be open source with relatively liberal license terms.
 
-TODO The current CalibrationSettings object needs to be split into Calibration Settings and a HardwareManager.
-
-Development of this plugin was started by [ASI](https:////www.asiimaging.com) in collaboration with the Micro-Manager team.
+Development of this plugin was started by [ASI](https:////www.asiimaging.com) in collaboration with the Micro-Manager team.  National Institute of Health and Howard Hughes Medical Institute have provided valuable support.
