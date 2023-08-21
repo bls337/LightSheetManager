@@ -135,7 +135,7 @@ public class AcquisitionTab extends Panel {
         lblNumTimePoints_ = new Label("Number:");
         lblTimePointInterval_ = new Label("Interval [s]:");
         spnNumTimePoints_ = Spinner.createIntegerSpinner(acqSettings.numTimePoints(), 1, Integer.MAX_VALUE,1);
-        spnTimePointInterval_ = Spinner.createIntegerSpinner(acqSettings.timePointInterval(), 1, Integer.MAX_VALUE, 1);
+        spnTimePointInterval_ = Spinner.createIntegerSpinner(acqSettings.timePointInterval(), 0, Integer.MAX_VALUE, 1);
 
         // disable elements based on acqSettings
         setTimePointSpinnersEnabled(acqSettings.isUsingTimePoints());

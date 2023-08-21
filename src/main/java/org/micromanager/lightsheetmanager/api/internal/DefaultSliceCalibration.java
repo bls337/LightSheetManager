@@ -20,6 +20,7 @@ public class DefaultSliceCalibration implements SliceCalibration {
         @Override
         public SliceCalibration.Builder sliceSlope(final double slope) {
             sliceSlope_ = slope;
+            System.out.println(sliceSlope_);
             return this;
         }
 

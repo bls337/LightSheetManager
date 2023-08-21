@@ -518,7 +518,6 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 
        currentAcquisition_ = new Acquisition(sink);
 
-        //currentAcquisition_.
         JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
         addMMSummaryMetadata(summaryMetadata, projectionMode);
 

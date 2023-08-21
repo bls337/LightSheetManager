@@ -10,8 +10,10 @@ import javax.swing.JLabel;
  */
 public class ExcitationPanel extends Panel {
 
-    private CheckBox cbxBeam_;
-    private CheckBox cbxSheet_;
+    private CheckBox cbxBeamExc_;
+    private CheckBox cbxSheetExc_;
+    private CheckBox cbxBeamEpi_;
+    private CheckBox cbxSheetEpi_;
 
     public ExcitationPanel() {
         super("Scanner");
@@ -20,19 +22,37 @@ public class ExcitationPanel extends Panel {
     }
 
     private void createUserInterface() {
-        final JLabel lblExcitation = new JLabel("Excitation:");
+        final JLabel lblExcitation = new JLabel("Excitation side:");
+        final JLabel lblEpi = new JLabel("Epi side:");
 
-        cbxBeam_ = new CheckBox("Beam", false);
-        cbxSheet_ = new CheckBox("Sheet", false);
-
-        createEventHandlers();
+        cbxBeamExc_ = new CheckBox("Beam", false);
+        cbxSheetExc_ = new CheckBox("Sheet", false);
+        cbxBeamEpi_ = new CheckBox("Beam", false);
+        cbxSheetEpi_ = new CheckBox("Sheet", false);
 
         add(lblExcitation, "");
-        add(cbxBeam_, "");
-        add(cbxSheet_, "");
+        add(cbxBeamExc_, "");
+        add(cbxSheetExc_, "wrap");
+        add(lblEpi, "");
+        add(cbxBeamEpi_, "");
+        add(cbxSheetEpi_, "");
     }
 
     private void createEventHandlers() {
+        cbxBeamExc_.registerListener(e -> {
 
+        });
+
+        cbxSheetExc_.registerListener(e -> {
+
+        });
+
+        cbxBeamEpi_.registerListener(e -> {
+
+        });
+
+        cbxSheetEpi_.registerListener(e -> {
+
+        });
     }
 }
