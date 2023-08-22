@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.setup;
 
 import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -48,6 +49,9 @@ public class BeamSheetControlPanel extends Panel {
     }
 
     private void createUserInterface() {
+        final GeometryType geometryType = model_.devices()
+                .getDeviceAdapter().getMicroscopeGeometry();
+
         pnlFirst_ = new Panel();
         pnlSecond_ = new Panel();
 
@@ -62,7 +66,6 @@ public class BeamSheetControlPanel extends Panel {
         txtOffset_ = new TextField();
 
         // second panel for other camera trigger modes
-
         final JLabel lblSheetWidth = new JLabel("Sheet width:");
         final JLabel lblSheetOffset = new JLabel("Sheet offset:");
         lblSlopeUnits2_ = new JLabel("μ°/px"); // TODO: reuse labels like this?
@@ -92,18 +95,31 @@ public class BeamSheetControlPanel extends Panel {
         pnlFirst_.add(btnPlotProfile_, "gapleft 100");
 
         // regular trigger modes
-        pnlSecond_.add(lblSheetWidth, "");
-        pnlSecond_.add(cbxAutoSheetWidth_, "");
-        pnlSecond_.add(txtSheetWidth_, "");
-        pnlSecond_.add(lblSlopeUnits2_, "");
-        pnlSecond_.add(btnSheetWidthMinus_, "");
-        pnlSecond_.add(btnSheetWidthPlus_, "");
-        pnlSecond_.add(sldSheetWidth_, "wrap");
-        pnlSecond_.add(lblSheetOffset, "span 3");
-        pnlSecond_.add(btnCenterOffset_, "");
-        pnlSecond_.add(btnSheetOffsetMinus_, "");
-        pnlSecond_.add(btnSheetOffsetPlus_, "");
-        pnlSecond_.add(sldSheetOffset_, "");
+        switch (geometryType) {
+            case DISPIM:
+                pnlSecond_.add(lblSheetWidth, "");
+                pnlSecond_.add(cbxAutoSheetWidth_, "");
+                pnlSecond_.add(txtSheetWidth_, "");
+                pnlSecond_.add(lblSlopeUnits2_, "");
+                pnlSecond_.add(btnSheetWidthMinus_, "");
+                pnlSecond_.add(btnSheetWidthPlus_, "");
+                pnlSecond_.add(sldSheetWidth_, "wrap");
+                pnlSecond_.add(lblSheetOffset, "span 3");
+                pnlSecond_.add(btnCenterOffset_, "");
+                pnlSecond_.add(btnSheetOffsetMinus_, "");
+                pnlSecond_.add(btnSheetOffsetPlus_, "");
+                pnlSecond_.add(sldSheetOffset_, "");
+                break;
+            case SCAPE:
+                pnlSecond_.add(lblSheetOffset, "");
+                pnlSecond_.add(btnCenterOffset_, "");
+                pnlSecond_.add(btnSheetOffsetMinus_, "");
+                pnlSecond_.add(btnSheetOffsetPlus_, "");
+                pnlSecond_.add(sldSheetOffset_, "");
+                break;
+            default:
+                break;
+        }
 
         // add panel based on camera trigger mode
         final CameraModes cameraMode =

@@ -5,6 +5,7 @@ import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
@@ -95,6 +96,7 @@ public class AcquisitionTab extends Panel {
     }
 
     private void createUserInterface() {
+
         final DefaultAcquisitionSettingsDISPIM acqSettings =
                 model_.acquisitions().getAcquisitionSettings();
 

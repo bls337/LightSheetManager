@@ -32,15 +32,17 @@ public class SetupPanel extends Panel {
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;
 
+        // layout panels
         leftPanel_ = new Panel();
         rightPanel_ = new Panel();
+
         piezoPanel_ = new PiezoCalibrationPanel(model_, pathNum);
         beamSheetPanel_ = new BeamSheetControlPanel(model_);
-        positionPanel_ = new PositionPanel();
+        positionPanel_ = new PositionPanel(model_);
 
-        joystickPanel_ = new JoystickPanel();
-        excitationPanel_ = new ExcitationPanel();
-        cameraPanel_ = new CameraPanel();
+        joystickPanel_ = new JoystickPanel(model_);
+        excitationPanel_ = new ExcitationPanel(model_);
+        cameraPanel_ = new CameraPanel(model_);
 
         leftPanel_.add(joystickPanel_, "wrap");
         leftPanel_.add(excitationPanel_, "growx, wrap");

@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.setup;
 
 
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.components.Button;
@@ -37,6 +38,8 @@ public class PiezoCalibrationPanel extends Panel {
     }
 
     private void createUserInterface() {
+        final GeometryType geometryType = model_.devices()
+                .getDeviceAdapter().getMicroscopeGeometry();
 
         final JLabel lblSlope = new JLabel("Slope:");
         final JLabel lblOffset = new JLabel("Offset:");
@@ -73,20 +76,36 @@ public class PiezoCalibrationPanel extends Panel {
         btnStepUp_ = new Button(Icons.ARROW_UP);
         btnStepDown_ = new Button(Icons.ARROW_DOWN);
 
-        add(lblSlope, "");
-        add(txtSlope_, "");
-        add(lblMicronsPerDeg, "");
-        add(btnTwoPoint_, "wrap");
-        add(lblOffset, "");
-        add(txtOffset_, "");
-        add(new JLabel("μm"), "");
-        add(btnUpdate_, "wrap");
-        add(lblStepSize, "");
-        add(txtStepSize_, "");
-        add(new JLabel("μm"), "");
-        add(btnStepDown_, "split 2");
-        add(btnStepUp_, "wrap");
-        add(btnRunAutofocus_, "span 3");
+        switch (geometryType) {
+            case DISPIM:
+                add(lblSlope, "");
+                add(txtSlope_, "");
+                add(lblMicronsPerDeg, "");
+                add(btnTwoPoint_, "wrap");
+                add(lblOffset, "");
+                add(txtOffset_, "");
+                add(new JLabel("μm"), "");
+                add(btnUpdate_, "wrap");
+                add(lblStepSize, "");
+                add(txtStepSize_, "");
+                add(new JLabel("μm"), "");
+                add(btnStepDown_, "split 2");
+                add(btnStepUp_, "wrap");
+                add(btnRunAutofocus_, "span 3");
+                break;
+            case SCAPE:
+                add(lblSlope, "");
+                add(txtSlope_, "");
+                add(lblMicronsPerDeg, "wrap");
+                add(lblOffset, "");
+                add(txtOffset_, "");
+                add(new JLabel("μm"), "wrap");
+                add(btnUpdate_, "wrap");
+                add(btnRunAutofocus_, "span 3");
+                break;
+            default:
+                break;
+        }
     }
 
     private void createEventHandlers() {

@@ -1,11 +1,13 @@
 package org.micromanager.lightsheetmanager.gui.setup;
 
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
-import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
+import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
-import java.awt.Font;
+import java.util.Objects;
+
 
 /**
  * Select which camera is being used.
@@ -18,13 +20,17 @@ public class CameraPanel extends Panel {
     private Button btnInvertedPath_;
     private Button btnLiveMode_;
 
-    public CameraPanel() {
+    private LightSheetManagerModel model_;
+    public CameraPanel(final LightSheetManagerModel model) {
         super("Cameras");
+        model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
     }
 
     private void createUserInterface() {
+        final GeometryType geometryType = model_.devices()
+                .getDeviceAdapter().getMicroscopeGeometry();
 
         setMigLayout(
                 "",
@@ -41,11 +47,20 @@ public class CameraPanel extends Panel {
         Button.setDefaultSize(165, 26);
         btnLiveMode_ = new Button("Live", Icons.CAMERA);
 
-        add(btnImagingPath_, "");
-        add(btnMultiPath_, "wrap");
-        add(btnEpiPath_, "");
-        add(btnInvertedPath_, "wrap");
-        add(btnLiveMode_, "span 2");
+        switch (geometryType) {
+            case DISPIM:
+                add(btnImagingPath_, "");
+                add(btnMultiPath_, "wrap");
+                add(btnEpiPath_, "");
+                add(btnInvertedPath_, "wrap");
+                add(btnLiveMode_, "span 2");
+                break;
+            case SCAPE:
+                add(btnLiveMode_, "span 2");
+                break;
+            default:
+                break;
+        }
     }
 
     private void createEventHandlers() {
