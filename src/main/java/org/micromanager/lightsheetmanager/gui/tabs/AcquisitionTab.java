@@ -8,6 +8,7 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.MultiPositionPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
@@ -18,7 +19,6 @@ import org.micromanager.lightsheetmanager.gui.playlist.AcquisitionTableFrame;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
-import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.ToggleButton;
 import org.micromanager.lightsheetmanager.model.data.AcquisitionModes;
@@ -32,6 +32,7 @@ public class AcquisitionTab extends Panel {
 
     // layout panel
     private Panel pnlRight_;
+    private Panel pnlButtons_;
 
     private ComboBox cmbAcquisitionModes_;
 
@@ -44,25 +45,15 @@ public class AcquisitionTab extends Panel {
     private Button btnRunOverviewAcq_;
 
     // durations
-    private Label lblSliceTime_;
-    private Label lblVolumeTime_;
-    private Label lblTotalTime_;
-
-    private Label lblSliceTimeValue_;
-    private Label lblVolumeTimeValue_;
-    private Label lblTotalTimeValue_;
+    private VolumeDurationPanel pnlDurations_;
 
     // time points
-    private Panel pnlTimePoints_;
+    private TimePointsPanel pnlTimePoints_;
     private CheckBox cbxUseTimePoints_;
 
     // multiple positions
-    private Panel pnlMultiPositions_;
+    private MultiPositionPanel pnlMultiPositions_;
     private CheckBox cbxUseMultiplePositions_;
-
-
-    private Panel pnlButtons_;
-    private Panel pnlDurations_;
 
     // channels
     private CheckBox cbxUseChannels_;
@@ -109,6 +100,9 @@ public class AcquisitionTab extends Panel {
         pnlSliceSettings_ = new SliceSettingsPanel(model_);
         pnlAdvancedTiming_ = new AdvancedTimingPanel(model_);
 
+        // durations
+        pnlDurations_ = new VolumeDurationPanel(model_);
+
         // multiple positions
         cbxUseMultiplePositions_ = new CheckBox(
                 "Multiple positions (XY)", acqSettings.isUsingMultiplePositions());
@@ -123,19 +117,8 @@ public class AcquisitionTab extends Panel {
         // disable elements based on acqSettings
         pnlTimePoints_.setEnabled(acqSettings.isUsingTimePoints());
 
-
-        // panels
+        // acquisition buttons
         pnlButtons_ = new Panel();
-        pnlDurations_ = new Panel("Durations");
-
-        // durations
-        lblSliceTime_ = new Label("Slice");
-        lblVolumeTime_ = new Label("Volume:");
-        lblTotalTime_ = new Label("Total:");
-
-        lblSliceTimeValue_ = new Label("0.0");
-        lblVolumeTimeValue_ = new Label("0.0");
-        lblTotalTimeValue_ = new Label("0.0");
 
         ToggleButton.setDefaultSize(120, 30);
         btnRunAcquisition_ = new ToggleButton(
@@ -172,14 +155,6 @@ public class AcquisitionTab extends Panel {
 
         cbxUseAdvancedTiming_ = new CheckBox("Use advanced timing settings",
                 12, acqSettings.isUsingAdvancedTiming(), CheckBox.RIGHT);
-
-        // durations
-        pnlDurations_.add(lblSliceTime_, "");
-        pnlDurations_.add(lblSliceTimeValue_, "wrap");
-        pnlDurations_.add(lblVolumeTime_, "");
-        pnlDurations_.add(lblVolumeTimeValue_, "wrap");
-        pnlDurations_.add(lblTotalTime_, "");
-        pnlDurations_.add(lblTotalTimeValue_, "");
 
         // acquisition buttons
         pnlButtons_.add(btnRunAcquisition_, "");
@@ -324,6 +299,26 @@ public class AcquisitionTab extends Panel {
         return pnlSliceSettings_;
     }
 
+    /**
+     * Switch between slice timing panel and advanced timing panel.
+     *
+     * @param state the state of the CheckBox
+     */
+    private void switchTimingSettings(final boolean state) {
+        pnlRight_.removeAll();
+        if (state) {
+            pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
+            pnlRight_.add(pnlAdvancedTiming_, "growx, wrap");
+            pnlRight_.add(cbxUseAdvancedTiming_, "growx");
+        } else {
+            pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
+            pnlRight_.add(pnlSliceSettings_, "growx, wrap");
+            pnlRight_.add(cbxUseAdvancedTiming_, "growx");
+        }
+        pnlRight_.revalidate();
+        pnlRight_.repaint();
+    }
+
 //    private void updateDurationLabels() {
 //        updateSlicePeriodLabel();
 //        updateVolumeDurationLabel();
@@ -400,26 +395,6 @@ public class AcquisitionTab extends Panel {
 //        }
 //        return volumeDuration;
 //    }
-
-    /**
-     * Switch between slice timing panel and advanced timing panel.
-     *
-     * @param state the state of the CheckBox
-     */
-    private void switchTimingSettings(final boolean state) {
-        pnlRight_.removeAll();
-        if (state) {
-            pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
-            pnlRight_.add(pnlAdvancedTiming_, "growx, wrap");
-            pnlRight_.add(cbxUseAdvancedTiming_, "growx");
-        } else {
-            pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
-            pnlRight_.add(pnlSliceSettings_, "growx, wrap");
-            pnlRight_.add(cbxUseAdvancedTiming_, "growx");
-        }
-        pnlRight_.revalidate();
-        pnlRight_.repaint();
-    }
 
 //    public double computeVolumeDuration(final DefaultAcquisitionSettingsDISPIM acqSettings) {
 //        final MultiChannelModes channelMode = acqSettings.channelMode();
