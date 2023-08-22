@@ -9,6 +9,7 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.gui.tabs.channels.ChannelTablePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
@@ -33,6 +34,9 @@ import java.util.Objects;
 public class AcquisitionTab extends Panel {
 
     private Studio studio_;
+
+    // layout panel
+    private Panel pnlRight_;
 
     private ComboBox cmbAcquisitionModes_;
 
@@ -73,9 +77,6 @@ public class AcquisitionTab extends Panel {
     private Panel pnlTimePoints_;
     private Panel pnlMultiplePositions_;
 
-    // layout panel
-    private Panel pnlRight_;
-
     private ChannelTablePanel pnlChannelTable_;
 
     private VolumeSettingsPanel pnlVolumeSettings_;
@@ -83,16 +84,17 @@ public class AcquisitionTab extends Panel {
 
     private CheckBox cbxUseAdvancedTiming_;
 
-    private XYZGridFrame xyzGridFrame_;
     private AdvancedTimingPanel pnlAdvancedTiming_;
 
-    private AcquisitionTableFrame acqTableFrame_;
+    // frames
+    private final XYZGridFrame xyzGridFrame_;
+    private final AcquisitionTableFrame acqTableFrame_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public AcquisitionTab(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
-        studio_ = model_.getStudio();
+        studio_ = model_.studio();
         acqTableFrame_ = new AcquisitionTableFrame(studio_);
         xyzGridFrame_ = new XYZGridFrame(model_);
         createUserInterface();
@@ -117,22 +119,26 @@ public class AcquisitionTab extends Panel {
 
         pnlVolumeSettings_ = new VolumeSettingsPanel(model_);
 
-        // switch between these two
+        // switch between these two panels
         pnlSliceSettings_ = new SliceSettingsPanel(model_);
         pnlAdvancedTiming_ = new AdvancedTimingPanel(model_);
 
         // check boxes for panels
         cbxUseMultiplePositions_ = new CheckBox(
                 "Multiple positions (XY)", acqSettings.isUsingMultiplePositions());
-        cbxUseTimePoints_ = new CheckBox(
-                "Time Points", acqSettings.isUsingTimePoints());
         cbxUseChannels_ = new CheckBox(
                 "Channels", acqSettings.isUsingChannels());
+
+        // time points
+        cbxUseTimePoints_ = new CheckBox(
+                "Time Points", acqSettings.isUsingTimePoints());
+        pnlTimePoints_ = new TimePointsPanel(model_, cbxUseTimePoints_);
+        // disable elements based on acqSettings
+        pnlTimePoints_.setEnabled(acqSettings.isUsingTimePoints());
 
         // panels
         pnlButtons_ = new Panel();
         pnlDurations_ = new Panel("Durations");
-        pnlTimePoints_ = new Panel(cbxUseTimePoints_);
         pnlMultiplePositions_ = new Panel(cbxUseMultiplePositions_);
 
         // durations
@@ -143,17 +149,6 @@ public class AcquisitionTab extends Panel {
         lblSliceTimeValue_ = new Label("0.0");
         lblVolumeTimeValue_ = new Label("0.0");
         lblTotalTimeValue_ = new Label("0.0");
-
-        // time points
-        lblNumTimePoints_ = new Label("Number:");
-        lblTimePointInterval_ = new Label("Interval [s]:");
-        spnNumTimePoints_ = Spinner.createIntegerSpinner(
-                acqSettings.numTimePoints(), 1, Integer.MAX_VALUE,1);
-        spnTimePointInterval_ = Spinner.createIntegerSpinner(
-                acqSettings.timePointInterval(), 0, Integer.MAX_VALUE, 1);
-
-        // disable elements based on acqSettings
-        setTimePointSpinnersEnabled(acqSettings.isUsingTimePoints());
 
         // multiple positions
         Spinner.setDefaultSize(7);
@@ -207,12 +202,6 @@ public class AcquisitionTab extends Panel {
         pnlDurations_.add(lblVolumeTimeValue_, "wrap");
         pnlDurations_.add(lblTotalTime_, "");
         pnlDurations_.add(lblTotalTimeValue_, "");
-
-        // time points
-        pnlTimePoints_.add(lblNumTimePoints_, "");
-        pnlTimePoints_.add(spnNumTimePoints_, "wrap");
-        pnlTimePoints_.add(lblTimePointInterval_, "");
-        pnlTimePoints_.add(spnTimePointInterval_, "");
 
         // multiple positions
         pnlMultiplePositions_.add(btnEditPositionList_, "");
@@ -345,20 +334,8 @@ public class AcquisitionTab extends Panel {
         cbxUseTimePoints_.registerListener(e -> {
             final boolean selected = cbxUseTimePoints_.isSelected();
             asb_.useTimePoints(selected);
-            setTimePointSpinnersEnabled(selected);
-            updateDurationLabels();
-        });
-
-        spnNumTimePoints_.registerListener(e -> {
-            asb_.numTimePoints(spnNumTimePoints_.getInt());
-            updateDurationLabels();
-            //System.out.println("getNumTimePoints: " + model_.acquisitions().getAcquisitionSettings().getNumTimePoints());
-        });
-
-        spnTimePointInterval_.registerListener(e -> {
-            asb_.timePointInterval(spnTimePointInterval_.getInt());
-            updateDurationLabels();
-            //System.out.println("getTimePointInterval: " + model_.acquisitions().getAcquisitionSettings().getTimePointInterval());
+            pnlTimePoints_.setEnabled(selected);
+            //updateDurationLabels();
         });
 
         // use channels
@@ -374,19 +351,13 @@ public class AcquisitionTab extends Panel {
             //System.out.println("getAcquisitionMode: " + model_.acquisitions().getAcquisitionSettings().getAcquisitionMode());
         });
 
+        // switches timing panels based on check box
         cbxUseAdvancedTiming_.registerListener(
                 e -> switchTimingSettings(cbxUseAdvancedTiming_.isSelected()));
     }
 
     public SliceSettingsPanel getSliceSettingsPanel() {
         return pnlSliceSettings_;
-    }
-
-    private void setTimePointSpinnersEnabled(final boolean state) {
-        lblNumTimePoints_.setEnabled(state);
-        lblTimePointInterval_.setEnabled(state);
-        spnNumTimePoints_.setEnabled(state);
-        spnTimePointInterval_.setEnabled(state);
     }
 
     private void setMultiPositionsEnabled(final boolean state) {
