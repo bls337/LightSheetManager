@@ -3,7 +3,6 @@ package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
-import org.micromanager.lightsheetmanager.model.devices.LightSheetDeviceManager;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -14,20 +13,12 @@ import java.util.Objects;
 
 public class VolumeSettingsPanel extends Panel {
 
-    private Label lblNumViews_;
-    private Label lblFirstView_;
-    private Label lblViewDelay_;
-    private Label lblSlicesPerView_;
-    private Label lblSliceStepSize_;
     private ComboBox cmbNumViews_;
     private ComboBox cmbFirstView_;
-    private Spinner spnNumViews_;
 
     private Spinner spnViewDelay_;
     private Spinner spnSliceStepSize_;
     private Spinner spnSlicesPerSide_;
-
-    private DefaultVolumeSettings.Builder vsb_;
 
     private LightSheetManagerModel model_;
 
@@ -42,8 +33,8 @@ public class VolumeSettingsPanel extends Panel {
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
 
-        final LightSheetDeviceManager lsdm = model_.devices().getDeviceAdapter();
-        final int numImagingPaths = lsdm.getNumImagingPaths();
+        final int numImagingPaths = model_.devices()
+                .getDeviceAdapter().getNumImagingPaths();
 
         final DefaultVolumeSettings volumeSettings = model_.acquisitions()
                 .getAcquisitionSettings().volumeSettings();
@@ -55,11 +46,11 @@ public class VolumeSettingsPanel extends Panel {
         }
         final String[] lbls = labels.toArray(new String[0]);
 
-        lblNumViews_ = new Label("Number of views:");
-        lblFirstView_ = new Label("First view:");
-        lblViewDelay_ = new Label("Delay before view [ms]:");
-        lblSlicesPerView_ = new Label("Slices per view:");
-        lblSliceStepSize_ = new Label("Slice step size [\u00B5m]:");
+        final Label lblNumViews = new Label("Number of views:");
+        final Label lblFirstView = new Label("First view:");
+        final Label lblViewDelay = new Label("Delay before view [ms]:");
+        final Label lblSlicesPerView = new Label("Slices per view:");
+        final Label lblSliceStepSize = new Label("Slice step size [\u00B5m]:");
 
         // if the number of sides has changed and the firstView or numViews is larger
         // than the number of sides, default to 1.
@@ -74,27 +65,31 @@ public class VolumeSettingsPanel extends Panel {
 
         cmbNumViews_ = new ComboBox(lbls, String.valueOf(numViews), 60, 20);
         cmbFirstView_ = new ComboBox(lbls, String.valueOf(firstView), 60, 20);
-        spnViewDelay_ = Spinner.createDoubleSpinner(volumeSettings.delayBeforeView(), 0.0, Double.MAX_VALUE, 0.25);
-        spnSliceStepSize_ = Spinner.createDoubleSpinner(volumeSettings.sliceStepSize(), 0.0, 100.0, 0.1);
-        spnSlicesPerSide_ = Spinner.createIntegerSpinner(volumeSettings.slicesPerView(), 0, 100, 1);
+
+        spnViewDelay_ = Spinner.createDoubleSpinner(
+                volumeSettings.delayBeforeView(), 0.0, Double.MAX_VALUE, 0.25);
+        spnSliceStepSize_ = Spinner.createDoubleSpinner(
+                volumeSettings.sliceStepSize(), 0.0, 100.0, 0.1);
+        spnSlicesPerSide_ = Spinner.createIntegerSpinner(
+                volumeSettings.slicesPerView(), 0, 100, 1);
 
         switch (geometryType) {
             case DISPIM:
-                add(lblNumViews_, "");
+                add(lblNumViews, "");
                 add(cmbNumViews_, "wrap");
-                add(lblFirstView_, "");
+                add(lblFirstView, "");
                 add(cmbFirstView_, "wrap");
-                add(lblViewDelay_, "");
+                add(lblViewDelay, "");
                 add(spnViewDelay_, "wrap");
-                add(lblSlicesPerView_, "");
+                add(lblSlicesPerView, "");
                 add(spnSlicesPerSide_, "wrap");
-                add(lblSliceStepSize_, "");
+                add(lblSliceStepSize, "");
                 add(spnSliceStepSize_, "");
                 break;
             case SCAPE:
-                add(lblSlicesPerView_, "");
+                add(new Label("Number of slices:"), "");
                 add(spnSlicesPerSide_, "wrap");
-                add(lblSliceStepSize_, "");
+                add(lblSliceStepSize, "");
                 add(spnSliceStepSize_, "");
                 break;
             default:
@@ -103,26 +98,27 @@ public class VolumeSettingsPanel extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultVolumeSettings.Builder vsb_ = model_.acquisitions().getAcquisitionSettingsBuilder().volumeSettingsBuilder();
+        final DefaultVolumeSettings.Builder vsb = model_.acquisitions()
+                .getAcquisitionSettingsBuilder().volumeSettingsBuilder();
 
         cmbNumViews_.registerListener(e -> {
-            vsb_.numViews(Integer.parseInt(cmbNumViews_.getSelected()));
+            vsb.numViews(Integer.parseInt(cmbNumViews_.getSelected()));
         });
 
         cmbFirstView_.registerListener(e -> {
-            vsb_.firstView(Integer.parseInt(cmbFirstView_.getSelected()));
+            vsb.firstView(Integer.parseInt(cmbFirstView_.getSelected()));
         });
 
         spnViewDelay_.registerListener(e -> {
-            vsb_.delayBeforeView(spnViewDelay_.getDouble());
+            vsb.delayBeforeView(spnViewDelay_.getDouble());
         });
 
         spnSlicesPerSide_.registerListener(e -> {
-            vsb_.slicesPerVolume(spnSlicesPerSide_.getInt());
+            vsb.slicesPerVolume(spnSlicesPerSide_.getInt());
         });
 
         spnSliceStepSize_.registerListener(e -> {
-            vsb_.sliceStepSize(spnSliceStepSize_.getDouble());
+            vsb.sliceStepSize(spnSliceStepSize_.getDouble());
         });
     }
 }

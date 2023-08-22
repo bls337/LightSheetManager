@@ -27,7 +27,7 @@ public class PiezoCalibrationPanel extends Panel {
 
     private final int pathNum_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public PiezoCalibrationPanel(final LightSheetManagerModel model, final int pathNum) {
         super("Piezo/Slice Calibration");
@@ -44,7 +44,6 @@ public class PiezoCalibrationPanel extends Panel {
         final JLabel lblSlope = new JLabel("Slope:");
         final JLabel lblOffset = new JLabel("Offset:");
         final JLabel lblStepSize = new JLabel("Step Size:");
-        //final JLabel lblMicrons = new JLabel("μm");
         final JLabel lblMicronsPerDeg = new JLabel("μm/°");
 
         setMigLayout(
@@ -72,6 +71,7 @@ public class PiezoCalibrationPanel extends Panel {
             txtSlope_.setText(String.valueOf(acqSettings.sliceCalibration(2).sliceSlope()));
             txtOffset_.setText(String.valueOf(acqSettings.sliceCalibration(2).sliceOffset()));
         }
+
         Button.setDefaultSize(26, 26);
         btnStepUp_ = new Button(Icons.ARROW_UP);
         btnStepDown_ = new Button(Icons.ARROW_DOWN);

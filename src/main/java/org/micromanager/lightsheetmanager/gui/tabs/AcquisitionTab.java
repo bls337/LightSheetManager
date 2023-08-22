@@ -8,11 +8,11 @@ import org.micromanager.lightsheetmanager.api.data.CameraModes;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.gui.tabs.channels.ChannelTablePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeSettingsPanel;
-import org.micromanager.lightsheetmanager.gui.frames.AdvancedTimingFrame;
 import org.micromanager.lightsheetmanager.gui.frames.XYZGridFrame;
 import org.micromanager.lightsheetmanager.gui.playlist.AcquisitionTableFrame;
 import org.micromanager.lightsheetmanager.gui.components.Button;
@@ -73,13 +73,18 @@ public class AcquisitionTab extends Panel {
     private Panel pnlTimePoints_;
     private Panel pnlMultiplePositions_;
 
+    // layout panel
+    private Panel pnlRight_;
+
     private ChannelTablePanel pnlChannelTable_;
 
     private VolumeSettingsPanel pnlVolumeSettings_;
     private SliceSettingsPanel pnlSliceSettings_;
 
+    private CheckBox cbxUseAdvancedTiming_;
+
     private XYZGridFrame xyzGridFrame_;
-    private AdvancedTimingFrame advTimingFrame_;
+    private AdvancedTimingPanel pnlAdvancedTiming_;
 
     private AcquisitionTableFrame acqTableFrame_;
 
@@ -89,7 +94,6 @@ public class AcquisitionTab extends Panel {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.getStudio();
         acqTableFrame_ = new AcquisitionTableFrame(studio_);
-        advTimingFrame_ = new AdvancedTimingFrame(model_);
         xyzGridFrame_ = new XYZGridFrame(model_);
         createUserInterface();
         createEventHandlers();
@@ -105,17 +109,25 @@ public class AcquisitionTab extends Panel {
                 "[]5[]",
                 "[]5[]"
         );
-        Panel pnlLeft = new Panel();
-        Panel pnlCenter = new Panel();
-        Panel pnlRight = new Panel();
+
+        // layout panels
+        final Panel pnlLeft = new Panel();
+        final Panel pnlCenter = new Panel();
+        pnlRight_ = new Panel();
 
         pnlVolumeSettings_ = new VolumeSettingsPanel(model_);
-        pnlSliceSettings_ = new SliceSettingsPanel(model_, advTimingFrame_);
+
+        // switch between these two
+        pnlSliceSettings_ = new SliceSettingsPanel(model_);
+        pnlAdvancedTiming_ = new AdvancedTimingPanel(model_);
 
         // check boxes for panels
-        cbxUseMultiplePositions_ = new CheckBox("Multiple positions (XY)", acqSettings.isUsingMultiplePositions());
-        cbxUseTimePoints_ = new CheckBox("Time Points", acqSettings.isUsingTimePoints());
-        cbxUseChannels_ = new CheckBox("Channels", acqSettings.isUsingChannels());
+        cbxUseMultiplePositions_ = new CheckBox(
+                "Multiple positions (XY)", acqSettings.isUsingMultiplePositions());
+        cbxUseTimePoints_ = new CheckBox(
+                "Time Points", acqSettings.isUsingTimePoints());
+        cbxUseChannels_ = new CheckBox(
+                "Channels", acqSettings.isUsingChannels());
 
         // panels
         pnlButtons_ = new Panel();
@@ -132,12 +144,13 @@ public class AcquisitionTab extends Panel {
         lblVolumeTimeValue_ = new Label("0.0");
         lblTotalTimeValue_ = new Label("0.0");
 
-        // TODO: is there a reasonable max value for these spinners?
         // time points
         lblNumTimePoints_ = new Label("Number:");
         lblTimePointInterval_ = new Label("Interval [s]:");
-        spnNumTimePoints_ = Spinner.createIntegerSpinner(acqSettings.numTimePoints(), 1, Integer.MAX_VALUE,1);
-        spnTimePointInterval_ = Spinner.createIntegerSpinner(acqSettings.timePointInterval(), 0, Integer.MAX_VALUE, 1);
+        spnNumTimePoints_ = Spinner.createIntegerSpinner(
+                acqSettings.numTimePoints(), 1, Integer.MAX_VALUE,1);
+        spnTimePointInterval_ = Spinner.createIntegerSpinner(
+                acqSettings.timePointInterval(), 0, Integer.MAX_VALUE, 1);
 
         // disable elements based on acqSettings
         setTimePointSpinnersEnabled(acqSettings.isUsingTimePoints());
@@ -145,7 +158,8 @@ public class AcquisitionTab extends Panel {
         // multiple positions
         Spinner.setDefaultSize(7);
         lblPostMoveDelay_ = new Label("Post-move delay [ms]:");
-        spnPostMoveDelay_ = Spinner.createIntegerSpinner(acqSettings.postMoveDelay(), 0, Integer.MAX_VALUE, 100);
+        spnPostMoveDelay_ = Spinner.createIntegerSpinner(
+                acqSettings.postMoveDelay(), 0, Integer.MAX_VALUE, 100);
         btnEditPositionList_ = new Button("Edit Position List", 120, 24);
         btnOpenXYZGrid_ = new Button("XYZ Grid", 80, 24);
 
@@ -182,6 +196,9 @@ public class AcquisitionTab extends Panel {
         cmbAcquisitionModes_ = new ComboBox(AcquisitionModes.toArray(),
                 acqSettings.acquisitionMode().toString(),
                 180, 24);
+
+        cbxUseAdvancedTiming_ = new CheckBox("Use advanced timing settings",
+                12, acqSettings.isUsingAdvancedTiming(), CheckBox.RIGHT);
 
         // durations
         pnlDurations_.add(lblSliceTime_, "");
@@ -220,28 +237,38 @@ public class AcquisitionTab extends Panel {
         pnlCenter.add(new JLabel("Acquisition mode:"), "split 2");
         pnlCenter.add(cmbAcquisitionModes_, "");
 
-        pnlRight.add(pnlVolumeSettings_, "growx, wrap");
-        pnlRight.add(pnlSliceSettings_, "growx, wrap");
+        final GeometryType geometryType = model_.devices()
+                .getDeviceAdapter().getMicroscopeGeometry();
 
+        switch (geometryType) {
+            case DISPIM:
+                pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
+                pnlRight_.add(pnlSliceSettings_, "growx, wrap");
+                pnlRight_.add(cbxUseAdvancedTiming_, "growx");
+                break;
+            case SCAPE:
+                pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
+                pnlRight_.add(pnlAdvancedTiming_, "growx, wrap");
+                break;
+            default:
+                break;
+        }
         // TODO: consider putting durations into the model, since recalculating the slice timing shouldn't necessarily happen here
         // includes calculating the slice timing
         updateDurationLabels();
 
         add(pnlLeft, "");
         add(pnlCenter, "");
-        add(pnlRight, "wrap");
+        add(pnlRight_, "wrap");
         add(pnlButtons_, "span 3");
     }
 
     private void acqFinishedCallback() {
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    btnRunAcquisition_.setState(false);
-                    btnPauseAcquisition_.setEnabled(false);
-                    btnSpeedTest_.setEnabled(true);
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                btnRunAcquisition_.setState(false);
+                btnPauseAcquisition_.setEnabled(false);
+                btnSpeedTest_.setEnabled(true);
             });
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -253,24 +280,22 @@ public class AcquisitionTab extends Panel {
     private void runAcquisition(boolean speedTest) {
         btnPauseAcquisition_.setEnabled(true);
         btnSpeedTest_.setEnabled(false);
-        Future acqFinished = model_.acquisitions().requestRun(speedTest);
+        Future<?> acqFinished = model_.acquisitions().requestRun(speedTest);
         // Launch new thread to update the button when the acquisition is complete
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    acqFinished.get();
-                } catch (Exception e ) {
-
-                }
-                // update the GUI when acquisition complete
-                acqFinishedCallback();
+        new Thread(() -> {
+            try {
+                acqFinished.get();
+            } catch (Exception e ) {
+                e.printStackTrace();
             }
+            // update the GUI when acquisition complete
+            acqFinishedCallback();
         }).start();
     }
 
     private void createEventHandlers() {
-        final DefaultAcquisitionSettingsDISPIM.Builder asb_ = model_.acquisitions().getAcquisitionSettingsBuilder();
+        final DefaultAcquisitionSettingsDISPIM.Builder asb_ =
+                model_.acquisitions().getAcquisitionSettingsBuilder();
 
         // start/stop acquisitions
         btnRunAcquisition_.registerListener(e -> {
@@ -348,6 +373,9 @@ public class AcquisitionTab extends Panel {
             asb_.acquisitionMode(AcquisitionModes.getByIndex(index));
             //System.out.println("getAcquisitionMode: " + model_.acquisitions().getAcquisitionSettings().getAcquisitionMode());
         });
+
+        cbxUseAdvancedTiming_.registerListener(
+                e -> switchTimingSettings(cbxUseAdvancedTiming_.isSelected()));
     }
 
     public SliceSettingsPanel getSliceSettingsPanel() {
@@ -442,6 +470,21 @@ public class AcquisitionTab extends Panel {
             }
         }
         return volumeDuration;
+    }
+
+    private void switchTimingSettings(final boolean state) {
+        pnlRight_.removeAll();
+        if (state) {
+            pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
+            pnlRight_.add(pnlAdvancedTiming_, "growx, wrap");
+            pnlRight_.add(cbxUseAdvancedTiming_, "growx");
+        } else {
+            pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
+            pnlRight_.add(pnlSliceSettings_, "growx, wrap");
+            pnlRight_.add(cbxUseAdvancedTiming_, "growx");
+        }
+        pnlRight_.revalidate();
+        pnlRight_.repaint();
     }
 
     public double computeVolumeDuration(final DefaultAcquisitionSettingsDISPIM acqSettings) {

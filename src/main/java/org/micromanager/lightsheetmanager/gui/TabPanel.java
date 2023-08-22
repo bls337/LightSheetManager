@@ -25,8 +25,6 @@ import java.util.Objects;
  */
 public class TabPanel extends Panel {
 
-    private Studio studio_;
-
     private NavigationTab navigationTab_;
     private AcquisitionTab acquisitionTab_;
     private AutofocusTab autofocusTab_;
@@ -39,16 +37,17 @@ public class TabPanel extends Panel {
 
     private final TabbedPane tabbedPane_;
 
-    private LightSheetManagerModel model_;
     private DeviceManager devices_;
 
-    public TabPanel(final Studio studio, final LightSheetManagerModel model, final DeviceManager devices) {
-        studio_ = Objects.requireNonNull(studio);
-        devices_ = Objects.requireNonNull(devices);
+    private final LightSheetManagerModel model_;
+
+    public TabPanel(final LightSheetManagerModel model,
+                    final int width, final int height) {
         model_ = Objects.requireNonNull(model);
+        devices_ = model_.devices();
 
         setupPathTabs_ = new ArrayList<>(2);
-        tabbedPane_ = new TabbedPane(900, 700);
+        tabbedPane_ = new TabbedPane(width, height);
 
         createUserInterface();
     }
