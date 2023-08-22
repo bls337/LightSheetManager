@@ -2,8 +2,10 @@ package org.micromanager.lightsheetmanager.gui.setup;
 
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import javax.swing.JLabel;
+import java.util.Objects;
 
 // TODO: find a better way to organize vendor specific panels/ui elements
 public class JoystickPanel extends Panel {
@@ -12,8 +14,11 @@ public class JoystickPanel extends Panel {
     private ComboBox cmbLeftWheel_;
     private ComboBox cmbRightWheel_;
 
-    public JoystickPanel() {
+    private LightSheetManagerModel model_;
+
+    public JoystickPanel(final LightSheetManagerModel model) {
         super("Joystick");
+        model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
     }

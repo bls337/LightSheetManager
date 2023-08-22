@@ -13,6 +13,7 @@ import org.micromanager.acqj.main.AcquisitionEvent;
 import org.micromanager.acquisition.SequenceSettings;
 import org.micromanager.acquisition.internal.MMAcquisition;
 import org.micromanager.acquisition.internal.MMAcquistionControlCallbacks;
+import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJAdapter;
 import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJMDADataSink;
 import org.micromanager.acquisition.internal.acqengjcompat.speedtest.SpeedTest;
 import org.micromanager.data.DataProvider;
@@ -514,7 +515,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         //      will "order" the acquisition of 1 image (per each camera)
         //////////////////////////////////////
         // Create acquisition
-       AcqEngJMDADataSink sink = new AcqEngJMDADataSink(studio_.events());
+       AcqEngJMDADataSink sink = new AcqEngJMDADataSink(studio_.events(), new AcqEngJAdapter(studio_));
 
        currentAcquisition_ = new Acquisition(sink);
 

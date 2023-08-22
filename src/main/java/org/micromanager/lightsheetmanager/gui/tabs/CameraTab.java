@@ -6,7 +6,6 @@ import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import java.awt.Font;

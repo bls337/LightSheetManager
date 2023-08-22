@@ -27,8 +27,6 @@ public class DeviceTab extends Panel {
     }
 
     private void createUserInterface() {
-//        navFrame_ = new NavigationFrame(model_);
-//        navFrame_.init();
 
         setMigLayout(
             "",

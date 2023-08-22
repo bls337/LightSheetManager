@@ -42,30 +42,30 @@ public class LightSheetManagerFrame extends JFrame {
         WindowPositioning.setUpBoundsMemory(
                 this, this.getClass(), this.getClass().getSimpleName());
 
-        // create the user interface based on the microscope geometry
+        // create the user interface
         if (isLoaded) {
             GeometryType geometryType = model_.devices()
                     .getDeviceAdapter().getMicroscopeGeometry();
             switch (geometryType) {
                 case DISPIM:
-                    createUserInterfaceDISPIM();
-                    break;
                 case SCAPE:
-                    createUserInterfaceSCAPE();
+                    createUserInterface();
                     break;
                 default:
-                    model_.setErrorText("Microscope geometry type is not supported yet.");
+                    model_.setErrorText("Microscope geometry type "
+                            + geometryType + " is not supported yet.");
                     createErrorUserInterface();
                     break;
             }
         } else {
+            model_.setErrorText("Error creating the data model.");
             createErrorUserInterface();
         }
 
     }
 
     /**
-     * This is the error window that opens when the device adapter is not detected.
+     * This is the window that opens when the plugin encounters an error.
      */
     private void createErrorUserInterface() {
         setTitle(LightSheetManagerPlugin.menuName);
@@ -91,9 +91,9 @@ public class LightSheetManagerFrame extends JFrame {
     }
 
     /**
-     * The user interface for diSPIM.
+     * The user interface for diSPIM or SCAPE.
      */
-    private void createUserInterfaceDISPIM() {
+    private void createUserInterface() {
         setTitle(LightSheetManagerPlugin.menuName);
         setResizable(false);
 
@@ -129,41 +129,6 @@ public class LightSheetManagerFrame extends JFrame {
             System.out.println("main window closed!");
         });
 
-    }
-
-    /**
-     *  The user interface for SCAPE.
-     */
-    private void createUserInterfaceSCAPE() {
-        setTitle(LightSheetManagerPlugin.menuName);
-        setResizable(false);
-
-        final Label lblTitle = new Label(LightSheetManagerPlugin.menuName, Font.BOLD, 20);
-        lblTitle.setFont(new Font(Font.MONOSPACED, Font.BOLD, 20));
-
-        // use MigLayout as the layout manager
-        setLayout(new MigLayout(
-                "insets 10 10 10 10",
-                "[]20[]",
-                "[]10[]"
-        ));
-
-        // TODO: this is where GUI will be put
-
-        pack(); // fit window size to layout
-        setIconImage(Icons.MICROSCOPE.getImage());
-
-        // clean up resources when the frame is closed
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-        // register micro-manager events
-        studio_.events().registerForEvents(this);
-
-        WindowUtils.registerWindowClosingEvent(this, event -> {
-            //tabPanel_.getDeviceTab().getNavigationFrame().stopTimer(); // TODO: put this somewhere else? or always use tabPanel
-            model_.getUserSettings().save();
-            System.out.println("main window closed!");
-        });
     }
 
     public Studio getStudio_() {

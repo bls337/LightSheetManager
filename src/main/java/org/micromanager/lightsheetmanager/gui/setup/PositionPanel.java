@@ -1,10 +1,14 @@
 package org.micromanager.lightsheetmanager.gui.setup;
 
+import ij.plugin.DICOM;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
+import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import javax.swing.JLabel;
+import java.util.Objects;
 
 public class PositionPanel extends Panel {
 
@@ -30,13 +34,19 @@ public class PositionPanel extends Panel {
 
     private Button btnTestAcq_;
 
-    public PositionPanel() {
+    private LightSheetManagerModel model_;
+
+    public PositionPanel(final LightSheetManagerModel model) {
         super("Positions");
+        model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
     }
 
     private void createUserInterface() {
+        final GeometryType geometryType = model_.devices()
+                .getDeviceAdapter().getMicroscopeGeometry();
+
         final JLabel lblImagingCenter = new JLabel("Imaging Center:");
         lblImagingCenterValue_ = new JLabel("0.0 μm");
 
@@ -71,25 +81,49 @@ public class PositionPanel extends Panel {
         lblImagingPositionValue_ = new JLabel("0.0 μm");
         lblIllumPositionValue_ = new JLabel("0.0 μm");
 
-        add(lblImagingCenter, "");
-        add(lblImagingCenterValue_, "");
-        add(btnImagingCenterGo_, "");
-        add(btnImagingCenterSet_, "split 2");
-        add(btnTestAcq_, "wrap");
+        switch (geometryType) {
+            case DISPIM:
+                add(lblImagingCenter, "");
+                add(lblImagingCenterValue_, "");
+                add(btnImagingCenterGo_, "");
+                add(btnImagingCenterSet_, "split 2");
+                add(btnTestAcq_, "wrap");
 
-        add(lblSlicePosition, "");
-        add(lblSlicePositionValue_, "");
-        add(txtSlicePosition_, "");
-        add(btnSliceZero_, "wrap");
-        add(lblImagingPosition, "");
-        add(lblImagingPositionValue_, "");
-        add(txtImagingPosition_, "");
-        add(btnImagingZero_, "wrap");
-        add(lblIllumPosition, "");
-        add(lblIllumPositionValue_, "");
-        add(txtIllumPosition_, "");
-        add(btnIllumGoHome_, "split 2");
-        add(btnIllumSetHome_, "");
+                add(lblSlicePosition, "");
+                add(lblSlicePositionValue_, "");
+                add(txtSlicePosition_, "");
+                add(btnSliceZero_, "wrap");
+
+                add(lblImagingPosition, "");
+                add(lblImagingPositionValue_, "");
+                add(txtImagingPosition_, "");
+                add(btnImagingZero_, "wrap");
+
+                add(lblIllumPosition, "");
+                add(lblIllumPositionValue_, "");
+                add(txtIllumPosition_, "");
+                add(btnIllumGoHome_, "split 2");
+                add(btnIllumSetHome_, "");
+                break;
+            case SCAPE:
+                add(lblImagingCenter, "");
+                add(lblImagingCenterValue_, "");
+                add(btnImagingCenterGo_, "split 2");
+                add(btnImagingCenterSet_, "wrap");
+
+                add(lblSlicePosition, "");
+                add(lblSlicePositionValue_, "");
+                add(btnSliceZero_, "wrap");
+
+                add(lblImagingPosition, "");
+                add(lblImagingPositionValue_, "");
+                add(btnImagingZero_, "wrap");
+
+                add(btnTestAcq_, "wrap");
+                break;
+            default:
+                break;
+        }
     }
 
     private void createEventHandlers() {
