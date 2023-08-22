@@ -66,10 +66,12 @@ public class TimePointsPanel extends Panel {
         });
     }
 
+    @Override
     public void setEnabled(final boolean state) {
         lblNumTimePoints_.setEnabled(state);
         lblTimePointInterval_.setEnabled(state);
         spnNumTimePoints_.setEnabled(state);
         spnTimePointInterval_.setEnabled(state);
     }
+
 }
