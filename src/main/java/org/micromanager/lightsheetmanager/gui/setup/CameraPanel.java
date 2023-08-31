@@ -56,7 +56,8 @@ public class CameraPanel extends Panel {
                 add(btnLiveMode_, "span 2");
                 break;
             case SCAPE:
-                add(btnInvertedPath_, "wrap"); // TODO: change size to match live mode button
+                btnInvertedPath_.setAbsoluteSize(165, 26);
+                add(btnInvertedPath_, "wrap");
                 add(btnLiveMode_, "");
                 break;
             default:

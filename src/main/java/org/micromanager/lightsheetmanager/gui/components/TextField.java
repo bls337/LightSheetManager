@@ -19,6 +19,9 @@ public class TextField extends JTextField {
 
     public TextField(final int size) {
         setColumns(size);
+        if (docListener != null) {
+            getDocument().addDocumentListener(docListener);
+        }
     }
 
     public static void setDefaultSize(final int size) {

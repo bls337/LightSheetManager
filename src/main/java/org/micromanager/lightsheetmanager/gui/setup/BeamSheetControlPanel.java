@@ -39,6 +39,10 @@ public class BeamSheetControlPanel extends Panel {
     private Panel pnlFirst_;  // virtual slit camera trigger mode active
     private Panel pnlSecond_; // all other camera trigger modes
 
+    // SCAPE only
+    private JLabel lblSlopeOffset_;
+    private TextField txtSheetOffset_;
+
     private LightSheetManagerModel model_;
 
     public BeamSheetControlPanel(final LightSheetManagerModel model) {
@@ -111,9 +115,13 @@ public class BeamSheetControlPanel extends Panel {
                 pnlSecond_.add(sldSheetOffset_, "");
                 break;
             case SCAPE:
+                txtSheetOffset_ = new TextField(8);
+                lblSlopeOffset_ = new JLabel("0.0 μm");
                 pnlSecond_.add(lblSheetOffset, "");
+                pnlSecond_.add(lblSlopeOffset_, "");
+                pnlSecond_.add(txtSheetOffset_, "span 2, wrap");
                 pnlSecond_.add(btnCenterOffset_, "");
-                pnlSecond_.add(btnSheetOffsetMinus_, "");
+                pnlSecond_.add(btnSheetOffsetMinus_, "split 2");
                 pnlSecond_.add(btnSheetOffsetPlus_, "");
                 pnlSecond_.add(sldSheetOffset_, "");
                 break;
