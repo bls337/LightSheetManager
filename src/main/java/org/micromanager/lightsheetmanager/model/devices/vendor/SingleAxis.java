@@ -1,8 +1,10 @@
 package org.micromanager.lightsheetmanager.model.devices.vendor;
 
 import org.micromanager.Studio;
+import org.micromanager.lightsheetmanager.model.data.MultiChannelModes;
 import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -194,6 +196,12 @@ public class SingleAxis extends DeviceBase {
 
         public static Pattern fromString(final String symbol) {
             return stringToEnum.getOrDefault(symbol, Pattern.RAMP);
+        }
+
+        public static String[] toArray() {
+            return Arrays.stream(values())
+                    .map(Pattern::toString)
+                    .toArray(String[]::new);
         }
     }
 

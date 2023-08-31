@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.setup;
 
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
@@ -26,11 +27,15 @@ public class SetupPanel extends Panel {
 
     private int pathNum_;
 
+    private SingleAxisPanel singleAxisPanel_;
+
     private LightSheetManagerModel model_;
 
     public SetupPanel(final LightSheetManagerModel model, final int pathNum) {
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;
+
+        singleAxisPanel_ = new SingleAxisPanel(model_);
 
         // layout panels
         leftPanel_ = new Panel();
@@ -44,8 +49,11 @@ public class SetupPanel extends Panel {
         excitationPanel_ = new ExcitationPanel(model_);
         cameraPanel_ = new CameraPanel(model_);
 
-        leftPanel_.add(joystickPanel_, "wrap");
+        leftPanel_.add(joystickPanel_, "growx, wrap");
         leftPanel_.add(excitationPanel_, "growx, wrap");
+        if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+            leftPanel_.add(singleAxisPanel_, "growx, wrap");
+        }
         leftPanel_.add(cameraPanel_, "growx, wrap");
 
         rightPanel_.add(positionPanel_, "");

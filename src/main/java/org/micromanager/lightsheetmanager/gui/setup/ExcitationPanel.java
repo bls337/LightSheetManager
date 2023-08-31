@@ -19,7 +19,7 @@ public class ExcitationPanel extends Panel {
     private CheckBox cbxBeamEpi_;
     private CheckBox cbxSheetEpi_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public ExcitationPanel(final LightSheetManagerModel model) {
         super("Scanner");
