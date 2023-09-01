@@ -109,17 +109,21 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                         studio_.logs().showError(e);
                     }
                 } else {
+                    // TODO: put this here?
+                    if (acqSettings_.acquisitionMode() == AcquisitionModes.NONE) {
+                        studio_.logs().showError("please select a valid acquisition mode!");
+                        return;
+                    }
                     // Every one of these modality-specific functions should block until the
                     // acquisition is complete
-                    GeometryType geometryType =
-                          model_.devices().getDeviceAdapter().getMicroscopeGeometry();
+                    GeometryType geometryType = model_.devices()
+                            .getDeviceAdapter().getMicroscopeGeometry();
                     switch (geometryType) {
                         case DISPIM:
-                        case SCAPE:
                             runAcquisitionDISPIM();
-//                            break;
-//                        case SCAPE:
-//                            runAcquisitionSCAPE();
+                            break;
+                        case SCAPE:
+                            runAcquisitionSCAPE();
                             break;
                         default:
                             studio_.logs().showError(
@@ -166,8 +170,420 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         return currentAcquisition_ != null && !currentAcquisition_.areEventsFinished();
     }
 
-    private boolean runAcquisitionSCAPE() {
-        return false;
+    private void runAcquisitionSCAPE() {
+
+        final boolean isLiveModeOn = studio_.live().isLiveModeOn();
+        if (isLiveModeOn) {
+            studio_.live().setLiveModeOn(false);
+            // close the live mode window if it exists
+            if (studio_.live().getDisplay() != null) {
+                studio_.live().getDisplay().close();
+            }
+        }
+
+        // TODO: check for both TriggerCamera and TriggerLaser
+        final String deviceName = model_.devices().getDevice("TriggerCamera").getDeviceName();
+        final String deviceLibrary = model_.devices().getDeviceLibrary(deviceName);
+        boolean isUsingPLC = deviceLibrary.equals("ASITiger");
+
+        PLogicDISPIM controller = null;
+
+        // Assume demo mode if default camera is DemoCamera
+        boolean demoMode = false;
+        try {
+            demoMode = core_.getDeviceLibrary(core_.getCameraDevice()).equals("DemoCamera");
+        } catch (Exception e) {
+            studio_.logs().logError(e);
+        }
+//        boolean demoMode = acqSettings_.demoMode();
+
+        if (!demoMode) {
+
+            if (isUsingPLC) {
+                controller = new PLogicDISPIM(model_, studio_, model_.devices(), asb_);
+
+                final boolean success = doHardwareCalculationsSCAPE(controller);
+                if (!success) {
+                    return; // early exit => could not set up hardware
+                }
+            } else {
+                doHardwareCalculationsNIDAQ();
+            }
+
+            setAcquisitionSettings(asb_.build());
+
+            String saveDir = acqSettings_.saveDirectory();
+            String saveName = acqSettings_.saveNamePrefix();
+
+            DefaultDatastore result = new DefaultDatastore(studio_);
+            try {
+                if (acqSettings_.saveMode() == DataStorage.SaveMode.NDTIFF) {
+                    DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
+                } else if (acqSettings_.saveMode() == DataStorage.SaveMode.MULTIPAGE_TIFF) {
+                    DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);
+                } else if (acqSettings_.saveMode() == DataStorage.SaveMode.SINGLEPLANE_TIFF_SERIES) {
+                    DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.SINGLEPLANE_TIFF_SERIES);
+                } else {
+                    studio_.logs().showError("Unsupported save mode: " + acqSettings_.saveMode());
+                    return;
+                }
+                result.setStorage(new NDTiffAdapter(result, saveDir, true));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+
+            // Projection mode
+            //TODO: where should this come from in settings?
+            boolean projectionMode = false;
+
+            //////////////////////////////////////
+            // Begin AcqEngJ integration
+            //      The acqSettings object should be static at this point, it will now
+            //      be parsed and used to create acquisition events, each of which
+            //      will "order" the acquisition of 1 image (per each camera)
+            //////////////////////////////////////
+            // Create acquisition
+            AcqEngJMDADataSink sink = new AcqEngJMDADataSink(studio_.events(), new AcqEngJAdapter(studio_));
+
+            currentAcquisition_ = new Acquisition(sink);
+
+            JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
+            addMMSummaryMetadata(summaryMetadata, projectionMode);
+
+            // TODO(Brandon): where should i get this from?
+            SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
+            sequenceSettingsBuilder.shouldDisplayImages(true);
+
+            // TODO: this is now deprecated, what is the replacement?
+            MMAcquisition acq;
+            try {
+                // MMAcquisition
+                acq = new MMAcquisition(studio_,
+                        saveDir, saveName, summaryMetadata,
+                        this, sequenceSettingsBuilder.build());
+            } catch (IOException e) {
+                studio_.logs().showError("IOException when trying to create MMAcquisition!");
+                return;
+            }
+            curStore_ = acq.getDatastore();
+            curPipeline_ = acq.getPipeline();
+            sink.setDatastore(curStore_);
+            sink.setPipeline(curPipeline_);
+
+            studio_.events().registerForEvents(this);
+            // commented because this is prob specific to MM MDAs
+//        studio_.events().post(new DefaultAcquisitionStartedEvent(curStore_, this,
+//              acquisitionSettings));
+
+
+            // TODO if position time ordering ever implemented, this should be reactivated and the
+            //  timelapse hook copied from org.micromanager.acquisition.internal.acqengjcompat.AcqEngJAdapter
+//        if (sequenceSettings_.acqOrderMode() == AcqOrderMode.POS_TIME_CHANNEL_SLICE
+//              || sequenceSettings_.acqOrderMode() == AcqOrderMode.POS_TIME_SLICE_CHANNEL) {
+//            // Pos_time ordered acquisition need their timelapse minimum start time to be
+//            // adjusted for each position.  The only place to do that seems to be a hardware hook.
+//            currentAcquisition_.addHook(timeLapseHook(acquisitionSettings),
+//                  AcquisitionAPI.BEFORE_HARDWARE_HOOK);
+//        }
+
+
+
+
+            if (projectionMode) {
+                // DiSPIM always uses 45 degrees
+                double theta = Math.PI / 4;
+                double zStep = acqSettings_.volumeSettings().sliceStepSize();
+                int numZSlices = acqSettings_.volumeSettings().slicesPerView();
+                int cameraWidth = (int) core_.getImageWidth();
+                int cameraHeight = (int) core_.getImageHeight();
+                double pixelSizeXYUm = core_.getPixelSizeUm();
+
+                int numUniqueProcessorsNeeded = 2; // Always keep enough around for 2 views
+                if (acqSettings_.isUsingChannels()) {
+                    numUniqueProcessorsNeeded *= acqSettings_.channels().length;
+                }
+
+                AcqEngJStackProcessors proc =
+                        new AcqEngJStackProcessors(ObliqueStackProcessor.YX_PROJECTION, theta,
+                                pixelSizeXYUm,
+                                zStep, numZSlices, cameraWidth, cameraHeight, numUniqueProcessorsNeeded);
+                currentAcquisition_.addImageProcessor(proc);
+            }
+
+            long acqButtonStart = System.currentTimeMillis();
+
+
+            ////////////  Acquisition hooks ////////////////////
+            // These functions will be run on different threads during the acquisition process
+            //    Hooks will run on the Acquisition Engine thread--the one that controls all hardware
+
+            // TODO add any code that needs to be executed on the acquisition thread (i.e. the one
+            //  that controls hardware)
+
+            // TODO: autofocus
+            currentAcquisition_.addHook(new AcquisitionHook() {
+                @Override
+                public AcquisitionEvent run(AcquisitionEvent event) {
+                    // TODO: does the Tiger controller need to be cleared and/or checked for errors here?
+
+                    if (event.isAcquisitionFinishedEvent()) {
+                        // Acquisition is finished, pass along event so things shut down properly
+                        return event;
+                    }
+
+                    if (event.getMinimumStartTimeAbsolute() != null) {
+                        nextWakeTime_ = event.getMinimumStartTimeAbsolute();
+                    }
+
+                    // Translate event to timeIndex/channel/etc
+                    AcquisitionEvent firstAcqEvent = event.getSequence().get(0);
+                    int timePoint = firstAcqEvent.getTIndex();
+
+                    ////////////////////////////////////
+                    ///////// Run autofocus ////////////
+                    ///////////////////////////////////
+
+                    // TODO: where should these come from? In diSPIM they appear to come from preferences,
+                    //  not settings...
+                    boolean doAutofocus = acqSettings_.isUsingAutofocus();
+
+                    boolean autofocusAtT0 = false;
+                    // TODO: this is where they come from in diSPIM?
+//                prefs_.getBoolean(org.micromanager.asidispim.Data.MyStrings.PanelNames.AUTOFOCUS.toString(),
+//                      org.micromanager.asidispim.Data.Properties.Keys.PLUGIN_AUTOFOCUS_ACQBEFORESTART, false);
+                    boolean autofocusEveryStagePass = false;
+                    boolean autofocusEachNFrames = false;
+                    boolean autofocusChannel = false;
+
+                    // TODO: this is the diSPIM plugin's autofocus code, which needs to be reimplemented
+                    //   and translated. There are also currently no autofocus related things in the acqSettings_
+//                if (acqSettings_.isUsingAutofocus()) {
+//                    // (Copied from diSPIM): Note that we will not autofocus as expected when using hardware
+//                    // timing.  Seems OK, since hardware timing will result in short
+//                    // acquisition times that do not need autofocus.
+//                    if ( (autofocusAtT0 && timePoint == 0) || ( (timePoint > 0) &&
+//                          (timePoint % autofocusEachNFrames == 0 ) ) ) {
+//                        if (acqSettings.useChannels) {
+//                            multiChannelPanel_.selectChannel(autofocusChannel);
+//                        }
+//                        if (sideActiveA) {
+//                            if (acqSettings.usePathPresets) {
+//                                controller_.setPathPreset(org.micromanager.asidispim.Data.Devices.Sides.A);
+//                                // blocks until all devices done
+//                            }
+//                            org.micromanager.asidispim.Utils.AutofocusUtils.FocusResult score = autofocus_.runFocus(
+//                                  this, org.micromanager.asidispim.Data.Devices.Sides.A, false,
+//                                  sliceTiming_, false);
+//                            updateCalibrationOffset(org.micromanager.asidispim.Data.Devices.Sides.A, score);
+//                        }
+//                        if (sideActiveB) {
+//                            if (acqSettings.usePathPresets) {
+//                                controller_.setPathPreset(org.micromanager.asidispim.Data.Devices.Sides.B);
+//                                // blocks until all devices done
+//                            }
+//                            org.micromanager.asidispim.Utils.AutofocusUtils.FocusResult score = autofocus_.runFocus(
+//                                  this, org.micromanager.asidispim.Data.Devices.Sides.B, false,
+//                                  sliceTiming_, false);
+//                            updateCalibrationOffset(org.micromanager.asidispim.Data.Devices.Sides.B, score);
+//                        }
+//                        // Restore settings of the controller
+//                        controller_.prepareControllerForAquisition(acqSettings, extraChannelOffset_);
+//                        if (acqSettings.useChannels && acqSettings.channelMode != org.micromanager.asidispim.Data.MultichannelModes.Keys.VOLUME) {
+//                            controller_.setupHardwareChannelSwitching(acqSettings, hideErrors);
+//                        }
+//                    }
+//                }
+
+                    return event;
+                }
+
+                @Override
+                public void close() {
+
+                }
+            }, Acquisition.BEFORE_HARDWARE_HOOK);
+
+
+
+            final PLogicDISPIM controllerInstance = controller;
+            // TODO This after camera hook is called after the camera has been readied to acquire a
+            //  sequence. I assume we want to tell the Tiger to start sending TTLs etc here
+            currentAcquisition_.addHook(new AcquisitionHook() {
+                @Override
+                public AcquisitionEvent run(AcquisitionEvent event) {
+                    // TODO: Cameras are now ready to receive triggers, so we can send (software) trigger
+                    //  to the tiger to tell it to start outputting TTLs
+
+                    if (isUsingPLC && controllerInstance != null) { // if not in demo mode
+                        int side = 0;
+                        // TODO: enable 2 sided acquisition
+                        controllerInstance.triggerControllerStartAcquisitionSCAPE(
+                                asb_.acquisitionMode(), side);
+                    }
+                    return event;
+                }
+
+                @Override
+                public void close() {
+
+                }
+            }, Acquisition.AFTER_CAMERA_HOOK);
+
+
+            ///////////// Turn off autoshutter /////////////////
+            final boolean isShutterOpen;
+            try {
+                isShutterOpen = core_.getShutterOpen();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+            // TODO: should the shutter be left open for the full duration of acquisition?
+            //  because that's what this code currently does
+            boolean autoShutter = core_.getAutoShutter();
+            if (autoShutter) {
+                core_.setAutoShutter(false);
+                if (!isShutterOpen) {
+                    try {
+                        core_.setShutterOpen(true);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+
+            currentAcquisition_.start();
+
+            ////////////  Create and submit acquisition events ////////////////////
+            // Create iterators of acquisition events and submit them to the engine for execution
+            // The engine will (try to) automatically iterate over the AcquisitionEvents of each
+            // iterator, but not over multiple iterators. So there should be one iterator submitted for
+            // each expected triggering of the Tiger controller.
+
+            // TODO: execute any start-acquisition runnables
+
+
+            // Loop 1: XY positions
+            PositionList pl = MMStudio.getInstance().positions().getPositionList();
+            if (acqSettings_.isUsingMultiplePositions() && (pl.getNumberOfPositions() == 0)) {
+                throw new RuntimeException("XY positions expected but position list is empty");
+            }
+
+            String[] cameraNames;
+            if (demoMode) {
+                ArrayList<String> cameraDeviceNames = new ArrayList<>();
+                StrVector loadedDevices = core_.getLoadedDevices();
+                for (int i = 0; i < loadedDevices.size(); i++) {
+                    try {
+                        if (core_.getDeviceType(loadedDevices.get(i)).toString().equals("CameraDevice")) {
+                            cameraDeviceNames.add(loadedDevices.get(i));
+                        }
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                };
+                if (cameraDeviceNames.size() < 2) {
+                    throw new RuntimeException("Need two cameras for diSPIM simulation");
+                }
+                cameraNames = cameraDeviceNames.toArray(new String[0]);
+            } else {
+                if (asb_.vsb().numViews() > 1) {
+                    cameraNames = new String[]{
+                            model_.devices().getDevice("Imaging1Camera").getDeviceName(),
+                            model_.devices().getDevice("Imaging2Camera").getDeviceName()
+                    };
+                } else {
+                    cameraNames = new String[]{
+                            model_.devices().getDevice("ImagingCamera").getDeviceName()
+                    };
+                }
+            }
+
+            for (int positionIndex = 0; positionIndex < (acqSettings_.isUsingMultiplePositions() ?
+                    pl.getNumberOfPositions() : 1); positionIndex++) {
+                AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
+                if (acqSettings_.isUsingMultiplePositions()) {
+                    baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
+                }
+                // TODO: what to do if multiple positions not defined: acquire at current stage position?
+                //  If yes, then nothing more to do here.
+
+                if (acqSettings_.isUsingHardwareTimePoints()) {
+                    // create a full iterator of TCZ acquisition events, and Tiger controller
+                    // will handle everything else
+                    if (acqSettings_.isUsingChannels()) {
+                        currentAcquisition_.submitEventIterator(
+                                LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
+                                        baseEvent.copy(), acqSettings_, cameraNames, null));
+                    } else {
+                        currentAcquisition_.submitEventIterator(
+                                LSMAcquisitionEvents.createTimelapseVolumeAcqEvents(
+                                        baseEvent.copy(), acqSettings_, cameraNames, null));
+                    }
+                } else {
+                    // Loop 2: Multiple time points
+                    for (int timeIndex = 0; timeIndex < (acqSettings_.isUsingTimePoints() ?
+                            acqSettings_.numTimePoints() : 1); timeIndex++) {
+                        baseEvent.setTimeIndex(timeIndex);
+                        // Loop 3: Channels; Loop 4: Z slices (non-interleaved)
+                        // Loop 3: Channels; Loop 4: Z slices (interleaved)
+                        if (acqSettings_.isUsingChannels()) {
+                            currentAcquisition_.submitEventIterator(
+                                    LSMAcquisitionEvents.createMultiChannelVolumeAcqEvents(
+                                            baseEvent.copy(), acqSettings_, cameraNames, null,
+                                            acqSettings_.acquisitionMode() ==
+                                                    AcquisitionModes.STAGE_SCAN_INTERLEAVED));
+                        } else {
+                            currentAcquisition_.submitEventIterator(
+                                    LSMAcquisitionEvents.createVolumeAcqEvents(
+                                            baseEvent.copy(), acqSettings_, cameraNames, null));
+                        }
+                    }
+                }
+            }
+
+
+
+            // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
+            // once everything finishes
+            currentAcquisition_.finish();
+
+
+            currentAcquisition_.waitForCompletion();
+
+            // cleanup
+            studio_.logs().logMessage("SCAPE plugin acquisition " +
+                    " took: " + (System.currentTimeMillis() - acqButtonStart) + "ms");
+
+
+            // clean up controller settings after acquisition
+            // want to do this, even with demo cameras, so we can test everything else
+            // TODO: figure out if we really want to return piezos to 0 position (maybe center position,
+            //   maybe not at all since we move when we switch to setup tab, something else??)
+            if (isUsingPLC) {
+                controller.cleanUpControllerAfterAcquisition(acqSettings_, true);
+            }
+
+            // Restore shutter/autoshutter to original state
+            try {
+                core_.setShutterOpen(isShutterOpen);
+                core_.setAutoShutter(autoShutter);
+            } catch (Exception e) {
+                throw new RuntimeException("Couldn't restore shutter to original state");
+            }
+
+            // Check if acquisition ended due to an exception and show error to user if it did
+            try {
+                currentAcquisition_.checkForExceptions();
+            } catch (Exception e){
+                studio_.logs().showError(e);
+            }
+
+            // TODO: execute any end-acquisition runnables
+
+            currentAcquisition_ = null;
+        }
     }
 
     /**
@@ -300,7 +716,117 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 //        }
 
         double extraChannelOffset = 0.0;
-        plc.prepareControllerForAquisition(acqSettings_, extraChannelOffset);
+        plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
+        return true;
+    }
+
+    private boolean doHardwareCalculationsSCAPE(PLogicDISPIM plc) {
+
+        // make sure slice timings are up-to-date
+
+        recalculateSliceTiming(asb_);
+        System.out.println(asb_.timingSettingsBuilder());
+
+
+        // TODO: was only checked in light sheet mode
+//        if (core_.getPixelSizeUm() < 1e-6) {
+//            studio_.logs().showError("Need to set the pixel size in Micro-Manager.");
+//        }
+
+        // setup channels
+        int nrChannelsSoftware = asb_.numChannels();  // how many times we trigger the controller per stack
+        int nrSlicesSoftware = asb_.volumeSettingsBuilder().slicesPerVolume();
+        //acqSettings_.volumeSettings().slicesPerView();
+        // TODO: channels need to modify panels and need extraChannelOffset_
+        boolean changeChannelPerVolumeSoftware = false;
+        boolean changeChannelPerVolumeDoneFirst = false;
+        if (acqSettings_.isUsingChannels()) {
+            if (asb_.numChannels() > 1) {
+                studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
+                return false; // early exit
+            }
+            switch (acqSettings_.channelMode()) {
+                case VOLUME:
+                    changeChannelPerVolumeSoftware = true;
+                    changeChannelPerVolumeDoneFirst = true;
+                    break;
+                case VOLUME_HW:
+                case SLICE_HW:
+                    if (acqSettings_.numChannels() == 1) {
+                        // only 1 channel selected so don't have to really use hardware switching
+                    } else {
+                        // we have at least 2 channels
+                        // intentionally leave extraChannelOffset_ untouched so that it can be specified by user by choosing a preset
+                        //   for the channel in the main Micro-Manager window
+                    }
+                    final boolean success = plc.setupHardwareChannelSwitching(acqSettings_);
+                    if (!success) {
+                        studio_.logs().showError("Couldn't set up slice hardware channel switching.");
+                        return false; // early exit
+                    }
+                    nrChannelsSoftware = 1;
+                    nrSlicesSoftware = asb_.volumeSettingsBuilder().slicesPerVolume() * asb_.numChannels();
+                    break;
+                default:
+                    studio_.logs().showError(
+                            "Unsupported multichannel mode \"" + acqSettings_.channelMode().toString() + "\"");
+                    return false; // early exit
+            }
+        }
+        // TODO: code that doubles nrSlicesSoftware if (twoSided && acqBothCameras) missing
+
+        CameraBase camera = model_.devices().getDevice("ImagingCamera");
+        CameraModes camMode = camera.getTriggerMode();
+        final float cameraReadoutTime = camera.getReadoutTime(camMode);
+        //final double exposureTime = acqSettings_.timingSettings().cameraExposure();
+        final double exposureTime = asb_.timingSettingsBuilder().cameraExposure();
+
+        // test acq was here
+
+        double volumeDuration = computeActualVolumeDuration(acqSettings_);
+        double timepointDuration = computeTimePointDuration();
+        long timepointIntervalMs = Math.round(acqSettings_.timePointInterval()*1000.0f);
+
+        // use hardware timing if < 1 second between time points
+        // experimentally need ~0.5 sec to set up acquisition, this gives a bit of cushion
+        // cannot do this in getCurrentAcquisitionSettings because of mutually recursive
+        // call with computeActualVolumeDuration()
+        if (acqSettings_.isUsingTimePoints()
+                && acqSettings_.numTimePoints() > 1
+                && timepointIntervalMs < (timepointDuration + 750)
+                && !acqSettings_.isUsingStageScanning()) {
+            // acqSettings_.useHardwareTimesPoints(true);
+            asb_.useHardwareTimePoints(true);
+        }
+
+        if (acqSettings_.isUsingMultiplePositions()) {
+            if ((acqSettings_.isUsingHardwareTimePoints()
+                    || acqSettings_.numTimePoints() > 1)
+                    && (timepointIntervalMs < timepointDuration*1.2)) {
+                //acqSettings_.setHardwareTimesPoints(false);
+                asb_.useHardwareTimePoints(false);
+                // TODO: WARNING
+            }
+        }
+
+        // TODO: make sure position updater is turned off!
+
+        // FIXME: what is happening here? getting timing error
+        double sliceDuration = asb_.timingSettingsBuilder().sliceDuration();
+        if (exposureTime + cameraReadoutTime > sliceDuration) {
+            //System.out.println(sliceDuration);
+            // should only possible to mess this up using advanced timing settings
+            // or if there are errors in our own calculations
+            studio_.logs().showError("Exposure time of " + exposureTime +
+                    " is longer than time needed for a line scan with" +
+                    " readout time of " + cameraReadoutTime + "\n" +
+                    "This will result in dropped frames. " +
+                    "Please change input");
+            return false; // early exit
+        }
+
+        double extraChannelOffset = 0.0;
+        plc.prepareControllerForAcquisitionSCAPE(acqSettings_, extraChannelOffset);
         return true;
     }
 
@@ -406,7 +932,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         if (!demoMode) {
 
             if (isUsingPLC) {
-                controller = new PLogicDISPIM(studio_, model_.devices(), asb_);
+                controller = new PLogicDISPIM(model_, studio_, model_.devices(), asb_);
 
                 final boolean success = doHardwareCalculations(controller);
                 if (!success) {

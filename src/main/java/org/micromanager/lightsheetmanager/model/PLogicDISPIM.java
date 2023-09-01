@@ -6,6 +6,7 @@ import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.data.CameraModes;
 import org.micromanager.lightsheetmanager.api.data.DISPIMDevice;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
@@ -32,7 +33,7 @@ public class PLogicDISPIM {
 
     private DeviceManager devices_;
 
-    // ASI Devices
+    // DISPIM
     private ASIScanner scanner1_;
     private ASIScanner scanner2_;
     private ASIPiezo piezo1_;
@@ -42,6 +43,11 @@ public class PLogicDISPIM {
     private ASIPLogic plcCamera_;
     private ASIPLogic plcLaser_;
 
+    // SCAPE
+    private ASIScanner scanner_;
+    private ASIPiezo piezo_;
+
+    // generic variables
     double scanDistance_;      // in microns; cached value from last call to prepareControllerForAcquisition()
     double actualStepSizeUm_;  // cached value from last call to prepareControllerForAcquisition()
     boolean zSpeedZero_;       // cached value from last call to prepareStageScanForAcquisition()
@@ -62,7 +68,10 @@ public class PLogicDISPIM {
 
     private final DefaultAcquisitionSettingsDISPIM.Builder asb_;
 
-    public PLogicDISPIM(final Studio studio, final DeviceManager devices, final DefaultAcquisitionSettingsDISPIM.Builder asb) {
+    private final LightSheetManagerModel model_;
+
+    public PLogicDISPIM(final LightSheetManagerModel model, final Studio studio, final DeviceManager devices, final DefaultAcquisitionSettingsDISPIM.Builder asb) {
+        model_ = Objects.requireNonNull(model);
         studio_ = Objects.requireNonNull(studio);
         devices_ = Objects.requireNonNull(devices);
         core_ = studio_.core();
@@ -75,15 +84,32 @@ public class PLogicDISPIM {
         lastDistanceStr_ = "";
         lastPosStr_ = "";
 
+        final GeometryType geometryType = model_.devices()
+                .getDeviceAdapter().getMicroscopeGeometry();
+
         // populate devices
-        scanner1_ = devices_.getDevice(DISPIMDevice.getIllumBeam(1));
-        scanner2_ = devices_.getDevice(DISPIMDevice.getIllumBeam(2));
-        piezo1_ = devices_.getDevice(DISPIMDevice.getImagingFocus(1));
-        piezo2_ = devices_.getDevice(DISPIMDevice.getImagingFocus(2));
-        plcCamera_ = devices_.getDevice(DISPIMDevice.TRIGGER_CAMERA);
-        plcLaser_ = devices_.getDevice(DISPIMDevice.TRIGGER_LASER);
-        xyStage_ = devices_.getDevice(DISPIMDevice.SAMPLE_XY);
-        zStage_ = devices_.getDevice(DISPIMDevice.SAMPLE_Z);
+        switch (geometryType) {
+            case DISPIM:
+                scanner1_ = devices_.getDevice(DISPIMDevice.getIllumBeam(1));
+                scanner2_ = devices_.getDevice(DISPIMDevice.getIllumBeam(2));
+                piezo1_ = devices_.getDevice(DISPIMDevice.getImagingFocus(1));
+                piezo2_ = devices_.getDevice(DISPIMDevice.getImagingFocus(2));
+                plcCamera_ = devices_.getDevice(DISPIMDevice.TRIGGER_CAMERA);
+                plcLaser_ = devices_.getDevice(DISPIMDevice.TRIGGER_LASER);
+                xyStage_ = devices_.getDevice(DISPIMDevice.SAMPLE_XY);
+                zStage_ = devices_.getDevice(DISPIMDevice.SAMPLE_Z);
+                break;
+            case SCAPE:
+                scanner_ = devices_.getDevice("IllumSlice");
+                piezo_ = devices_.getDevice("ImagingFocus");
+                plcCamera_ = devices_.getDevice("TriggerCamera");
+                plcLaser_ = devices_.getDevice("TriggerLaser");
+                xyStage_ = devices_.getDevice("SampleXY");
+                zStage_ = devices_.getDevice("SampleZ");
+                break;
+            default:
+                break;
+        }
     }
 
     // TODO: numViews > 2
@@ -93,7 +119,7 @@ public class PLogicDISPIM {
      * @param channelOffset
      * @return
      */
-    public boolean prepareControllerForAquisitionOffsetOnly(
+    public boolean prepareControllerForAcquisitionOffsetOnly(
             final DefaultAcquisitionSettingsDISPIM settings,
             final double channelOffset) {
 
@@ -125,7 +151,7 @@ public class PLogicDISPIM {
      * @param channelOffset
      * @return false if there was some error that should abort acquisition
      */
-    public boolean prepareControllerForAquisition(
+    public boolean prepareControllerForAcquisition(
             final DefaultAcquisitionSettingsDISPIM settings,
             final double channelOffset) {
         // turn off beam and scan on both sides (they are turned off by SPIM state machine anyway)
@@ -254,6 +280,59 @@ public class PLogicDISPIM {
         } else {
             scanDistance_ = 0;
         }
+
+        // sets PLogic "acquisition running" flag
+        plcCamera_.setPreset(3);
+        plcLaser_.setPreset(3);
+
+        studio_.logs().logMessage("Finished preparing controller for acquisition with offset " + channelOffset +
+                " with mode " + settings.acquisitionMode() + " and settings:\n" + settings);
+        return true;
+    }
+
+    public boolean prepareControllerForAcquisitionSCAPE(
+            final DefaultAcquisitionSettingsDISPIM settings,
+            final double channelOffset) {
+        // turn off beam and scan on both sides (they are turned off by SPIM state machine anyway)
+        // also ensures that properties match reality at end of acquisition
+        // SPIM state machine restores position of beam at end of SPIM state machine, now it
+        // will be restored to blanking position
+        scanner_.setBeamOn(false);
+        scanner_.sa().setModeX(SingleAxis.Mode.DISABLED);
+
+        final int numViews = settings.volumeSettings().numViews();
+        final int firstView = settings.volumeSettings().firstView();
+
+        // set up controller with appropriate SPIM parameters for each active side
+        // some of these things only need to be done once if the same micro-mirror
+        //   card is used (as is typical) but keeping code universal to handle
+        //   case where MM devices reside on different controller cards
+        // Note: firstView starts counting from 1...n views
+//        if (numViews > 1 || firstView == 1) {
+//            final boolean success = prepareControllerForAcquisitionSide(settings, 1, channelOffset, false);
+//            if (!success) {
+//                return false;
+//            }
+//        }
+//        if (numViews > 1 || firstView != 1) {
+//            final boolean success = prepareControllerForAcquisitionSide(settings, 2, channelOffset, false);
+//            if (!success) {
+//                return false;
+//            }
+//        }
+
+        // make sure set to use TTL signal from backplane in case PLOGIC_LASER is set to PLogicMode different from diSPIM shutter
+        plcCamera_.setPreset(12);
+        plcLaser_.setPreset(12);
+
+        // make sure shutter is set to the PLOGIC_LASER device
+        try {
+            core_.setShutterDevice(plcLaser_.getDeviceName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        scanDistance_ = 0;
 
         // sets PLogic "acquisition running" flag
         plcCamera_.setPreset(3);
@@ -836,6 +915,31 @@ public class PLogicDISPIM {
                 // in actuality only matters which device we trigger if there are
                 // two micro-mirror cards, which hasn't ever been done in practice yet
                 scanner.setSPIMState(ASIScanner.SPIMState.RUNNING);
+                break;
+            default:
+                studio_.logs().showError("Unknown acquisition mode");
+                return false;
+        }
+        return true;
+    }
+
+    public boolean triggerControllerStartAcquisitionSCAPE(final AcquisitionModes acqMode, int side) {
+        switch (acqMode) {
+            case STAGE_SCAN:
+            case STAGE_SCAN_INTERLEAVED:
+            case STAGE_SCAN_UNIDIRECTIONAL:
+                // for stage scan we send trigger to stage card, which sends
+                // hardware trigger to the micro-mirror card
+                scanner_.setSPIMState(ASIScanner.SPIMState.ARMED);
+                xyStage_.setScanState(ASIXYStage.ScanState.RUNNING);
+                break;
+            case PIEZO_SLICE_SCAN:
+            case SLICE_SCAN_ONLY:
+            case PIEZO_SCAN_ONLY:
+            case NO_SCAN:
+                // in actuality only matters which device we trigger if there are
+                // two micro-mirror cards, which hasn't ever been done in practice yet
+                scanner_.setSPIMState(ASIScanner.SPIMState.RUNNING);
                 break;
             default:
                 studio_.logs().showError("Unknown acquisition mode");
