@@ -109,24 +109,45 @@ public class NavigationPanel extends Panel {
 
             //System.out.println(property);
             if (propertyName.startsWith(illum)) {
-                final int pathNum = Character.getNumericValue(propertyName.charAt(illum.length()));
-                // galvo devices
-                ControlPanel.Axis axis = ControlPanel.Axis.NONE;
-                if (propertyName.endsWith("Beam")) {
-                    axis = ControlPanel.Axis.X;
-                } else if (propertyName.endsWith("Slice")) {
-                    axis = ControlPanel.Axis.Y;
+                // check if String contains digit (TODO: or switch based on microscope geometry?)
+                boolean containsDigit = containsDigit(propertyName);
+                if (containsDigit) {
+                    // DISPIM
+                    System.out.println("propertyName: " + propertyName);
+                    final int pathNum = Character.getNumericValue(propertyName.charAt(illum.length()));
+                    System.out.println("pathNum: " + pathNum);
+                    // galvo devices
+                    ControlPanel.Axis axis = ControlPanel.Axis.NONE;
+                    if (propertyName.endsWith("Beam")) {
+                        axis = ControlPanel.Axis.X;
+                    } else if (propertyName.endsWith("Slice")) {
+                        axis = ControlPanel.Axis.Y;
+                    }
+                    ControlPanel controlPanel = new ControlPanel(
+                            studio_, propertyName, deviceName, deviceType, axis);
+                    illumProperties.get(pathNum - 1).add(controlPanel);
+                    System.out.println(propertyName + " " + pathNum + " added to illum properties.");
+                } else {
+                    // does not contain digit: SCAPE
+                    final int pathNum = 1;
+                    ControlPanel.Axis axis = ControlPanel.Axis.NONE;
+                    ControlPanel controlPanel = new ControlPanel(
+                            studio_, propertyName, deviceName, deviceType, axis);
+                    illumProperties.get(pathNum - 1).add(controlPanel);
+                    System.out.println(propertyName + " " + pathNum + " added to illum properties.");
+                }
+            } else if (propertyName.startsWith(imaging)) {
+                boolean containsDigit = containsDigit(propertyName);
+                final int pathNum;
+                if (containsDigit) {
+                    pathNum = Character.getNumericValue(propertyName.charAt(imaging.length()));
+                } else {
+                    pathNum = 1;
                 }
                 ControlPanel controlPanel = new ControlPanel(
-                        studio_, propertyName, deviceName, deviceType, axis);
-                illumProperties.get(pathNum-1).add(controlPanel);
-                System.out.println(propertyName + " " + pathNum + " added to illum properties.");
-            } else if (propertyName.startsWith(imaging)) {
-                final int pathNum = Character.getNumericValue(propertyName.charAt(imaging.length()));
-                ControlPanel controlPanel = new ControlPanel(
                         studio_, propertyName, deviceName, deviceType, ControlPanel.Axis.NONE);
+                imagingProperties.get(pathNum - 1).add(controlPanel);
                 System.out.println(propertyName + " " + pathNum + " added to imaging properties.");
-                imagingProperties.get(pathNum-1).add(controlPanel);
             } else {
                 // propertyName doesn't start with "Illum" or "Imaging"
                 if (deviceType == DeviceType.XYStageDevice) {
@@ -170,7 +191,7 @@ public class NavigationPanel extends Panel {
 
         int i = 1;
         for (ArrayList<ControlPanel> list : imagingProperties) {
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 Panel imagingPanel = new Panel("Imaging Path " + i, TitledBorder.LEFT);
                 for (ControlPanel controlPanel : list) {
                     imagingPanel.add(controlPanel, "wrap");
@@ -183,7 +204,7 @@ public class NavigationPanel extends Panel {
 
         int ii = 1;
         for (ArrayList<ControlPanel> list : illumProperties) {
-            if (list.size() > 0) {
+            if (!list.isEmpty()) {
                 Panel illumPanel = new Panel("Illumination Path " + ii, TitledBorder.LEFT);
                 for (ControlPanel controlPanel : list) {
                     illumPanel.add(controlPanel, "wrap");
@@ -224,6 +245,22 @@ public class NavigationPanel extends Panel {
             isPollingPositions = !isPollingPositions;
             System.out.println("isPollingPositions: " + isPollingPositions);
         });
+    }
+
+    /**
+     * Returns true if the string contains a digit.
+     *
+     * @param str the string to search
+     * @return true if the string contains a digit.
+     */
+    private boolean containsDigit(final String str) {
+        boolean containsDigit = false;
+        for (char c : str.toCharArray()) {
+            if (Character.isDigit(c)) {
+                containsDigit = true;
+            }
+        }
+        return containsDigit;
     }
 
     // TODO: what are axis devices? stages? piezos?
