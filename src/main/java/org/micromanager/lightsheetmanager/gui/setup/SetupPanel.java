@@ -35,8 +35,6 @@ public class SetupPanel extends Panel {
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;
 
-        singleAxisPanel_ = new SingleAxisPanel(model_);
-
         // layout panels
         leftPanel_ = new Panel();
         rightPanel_ = new Panel();
@@ -52,6 +50,7 @@ public class SetupPanel extends Panel {
         leftPanel_.add(joystickPanel_, "growx, wrap");
         leftPanel_.add(excitationPanel_, "growx, wrap");
         if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+            singleAxisPanel_ = new SingleAxisPanel(model_);
             leftPanel_.add(singleAxisPanel_, "growx, wrap");
         }
         leftPanel_.add(cameraPanel_, "growx, wrap");
