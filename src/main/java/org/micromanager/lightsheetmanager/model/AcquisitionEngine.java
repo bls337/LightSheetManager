@@ -526,10 +526,17 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
         sequenceSettingsBuilder.shouldDisplayImages(true);
 
-        // MMAcquisition
-        MMAcquisition acq = new MMAcquisition(studio_,
-              saveDir, saveName, summaryMetadata,
-              this, sequenceSettingsBuilder.build());
+        // TODO: this is now deprecated, what is the replacement?
+        MMAcquisition acq;
+        try {
+            // MMAcquisition
+            acq = new MMAcquisition(studio_,
+                    saveDir, saveName, summaryMetadata,
+                    this, sequenceSettingsBuilder.build());
+        } catch (IOException e) {
+            studio_.logs().showError("IOException when trying to create MMAcquisition!");
+            return;
+        }
         curStore_ = acq.getDatastore();
         curPipeline_ = acq.getPipeline();
         sink.setDatastore(curStore_);
