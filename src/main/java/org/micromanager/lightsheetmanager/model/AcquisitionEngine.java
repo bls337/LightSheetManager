@@ -115,10 +115,11 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                           model_.devices().getDeviceAdapter().getMicroscopeGeometry();
                     switch (geometryType) {
                         case DISPIM:
-                            runAcquisitionDISPIM();
-                            break;
                         case SCAPE:
-                            runAcquisitionSCAPE();
+                            runAcquisitionDISPIM();
+//                            break;
+//                        case SCAPE:
+//                            runAcquisitionSCAPE();
                             break;
                         default:
                             studio_.logs().showError(

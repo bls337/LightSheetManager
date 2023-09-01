@@ -20,7 +20,7 @@ public class CameraPanel extends Panel {
     private Button btnInvertedPath_;
     private Button btnLiveMode_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
     public CameraPanel(final LightSheetManagerModel model) {
         super("Cameras");
         model_ = Objects.requireNonNull(model);
@@ -66,25 +66,74 @@ public class CameraPanel extends Panel {
     }
 
     private void createEventHandlers() {
-        btnImagingPath_.registerListener(e -> {
+        final GeometryType geometryType = model_.devices()
+                .getDeviceAdapter().getMicroscopeGeometry();
 
-        });
+        switch (geometryType) {
+            case DISPIM:
+                btnImagingPath_.registerListener(e -> {
 
-        btnMultiPath_.registerListener(e -> {
+                });
 
-        });
+                btnMultiPath_.registerListener(e -> {
 
-        btnEpiPath_.registerListener(e -> {
+                });
 
-        });
+                btnEpiPath_.registerListener(e -> {
 
-        btnInvertedPath_.registerListener(e -> {
+                });
 
-        });
+                btnInvertedPath_.registerListener(e -> {
 
-        btnLiveMode_.registerListener(e -> {
+                });
 
-        });
+                btnLiveMode_.registerListener(e -> {
+
+                });
+                break;
+            case SCAPE:
+                btnInvertedPath_.registerListener(e -> {
+                    // TODO: make this work, needs Device Adapter pull request and name for camera...
+                    closeLiveModeWindow();
+                    final String cameraName = model_.devices()
+                            .getDevice("InvertedCamera").getDeviceName();
+                    try {
+                        model_.studio().core().setCameraDevice(cameraName);
+                    } catch (Exception ex) {
+                        model_.studio().logs().showError("could not set camera to " + cameraName);
+                    }
+                    model_.studio().live().setLiveModeOn(true);
+                });
+
+                btnLiveMode_.registerListener(e -> {
+                    closeLiveModeWindow();
+                    final String cameraName = model_.devices()
+                            .getDevice("ImagingCamera").getDeviceName();
+                    try {
+                        model_.studio().core().setCameraDevice(cameraName);
+                    } catch (Exception ex) {
+                        model_.studio().logs().showError("could not set camera to " + cameraName);
+                    }
+                    model_.studio().live().setLiveModeOn(true);
+                });
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Closes the Live Mode window if it exists.
+     */
+    private void closeLiveModeWindow() {
+        final boolean isLiveModeOn = model_.studio().live().isLiveModeOn();
+        if (isLiveModeOn) {
+            model_.studio().live().setLiveModeOn(false);
+            // close the live mode window if it exists
+            if (model_.studio().live().getDisplay() != null) {
+                model_.studio().live().getDisplay().close();
+            }
+        }
     }
 
 }
