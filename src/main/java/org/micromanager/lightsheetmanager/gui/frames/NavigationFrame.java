@@ -19,10 +19,10 @@ public class NavigationFrame extends JFrame {
     }
 
     public void init() {
-        navigationPanel_.init();
+        navigationPanel_.createUserInterface();
     }
 
     public void stopTimer() {
-        navigationPanel_.stopTimer();
+        navigationPanel_.stopPolling();
     }
 }

@@ -10,21 +10,16 @@ public class NavigationTab extends Panel  {
 
     private NavigationPanel navigationPanel_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public NavigationTab(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
         navigationPanel_ = new NavigationPanel(model_);
         add(navigationPanel_, "");
-        navigationPanel_.init();
     }
 
-    public void init() {
-        navigationPanel_.init();
-    }
-
-    public void stopTimer() {
-        navigationPanel_.stopTimer();
+    public void stopPolling() {
+        navigationPanel_.stopPolling();
     }
 
 }

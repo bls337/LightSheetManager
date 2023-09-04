@@ -1,7 +1,8 @@
 package org.micromanager.lightsheetmanager.gui.navigation;
 
-import javax.swing.Timer;
+import javax.swing.SwingWorker;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 // TODO: use a SwingWorker? will it interfere with +/- buttons?
 
@@ -10,35 +11,44 @@ import java.util.Objects;
  */
 public class PositionUpdater {
 
-    private static final int DEFAULT_TIMER_DELAY_MS = 1000;
+    private int pollingDelayMs_;
 
-    private Timer timer_;
+    private SwingWorker<Void, Void> worker_;
 
     private NavigationPanel navPanel_;
 
-    public PositionUpdater(final NavigationPanel navPanel, final boolean isPollingPositions) {
+    private AtomicBoolean isPolling_;
+    public PositionUpdater(final NavigationPanel navPanel) {
         navPanel_ = Objects.requireNonNull(navPanel);
-        timer_ = new Timer(DEFAULT_TIMER_DELAY_MS, e -> navPanel_.update());
-        if (!isPollingPositions) {
-            timer_.stop();
-        }
-        //timer_.start();
-        //System.out.println("isRunning: " + timer_.isRunning());
+        isPolling_ = new AtomicBoolean(true);
+        startPolling();
     }
 
-    public void setTimerDelay(final int ms) {
-        timer_.setDelay(ms);
+    private void createPollingTask() {
+        isPolling_.set(true);
+        worker_ = new SwingWorker<Void, Void>() {
+            @Override
+            protected Void doInBackground() {
+
+                while (isPolling_.get()) {
+                    navPanel_.updatePositions();
+                    if (!isPolling_.get()) {
+                        System.out.println("break!");
+                        break;
+                    }
+                }
+
+                return null;
+            }
+        };
     }
 
-    public int getTimerDelay() {
-        return timer_.getDelay();
+    public void startPolling() {
+        createPollingTask();
+        worker_.execute();
     }
 
-    public void stopTimer() {
-        timer_.stop();
-    }
-
-    public void startTimer() {
-        timer_.start();
+    public void stopPolling() {
+        isPolling_.set(false);
     }
 }
