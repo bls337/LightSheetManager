@@ -249,23 +249,15 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
             currentAcquisition_ = new Acquisition(sink);
 
             JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
-            addMMSummaryMetadata(summaryMetadata, projectionMode);
+            DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata, projectionMode);
 
             // TODO(Brandon): where should i get this from?
             SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
             sequenceSettingsBuilder.shouldDisplayImages(true);
 
-            // TODO: this is now deprecated, what is the replacement?
-            MMAcquisition acq;
-            try {
-                // MMAcquisition
-                acq = new MMAcquisition(studio_,
-                        saveDir, saveName, summaryMetadata,
+            MMAcquisition acq = new MMAcquisition(studio_, dsmd,
                         this, sequenceSettingsBuilder.build());
-            } catch (IOException e) {
-                studio_.logs().showError("IOException when trying to create MMAcquisition!");
-                return;
-            }
+
             curStore_ = acq.getDatastore();
             curPipeline_ = acq.getPipeline();
             sink.setDatastore(curStore_);
@@ -842,7 +834,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
      * This function adds in its fields in order to achieve compatibility.
      */
     // TODO remove doProjections when it clear where it should come from in settings
-    private void addMMSummaryMetadata(JSONObject summaryMetadata, boolean doProjections) {
+    private DefaultSummaryMetadata addMMSummaryMetadata(JSONObject summaryMetadata, boolean doProjections) {
         try {
             // These are the ones from the clojure engine that may yet need to be translated
             //        "Channels" -> {Long@25854} 2
@@ -896,6 +888,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 
             summaryMetadata.put(PropertyKey.MICRO_MANAGER_VERSION.key(),
                   dsmd.getMicroManagerVersion());
+            return dsmd;
         } catch (JSONException e) {
             studio_.logs().logError(e);
             throw new RuntimeException(e);
@@ -1047,23 +1040,15 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
        currentAcquisition_ = new Acquisition(sink);
 
         JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
-        addMMSummaryMetadata(summaryMetadata, projectionMode);
+        DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata, projectionMode);
 
         // TODO(Brandon): where should i get this from?
         SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
         sequenceSettingsBuilder.shouldDisplayImages(true);
 
-        // TODO: this is now deprecated, what is the replacement?
-        MMAcquisition acq;
-        try {
-            // MMAcquisition
-            acq = new MMAcquisition(studio_,
-                    saveDir, saveName, summaryMetadata,
-                    this, sequenceSettingsBuilder.build());
-        } catch (IOException e) {
-            studio_.logs().showError("IOException when trying to create MMAcquisition!");
-            return;
-        }
+        MMAcquisition acq = new MMAcquisition(studio_, dsmd,
+                this, sequenceSettingsBuilder.build());
+
         curStore_ = acq.getDatastore();
         curPipeline_ = acq.getPipeline();
         sink.setDatastore(curStore_);
