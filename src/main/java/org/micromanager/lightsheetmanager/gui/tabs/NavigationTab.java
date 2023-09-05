@@ -8,7 +8,7 @@ import java.util.Objects;
 
 public class NavigationTab extends Panel  {
 
-    private NavigationPanel navigationPanel_;
+    private final NavigationPanel navigationPanel_;
 
     private final LightSheetManagerModel model_;
 
@@ -18,8 +18,8 @@ public class NavigationTab extends Panel  {
         add(navigationPanel_, "");
     }
 
-    public void stopPolling() {
-        navigationPanel_.stopPolling();
+    public NavigationPanel getNavigationPanel() {
+        return navigationPanel_;
     }
 
 }
