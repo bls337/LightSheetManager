@@ -226,10 +226,13 @@ public class NavigationPanel extends Panel {
         btnRefreshPanel_.registerListener(e -> {
             System.out.println("refresh pressed");
             removeAll();
-            revalidate();
-            repaint();
             createUserInterface();
             createEventHandlers();
+            if (cbxPollPositions_.isSelected()) {
+                positionUpdater_.startPolling();
+            }
+            revalidate();
+            repaint();
         });
 
         btnHaltDevices_.registerListener(e -> haltAllDevices());
@@ -240,7 +243,7 @@ public class NavigationPanel extends Panel {
             } else {
                 positionUpdater_.stopPolling();
             }
-            System.out.println("isSelected: " + cbxPollPositions_.isSelected());
+            System.out.println("poll positions isSelected: " + cbxPollPositions_.isSelected());
         });
 
     }
@@ -265,12 +268,15 @@ public class NavigationPanel extends Panel {
      * Used by the PositionUpdater to update the displayed positions.
      */
     public void updatePositions() {
-        System.out.println("isEDT: " + SwingUtilities.isEventDispatchThread());
-
+        //System.out.println("isEDT: " + SwingUtilities.isEventDispatchThread());
         //System.out.println("updating!");
         for (ControlPanel panel : controlPanels_) {
             panel.updatePosition();
         }
+    }
+
+    public void startPolling() {
+        positionUpdater_.startPolling();
     }
 
     public void stopPolling() {

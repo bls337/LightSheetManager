@@ -8,7 +8,9 @@ import mmcorej.DeviceType;
 import org.micromanager.Studio;
 
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.geom.Point2D;
 import java.util.Objects;
 
@@ -443,13 +445,15 @@ public class ControlPanel extends Panel {
     }
 
     /////////////
-
+    // FIXME: support all types of devices!
     // TODO: deal with "-0.0000", and check updateMethod_ for null??
     public void updatePosition() {
-        //System.out.println("updateMethod_: " + updateMethod_);
         //lblPosition_.setText(String.format("%.3f ", getXPosition()) + units_);
-        lblPosition_.setText(String.format("%.3f ", updateMethod_.update()) + units_);
-        //System.out.println(String.format("%.3f ", updateMethod.update()) + units_);
+        final String value = String.format("%.3f ", updateMethod_.update());
+        EventQueue.invokeLater(() -> {
+            //System.out.println("isEDT = " + SwingUtilities.isEventDispatchThread());
+            lblPosition_.setText(value + units_);
+        });
     }
 
     private void reportError() {
