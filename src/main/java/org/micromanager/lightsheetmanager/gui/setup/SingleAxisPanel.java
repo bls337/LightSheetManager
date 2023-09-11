@@ -23,12 +23,10 @@ public class SingleAxisPanel extends Panel {
     private Spinner spnAmplitude_;
     private Spinner spnPeriod_;
 
-    private GeometryType geometryType_;
-
     private final LightSheetManagerModel model_;
 
     public SingleAxisPanel(final LightSheetManagerModel model) {
-        super("SingleAxisY");
+        super("Single Axis Y");
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
@@ -36,21 +34,20 @@ public class SingleAxisPanel extends Panel {
 
     private void createUserInterface() {
 
-            // TODO: put these in acqSettings for SCAPE!
-//            final ASIScanner galvo = model_.devices()
-//                    .getDevice("IllumSlice");
+        final ASIScanner scanner = model_.devices()
+                .getDevice("IllumSlice");
 
         final JLabel lblPattern = new JLabel("Pattern:");
         final JLabel lblAmplitude = new JLabel("Amplitude");
         final JLabel lblPeriod = new JLabel("Period");
 
-        // galvo.sa().getPatternY().toString()
+        // scanner.sa().getPatternY().toString()
         final String[] patterns = SingleAxis.Pattern.toArray();
         cbxPattern_ = new ComboBox(patterns,
                 patterns[0], 100, 24);
 
-        spnAmplitude_ = Spinner.createDoubleSpinner(0.0, 1.0, 100.0, 1.0);
-        spnPeriod_ = Spinner.createIntegerSpinner(0, 1, 100, 1);
+        spnAmplitude_ = Spinner.createDoubleSpinner(0.0, 0.0, 100.0, 1.0);
+        spnPeriod_ = Spinner.createIntegerSpinner(0, 0, 100, 1);
 
         add(lblPattern, "");
         add(cbxPattern_, "wrap");

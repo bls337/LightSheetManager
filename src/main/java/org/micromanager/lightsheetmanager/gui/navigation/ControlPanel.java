@@ -8,7 +8,6 @@ import mmcorej.DeviceType;
 import org.micromanager.Studio;
 
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.geom.Point2D;
@@ -160,7 +159,7 @@ public class ControlPanel extends Panel {
             btnMoveToZero_.registerListener(e -> setPosition(0.0));
 
             //if (isStageDevice()) {
-            btnSetZero_.registerListener(e -> setOriginX());
+            btnSetZero_.registerListener(e -> setOrigin());
             //}
         } else if (deviceType_ == DeviceType.GalvoDevice) {
             switch (deviceAxis_) {
@@ -283,7 +282,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setRelativePosition(deviceName_, d);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            studio_.logs().showError("failed to set relative position!");
         }
     }
 
@@ -291,7 +290,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setPosition(deviceName_, d);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            studio_.logs().showError("failed to set position!");
         }
     }
 
@@ -330,17 +329,19 @@ public class ControlPanel extends Panel {
 
     private void setOriginY() {
         try {
+            System.out.println("deviceName_: " + deviceName_);
             core_.setOriginY(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            studio_.logs().showError("failed to set y origin!");
         }
     }
 
     private void setOriginX() {
         try {
+            System.out.println("deviceName_: " + deviceName_);
             core_.setOriginX(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            studio_.logs().showError("failed to set x origin!");
         }
     }
 
@@ -348,7 +349,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setOrigin();
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            studio_.logs().showError("failed to set origin!");
         }
     }
 
@@ -454,10 +455,6 @@ public class ControlPanel extends Panel {
             //System.out.println("isEDT = " + SwingUtilities.isEventDispatchThread());
             lblPosition_.setText(value + units_);
         });
-    }
-
-    private void reportError() {
-        studio_.logs().logError("failed!");
     }
 
 }
