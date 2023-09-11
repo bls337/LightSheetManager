@@ -335,6 +335,12 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             return this;
         }
 
+        // TODO: finish toString with rest of properties
+        @Override
+        public String toString() {
+            return String.format("[tsb_=%s]", tsb_);
+        }
+
     }
 
     private final DefaultTimingSettings timingSettings_;
@@ -668,6 +674,11 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         return channels_;
     }
 
+    // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
+    @Override
+    public String toString() {
+        return String.format("[timingSettings_=%s]", timingSettings_);
+    }
 //    public String toJson() {
 //        return new Gson().toJson(this);
 //    }

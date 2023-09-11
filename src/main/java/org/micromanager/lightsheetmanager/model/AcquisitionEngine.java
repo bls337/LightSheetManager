@@ -171,6 +171,8 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     }
 
     private void runAcquisitionSCAPE() {
+        //System.out.println(asb_);
+        //System.out.println(asb_.build());
 
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
@@ -587,7 +589,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         // make sure slice timings are up-to-date
 
         recalculateSliceTiming(asb_);
-        System.out.println(asb_.timingSettingsBuilder());
+        System.out.println("after recalculateSliceTiming: " + asb_.timingSettingsBuilder());
 
 
         // TODO: was only checked in light sheet mode
@@ -717,7 +719,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         // make sure slice timings are up-to-date
 
         recalculateSliceTiming(asb_);
-        System.out.println(asb_.timingSettingsBuilder());
+        System.out.println("after recalculateSliceTiming: " + asb_.timingSettingsBuilder());
 
 
         // TODO: was only checked in light sheet mode

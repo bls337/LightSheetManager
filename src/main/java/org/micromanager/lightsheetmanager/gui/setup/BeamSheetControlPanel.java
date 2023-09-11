@@ -85,9 +85,11 @@ public class BeamSheetControlPanel extends Panel {
         btnSheetOffsetPlus_ = new Button("+");
 
         // TODO: set the ranges of these sliders to the micro-mirror's min and max deflection
-        UIManager.put("Slider.focus", UIManager.get("Slider.background")); // remove highlight when clicked
-        sldSheetWidth_ = new Slider(0, 8, 4);
-        sldSheetOffset_ = new Slider(-1, 1, 0);
+        sldSheetWidth_ = new Slider(0, 8, 1000);
+        sldSheetOffset_ = new Slider(-1, 1, 1000);
+
+        sldSheetWidth_.setDouble(0.0);
+        sldSheetOffset_.setDouble(0.0);
 
         // virtual slit trigger mode
         pnlFirst_.add(lblSlope, "");
@@ -152,6 +154,16 @@ public class BeamSheetControlPanel extends Panel {
 
         btnCenterOffset_.registerListener(e -> {
             System.out.println("center offset pressed");
+        });
+
+        sldSheetWidth_.registerListener(e -> {
+            final double value = sldSheetWidth_.getDouble();
+            System.out.println("value: " + value);
+        });
+
+        sldSheetOffset_.registerListener(e -> {
+            final double value = sldSheetOffset_.getDouble();
+            System.out.println("value: " + value);
         });
 
     }

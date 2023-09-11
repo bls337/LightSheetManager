@@ -143,7 +143,6 @@ public class DefaultTimingSettings implements TimingSettings {
         }
 
         public double cameraExposure() {
-            System.out.println("set exposure!!");
             return cameraExposure_;
         }
 
