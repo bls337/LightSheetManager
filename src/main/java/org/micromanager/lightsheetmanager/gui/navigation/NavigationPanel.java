@@ -124,6 +124,10 @@ public class NavigationPanel extends Panel {
                     // does not contain digit: SCAPE
                     final int pathNum = 1;
                     ControlPanel.Axis axis = ControlPanel.Axis.NONE;
+                    // TODO: find a better way for properties that start with illum but need a specific axis...
+                    if (deviceType == DeviceType.GalvoDevice) {
+                        axis = ControlPanel.Axis.X;
+                    }
                     ControlPanel controlPanel = new ControlPanel(
                             studio_, propertyName, deviceName, deviceType, axis);
                     illumProperties.get(pathNum - 1).add(controlPanel);
