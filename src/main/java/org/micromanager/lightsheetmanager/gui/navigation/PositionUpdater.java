@@ -31,7 +31,11 @@ public class PositionUpdater {
             protected Void doInBackground() {
                 while (isPolling_.get()) {
                     //System.out.println("updater tick");
-                    navPanel_.updatePositions();
+                    try {
+                        navPanel_.updatePositions();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     if (!isPolling_.get()) {
                         System.out.println("break!");
                         break;
