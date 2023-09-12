@@ -171,8 +171,11 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     }
 
     private void runAcquisitionSCAPE() {
-        //System.out.println(asb_);
-        //System.out.println(asb_.build());
+//        System.out.println(asb_);
+//        System.out.println(asb_.build());
+
+        // TODO: remove this when acqSettings for SCAPE are implemented
+        asb_.useAdvancedTiming(true);
 
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
