@@ -129,21 +129,11 @@ public class PiezoCalibrationPanel extends Panel {
         });
 
         txtSlope_.addDocumentListener(e -> {
-            System.out.println("Here1");
-            if (pathNum_ == 1) {
-                asb.sliceCalibrationBuilder().sliceSlope(Double.parseDouble(txtSlope_.getText()));
-            } else {
-                asb.sliceCalibrationBuilder2().sliceSlope(Double.parseDouble(txtSlope_.getText()));
-            }
+            asb.sliceCalibrationBuilder(pathNum_).sliceSlope(Double.parseDouble(txtSlope_.getText()));
         });
 
         txtOffset_.addDocumentListener(e -> {
-            System.out.println("Here2");
-            if (pathNum_ == 1) {
-                asb.sliceCalibrationBuilder().sliceOffset(Double.parseDouble(txtOffset_.getText()));
-            } else {
-                asb.sliceCalibrationBuilder2().sliceOffset(Double.parseDouble(txtOffset_.getText()));
-            }
+            asb.sliceCalibrationBuilder(pathNum_).sliceOffset(Double.parseDouble(txtOffset_.getText()));
         });
 
         txtStepSize_.registerListener(e -> {
