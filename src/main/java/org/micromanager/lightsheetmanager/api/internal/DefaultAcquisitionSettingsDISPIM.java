@@ -16,9 +16,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultScanSettings.Builder scsb_ = new DefaultScanSettings.Builder();
         private DefaultSheetCalibration.Builder shcb_ = new DefaultSheetCalibration.Builder();
 
-        private DefaultSliceCalibration.Builder[] slcb3_ = new DefaultSliceCalibration.Builder[2];
-        private DefaultSliceCalibration.Builder slcb_ = new DefaultSliceCalibration.Builder();
-        private DefaultSliceCalibration.Builder slcb2_ = new DefaultSliceCalibration.Builder();
+        private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
         private AcquisitionModes acquisitionMode_ = AcquisitionModes.NONE;
         private MultiChannelModes channelMode_ = MultiChannelModes.NONE;
         private CameraModes cameraMode_ = CameraModes.INTERNAL;
@@ -40,6 +38,9 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private ChannelSpec[] channels_ = new ChannelSpec[]{};
 
         public Builder() {
+            for (int i = 0; i < 2; i++) {
+                slcb_[i] = new DefaultSliceCalibration.Builder();
+            }
         }
 
         public Builder(final DefaultAcquisitionSettingsDISPIM acqSettings) {
@@ -50,10 +51,8 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             ssbLS_ = acqSettings.sliceSettingsLS_.copyBuilder();
             scsb_ = acqSettings.scanSettings_.copyBuilder();
             for (int i = 0; i < 2; i++) {
-                slcb3_[i] = acqSettings.sliceCalibrations_[i].copyBuilder();
+                slcb_[i] = acqSettings.sliceCalibrations_[i].copyBuilder();
             }
-//            slcb_ = acqSettings.sliceCalibration_.copyBuilder();
-//            slcb2_ = acqSettings.sliceCalibration2_.copyBuilder();
             shcb_ = acqSettings.sheetCalibration_.copyBuilder();
             acquisitionMode_ = acqSettings.acquisitionMode_;
             channelMode_ = acqSettings.channelMode_;
@@ -274,12 +273,8 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             return shcb_;
         }
 
-        public DefaultSliceCalibration.Builder sliceCalibrationBuilder() {
-            return slcb_;
-        }
-
-        public DefaultSliceCalibration.Builder sliceCalibrationBuilder2() {
-            return slcb2_;
+        public DefaultSliceCalibration.Builder sliceCalibrationBuilder(final int view) {
+            return slcb_[view-1];
         }
 
         public DefaultTimingSettings.Builder tsb() {
@@ -349,9 +344,6 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
     private final DefaultSliceSettings sliceSettings_;
     private final DefaultScanSettings scanSettings_;
     private final DefaultSheetCalibration sheetCalibration_;
-//    private final DefaultSliceCalibration sliceCalibration_;
-//    private final DefaultSliceCalibration sliceCalibration2_;
-
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
     private final AcquisitionModes acquisitionMode_;
@@ -382,11 +374,9 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         sliceSettingsLS_ = builder.ssbLS_.build();
         scanSettings_ = builder.scsb_.build();
         sheetCalibration_ = builder.shcb_.build();
-//        sliceCalibration_ = builder.slcb_.build();
-//        sliceCalibration2_ = builder.slcb2_.build();
-        sliceCalibrations_ = new DefaultSliceCalibration[2];
+        sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
         for (int i = 0; i < 2; i++) {
-            sliceCalibrations_[i] = builder.slcb_.build(); // TODO: !!!
+            sliceCalibrations_[i] = builder.slcb_[i].build();
         }
         acquisitionMode_ = builder.acquisitionMode_;
         channelMode_ = builder.channelMode_;
