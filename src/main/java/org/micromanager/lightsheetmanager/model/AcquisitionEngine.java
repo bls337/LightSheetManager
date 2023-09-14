@@ -720,7 +720,9 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     private boolean doHardwareCalculationsSCAPE(PLogicDISPIM plc) {
 
         // make sure slice timings are up-to-date
-
+        final double sliceDuration1 = getSliceDuration(asb_.timingSettingsBuilder());
+        asb_.timingSettingsBuilder().sliceDuration(sliceDuration1);
+        
         recalculateSliceTiming(asb_);
         System.out.println("after recalculateSliceTiming: " + asb_.timingSettingsBuilder());
 
@@ -1588,6 +1590,17 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                 delayBeforeLaser + laserDuration                    // laser time
             ),
             delayBeforeCamera + cameraDuration                      // camera time
+        );
+    }
+
+    public double getSliceDuration(DefaultTimingSettings.Builder tsb) {
+        DefaultTimingSettings s = tsb.build();
+        // slice duration is the max out of the scan time, laser time, and camera time
+        return Math.max(Math.max(
+                        s.delayBeforeScan() + (s.scanDuration() * s.scansPerSlice()),   // scan time
+                        s.delayBeforeLaser() + s.laserTriggerDuration()                 // laser time
+                ),
+                s.delayBeforeCamera() + s.cameraTriggerDuration()                      // camera time
         );
     }
 
