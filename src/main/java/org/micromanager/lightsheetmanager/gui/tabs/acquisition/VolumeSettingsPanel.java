@@ -87,6 +87,8 @@ public class VolumeSettingsPanel extends Panel {
                 add(spnSliceStepSize_, "");
                 break;
             case SCAPE:
+                add(lblViewDelay, "");
+                add(spnViewDelay_, "wrap");
                 add(new Label("Number of slices:"), "");
                 add(spnSlicesPerSide_, "wrap");
                 add(lblSliceStepSize, "");

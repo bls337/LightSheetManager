@@ -308,12 +308,12 @@ public class PLogicDISPIM {
         //   card is used (as is typical) but keeping code universal to handle
         //   case where MM devices reside on different controller cards
         // Note: firstView starts counting from 1...n views
-//        if (numViews > 1 || firstView == 1) {
-//            final boolean success = prepareControllerForAcquisitionSide(settings, 1, channelOffset, false);
-//            if (!success) {
-//                return false;
-//            }
-//        }
+        if (numViews > 1 || firstView == 1) {
+            final boolean success = prepareControllerForAcquisitionSide(settings, 1, channelOffset, false);
+            if (!success) {
+                return false;
+            }
+        }
 //        if (numViews > 1 || firstView != 1) {
 //            final boolean success = prepareControllerForAcquisitionSide(settings, 2, channelOffset, false);
 //            if (!success) {
@@ -501,6 +501,12 @@ public class PLogicDISPIM {
             default:
                 studio_.logs().showError("does not support numViews > 2!");
                 break;
+        }
+
+        // TODO: make a separate method for scape? two classes instead? no need for switch
+        if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+            scanner = scanner_;
+            piezo = piezo_;
         }
 
         // TODO: find a better way than != null
