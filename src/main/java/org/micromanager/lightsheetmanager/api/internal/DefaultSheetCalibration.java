@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.SheetCalibration;
 
+// TODO: put liveScanPeriod_ into main settings? it is not a per-view item
 public class DefaultSheetCalibration implements SheetCalibration {
 
     public static class Builder implements SheetCalibration.Builder {
@@ -12,7 +13,6 @@ public class DefaultSheetCalibration implements SheetCalibration {
         private double autoSheetWidthPerPixel_ = 0.0;
         private double scanSpeed_ = 0.0;
         private double scanOffset_ = 0.0;
-        private double liveScanPeriod_ = 20.0;
 
         public Builder() {
         }
@@ -24,7 +24,6 @@ public class DefaultSheetCalibration implements SheetCalibration {
             autoSheetWidthPerPixel_ = sheetCalibration.autoSheetWidthPerPixel_;
             scanSpeed_ = sheetCalibration.scanSpeed_;
             scanOffset_ = sheetCalibration.scanOffset_;
-            liveScanPeriod_ = sheetCalibration.liveScanPeriod_;
         }
 
         // normal camera modes
@@ -67,14 +66,6 @@ public class DefaultSheetCalibration implements SheetCalibration {
             return this;
         }
 
-        // settings tab
-
-        @Override
-        public SheetCalibration.Builder liveScanPeriod(int milliseconds) {
-            liveScanPeriod_ = milliseconds;
-            return this;
-        }
-
         @Override
         public DefaultSheetCalibration build() {
             return new DefaultSheetCalibration(this);
@@ -87,7 +78,6 @@ public class DefaultSheetCalibration implements SheetCalibration {
     private final double autoSheetWidthPerPixel_;
     private final double scanSpeed_;
     private final double scanOffset_;
-    private final double liveScanPeriod_;
 
     private DefaultSheetCalibration(Builder builder) {
         sheetWidth_ = builder.sheetWidth_;
@@ -96,7 +86,6 @@ public class DefaultSheetCalibration implements SheetCalibration {
         autoSheetWidthPerPixel_ = builder.autoSheetWidthPerPixel_;
         scanSpeed_ = builder.scanSpeed_;
         scanOffset_ = builder.scanOffset_;
-        liveScanPeriod_ = builder.liveScanPeriod_;
     }
 
     @Override
@@ -138,10 +127,4 @@ public class DefaultSheetCalibration implements SheetCalibration {
         return scanOffset_;
     }
 
-    // settings tab
-
-    @Override
-    public double getLiveScanPeriod() {
-        return liveScanPeriod_;
-    }
 }

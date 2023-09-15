@@ -52,13 +52,6 @@ public interface SheetCalibration {
         Builder scanOffset(final double offset);
 
         /**
-         * Sets the live scan period in milliseconds.
-         *
-         * @param milliseconds the scan period in milliseconds
-         */
-        Builder liveScanPeriod(final int milliseconds);
-
-        /**
          * Creates an immutable instance of SheetCalibration
          *
          * @return Immutable version of SheetCalibration
@@ -79,6 +72,4 @@ public interface SheetCalibration {
     double scanSpeed();
     double scanOffset();
 
-    // settings tab
-    double getLiveScanPeriod();
 }

@@ -255,6 +255,7 @@ public class AcquisitionTab extends Panel {
         });
 
         btnOpenPlaylist_.registerListener(e -> acqTableFrame_.setVisible(true));
+        btnOpenPlaylist_.setEnabled(false); // TODO: enable when playlist is implemented
 
         btnSpeedTest_.registerListener(e -> runAcquisition(true));
         btnRunOverviewAcq_.registerListener(e -> {

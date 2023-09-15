@@ -131,6 +131,8 @@ public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
          */
         T channels(final ChannelSpec[] channels);
 
+        T liveScanPeriod(final double liveScanPeriod);
+
         /**
          * Creates an immutable instance of AcquisitionSettingsDISPIM
          *
@@ -186,7 +188,7 @@ public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
      *
      * @return immutable DefaultSheetCalibration instance.
      */
-    DefaultSheetCalibration sheetCalibration();
+    DefaultSheetCalibration sheetCalibration(final int view);
 
     /**
      * Returns the immutable DefaultSliceCalibration instance.
@@ -307,4 +309,6 @@ public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
      * @return the channels as an array.
      */
     ChannelSpec[] channels();
+
+    double liveScanPeriod();
 }
