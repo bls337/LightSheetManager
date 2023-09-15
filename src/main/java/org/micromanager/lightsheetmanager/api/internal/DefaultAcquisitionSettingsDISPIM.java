@@ -14,8 +14,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultSliceSettings.Builder ssb_ = new DefaultSliceSettings.Builder();
         private DefaultSliceSettingsLS.Builder ssbLS_ = new DefaultSliceSettingsLS.Builder();
         private DefaultScanSettings.Builder scsb_ = new DefaultScanSettings.Builder();
-        private DefaultSheetCalibration.Builder shcb_ = new DefaultSheetCalibration.Builder();
-
+        private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
         private AcquisitionModes acquisitionMode_ = AcquisitionModes.NONE;
         private MultiChannelModes channelMode_ = MultiChannelModes.NONE;
@@ -36,11 +35,14 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private int numChannels_ = 0;
         private String channelGroup_ = "";
         private ChannelSpec[] channels_ = new ChannelSpec[]{};
+        private double liveScanPeriod_ = 20.0;
 
         public Builder() {
             for (int i = 0; i < 2; i++) {
+                shcb_[i] = new DefaultSheetCalibration.Builder();
                 slcb_[i] = new DefaultSliceCalibration.Builder();
             }
+
         }
 
         public Builder(final DefaultAcquisitionSettingsDISPIM acqSettings) {
@@ -52,8 +54,8 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             scsb_ = acqSettings.scanSettings_.copyBuilder();
             for (int i = 0; i < 2; i++) {
                 slcb_[i] = acqSettings.sliceCalibrations_[i].copyBuilder();
+                shcb_[i] = acqSettings.sheetCalibrations_[i].copyBuilder();
             }
-            shcb_ = acqSettings.sheetCalibration_.copyBuilder();
             acquisitionMode_ = acqSettings.acquisitionMode_;
             channelMode_ = acqSettings.channelMode_;
             cameraMode_ = acqSettings.cameraMode_;
@@ -70,6 +72,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             numChannels_ = acqSettings.numChannels_;
             channelGroup_ = acqSettings.channelGroup_;
             channels_ = acqSettings.channels_;
+            liveScanPeriod_ = acqSettings.liveScanPeriod_;
         }
 
         /**
@@ -248,6 +251,12 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             return this;
         }
 
+        @Override
+        public Builder liveScanPeriod(double liveScanPeriod) {
+            liveScanPeriod_ = liveScanPeriod;
+            return this;
+        }
+
         // getters for sub-builders
         public DefaultTimingSettings.Builder timingSettingsBuilder() {
             return tsb_;
@@ -269,8 +278,8 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             return scsb_;
         }
 
-        public DefaultSheetCalibration.Builder sheetCalibrationBuilder() {
-            return shcb_;
+        public DefaultSheetCalibration.Builder sheetCalibrationBuilder(final int view) {
+            return shcb_[view-1];
         }
 
         public DefaultSliceCalibration.Builder sliceCalibrationBuilder(final int view) {
@@ -343,7 +352,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
     private final DefaultSliceSettingsLS sliceSettingsLS_;
     private final DefaultSliceSettings sliceSettings_;
     private final DefaultScanSettings scanSettings_;
-    private final DefaultSheetCalibration sheetCalibration_;
+    private final DefaultSheetCalibration[] sheetCalibrations_;
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
     private final AcquisitionModes acquisitionMode_;
@@ -366,6 +375,8 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
     private final String channelGroup_;
     private final ChannelSpec[] channels_;
 
+    private final double liveScanPeriod_;
+
     private DefaultAcquisitionSettingsDISPIM(Builder builder) {
         super(builder);
         timingSettings_ = builder.tsb_.build();
@@ -373,9 +384,10 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         sliceSettings_ = builder.ssb_.build();
         sliceSettingsLS_ = builder.ssbLS_.build();
         scanSettings_ = builder.scsb_.build();
-        sheetCalibration_ = builder.shcb_.build();
+        sheetCalibrations_ = new DefaultSheetCalibration[2];
         sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
         for (int i = 0; i < 2; i++) {
+            sheetCalibrations_[i] = builder.shcb_[i].build();
             sliceCalibrations_[i] = builder.slcb_[i].build();
         }
         acquisitionMode_ = builder.acquisitionMode_;
@@ -394,6 +406,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         numChannels_ = builder.numChannels_;
         channelGroup_ = builder.channelGroup_;
         channels_ = builder.channels_;
+        liveScanPeriod_= builder.liveScanPeriod_;
     }
 
 //    /**
@@ -488,8 +501,8 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
      * @return immutable DefaultSheetCalibration instance.
      */
     @Override
-    public DefaultSheetCalibration sheetCalibration() {
-        return sheetCalibration_;
+    public DefaultSheetCalibration sheetCalibration(final int view) {
+        return sheetCalibrations_[view-1];
     }
 
     /**
@@ -662,6 +675,11 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
     @Override
     public ChannelSpec[] channels() {
         return channels_;
+    }
+
+    @Override
+    public double liveScanPeriod() {
+        return liveScanPeriod_;
     }
 
     // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?

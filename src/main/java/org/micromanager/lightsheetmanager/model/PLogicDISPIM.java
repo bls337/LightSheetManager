@@ -13,6 +13,7 @@ import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.data.AcquisitionModes;
 import org.micromanager.lightsheetmanager.model.data.MultiChannelModes;
 import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -25,7 +26,7 @@ import java.awt.geom.Point2D;
 import java.util.Objects;
 
 // Replacement for ControllerUtils.java
-
+// TODO: use arrays for piezos etc on diSPIM
 public class PLogicDISPIM {
 
     private Studio studio_;
@@ -689,8 +690,8 @@ public class PLogicDISPIM {
                 scanner.setSPIMInterleaveSides(isInterleaved);
 
                 // send sheet width/offset
-                //float sheetWidth = getSheetWidth(asb_.cameraMode(), view);
-                //float sheetOffset = getSheetOffset(asb_.cameraMode(), view);
+                float sheetWidth = getSheetWidth(asb_.cameraMode(), view);
+                float sheetOffset = getSheetOffset(asb_.cameraMode(), view);
                 if (cameraMode == CameraModes.VIRTUAL_SLIT) {
                     // adjust sheet width and offset to account for settle time where scan is going but we aren't imaging yet
                     // FIXME: !!!
@@ -702,8 +703,8 @@ public class PLogicDISPIM {
 //                    // width should be increased by ratio (1 + settle_fraction)
 //                    sheetWidth += (sheetWidth * settleTime/readoutTime);
                 }
-                //scanner.sa().setAmplitudeX(sheetWidth);
-                //scanner.sa().setOffsetX(sheetOffset);
+                scanner.sa().setAmplitudeX(sheetWidth);
+                scanner.sa().setOffsetX(sheetOffset);
             }
         }
         return true;
@@ -1002,15 +1003,19 @@ public class PLogicDISPIM {
     /**
      * gets the sheet width for the specified settings in units of degrees
      * @param cameraMode
-     * @param side
+     * @param view
      * @return 0 if camera isn't assigned
      */
-    public float getSheetWidth(CameraModes cameraMode, int side) {
+    public float getSheetWidth(CameraModes cameraMode, int view) {
         float sheetWidth;
         //final String cameraName = devices_.getMMDevice(cameraDevice);
-        AndorCamera camera = devices_.getDevice("ImagingCamera1"); // TODO: find a way of adapting to different cameras
+        String deviceName = "ImagingCamera" + view; // diSPIM
+        if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+            deviceName = "ImagingCamera";
+        }
+        CameraBase camera = devices_.getDevice(deviceName); // TODO: find a way of adapting to different cameras
         String cameraName = camera.getDeviceName(); // TODO: put this on LSM camera?
-//
+
 //        // start by assuming the base value, then modify below if needed
 //        final Properties.Keys widthProp = (side == Devices.Sides.A) ?
 //                Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_A : Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_B;
@@ -1018,11 +1023,11 @@ public class PLogicDISPIM {
         sheetWidth = 1; // TODO: get from properties
 
         if (cameraName == null || cameraName.equals("")) {
-            studio_.logs().logDebugMessage("Could get sheet width for invalid device " + cameraName);
+            studio_.logs().logDebugMessage("Could not get sheet width for invalid device " + cameraName);
             return sheetWidth;
         }
 
-//        if (cameraMode == CameraModes.VIRTUAL_SLIT) {
+        if (cameraMode == CameraModes.VIRTUAL_SLIT) {
 //            final float sheetSlope = prefs_.getFloat(
 //                    MyStrings.PanelNames.SETUP.toString() + side.toString(),
 //                    Properties.Keys.PLUGIN_LIGHTSHEET_SLOPE, 2000);
@@ -1032,7 +1037,7 @@ public class PLogicDISPIM {
 //            }
 //            final float slopePolarity = (side == Devices.Sides.B) ? -1f : 1f;
 //            sheetWidth = roi.height * sheetSlope * slopePolarity / 1e6f;  // in microdegrees per pixel, convert to degrees
-//        } else {
+        } else {
 //            final boolean autoSheet = prefs_.getBoolean(
 //                    MyStrings.PanelNames.SETUP.toString() + side.toString(),
 //                    Properties.Keys.PREFS_AUTO_SHEET_WIDTH, false);
@@ -1048,12 +1053,12 @@ public class PLogicDISPIM {
 //                // TODO calculation should account for sample exposure to make sure 0.25ms edges get appropriately compensated for
 //                sheetWidth *= 1.1f;  // 10% extra width just to be sure
 //            }
-//        }
+        }
         return sheetWidth;
     }
 
     // TODO: needs properties
-    public float getSheetOffset(CameraModes cameraMode, int side) {
+    public float getSheetOffset(CameraModes cameraMode, int view) {
         float sheetOffset;
         if (cameraMode == CameraModes.VIRTUAL_SLIT) {
             //sheetOffset = prefs_.getFloat(
