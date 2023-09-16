@@ -215,6 +215,31 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                 doHardwareCalculationsNIDAQ();
             }
 
+            // --- testing code below ---
+//            String plcName = "Scanner:AB:33";
+//            StrVector propertyNames;
+//            try {
+//                propertyNames = core_.getDevicePropertyNames(plcName);
+//            } catch (Exception e) {
+//                propertyNames = null;
+//            }
+//
+//            Gson gsonObj = new Gson();
+//            HashMap<String, String> deviceProps = new HashMap<>();
+//            for (String propName : propertyNames) {
+//                String propValue;
+//                try {
+//                    propValue = core_.getProperty(plcName, propName);
+//                } catch (Exception e) {
+//                    propValue = "";
+//                    System.out.println("failed!");
+//                }
+//                deviceProps.put(propName, propValue);
+//                //System.out.println(propName);
+//            }
+//            String jsonStr = gsonObj.toJson(deviceProps);
+//            System.out.println(jsonStr);
+
             setAcquisitionSettings(asb_.build());
 
             String saveDir = acqSettings_.saveDirectory();
