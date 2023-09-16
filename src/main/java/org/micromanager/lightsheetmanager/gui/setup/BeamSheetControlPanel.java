@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.gui.setup;
 
 import org.micromanager.lightsheetmanager.api.data.CameraModes;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -10,7 +11,6 @@ import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import javax.swing.JLabel;
-import javax.swing.UIManager;
 import java.util.Objects;
 
 public class BeamSheetControlPanel extends Panel {
@@ -43,11 +43,14 @@ public class BeamSheetControlPanel extends Panel {
     private JLabel lblSlopeOffset_;
     private TextField txtSheetOffset_;
 
+    private int pathNum_;
+
     private LightSheetManagerModel model_;
 
-    public BeamSheetControlPanel(final LightSheetManagerModel model) {
+    public BeamSheetControlPanel(final LightSheetManagerModel model, final int pathNum) {
         super("Light Sheet Synchronization");
         model_ = Objects.requireNonNull(model);
+        pathNum_ = pathNum;
         createUserInterface();
         createEventHandlers();
     }
@@ -142,6 +145,9 @@ public class BeamSheetControlPanel extends Panel {
     }
 
     private void createEventHandlers() {
+        final DefaultAcquisitionSettingsDISPIM.Builder asb_ = model_.acquisitions()
+                .getAcquisitionSettingsBuilder();
+
         // first panel
         btnPlotProfile_.registerListener(e -> {
             System.out.println("do something here...");
@@ -149,21 +155,43 @@ public class BeamSheetControlPanel extends Panel {
 
         // second panel
         cbxAutoSheetWidth_.registerListener(e -> {
-            setEnabledSheetWidth(cbxAutoSheetWidth_.isSelected());
+            final boolean state = cbxAutoSheetWidth_.isSelected();
+            asb_.sheetCalibrationBuilder(pathNum_).useAutoSheetWidth(state);
+            setEnabledSheetWidth(state);
         });
 
+        // TODO: this
         btnCenterOffset_.registerListener(e -> {
             System.out.println("center offset pressed");
         });
 
         sldSheetWidth_.registerListener(e -> {
             final double value = sldSheetWidth_.getDouble();
-            System.out.println("value: " + value);
+            asb_.sheetCalibrationBuilder(pathNum_).sheetWidth(value);
+            System.out.println("sheetWidth value: " + value);
         });
 
         sldSheetOffset_.registerListener(e -> {
             final double value = sldSheetOffset_.getDouble();
-            System.out.println("value: " + value);
+            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+            System.out.println("sheetOffset value: " + value);
+        });
+
+        // TODO: buttons
+        btnSheetOffsetMinus_.registerListener(e -> {
+
+        });
+
+        btnSheetOffsetPlus_.registerListener(e -> {
+
+        });
+
+        btnSheetWidthMinus_.registerListener(e -> {
+
+        });
+
+        btnSheetWidthPlus_.registerListener(e -> {
+
         });
 
     }
