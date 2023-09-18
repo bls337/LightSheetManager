@@ -156,6 +156,9 @@ public class AcquisitionTab extends Panel {
         cbxUseAdvancedTiming_ = new CheckBox("Use advanced timing settings",
                 12, acqSettings.isUsingAdvancedTiming(), CheckBox.RIGHT);
 
+        btnRunOverviewAcq_.setEnabled(false); // TODO: re-enable when these features are put in
+        btnTestAcquisition_.setEnabled(false);
+
         // acquisition buttons
         pnlButtons_.add(btnRunAcquisition_, "");
         pnlButtons_.add(btnPauseAcquisition_, "");

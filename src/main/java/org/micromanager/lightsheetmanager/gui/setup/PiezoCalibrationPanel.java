@@ -54,7 +54,13 @@ public class PiezoCalibrationPanel extends Panel {
 
         Button.setDefaultSize(80, 26);
         btnTwoPoint_ = new Button("2-point");
-        btnUpdate_ = new Button("Update");
+
+        if (geometryType == GeometryType.DISPIM) {
+            btnUpdate_ = new Button("Update");
+        } else {
+            // SCAPE
+            btnUpdate_ = new Button("Update", 120, 26);
+        }
         btnRunAutofocus_ = new Button("Run Autofocus", 120, 26);
 
         final DefaultAcquisitionSettingsDISPIM acqSettings =
@@ -100,7 +106,7 @@ public class PiezoCalibrationPanel extends Panel {
                 add(lblOffset, "");
                 add(txtOffset_, "");
                 add(new JLabel("μm"), "wrap");
-                add(btnUpdate_, "wrap");
+                add(btnUpdate_, "wrap, span 3");
                 add(btnRunAutofocus_, "span 3");
                 break;
             default:
