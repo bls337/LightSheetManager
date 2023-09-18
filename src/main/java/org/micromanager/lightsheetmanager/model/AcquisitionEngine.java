@@ -177,6 +177,12 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         // TODO: remove this when acqSettings for SCAPE are implemented
         asb_.useAdvancedTiming(true);
 
+        asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
+        asb_.sheetCalibrationBuilder(1).autoSheetWidthPerPixel(0.0);
+
+        // TODO: put this here for now... (make sure vars are updated)
+        setAcquisitionSettings(asb_.build());
+
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
             studio_.live().setLiveModeOn(false);

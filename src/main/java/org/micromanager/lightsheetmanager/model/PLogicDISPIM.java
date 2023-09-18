@@ -1047,9 +1047,7 @@ public class PLogicDISPIM {
                 if (roi == null || roi.height == 0) {
                     studio_.logs().logDebugMessage("Could not get camera ROI for auto sheet mode");
                 }
-                // FIXME: find out what value sheetSlope is!
-                final double sheetSlope = 1.0;
-                //final double sheetSlope = model_.getAcquisitionEngine().getAcquisitionSettings().sheetCalibration(view)
+                final double sheetSlope = model_.getAcquisitionEngine().getAcquisitionSettings().sheetCalibration(view).autoSheetWidthPerPixel();
                 sheetWidth = roi.height *  sheetSlope / 1000.0;  // in millidegrees per pixel, convert to degrees
                 sheetWidth *= 1.1f;  // 10% extra width just to be sure
             }
