@@ -59,6 +59,9 @@ public class BeamSheetControlPanel extends Panel {
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
 
+        final DefaultAcquisitionSettingsDISPIM acqSettings = model_.acquisitions()
+                .getAcquisitionSettings();
+
         pnlFirst_ = new Panel();
         pnlSecond_ = new Panel();
 
@@ -91,8 +94,8 @@ public class BeamSheetControlPanel extends Panel {
         sldSheetWidth_ = new Slider(0, 8, 1000);
         sldSheetOffset_ = new Slider(-1, 1, 1000);
 
-        sldSheetWidth_.setDouble(0.0);
-        sldSheetOffset_.setDouble(0.0);
+        sldSheetWidth_.setDouble(acqSettings.sheetCalibration(pathNum_).sheetWidth());
+        sldSheetOffset_.setDouble(acqSettings.sheetCalibration(pathNum_).sheetOffset());
 
         // virtual slit trigger mode
         pnlFirst_.add(lblSlope, "");
