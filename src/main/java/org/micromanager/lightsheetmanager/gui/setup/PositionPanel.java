@@ -1,11 +1,11 @@
 package org.micromanager.lightsheetmanager.gui.setup;
 
-import ij.plugin.DICOM;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -34,11 +34,14 @@ public class PositionPanel extends Panel {
 
     private Button btnTestAcq_;
 
+    private int pathNum_;
+
     private LightSheetManagerModel model_;
 
-    public PositionPanel(final LightSheetManagerModel model) {
+    public PositionPanel(final LightSheetManagerModel model, final int pathNum) {
         super("Positions");
         model_ = Objects.requireNonNull(model);
+        pathNum_ = pathNum;
         createUserInterface();
         createEventHandlers();
     }
@@ -48,7 +51,9 @@ public class PositionPanel extends Panel {
                 .getDeviceAdapter().getMicroscopeGeometry();
 
         final JLabel lblImagingCenter = new JLabel("Imaging Center:");
-        lblImagingCenterValue_ = new JLabel("0.0 μm");
+        final double imagingCenter = model_.acquisitions().getAcquisitionSettings()
+                .sheetCalibration(pathNum_).imagingCenter();
+        lblImagingCenterValue_ = new JLabel(imagingCenter + " μm");
 
         setMigLayout(
                 "",
@@ -127,6 +132,25 @@ public class PositionPanel extends Panel {
     }
 
     private void createEventHandlers() {
+        final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
 
+        btnImagingCenterGo_.registerListener(e -> {
+
+        });
+
+        btnImagingCenterSet_.registerListener(e -> {
+            // FIXME: check for piezo limits!
+            final double piezoPosition = piezo.getPosition();
+            model_.acquisitions().getAcquisitionSettingsBuilder()
+                    .sheetCalibrationBuilder(pathNum_).imagingCenter(piezoPosition);
+        });
+
+        btnImagingZero_.registerListener(e -> {
+
+        });
+
+        btnSliceZero_.registerListener(e -> {
+
+        });
     }
 }
