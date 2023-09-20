@@ -124,6 +124,9 @@ public class BeamSheetControlPanel extends Panel {
                 break;
             case SCAPE:
                 txtSheetOffset_ = new TextField(8);
+                final double value = model_.acquisitions().getAcquisitionSettings()
+                        .sheetCalibration(pathNum_).sheetOffset();
+                txtSheetOffset_.setText(Double.toString(value));
                 lblSlopeOffset_ = new JLabel("0.0 μm");
                 pnlSecond_.add(lblSheetOffset, "");
                 pnlSecond_.add(lblSlopeOffset_, "");
@@ -177,6 +180,7 @@ public class BeamSheetControlPanel extends Panel {
         sldSheetOffset_.registerListener(e -> {
             final double value = sldSheetOffset_.getDouble();
             asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+            txtSheetOffset_.setText(Double.toString(value));
             System.out.println("sheetOffset value: " + value);
         });
 
