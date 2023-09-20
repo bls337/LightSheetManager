@@ -11,6 +11,7 @@ import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import javax.swing.JLabel;
+import java.awt.EventQueue;
 import java.util.Objects;
 
 public class BeamSheetControlPanel extends Panel {
@@ -166,11 +167,6 @@ public class BeamSheetControlPanel extends Panel {
             setEnabledSheetWidth(state);
         });
 
-        // TODO: this
-        btnCenterOffset_.registerListener(e -> {
-            System.out.println("center offset pressed");
-        });
-
         sldSheetWidth_.registerListener(e -> {
             final double value = sldSheetWidth_.getDouble();
             asb_.sheetCalibrationBuilder(pathNum_).sheetWidth(value);
@@ -184,13 +180,38 @@ public class BeamSheetControlPanel extends Panel {
             System.out.println("sheetOffset value: " + value);
         });
 
+        txtSheetOffset_.addDocumentListener(e -> {
+            final double value = Double.parseDouble(txtSheetOffset_.getText());
+            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+            EventQueue.invokeLater(() -> {
+                sldSheetOffset_.setDouble(value);
+            });
+        });
+
+        btnCenterOffset_.registerListener(e -> {
+            System.out.println("center offset pressed");
+            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(0.0);
+            txtSheetOffset_.setText("0");
+            sldSheetOffset_.setDouble(0);
+        });
+
         // TODO: buttons
         btnSheetOffsetMinus_.registerListener(e -> {
-
+            final double value = model_.acquisitions().getAcquisitionSettings()
+                    .sheetCalibration(pathNum_).sheetOffset() - 0.01;
+            System.out.println("value: " + value);
+            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+            txtSheetOffset_.setText(Double.toString(value));
+            sldSheetOffset_.setDouble(value);
         });
 
         btnSheetOffsetPlus_.registerListener(e -> {
-
+            final double value = model_.acquisitions().getAcquisitionSettings()
+                    .sheetCalibration(pathNum_).sheetOffset() + 0.01;
+            System.out.println("value: " + value);
+            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+            txtSheetOffset_.setText(Double.toString(value));
+            sldSheetOffset_.setDouble(value);
         });
 
         btnSheetWidthMinus_.registerListener(e -> {
