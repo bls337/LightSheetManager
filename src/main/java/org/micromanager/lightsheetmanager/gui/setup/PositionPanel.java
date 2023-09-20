@@ -131,11 +131,15 @@ public class PositionPanel extends Panel {
         }
     }
 
+    // TODO: currently set up for SCAPE geometry, compare to original diSPIM plugin
     private void createEventHandlers() {
         final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
 
         btnImagingCenterGo_.registerListener(e -> {
-
+            // FIXME: make sure this is the same as original plugin
+            final double imagingCenter = model_.acquisitions().getAcquisitionSettings()
+                    .sheetCalibration(pathNum_).imagingCenter();
+            piezo.setPosition(imagingCenter);
         });
 
         btnImagingCenterSet_.registerListener(e -> {
@@ -143,6 +147,7 @@ public class PositionPanel extends Panel {
             final double piezoPosition = piezo.getPosition();
             model_.acquisitions().getAcquisitionSettingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).imagingCenter(piezoPosition);
+            lblImagingCenterValue_.setText(Double.toString(piezoPosition));
         });
 
         btnImagingZero_.registerListener(e -> {
