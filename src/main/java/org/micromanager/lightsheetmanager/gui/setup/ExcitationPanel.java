@@ -4,6 +4,7 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -39,6 +40,12 @@ public class ExcitationPanel extends Panel {
         cbxBeamEpi_ = new CheckBox("Beam", false);
         cbxSheetEpi_ = new CheckBox("Sheet", false);
 
+        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+        // TODO: better way to check
+        if (scanner != null) {
+            cbxBeamExc_.setSelected(scanner.isBeamOn());
+        }
+
         switch (geometryType) {
             case DISPIM:
                 add(lblExcitation, "");
@@ -58,9 +65,16 @@ public class ExcitationPanel extends Panel {
     }
 
     private void createEventHandlers() {
-        cbxBeamExc_.registerListener(e -> {
 
-        });
+        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+
+        // TODO: fix this
+        if (scanner != null) {
+            cbxBeamExc_.registerListener(e -> {
+                scanner.setBeamOn(cbxBeamExc_.isSelected());
+                System.out.println("set beam on: " + cbxBeamExc_.isSelected());
+            });
+        }
 
         cbxSheetExc_.registerListener(e -> {
 
