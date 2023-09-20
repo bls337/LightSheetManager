@@ -122,8 +122,8 @@ public class PiezoCalibrationPanel extends Panel {
 
         final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
         final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
-        System.out.println("piezo: " + piezo);
-        System.out.println("scanner: " + scanner);
+//        System.out.println("piezo: " + piezo);
+//        System.out.println("scanner: " + scanner);
 
         btnTwoPoint_.registerListener(e -> {
 
