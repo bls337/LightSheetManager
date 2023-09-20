@@ -25,6 +25,23 @@ public class ASIScanner extends ASITigerBase {
         return singleAxis_;
     }
 
+    public void setPosition(final double position) {
+        try {
+            core_.setPosition(deviceName_, position);
+        } catch (Exception e) {
+            studio_.logs().showError("Could not move scanner!");
+        }
+    }
+
+    public double getPosition() {
+        try {
+            return core_.getPosition(deviceName_);
+        } catch (Exception e) {
+            studio_.logs().showError("Could get the scanner position!");
+            return 0.0;
+        }
+    }
+
     public void setAttenuateX(final float value) {
         setPropertyFloat(Properties.ATTENUATE_X, value);
     }
