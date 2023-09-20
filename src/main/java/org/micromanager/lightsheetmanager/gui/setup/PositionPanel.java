@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -86,6 +87,10 @@ public class PositionPanel extends Panel {
         lblImagingPositionValue_ = new JLabel("0.0 μm");
         lblIllumPositionValue_ = new JLabel("0.0 μm");
 
+        txtSlicePosition_.setText("0");
+        txtImagingPosition_.setText("0");
+        txtIllumPosition_.setText("0");
+
         switch (geometryType) {
             case DISPIM:
                 add(lblImagingCenter, "");
@@ -118,10 +123,12 @@ public class PositionPanel extends Panel {
 
                 add(lblSlicePosition, "");
                 add(lblSlicePositionValue_, "");
+                add(txtSlicePosition_, "split 2");
                 add(btnSliceZero_, "wrap");
 
                 add(lblImagingPosition, "");
                 add(lblImagingPositionValue_, "");
+                add(txtImagingPosition_, "split 2");
                 add(btnImagingZero_, "wrap");
 
                 add(btnTestAcq_, "wrap");
@@ -131,12 +138,16 @@ public class PositionPanel extends Panel {
         }
     }
 
+    // TODO: prevent errors if there is no piezo/scanner selected in config (null values)
     // TODO: currently set up for SCAPE geometry, compare to original diSPIM plugin
     private void createEventHandlers() {
         final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
+        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+//        System.out.println("piezo: " + piezo);
+//        System.out.println("scanner: " + scanner);
 
         btnImagingCenterGo_.registerListener(e -> {
-            // FIXME: make sure this is the same as original plugin
+            // FIXME: make sure this is the same as original plugin, diSPIM also moves Scanner with computeGalvoFromPiezo
             final double imagingCenter = model_.acquisitions().getAcquisitionSettings()
                     .sheetCalibration(pathNum_).imagingCenter();
             piezo.setPosition(imagingCenter);
@@ -151,11 +162,22 @@ public class PositionPanel extends Panel {
         });
 
         btnImagingZero_.registerListener(e -> {
-
+            piezo.setPosition(0.0);
         });
 
         btnSliceZero_.registerListener(e -> {
-
+            scanner.setPosition(0.0);
         });
+
+        // FIXME: find a better way to check for devices existing
+        if (scanner != null && piezo != null) {
+            txtImagingPosition_.registerListener(e -> {
+                piezo.setPosition(Double.parseDouble(txtImagingPosition_.getText()));
+            });
+
+            txtSlicePosition_.registerListener(e -> {
+                scanner.setPosition(Double.parseDouble(txtSlicePosition_.getText()));
+            });
+        }
     }
 }
