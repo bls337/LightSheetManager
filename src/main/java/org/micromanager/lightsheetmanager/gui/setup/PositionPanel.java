@@ -171,11 +171,13 @@ public class PositionPanel extends Panel {
 
         // FIXME: find a better way to check for devices existing
         if (scanner != null && piezo != null) {
-            txtImagingPosition_.registerListener(e -> {
+            txtImagingPosition_.addDocumentListener(e -> {
+                System.out.println("imaging position update: " + txtImagingPosition_.getText());
                 piezo.setPosition(Double.parseDouble(txtImagingPosition_.getText()));
             });
 
-            txtSlicePosition_.registerListener(e -> {
+            txtSlicePosition_.addDocumentListener(e -> {
+                System.out.println("slice position update: " + txtSlicePosition_.getText());
                 scanner.setPosition(Double.parseDouble(txtSlicePosition_.getText()));
             });
         }
