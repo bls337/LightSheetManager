@@ -41,7 +41,7 @@ public class SetupPanel extends Panel {
 
         piezoPanel_ = new PiezoCalibrationPanel(model_, pathNum);
         beamSheetPanel_ = new BeamSheetControlPanel(model_, pathNum);
-        positionPanel_ = new PositionPanel(model_);
+        positionPanel_ = new PositionPanel(model_, pathNum);
 
         joystickPanel_ = new JoystickPanel(model_);
         excitationPanel_ = new ExcitationPanel(model_);

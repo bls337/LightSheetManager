@@ -561,10 +561,10 @@ public class PLogicDISPIM {
                 // TODO: add centerAtCurrentZ to acqSettings
                 final boolean centerAtCurrentZ = false;
                 if (centerAtCurrentZ) {
-                    // TODO: fix this ???
                     piezoCenter = (float)piezo.getPosition(); //(float) positions_.getUpdatedPosition(piezoDevice, Joystick.Directions.NONE);
                 } else {
-                    piezoCenter = (float)piezo.getPosition();
+                    piezoCenter = (float)model_.acquisitions().getAcquisitionSettings()
+                            .sheetCalibration(view).imagingCenter();
                 }
             }
 

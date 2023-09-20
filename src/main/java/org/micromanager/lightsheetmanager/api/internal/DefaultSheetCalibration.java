@@ -7,6 +7,7 @@ public class DefaultSheetCalibration implements SheetCalibration {
 
     public static class Builder implements SheetCalibration.Builder {
 
+        private double imagingCenter_ = 0.0;
         private double sheetWidth_ = 0.0;
         private double sheetOffset_ = 0.0;
         private boolean useAutoSheetWidth_ = false;
@@ -18,6 +19,7 @@ public class DefaultSheetCalibration implements SheetCalibration {
         }
 
         private Builder(final DefaultSheetCalibration sheetCalibration) {
+            imagingCenter_ = sheetCalibration.imagingCenter_;
             sheetWidth_ = sheetCalibration.sheetWidth_;
             sheetOffset_ = sheetCalibration.sheetOffset_;
             useAutoSheetWidth_ = sheetCalibration.useAutoSheetWidth_;
@@ -27,6 +29,12 @@ public class DefaultSheetCalibration implements SheetCalibration {
         }
 
         // normal camera modes
+
+        @Override
+        public SheetCalibration.Builder imagingCenter(double center) {
+            imagingCenter_ = center;
+            return this;
+        }
 
         @Override
         public SheetCalibration.Builder sheetWidth(double width) {
@@ -72,6 +80,7 @@ public class DefaultSheetCalibration implements SheetCalibration {
         }
     }
 
+    private final double imagingCenter_;
     private final double sheetWidth_;
     private final double sheetOffset_;
     private final boolean useAutoSheetWidth_;
@@ -80,6 +89,7 @@ public class DefaultSheetCalibration implements SheetCalibration {
     private final double scanOffset_;
 
     private DefaultSheetCalibration(Builder builder) {
+        imagingCenter_ = builder.imagingCenter_;
         sheetWidth_ = builder.sheetWidth_;
         sheetOffset_ = builder.sheetOffset_;
         useAutoSheetWidth_ = builder.useAutoSheetWidth_;
@@ -91,6 +101,11 @@ public class DefaultSheetCalibration implements SheetCalibration {
     @Override
     public DefaultSheetCalibration.Builder copyBuilder() {
         return new Builder(this);
+    }
+
+    @Override
+    public double imagingCenter() {
+        return imagingCenter_;
     }
 
     // standard camera modes

@@ -9,6 +9,8 @@ public interface SheetCalibration {
 
     interface Builder {
 
+        Builder imagingCenter(final double center);
+
         /**
          * Sets the width of the light sheet in normal camera trigger modes.
          *
@@ -63,6 +65,7 @@ public interface SheetCalibration {
     Builder copyBuilder();
 
     // normal camera trigger modes
+    double imagingCenter();
     double sheetWidth();
     double sheetOffset();
     boolean isUsingAutoSheetWidth();
