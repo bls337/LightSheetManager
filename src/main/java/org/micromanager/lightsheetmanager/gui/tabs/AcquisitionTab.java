@@ -164,8 +164,8 @@ public class AcquisitionTab extends Panel {
         pnlButtons_.add(btnPauseAcquisition_, "");
         pnlButtons_.add(btnTestAcquisition_, "");
         pnlButtons_.add(btnOpenPlaylist_, "");
-        pnlButtons_.add(btnSpeedTest_, "");
         pnlButtons_.add(btnRunOverviewAcq_, "");
+        pnlButtons_.add(btnSpeedTest_, "");
 
         // 3 panel layout
         pnlLeft.add(pnlDurations_, "growx, growy");

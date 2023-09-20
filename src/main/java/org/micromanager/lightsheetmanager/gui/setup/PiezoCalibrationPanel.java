@@ -8,6 +8,8 @@ import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -118,13 +120,33 @@ public class PiezoCalibrationPanel extends Panel {
         final DefaultAcquisitionSettingsDISPIM.Builder asb =
                 model_.acquisitions().getAcquisitionSettingsBuilder();
 
+        final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
+        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+        System.out.println("piezo: " + piezo);
+        System.out.println("scanner: " + scanner);
+
         btnTwoPoint_.registerListener(e -> {
 
         });
 
-        btnUpdate_.registerListener(e -> {
-
-        });
+        // FIXME: find a better way to check for devices existing
+        if (scanner != null && piezo != null) {
+            btnUpdate_.registerListener(e -> {
+                if (scanner.isBeamOn()) {
+                    final double rate = model_.acquisitions().getAcquisitionSettings()
+                            .sliceCalibration(pathNum_).sliceSlope();
+                    final double piezoPosition = piezo.getPosition();
+                    final double scannerPosition = scanner.getPosition();
+                    double channelOffset = 0.0;
+                    // FIXME: update channelOffset
+                    // was: channelOffset = ASIdiSPIM.getFrame().getAcquisitionPanel().getChannelOffset();
+                    final double newOffset = piezoPosition - rate * scannerPosition - channelOffset;
+                    txtOffset_.setText(Double.toString(newOffset));
+                    model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
+                            newOffset + " (with channel offset of " + channelOffset + ")");
+                }
+            });
+        }
 
         btnStepUp_.registerListener(e -> {
 
