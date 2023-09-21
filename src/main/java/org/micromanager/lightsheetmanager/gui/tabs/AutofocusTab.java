@@ -176,8 +176,8 @@ public class AutofocusTab extends Panel {
 
         // add panels to tab
         add(pnlGeneralOptions, "");
-        add(pnlAcqActiveOptions, "wrap");
-        add(pnlAcqSetupOptions, "");
+        //add(pnlAcqActiveOptions, "wrap");
+        //add(pnlAcqSetupOptions, "");
         //add(pnlMoveCorrection, "wrap"); // TODO: add planar correction
     }
 

@@ -41,8 +41,8 @@ public class SettingsTab extends Panel {
         final DefaultAcquisitionSettingsDISPIM acqSettings =
                 model_.acquisitions().getAcquisitionSettings();
 
-        final Panel pnlScan = new Panel("Stage Scan Settings");
-        pnlScan.setMigLayout(
+        final Panel pnlScanSettings = new Panel("Stage Scan Settings");
+        pnlScanSettings.setMigLayout(
                 "",
                 "[]5[]",
                 "[]5[]");
@@ -94,17 +94,17 @@ public class SettingsTab extends Panel {
         spnLiveScanPeriod_ = Spinner.createIntegerSpinner(20, 2, 10000, 100);
 
         // scan settings panel
-        pnlScan.add(lblScanAcceleration, "");
-        pnlScan.add(spnScanAcceleration_, "wrap");
-        pnlScan.add(lblScanOvershootDist, "");
-        pnlScan.add(spnScanOvershootDist_, "wrap");
-        pnlScan.add(lblScanRetraceSpeed, "");
-        pnlScan.add(spnScanRetraceSpeed_, "wrap");
-        pnlScan.add(lblScanAngleFirstView, "");
-        pnlScan.add(spnScanAngleFirstView_, "wrap");
-        pnlScan.add(cbxScanFromCurrentPosition_, "wrap");
-        pnlScan.add(cbxScanNegativeDirection_, "wrap");
-        pnlScan.add(cbxReturnToOriginalPosition_, "wrap");
+        pnlScanSettings.add(lblScanAcceleration, "");
+        pnlScanSettings.add(spnScanAcceleration_, "wrap");
+        pnlScanSettings.add(lblScanOvershootDist, "");
+        pnlScanSettings.add(spnScanOvershootDist_, "wrap");
+        pnlScanSettings.add(lblScanRetraceSpeed, "");
+        pnlScanSettings.add(spnScanRetraceSpeed_, "wrap");
+        pnlScanSettings.add(lblScanAngleFirstView, "");
+        pnlScanSettings.add(spnScanAngleFirstView_, "wrap");
+        pnlScanSettings.add(cbxScanFromCurrentPosition_, "wrap");
+        pnlScanSettings.add(cbxScanNegativeDirection_, "wrap");
+        pnlScanSettings.add(cbxReturnToOriginalPosition_, "wrap");
 
         // light sheet scanner settings panel
         pnlLightSheet.add(lblSheetAxisFilterFreq, "");
@@ -115,7 +115,7 @@ public class SettingsTab extends Panel {
         pnlLightSheet.add(spnLiveScanPeriod_, "");
 
         add(pnlLightSheet, "growx, wrap");
-        add(pnlScan, "");
+        //add(pnlScanSettings, "");
     }
 
     private void createEventHandlers() {
