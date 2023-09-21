@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  * Acquisition modes for diSPIM.
  */
-public enum AcquisitionModes {
+public enum AcquisitionMode {
     NONE("None"),
 
     PIEZO_SLICE_SCAN("Synchronous piezo/slice scan"),
@@ -20,7 +20,7 @@ public enum AcquisitionModes {
 
     private final String text_;
 
-    AcquisitionModes(final String text) {
+    AcquisitionMode(final String text) {
         text_ = text;
     }
 
@@ -29,13 +29,13 @@ public enum AcquisitionModes {
         return text_;
     }
 
-    public static AcquisitionModes getByIndex(final int index) {
+    public static AcquisitionMode getByIndex(final int index) {
         return values()[index];
     }
 
     public static String[] toArray() {
         return Arrays.stream(values())
-                .map(AcquisitionModes::toString)
+                .map(AcquisitionMode::toString)
                 .toArray(String[]::new);
     }
 

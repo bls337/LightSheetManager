@@ -7,7 +7,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelModes;
+import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 
 import javax.swing.JLabel;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class ChannelTablePanel extends Panel {
         final String[] groupLabels = getAvailableGroups();
         cmbChannelGroup_ = new ComboBox(groupLabels, groupLabels[0]);
 
-        cmbChannelMode_ = new ComboBox(MultiChannelModes.toArray(),
+        cmbChannelMode_ = new ComboBox(MultiChannelMode.toArray(),
                 model_.acquisitions().getAcquisitionSettings().channelMode().toString());
 
         add(lblChannelGroup_, "split 2");
@@ -86,7 +86,7 @@ public class ChannelTablePanel extends Panel {
 
         cmbChannelMode_.registerListener(e -> {
             final int index = cmbChannelMode_.getSelectedIndex();
-            asb_.channelMode(MultiChannelModes.getByIndex(index));
+            asb_.channelMode(MultiChannelMode.getByIndex(index));
             //System.out.println("getChannelMode: " + model_.acquisitions().getAcquisitionSettings().getChannelMode());
         });
 

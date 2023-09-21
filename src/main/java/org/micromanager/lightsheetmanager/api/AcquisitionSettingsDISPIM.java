@@ -9,8 +9,8 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
-import org.micromanager.lightsheetmanager.api.data.AcquisitionModes;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelModes;
+import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
+import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 
 /**
  * Acquisition settings for diSPIM microscope geometries.
@@ -24,14 +24,14 @@ public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
          *
          * @param acqMode the acquisition mode
          */
-        T acquisitionMode(final AcquisitionModes acqMode);
+        T acquisitionMode(final AcquisitionMode acqMode);
 
         /**
          * Sets the channel mode.
          *
          * @param channelMode the channel mode.
          */
-        T channelMode(final MultiChannelModes channelMode);
+        T channelMode(final MultiChannelMode channelMode);
 
         /**
          * Sets the camera mode.
@@ -203,14 +203,14 @@ public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
      *
      * @return the acquisition mode.
      */
-    AcquisitionModes acquisitionMode();
+    AcquisitionMode acquisitionMode();
 
     /**
      * Returns the channel mode.
      *
      * @return the channel mode.
      */
-    MultiChannelModes channelMode();
+    MultiChannelMode channelMode();
 
     /**
      * Returns the camera mode.

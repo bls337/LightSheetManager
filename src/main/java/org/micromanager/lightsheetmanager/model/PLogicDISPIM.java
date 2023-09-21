@@ -10,8 +10,8 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
-import org.micromanager.lightsheetmanager.api.data.AcquisitionModes;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelModes;
+import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
+import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
@@ -187,7 +187,7 @@ public class PLogicDISPIM {
         }
 
         if (settings.isUsingStageScanning()
-                && settings.acquisitionMode() == AcquisitionModes.STAGE_SCAN_INTERLEAVED) {
+                && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             if (numViews != 2) {
                 studio_.logs().showError("Interleaved stage scan only possible for 2-sided acquisition.");
                 return false;
@@ -232,7 +232,7 @@ public class PLogicDISPIM {
             // figure out the speed we should be going according to slice period, slice spacing, geometry, etc.
             final double requestedMotorSpeed = computeScanSpeed(settings, scanner1_.getSPIMNumScansPerSlice());  // in mm/sec
 
-            final boolean isInterleaved = (settings.acquisitionMode() == AcquisitionModes.STAGE_SCAN_INTERLEAVED);
+            final boolean isInterleaved = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
 
             final float maxSpeed = xyStage_.getMaxSpeedX();
             if (requestedMotorSpeed > maxSpeed * 0.8) {
@@ -262,7 +262,7 @@ public class PLogicDISPIM {
             numLines *= ((double) settings.numChannels() / computeScanChannelsPerPass(settings));
             xyStage_.setScanNumLines(numLines);
 
-            final boolean isStageScan2Sided = (settings.acquisitionMode() == AcquisitionModes.STAGE_SCAN) && settings.volumeSettings().numViews() == 2;
+            final boolean isStageScan2Sided = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN) && settings.volumeSettings().numViews() == 2;
             xyStage_.setScanPattern(isStageScan2Sided ? ASIXYStage.ScanPattern.SERPENTINE : ASIXYStage.ScanPattern.RASTER);
 
             if (xyStage_.getAxisPolarityX() != ASIXYStage.AxisPolarity.NORMAL) {
@@ -350,7 +350,7 @@ public class PLogicDISPIM {
         //double sliceDuration = settings.timingSettings().sliceDuration();
         //double sliceDuration = 0.0; // TODO: get from SliceTiming
         double sliceDuration = getSliceDuration(settings.timingSettings(), numScansPerSlice); // TODO: ???
-        if (settings.acquisitionMode() == AcquisitionModes.STAGE_SCAN_INTERLEAVED) {
+        if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             // pretend like our slice takes twice as long so that we move the correct speed
             // this has the effect of halving the motor speed
             // but keeping the scan distance the same
@@ -363,7 +363,7 @@ public class PLogicDISPIM {
 
     // compute how many channels we do in each one-way scan
     private int computeScanChannelsPerPass(DefaultAcquisitionSettingsDISPIM settings) {
-        return settings.channelMode() == MultiChannelModes.SLICE_HW ? settings.numChannels() : 1;
+        return settings.channelMode() == MultiChannelMode.SLICE_HW ? settings.numChannels() : 1;
     }
 
     /**
@@ -520,7 +520,7 @@ public class PLogicDISPIM {
                 // if we are changing color slice by slice then set controller to do multiple slices per piezo move
                 // otherwise just set to 1 slice per piezo move
                 int numSlicesPerPiezo = 1;
-                if (settings.isUsingChannels() && settings.channelMode() == MultiChannelModes.SLICE_HW) {
+                if (settings.isUsingChannels() && settings.channelMode() == MultiChannelMode.SLICE_HW) {
                     numSlicesPerPiezo = settings.numChannels();
                 }
                 scanner.setSPIMNumSlicesPerPiezo(numSlicesPerPiezo);
@@ -530,7 +530,7 @@ public class PLogicDISPIM {
                 // otherwise (no channels, software switching, slice by slice HW switching)
                 //   just do one volume per start trigger
                 int numVolumesPerTrigger = 1;
-                if (settings.isUsingChannels() && settings.channelMode() == MultiChannelModes.VOLUME_HW) {
+                if (settings.isUsingChannels() && settings.channelMode() == MultiChannelMode.VOLUME_HW) {
                     numVolumesPerTrigger = settings.numChannels();
                 }
 
@@ -570,7 +570,7 @@ public class PLogicDISPIM {
 
             // if we set piezoAmplitude to 0 here then sliceAmplitude will also be 0
             float piezoAmplitude;
-            if (settings.isUsingStageScanning() || settings.acquisitionMode() == AcquisitionModes.NO_SCAN) {
+            if (settings.isUsingStageScanning() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
                 piezoAmplitude = 0.0f;
             } else {
                 piezoAmplitude = (float) ((settings.volumeSettings().slicesPerView() - 1) * settings.volumeSettings().sliceStepSize());
@@ -604,7 +604,7 @@ public class PLogicDISPIM {
             float sliceAmplitude = piezoAmplitude / sliceRate;
             float sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
 
-            if (settings.acquisitionMode() == AcquisitionModes.PIEZO_SCAN_ONLY) {
+            if (settings.acquisitionMode() == AcquisitionMode.PIEZO_SCAN_ONLY) {
                 if (cameraMode == CameraMode.OVERLAP) {
                     float actualPiezoCenter = piezoCenter - piezoAmplitude / (2 * (numSlicesHW - 1));
                     sliceCenter = (actualPiezoCenter - sliceOffset) / sliceRate;
@@ -640,7 +640,7 @@ public class PLogicDISPIM {
 
                 // if mode SLICE_SCAN_ONLY we have computed slice movement as if we
                 //   were moving the piezo but now make piezo stay still
-                if (settings.acquisitionMode() == AcquisitionModes.SLICE_SCAN_ONLY) {
+                if (settings.acquisitionMode() == AcquisitionMode.SLICE_SCAN_ONLY) {
                     // if we artificially shifted centers due to extra trigger and only moving piezo
                     // then move galvo center back to where it would have been
                     if (settings.cameraMode() == CameraMode.OVERLAP) {
@@ -681,7 +681,7 @@ public class PLogicDISPIM {
                 }
 
                 final boolean isInterleaved = (settings.isUsingStageScanning()
-                        && settings.acquisitionMode() == AcquisitionModes.STAGE_SCAN_INTERLEAVED);
+                        && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
 
                 // even though we have moved piezos to home position let's still tell firmware
                 //    not to move piezos anywhere (i.e. maybe setting "home disable" to true doesn't have any really effect)
@@ -753,11 +753,11 @@ public class PLogicDISPIM {
 
     public boolean setupHardwareChannelSwitching(final DefaultAcquisitionSettingsDISPIM settings) {
 
-        MultiChannelModes channelMode = settings.channelMode();
+        MultiChannelMode channelMode = settings.channelMode();
 
         // PLogic can only handle up to 4 channels
         if ((settings.numChannels() > 4) &&
-                (channelMode == MultiChannelModes.VOLUME_HW || channelMode == MultiChannelModes.SLICE_HW)) {
+                (channelMode == MultiChannelMode.VOLUME_HW || channelMode == MultiChannelMode.SLICE_HW)) {
             studio_.logs().showError("PLogic card cannot handle more than 4 channels for hardware switching.");
             return false;
         }
@@ -881,7 +881,7 @@ public class PLogicDISPIM {
                 // if we are doing per-volume switching with side B first then counter will start at 1 instead of 0
                 // the following lines account for this by incrementing the channel number "match" by 1 in this special case
                 int adjustedChannelNum = channelNum;
-                if (channelMode == MultiChannelModes.VOLUME_HW && !(settings.volumeSettings().firstView() == 0)) {
+                if (channelMode == MultiChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 0)) {
                     adjustedChannelNum = (channelNum + 1) % settings.numChannels();
                 }
                 // map the channel number to the equivalent addresses for the AND4
@@ -902,7 +902,7 @@ public class PLogicDISPIM {
         return true;
     }
 
-    public boolean triggerControllerStartAcquisition(final AcquisitionModes acqMode, int side) {
+    public boolean triggerControllerStartAcquisition(final AcquisitionMode acqMode, int side) {
         ASIScanner scanner;
         if (side == 1) {
             scanner = scanner1_;
@@ -933,7 +933,7 @@ public class PLogicDISPIM {
         return true;
     }
 
-    public boolean triggerControllerStartAcquisitionSCAPE(final AcquisitionModes acqMode, int side) {
+    public boolean triggerControllerStartAcquisitionSCAPE(final AcquisitionMode acqMode, int side) {
         switch (acqMode) {
             case STAGE_SCAN:
             case STAGE_SCAN_INTERLEAVED:

@@ -3,8 +3,8 @@ package org.micromanager.lightsheetmanager.api.internal;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
-import org.micromanager.lightsheetmanager.api.data.AcquisitionModes;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelModes;
+import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
+import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 
 public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings implements AcquisitionSettingsDISPIM {
 
@@ -16,8 +16,8 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultScanSettings.Builder scsb_ = new DefaultScanSettings.Builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
-        private AcquisitionModes acquisitionMode_ = AcquisitionModes.NONE;
-        private MultiChannelModes channelMode_ = MultiChannelModes.NONE;
+        private AcquisitionMode acquisitionMode_ = AcquisitionMode.NONE;
+        private MultiChannelMode channelMode_ = MultiChannelMode.NONE;
         private CameraMode cameraMode_ = CameraMode.INTERNAL;
 
         private boolean useChannels_ = false;
@@ -81,7 +81,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
          * @param acqMode the acquisition mode
          */
         @Override
-        public Builder acquisitionMode(final AcquisitionModes acqMode) {
+        public Builder acquisitionMode(final AcquisitionMode acqMode) {
             acquisitionMode_ = acqMode;
             return this;
         }
@@ -92,7 +92,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
          * @param channelMode the channel mode.
          */
         @Override
-        public Builder channelMode(final MultiChannelModes channelMode) {
+        public Builder channelMode(final MultiChannelMode channelMode) {
             channelMode_ = channelMode;
             return this;
         }
@@ -300,7 +300,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
 
         // getters for builder
 
-        public AcquisitionModes acquisitionMode() {
+        public AcquisitionMode acquisitionMode() {
             return acquisitionMode_;
         }
 
@@ -355,8 +355,8 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
     private final DefaultSheetCalibration[] sheetCalibrations_;
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
-    private final AcquisitionModes acquisitionMode_;
-    private final MultiChannelModes channelMode_;
+    private final AcquisitionMode acquisitionMode_;
+    private final MultiChannelMode channelMode_;
     private final CameraMode cameraMode_;
 
     private final boolean useChannels_;
@@ -523,7 +523,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
      * @return the acquisition mode.
      */
     @Override
-    public AcquisitionModes acquisitionMode() {
+    public AcquisitionMode acquisitionMode() {
         return acquisitionMode_;
     }
 
@@ -533,7 +533,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
      * @return the channel mode.
      */
     @Override
-    public MultiChannelModes channelMode() {
+    public MultiChannelMode channelMode() {
         return channelMode_;
     }
 

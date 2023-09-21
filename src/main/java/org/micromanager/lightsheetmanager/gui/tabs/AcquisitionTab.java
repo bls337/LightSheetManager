@@ -21,7 +21,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.ToggleButton;
-import org.micromanager.lightsheetmanager.api.data.AcquisitionModes;
+import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -149,7 +149,7 @@ public class AcquisitionTab extends Panel {
             pnlChannelTable_.setItemsEnabled(false);
         }
 
-        cmbAcquisitionModes_ = new ComboBox(AcquisitionModes.toArray(),
+        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.toArray(),
                 acqSettings.acquisitionMode().toString(),
                 180, 24);
 
@@ -290,7 +290,7 @@ public class AcquisitionTab extends Panel {
 
         cmbAcquisitionModes_.registerListener(e -> {
             final int index = cmbAcquisitionModes_.getSelectedIndex();
-            asb_.acquisitionMode(AcquisitionModes.getByIndex(index));
+            asb_.acquisitionMode(AcquisitionMode.getByIndex(index));
             //System.out.println("getAcquisitionMode: " + model_.acquisitions().getAcquisitionSettings().getAcquisitionMode());
         });
 

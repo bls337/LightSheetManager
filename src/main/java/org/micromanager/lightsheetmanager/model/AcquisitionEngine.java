@@ -31,8 +31,8 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
-import org.micromanager.lightsheetmanager.api.data.AcquisitionModes;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelModes;
+import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
+import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -110,7 +110,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                     }
                 } else {
                     // TODO: put this here?
-                    if (acqSettings_.acquisitionMode() == AcquisitionModes.NONE) {
+                    if (acqSettings_.acquisitionMode() == AcquisitionMode.NONE) {
                         studio_.logs().showError("please select a valid acquisition mode!");
                         return;
                     }
@@ -561,7 +561,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                                     LSMAcquisitionEvents.createMultiChannelVolumeAcqEvents(
                                             baseEvent.copy(), acqSettings_, cameraNames, null,
                                             acqSettings_.acquisitionMode() ==
-                                                    AcquisitionModes.STAGE_SCAN_INTERLEAVED));
+                                                    AcquisitionMode.STAGE_SCAN_INTERLEAVED));
                         } else {
                             currentAcquisition_.submitEventIterator(
                                     LSMAcquisitionEvents.createVolumeAcqEvents(
@@ -907,7 +907,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 
             // MM MDA acquisitions have a defined order
             summaryMetadata.put(PropertyKey.SLICES_FIRST.key(),
-                  acqSettings_.acquisitionMode() == AcquisitionModes.STAGE_SCAN_INTERLEAVED);
+                  acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
             summaryMetadata.put(PropertyKey.TIME_FIRST.key(),
                   false); // currently only position, time ordering
 
@@ -1354,7 +1354,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                               LSMAcquisitionEvents.createMultiChannelVolumeAcqEvents(
                                     baseEvent.copy(), acqSettings_, cameraNames, null,
                                     acqSettings_.acquisitionMode() ==
-                                          AcquisitionModes.STAGE_SCAN_INTERLEAVED));
+                                          AcquisitionMode.STAGE_SCAN_INTERLEAVED));
                     } else {
                         currentAcquisition_.submitEventIterator(
                               LSMAcquisitionEvents.createVolumeAcqEvents(
@@ -1642,7 +1642,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
      * @return duration in ms
      */
     public double computeActualVolumeDuration(final DefaultAcquisitionSettingsDISPIM acqSettings) {
-        final MultiChannelModes channelMode = acqSettings.channelMode();
+        final MultiChannelMode channelMode = acqSettings.channelMode();
         final int numChannels = acqSettings.numChannels();
         final int numViews = acqSettings.volumeSettings().numViews();
         final double delayBeforeSide = acqSettings.volumeSettings().delayBeforeView();
@@ -1659,11 +1659,11 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         } else {
             // piezo scan
             double channelSwitchDelay = 0;
-            if (channelMode == MultiChannelModes.VOLUME) {
+            if (channelMode == MultiChannelMode.VOLUME) {
                 channelSwitchDelay = 500;   // estimate channel switching overhead time as 0.5s
                 // actual value will be hardware-dependent
             }
-            if (channelMode == MultiChannelModes.SLICE_HW) {
+            if (channelMode == MultiChannelMode.SLICE_HW) {
                 return numViews * (delayBeforeSide + stackDuration * numChannels);  // channelSwitchDelay = 0
             } else {
                 return numViews * numChannels
