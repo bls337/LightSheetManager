@@ -173,11 +173,13 @@ public class PositionPanel extends Panel {
 
         btnImagingZero_.registerListener(e -> {
             piezo.setPosition(0.0);
+            lblSlicePositionValue_.setText(piezo.getPosition() + " μm");
         });
 
         btnSliceZero_.registerListener(e -> {
             final double xValue = scanner.getPosition().x;
             scanner.setPosition(xValue, 0.0);
+            lblSlicePositionValue_.setText(scanner.getPosition().y + " °");
         });
 
         // FIXME: find a better way to check for devices existing
@@ -185,14 +187,16 @@ public class PositionPanel extends Panel {
             txtImagingPosition_.addDocumentListener(e -> {
                 System.out.println("imaging position update: " + txtImagingPosition_.getText());
                 piezo.setPosition(Double.parseDouble(txtImagingPosition_.getText()));
-                lblImagingPositionValue_.setText(txtImagingPosition_.getText() + " μm");
+                lblImagingPositionValue_.setText(piezo.getPosition() + " μm");
+                //lblImagingPositionValue_.setText(txtImagingPosition_.getText() + " μm");
             });
 
             txtSlicePosition_.addDocumentListener(e -> {
                 System.out.println("slice y position update: " + txtSlicePosition_.getText());
                 final double xValue = scanner.getPosition().x;
                 scanner.setPosition(xValue, Double.parseDouble(txtSlicePosition_.getText()));
-                lblSlicePositionValue_.setText(txtSlicePosition_.getText() + " °");
+                lblSlicePositionValue_.setText(scanner.getPosition().y + " °");
+                //lblSlicePositionValue_.setText(txtSlicePosition_.getText() + " °");
             });
         }
     }
