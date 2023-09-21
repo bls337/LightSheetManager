@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.api;
 
 
 import org.micromanager.lightsheetmanager.api.data.AutofocusFit;
-import org.micromanager.lightsheetmanager.api.data.AutofocusModes;
+import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 
 /**
@@ -39,7 +39,7 @@ public interface AutofocusSettings {
          *
          * @param mode the autofocus mode
          */
-        Builder mode(final AutofocusModes mode);
+        Builder mode(final AutofocusMode mode);
 
         /**
          * Sets the type of scoring algorithm to use when running autofocus.
@@ -125,7 +125,7 @@ public interface AutofocusSettings {
      *
      * @return the autofocus mode
      */
-    AutofocusModes mode();
+    AutofocusMode mode();
 
     /**
      * Returns the type of scoring algorithm used for autofocus.

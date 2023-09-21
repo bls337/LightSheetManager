@@ -1,6 +1,6 @@
 package org.micromanager.lightsheetmanager.api;
 
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
 
@@ -10,14 +10,14 @@ import java.awt.Rectangle;
  */
 public interface LightSheetCamera {
 
-    void setTriggerMode(final CameraModes cameraMode);
-    CameraModes getTriggerMode();
+    void setTriggerMode(final CameraMode cameraMode);
+    CameraMode getTriggerMode();
 
     void setBinning();
     int getBinning();
 
     Rectangle getResolution();
     double getRowReadoutTime();
-    float getReadoutTime(final CameraModes cameraMode);
-    float getResetTime(final CameraModes cameraMode);
+    float getReadoutTime(final CameraMode cameraMode);
+    float getResetTime(final CameraMode cameraMode);
 }

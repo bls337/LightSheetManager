@@ -4,7 +4,7 @@ import mmcorej.CMMCore;
 import mmcorej.Configuration;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.DISPIMDevice;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
@@ -192,7 +192,7 @@ public class PLogicDISPIM {
                 studio_.logs().showError("Interleaved stage scan only possible for 2-sided acquisition.");
                 return false;
             }
-            if (settings.cameraMode() == CameraModes.OVERLAP) {
+            if (settings.cameraMode() == CameraMode.OVERLAP) {
                 studio_.logs().showError("Interleaved stage scan not compatible with overlap camera mode");
                 return false;
             }
@@ -583,8 +583,8 @@ public class PLogicDISPIM {
             // tweak the parameters if we are using synchronous/overlap mode
             // object is to get exact same piezo/scanner positions in first
             // N frames (piezo/scanner will move to N+1st position but no image taken)
-            final CameraModes cameraMode = settings.cameraMode();
-            if (cameraMode == CameraModes.OVERLAP) {
+            final CameraMode cameraMode = settings.cameraMode();
+            if (cameraMode == CameraMode.OVERLAP) {
                 piezoAmplitude *= ((float) numSlicesHW) / ((float) numSlicesHW - 1f);
                 piezoCenter += piezoAmplitude / (2 * numSlicesHW);
                 numSlicesHW += 1;
@@ -605,7 +605,7 @@ public class PLogicDISPIM {
             float sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
 
             if (settings.acquisitionMode() == AcquisitionModes.PIEZO_SCAN_ONLY) {
-                if (cameraMode == CameraModes.OVERLAP) {
+                if (cameraMode == CameraMode.OVERLAP) {
                     float actualPiezoCenter = piezoCenter - piezoAmplitude / (2 * (numSlicesHW - 1));
                     sliceCenter = (actualPiezoCenter - sliceOffset) / sliceRate;
                 }
@@ -643,7 +643,7 @@ public class PLogicDISPIM {
                 if (settings.acquisitionMode() == AcquisitionModes.SLICE_SCAN_ONLY) {
                     // if we artificially shifted centers due to extra trigger and only moving piezo
                     // then move galvo center back to where it would have been
-                    if (settings.cameraMode() == CameraModes.OVERLAP) {
+                    if (settings.cameraMode() == CameraMode.OVERLAP) {
                         piezoCenter -= piezoAmplitude / (2 * (numSlicesHW - 1));
                     }
                     piezoAmplitude = 0.0f;
@@ -693,7 +693,7 @@ public class PLogicDISPIM {
                 // send sheet width/offset
                 double sheetWidth = getSheetWidth(asb_.cameraMode(), view);
                 double sheetOffset = getSheetOffset(asb_.cameraMode(), view);
-                if (cameraMode == CameraModes.VIRTUAL_SLIT) {
+                if (cameraMode == CameraMode.VIRTUAL_SLIT) {
                     // adjust sheet width and offset to account for settle time where scan is going but we aren't imaging yet
                     // FIXME: !!!
                     //final float settleTime = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SCAN_SETTLE);
@@ -1008,7 +1008,7 @@ public class PLogicDISPIM {
      * @param view
      * @return 0 if camera isn't assigned
      */
-    public double getSheetWidth(CameraModes cameraMode, int view) {
+    public double getSheetWidth(CameraMode cameraMode, int view) {
         double sheetWidth;
         //final String cameraName = devices_.getMMDevice(cameraDevice);
         String deviceName = "ImagingCamera" + view; // diSPIM
@@ -1029,7 +1029,7 @@ public class PLogicDISPIM {
             return sheetWidth;
         }
 
-        if (cameraMode == CameraModes.VIRTUAL_SLIT) {
+        if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             // TODO: this!
 //            final float sheetSlope = prefs_.getFloat(
 //                    MyStrings.PanelNames.SETUP.toString() + side.toString(),
@@ -1071,9 +1071,9 @@ public class PLogicDISPIM {
     }
 
     // TODO: needs properties
-    public double getSheetOffset(CameraModes cameraMode, int view) {
+    public double getSheetOffset(CameraMode cameraMode, int view) {
         double sheetOffset;
-        if (cameraMode == CameraModes.VIRTUAL_SLIT) {
+        if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             // in millidegrees, convert to degrees
             // TODO: is this correct?
             sheetOffset = model_.getAcquisitionEngine().getAcquisitionSettings().sheetCalibration(view).sheetOffset() / 1000.0;

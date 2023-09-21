@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.AutofocusFit;
-import org.micromanager.lightsheetmanager.api.data.AutofocusModes;
+import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAutofocusSettings;
@@ -81,16 +81,20 @@ public class AutofocusTab extends Panel {
         cbxShowImages_ = new CheckBox("Show Images", 12, true, CheckBox.RIGHT);
         cbxShowPlot_ = new CheckBox("Show Plot", 12, true, CheckBox.RIGHT);
 
-        spnNumImages_ = Spinner.createIntegerSpinner(1, 0, Integer.MAX_VALUE, 1);
-        spnStepSize_ = Spinner.createFloatSpinner(0.001f, 0.0f, 100.0f, 1.0f);
-        spnMinimumR2_ = Spinner.createFloatSpinner(0.75f, 0.0f, 1.0f, 0.01f);
+        spnNumImages_ = Spinner.createIntegerSpinner(
+                acqSettings.autofocusSettings().numImages(), 0, Integer.MAX_VALUE, 1);
+        spnStepSize_ = Spinner.createDoubleSpinner(
+                acqSettings.autofocusSettings().stepSize(), 0.0, 100.0, 1.0);
+        spnMinimumR2_ = Spinner.createDoubleSpinner(
+                acqSettings.autofocusSettings().r2(), 0.0, 1.0, 0.01);
 
+        ComboBox.setDefaultSize(120, 20);
         cmbScoringAlgorithm_ = new ComboBox(AutofocusType.toArray(),
                 acqSettings.autofocusSettings().scoringAlgorithm().toString());
         cmbFittingFunction_ = new ComboBox(AutofocusFit.toArray(),
                 acqSettings.autofocusSettings().fit().toString());
         ComboBox.setDefaultSize(140, 20);
-        cmbAutofocusMode_ = new ComboBox(AutofocusModes.toArray(),
+        cmbAutofocusMode_ = new ComboBox(AutofocusMode.toArray(),
                 acqSettings.autofocusSettings().mode().toString());
 
         // autofocus options during acquisition
@@ -121,7 +125,7 @@ public class AutofocusTab extends Panel {
         final Label lblMinMovement = new Label("Min movement:");
         final Spinner spnCorrectEveryX = Spinner.createIntegerSpinner(100, 0, 1000, 1);
         final Spinner spnMaxDistance = Spinner.createIntegerSpinner(96, 0, 100, 1);
-        final Spinner spnMinMovement = Spinner.createFloatSpinner(1.0f, 0.0f, 10.0f, 0.5f);
+        final Spinner spnMinMovement = Spinner.createDoubleSpinner(1.0, 0.0, 10.0, 0.5);
         final ComboBox cmbChannel = new ComboBox(labels, "None", 60, 20);
 
         // add ui elements to the panel
@@ -193,31 +197,34 @@ public class AutofocusTab extends Panel {
                 .acquisitions().getAcquisitionSettingsBuilder().autofocusSettingsBuilder();
 
         // general autofocus settings
-        cbxShowImages_.registerListener(e ->
-                System.out.println("cbxShowImages_: " + cbxShowImages_.isSelected()));
+        cbxShowImages_.registerListener(e -> {
+            System.out.println("cbxShowImages_: " + cbxShowImages_.isSelected());
+        });
 
-        cbxShowPlot_.registerListener(e ->
-                System.out.println("cbxShowPlot_: " + cbxShowPlot_.isSelected()));
+        cbxShowPlot_.registerListener(e -> {
+            System.out.println("cbxShowPlot_: " + cbxShowPlot_.isSelected());
+        });
 
         spnNumImages_.registerListener(e ->
                 afsb_.numImages(spnNumImages_.getInt()));
 
         spnStepSize_.registerListener(e ->
-                afsb_.stepSize(spnStepSize_.getFloat()));
+                afsb_.stepSize(spnStepSize_.getDouble()));
 
         spnMinimumR2_.registerListener(e -> {
-
+            afsb_.r2(spnMinimumR2_.getDouble());
         });
 
         cmbAutofocusMode_.registerListener(e -> {
-
+            afsb_.mode(AutofocusMode.fromString(cmbAutofocusMode_.getSelected()));
         });
 
         cmbScoringAlgorithm_.registerListener(e -> {
+            afsb_.scoringAlgorithm(AutofocusType.fromString(cmbScoringAlgorithm_.getSelected()));
         });
 
         cmbFittingFunction_.registerListener(e -> {
-
+            afsb_.fit(AutofocusFit.fromString(cmbFittingFunction_.getSelected()));
         });
 
         // autofocus options during acquisition

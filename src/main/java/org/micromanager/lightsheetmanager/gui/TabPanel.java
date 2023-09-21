@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.gui;
 
-import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.tabs.NavigationTab;
 import org.micromanager.lightsheetmanager.gui.tabs.SetupPathTab;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
@@ -102,7 +101,7 @@ public class TabPanel extends Panel {
      *
      * @param cameraMode the selected camera trigger mode
      */
-    public void swapSetupPathPanels(final CameraModes cameraMode) {
+    public void swapSetupPathPanels(final CameraMode cameraMode) {
         for (SetupPathTab setupPathTab : setupPathTabs_) {
             setupPathTab.swapPanels(cameraMode);
         }

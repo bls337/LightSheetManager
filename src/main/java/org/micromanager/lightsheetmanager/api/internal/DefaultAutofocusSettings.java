@@ -2,15 +2,15 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AutofocusSettings;
 import org.micromanager.lightsheetmanager.api.data.AutofocusFit;
-import org.micromanager.lightsheetmanager.api.data.AutofocusModes;
+import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 
 public class DefaultAutofocusSettings implements AutofocusSettings {
 
     public static class Builder implements AutofocusSettings.Builder {
         private int numImages_ = 4;
-        private double stepSize_ = 1.0;
-        private AutofocusModes mode_ = AutofocusModes.FIXED_PIEZO_SWEEP_SLICE;
+        private double stepSize_ = 0.001;
+        private AutofocusMode mode_ = AutofocusMode.FIXED_PIEZO_SWEEP_SLICE;
         private AutofocusType scoring_ = AutofocusType.VOLATH;
         private AutofocusFit fit_ = AutofocusFit.GAUSSIAN;
         private double r2_ = 1.0;
@@ -69,7 +69,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          * @param mode the autofocus mode
          */
         @Override
-        public AutofocusSettings.Builder mode(final AutofocusModes mode) {
+        public AutofocusSettings.Builder mode(final AutofocusMode mode) {
             mode_ = mode;
             return this;
         }
@@ -183,7 +183,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 
     private final int numImages_;
     private final double stepSize_;
-    private final AutofocusModes mode_;
+    private final AutofocusMode mode_;
     private final AutofocusType scoring_;
     private final AutofocusFit fit_;
     private final double r2_;
@@ -241,7 +241,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
      * @return the autofocus mode
      */
     @Override
-    public AutofocusModes mode() {
+    public AutofocusMode mode() {
         return mode_;
     }
 

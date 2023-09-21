@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.model.devices.cameras;
 
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.LightSheetCamera;
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
 
@@ -46,14 +46,14 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public void setTriggerMode(CameraModes cameraMode) {
+    public void setTriggerMode(CameraMode cameraMode) {
         mode_ = cameraMode;
         // work-around a bug in SDK3 device adapter, can't switch from light sheet mode
         //  to "normal" center out simultaneous but works if we always go through the in-between mode
         if (hasProperty(Properties.SENSOR_READOUT_MODE)) {
             setProperty(Properties.SENSOR_READOUT_MODE, Values.BOTTOM_UP_SIMULTANEOUS);
             setProperty(Properties.SENSOR_READOUT_MODE,
-                    (cameraMode == CameraModes.VIRTUAL_SLIT) ? Values.BOTTOM_UP_SEQUENTIAL : Values.CENTER_OUT_SIMULTANEOUS);
+                    (cameraMode == CameraMode.VIRTUAL_SLIT) ? Values.BOTTOM_UP_SEQUENTIAL : Values.CENTER_OUT_SIMULTANEOUS);
         }
         switch (cameraMode) {
             case VIRTUAL_SLIT:
@@ -164,7 +164,7 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getReadoutTime(CameraModes cameraMode) {
+    public float getReadoutTime(CameraMode cameraMode) {
         float readoutTimeMs = 10.0f;
         System.out.println("getReadoutTime: mode: " + cameraMode);
         switch (cameraMode) {
@@ -197,7 +197,7 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getResetTime(CameraModes cameraMode) {
+    public float getResetTime(CameraMode cameraMode) {
         final double rowReadoutTime = getRowReadoutTime();
         final float cameraReadoutTime = getReadoutTime(cameraMode);
         int numRowsOverhead = 1; // TODO: change? or keep for explanatory purposes

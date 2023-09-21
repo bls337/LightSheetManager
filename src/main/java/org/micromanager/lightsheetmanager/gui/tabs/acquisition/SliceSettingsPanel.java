@@ -1,6 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
@@ -142,9 +142,9 @@ public class SliceSettingsPanel extends Panel {
      *
      * @param cameraMode the current camera trigger mode
      */
-    public void switchUI(final CameraModes cameraMode) {
+    public void switchUI(final CameraMode cameraMode) {
         removeAll();
-        if (cameraMode != CameraModes.VIRTUAL_SLIT) {
+        if (cameraMode != CameraMode.VIRTUAL_SLIT) {
             add(cbxMinimizeSlicePeriod_, "wrap");
             add(lblSlicePeriod_, "");
             add(spnSlicePeriod_, "wrap");

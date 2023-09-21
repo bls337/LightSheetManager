@@ -1,6 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.setup;
 
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.components.Button;
@@ -149,9 +149,9 @@ public class BeamSheetControlPanel extends Panel {
         }
 
         // add panel based on camera trigger mode
-        final CameraModes cameraMode =
+        final CameraMode cameraMode =
                 model_.acquisitions().getAcquisitionSettingsBuilder().cameraMode();
-        if (cameraMode == CameraModes.VIRTUAL_SLIT) {
+        if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             add(pnlFirst_, "");
         } else {
             add(pnlSecond_, "");
@@ -241,8 +241,8 @@ public class BeamSheetControlPanel extends Panel {
     /**
      * This is called when the camera trigger mode changes and updates the controls accordingly.
      */
-    public void swapPanels(final CameraModes cameraMode) {
-        if (cameraMode != CameraModes.VIRTUAL_SLIT) {
+    public void swapPanels(final CameraMode cameraMode) {
+        if (cameraMode != CameraMode.VIRTUAL_SLIT) {
             remove(pnlFirst_);
             add(pnlSecond_, "");
         } else {

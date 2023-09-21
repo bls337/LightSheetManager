@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.data.AcquisitionModes;
 import org.micromanager.lightsheetmanager.model.data.MultiChannelModes;
@@ -18,7 +18,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
         private AcquisitionModes acquisitionMode_ = AcquisitionModes.NONE;
         private MultiChannelModes channelMode_ = MultiChannelModes.NONE;
-        private CameraModes cameraMode_ = CameraModes.INTERNAL;
+        private CameraMode cameraMode_ = CameraMode.INTERNAL;
 
         private boolean useChannels_ = false;
         private boolean useTimePoints_ = false;
@@ -103,7 +103,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
          * @param cameraMode the camera mode.
          */
         @Override
-        public Builder cameraMode(final CameraModes cameraMode) {
+        public Builder cameraMode(final CameraMode cameraMode) {
             cameraMode_ = cameraMode;
             return this;
         }
@@ -304,7 +304,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             return acquisitionMode_;
         }
 
-        public CameraModes cameraMode() {
+        public CameraMode cameraMode() {
             return cameraMode_;
         }
 
@@ -357,7 +357,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
 
     private final AcquisitionModes acquisitionMode_;
     private final MultiChannelModes channelMode_;
-    private final CameraModes cameraMode_;
+    private final CameraMode cameraMode_;
 
     private final boolean useChannels_;
     private final boolean useTimePoints_;
@@ -543,7 +543,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
      * @return the camera mode.
      */
     @Override
-    public CameraModes cameraMode() {
+    public CameraMode cameraMode() {
         return cameraMode_;
     }
 

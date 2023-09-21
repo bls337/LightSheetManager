@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.model.devices.cameras;
 
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.LightSheetCamera;
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
 
@@ -33,12 +33,12 @@ public class DemoCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getResetTime(CameraModes cameraMode) {
+    public float getResetTime(CameraMode cameraMode) {
         return 0;
     }
 
     @Override
-    public float getReadoutTime(CameraModes cameraMode) {
+    public float getReadoutTime(CameraMode cameraMode) {
         return 0;
     }
 }
