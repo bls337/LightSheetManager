@@ -83,7 +83,7 @@ public class PositionPanel extends Panel {
         btnIllumGoHome_ = new Button("Go Home");
         btnIllumSetHome_ = new Button("Set Home");
 
-        lblSlicePositionValue_ = new JLabel("0.0 μm");
+        lblSlicePositionValue_ = new JLabel("0.0 °");
         lblImagingPositionValue_ = new JLabel("0.0 μm");
         lblIllumPositionValue_ = new JLabel("0.0 μm");
 

@@ -46,6 +46,9 @@ public class BeamSheetControlPanel extends Panel {
 
     private int pathNum_;
 
+    // TODO: this is temporary solution until, update this var so we don't have to rebuild the acqSettings
+    private double currentOffset_;
+
     private LightSheetManagerModel model_;
 
     public BeamSheetControlPanel(final LightSheetManagerModel model, final int pathNum) {
@@ -54,6 +57,9 @@ public class BeamSheetControlPanel extends Panel {
         pathNum_ = pathNum;
         createUserInterface();
         createEventHandlers();
+
+        currentOffset_ = model_.acquisitions().getAcquisitionSettings()
+                .sheetCalibration(pathNum_).sheetOffset();
     }
 
     private void createUserInterface() {
@@ -197,8 +203,10 @@ public class BeamSheetControlPanel extends Panel {
 
         // TODO: buttons
         btnSheetOffsetMinus_.registerListener(e -> {
-            final double value = model_.acquisitions().getAcquisitionSettings()
-                    .sheetCalibration(pathNum_).sheetOffset() - 0.01;
+            //final double value = model_.acquisitions().getAcquisitionSettings()
+            //        .sheetCalibration(pathNum_).sheetOffset() - 0.01;
+            currentOffset_ -= 0.01;
+            final double value = currentOffset_;
             System.out.println("value: " + value);
             asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
             txtSheetOffset_.setText(Double.toString(value));
@@ -206,8 +214,10 @@ public class BeamSheetControlPanel extends Panel {
         });
 
         btnSheetOffsetPlus_.registerListener(e -> {
-            final double value = model_.acquisitions().getAcquisitionSettings()
-                    .sheetCalibration(pathNum_).sheetOffset() + 0.01;
+//            final double value = model_.acquisitions().getAcquisitionSettings()
+//                    .sheetCalibration(pathNum_).sheetOffset() + 0.01;
+            currentOffset_ += 0.01;
+            final double value = currentOffset_;
             System.out.println("value: " + value);
             asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
             txtSheetOffset_.setText(Double.toString(value));
