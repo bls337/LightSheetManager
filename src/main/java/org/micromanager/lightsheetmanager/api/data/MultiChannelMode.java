@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public enum MultiChannelModes {
+public enum MultiChannelMode {
     NONE("None"),
     VOLUME("Every Volume"),
     VOLUME_HW("Every Volume (PLogic)"),
@@ -13,10 +13,10 @@ public enum MultiChannelModes {
 
     private final String text_;
 
-    private static final Map<String, MultiChannelModes> stringToEnum =
+    private static final Map<String, MultiChannelMode> stringToEnum =
             Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
-    MultiChannelModes(final String text) {
+    MultiChannelMode(final String text) {
         text_ = text;
     }
 
@@ -25,17 +25,17 @@ public enum MultiChannelModes {
         return text_;
     }
 
-    public static MultiChannelModes fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, MultiChannelModes.NONE);
+    public static MultiChannelMode fromString(final String symbol) {
+        return stringToEnum.getOrDefault(symbol, MultiChannelMode.NONE);
     }
 
-    public static MultiChannelModes getByIndex(final int index) {
+    public static MultiChannelMode getByIndex(final int index) {
         return values()[index];
     }
 
     public static String[] toArray() {
         return Arrays.stream(values())
-                .map(MultiChannelModes::toString)
+                .map(MultiChannelMode::toString)
                 .toArray(String[]::new);
     }
 
