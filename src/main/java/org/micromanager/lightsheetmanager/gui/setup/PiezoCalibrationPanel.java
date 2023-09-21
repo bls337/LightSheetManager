@@ -136,7 +136,7 @@ public class PiezoCalibrationPanel extends Panel {
                     final double rate = model_.acquisitions().getAcquisitionSettings()
                             .sliceCalibration(pathNum_).sliceSlope();
                     final double piezoPosition = piezo.getPosition();
-                    final double scannerPosition = scanner.getPosition();
+                    final double scannerPosition = scanner.getPosition().y;
                     double channelOffset = 0.0;
                     // FIXME: update channelOffset
                     // was: channelOffset = ASIdiSPIM.getFrame().getAcquisitionPanel().getChannelOffset();

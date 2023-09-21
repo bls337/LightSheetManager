@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.model.devices.vendor;
 
 import org.micromanager.Studio;
 
+import java.awt.geom.Point2D;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,20 +26,20 @@ public class ASIScanner extends ASITigerBase {
         return singleAxis_;
     }
 
-    public void setPosition(final double position) {
+    public void setPosition(final double x, final double y) {
         try {
-            core_.setPosition(deviceName_, position);
+            core_.setGalvoPosition(deviceName_, x, y);
         } catch (Exception e) {
             studio_.logs().showError("Could not move scanner!");
         }
     }
 
-    public double getPosition() {
+    public Point2D.Double getPosition() {
         try {
-            return core_.getPosition(deviceName_);
+            return core_.getGalvoPosition(deviceName_);
         } catch (Exception e) {
             studio_.logs().showError("Could get the scanner position!");
-            return 0.0;
+            return new Point2D.Double(0.0, 0.0);
         }
     }
 
