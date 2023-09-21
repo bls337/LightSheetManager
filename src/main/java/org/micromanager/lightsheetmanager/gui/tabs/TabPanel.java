@@ -1,4 +1,4 @@
-package org.micromanager.lightsheetmanager.gui;
+package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.tabs.NavigationTab;
