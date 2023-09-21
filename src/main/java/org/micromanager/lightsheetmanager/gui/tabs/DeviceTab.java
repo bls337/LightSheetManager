@@ -1,6 +1,5 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
-import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
@@ -34,17 +33,21 @@ public class DeviceTab extends Panel {
             "[]0[]"
         );
 
-        btnCreateConfigGroup_ = new Button("Create System Configuration Group", 220, 30);
+        btnCreateConfigGroup_ = new Button("Create Devices Configuration Group", 220, 30);
 
-        final GeometryType geometryType = devices_.getDeviceAdapter().getMicroscopeGeometry();
-        final int numImagingPaths = devices_.getDeviceAdapter().getNumImagingPaths();
+        final JLabel lblGeometryType = new JLabel("Microscope Geometry: "
+                + devices_.getDeviceAdapter().getMicroscopeGeometry());
+        final JLabel lblLightSheetType = new JLabel("Light Sheet Type: "
+                + devices_.getDeviceAdapter().getLightSheetType());
+        final JLabel lblNumImagingPaths = new JLabel("Imaging Paths: "
+                + devices_.getDeviceAdapter().getNumImagingPaths());
+        final JLabel lblNumIlluminationPaths = new JLabel("Illumination Paths: "
+                + devices_.getDeviceAdapter().getNumIlluminationPaths());
+        final JLabel lblNumSimultaneousCameras = new JLabel("Simultaneous Cameras: "
+                + devices_.getDeviceAdapter().getNumSimultaneousCameras());
 
-        final JLabel lblGeometryType = new JLabel("Microscope Geometry: " + geometryType);
-        final JLabel lblLightSheetType = new JLabel("Light Sheet Type: " + devices_.getDeviceAdapter().getLightSheetType());
-        final JLabel lblNumImagingPaths = new JLabel("Imaging Paths: " + numImagingPaths);
-        final JLabel lblNumIlluminationPaths = new JLabel("Illumination Paths: " + devices_.getDeviceAdapter().getNumIlluminationPaths());
-        final JLabel lblNumSimultaneousCameras = new JLabel("Simultaneous Cameras: " + devices_.getDeviceAdapter().getNumSimultaneousCameras());
-        //final JLabel lblDeviceAdapterVersion = new JLabel("Device Adapter Version: " + devices_.getVersionNumber());
+        btnCreateConfigGroup_.setToolTipText("Creates or updates the \"LightSheetManager::Devices\" " +
+                "configuration group with all editable properties from the Light Sheet Manager device adapter.");
 
         add(lblGeometryType, "wrap");
         add(lblLightSheetType, "wrap");
@@ -55,8 +58,9 @@ public class DeviceTab extends Panel {
     }
 
     private void createEventHandlers() {
-        btnCreateConfigGroup_.registerListener(e ->
-                devices_.createConfigGroup());
+        btnCreateConfigGroup_.registerListener(e -> {
+            devices_.createConfigGroup();
+        });
     }
 
 }

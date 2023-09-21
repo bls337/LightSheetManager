@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.model;
 
+import mmcorej.Configuration;
 import mmcorej.StrVector;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import mmcorej.CMMCore;
@@ -21,6 +22,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIZStage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -318,34 +320,82 @@ public class DeviceManager {
      * the Light Sheet Manager device adapter.
      */
     public void createConfigGroup() {
-        final String groupName = "System";
-        final String configName = "Startup";
+        final String groupName = "LightSheetManager";
+        final String configName = "Devices";
 
-        if (core_.isGroupDefined(groupName)) {
-            studio_.logs().showError("\"System\" configuration group is already defined.");
-            return; // already defined => early exit
+        // create group
+        if (!core_.isGroupDefined(groupName)) {
+            try {
+                core_.defineConfigGroup(groupName);
+            } catch (Exception e) {
+                studio_.logs().logError("could not create the \"" + groupName + "\" configuration group.");
+                return; // early exit
+            }
+            // create config
+            if (!core_.isConfigDefined(groupName, configName)) {
+                try {
+                    core_.defineConfig(groupName, configName);
+                } catch (Exception e) {
+                    studio_.logs().logError("could not create the \"" + configName + "\" configuration preset.");
+                    return; // early exit
+                }
+            }
         }
 
+        ArrayList<String> updatedProperties = updateConfig(groupName, configName);
+
+        if (updatedProperties.isEmpty()) {
+            studio_.logs().showMessage("All device adapter properties are present in the "
+                    + groupName + "::" + configName + " configuration group.");
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (String property : updatedProperties) {
+                sb.append(property).append("\n");
+            }
+            studio_.logs().showMessage("Added properties to the "
+                    + groupName + "::" + configName + " configuration group: \n" + sb);
+        }
+    }
+
+
+    /**
+     * Returns a list of new properties added to the configuration group.
+     *
+     * @param groupName the group name to check
+     * @param configName the configuration group to check
+     * @return an ArrayList of new properties
+     */
+    private ArrayList<String> updateConfig(final String groupName, final String configName) {
+        ArrayList<String> newProperties = new ArrayList<>();
+        final String[] props = getDeviceAdapter().getDevicePropertyNames();
+        final String[] properties = getDeviceAdapter().getEditableProperties(props);
+
+        Configuration config;
         try {
-            core_.defineConfigGroup(groupName);
+            config = core_.getConfigData(groupName, configName);
         } catch (Exception e) {
-            studio_.logs().logError("Could not create the \"System\" configuration group.");
-            return; // error => early exit
+            studio_.logs().showError("could not get configuration data!");
+            return newProperties; // early exit => could not get config data to compare
         }
-
-        String[] props = getDeviceAdapter().getDevicePropertyNames();
-        String[] properties = getDeviceAdapter().getEditableProperties(props);
 
         for (String propertyName : properties) {
-            try {
-                core_.defineConfig(groupName, configName, deviceAdapterName_, propertyName, LightSheetDeviceManager.UNDEFINED);
-            } catch (Exception e) {
-                studio_.logs().logError("Could not create the \"" + propertyName + "\" property the \"System\" configuration group.");
+            if (!config.isPropertyIncluded(deviceAdapterName_, propertyName)) {
+                try {
+                    core_.defineConfig(groupName, configName,
+                            deviceAdapterName_, propertyName, LightSheetDeviceManager.UNDEFINED);
+                    newProperties.add(propertyName);
+                } catch (Exception e) {
+                    studio_.logs().logError("Could not create the \"" + propertyName
+                            + "\" property for the \"" + groupName + "\" configuration group.");
+                }
             }
         }
 
         // update MM ui
-        studio_.getApplication().refreshGUI();
+        if (!newProperties.isEmpty()) {
+            studio_.getApplication().refreshGUI();
+        }
+        return newProperties;
     }
 
 }
