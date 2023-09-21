@@ -12,6 +12,7 @@ import org.micromanager.lightsheetmanager.LightSheetManagerPlugin;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
+import org.micromanager.lightsheetmanager.gui.tabs.TabPanel;
 import org.micromanager.lightsheetmanager.gui.utils.WindowUtils;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.internal.utils.WindowPositioning;
