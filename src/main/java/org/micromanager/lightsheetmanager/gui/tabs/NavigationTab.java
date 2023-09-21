@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.gui.components.Panel;
-import org.micromanager.lightsheetmanager.gui.navigation.NavigationPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.navigation.NavigationPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import java.util.Objects;

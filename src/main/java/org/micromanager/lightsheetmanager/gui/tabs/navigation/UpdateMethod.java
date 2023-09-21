@@ -1,4 +1,4 @@
-package org.micromanager.lightsheetmanager.gui.navigation;
+package org.micromanager.lightsheetmanager.gui.tabs.navigation;
 
 @FunctionalInterface
 public interface UpdateMethod {

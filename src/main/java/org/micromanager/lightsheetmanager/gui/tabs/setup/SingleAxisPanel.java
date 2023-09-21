@@ -1,7 +1,6 @@
-package org.micromanager.lightsheetmanager.gui.setup;
+package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
 
-import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
