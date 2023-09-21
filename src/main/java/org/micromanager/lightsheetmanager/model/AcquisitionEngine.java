@@ -61,6 +61,8 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     private LightSheetManagerModel model_;
     private volatile Acquisition currentAcquisition_ = null;
 
+    private AutofocusRunner autofocusRunner_;
+
     private Datastore curStore_;
     private Pipeline curPipeline_;
     private long nextWakeTime_ = -1;
@@ -71,6 +73,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         core_ = studio_.core();
 
         data_ = new DataStorage(studio_);
+        autofocusRunner_ = new AutofocusRunner(model_);
 
         // default settings
         asb_ = new DefaultAcquisitionSettingsDISPIM.Builder();
@@ -1758,4 +1761,9 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     public DataProvider getAcquisitionDatastore() {
         return curStore_;
     }
+
+    public AutofocusRunner getAutofocusRunner() {
+        return autofocusRunner_;
+    }
+
 }
