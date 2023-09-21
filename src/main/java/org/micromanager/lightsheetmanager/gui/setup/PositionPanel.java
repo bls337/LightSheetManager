@@ -87,6 +87,16 @@ public class PositionPanel extends Panel {
         lblImagingPositionValue_ = new JLabel("0.0 μm");
         lblIllumPositionValue_ = new JLabel("0.0 μm");
 
+        final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
+        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+
+        if (piezo != null && scanner != null) {
+            final double piezoPosition = piezo.getPosition();
+            final double scannerPosition = scanner.getPosition().y;
+            lblImagingPositionValue_.setText(piezoPosition + " μm");
+            lblSlicePositionValue_.setText(scannerPosition + " °");
+        }
+
         txtSlicePosition_.setText("0");
         txtImagingPosition_.setText("0");
         txtIllumPosition_.setText("0");
@@ -166,7 +176,8 @@ public class PositionPanel extends Panel {
         });
 
         btnSliceZero_.registerListener(e -> {
-            scanner.setPosition(0.0);
+            final double xValue = scanner.getPosition().x;
+            scanner.setPosition(xValue, 0.0);
         });
 
         // FIXME: find a better way to check for devices existing
@@ -174,11 +185,14 @@ public class PositionPanel extends Panel {
             txtImagingPosition_.addDocumentListener(e -> {
                 System.out.println("imaging position update: " + txtImagingPosition_.getText());
                 piezo.setPosition(Double.parseDouble(txtImagingPosition_.getText()));
+                lblImagingPositionValue_.setText(txtImagingPosition_.getText() + " μm");
             });
 
             txtSlicePosition_.addDocumentListener(e -> {
-                System.out.println("slice position update: " + txtSlicePosition_.getText());
-                scanner.setPosition(Double.parseDouble(txtSlicePosition_.getText()));
+                System.out.println("slice y position update: " + txtSlicePosition_.getText());
+                final double xValue = scanner.getPosition().x;
+                scanner.setPosition(xValue, Double.parseDouble(txtSlicePosition_.getText()));
+                lblSlicePositionValue_.setText(txtSlicePosition_.getText() + " °");
             });
         }
     }
