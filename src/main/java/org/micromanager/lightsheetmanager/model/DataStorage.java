@@ -4,7 +4,6 @@ import org.micromanager.Studio;
 import org.micromanager.data.Datastore;
 import org.micromanager.data.Image;
 import org.micromanager.lightsheetmanager.api.DataSink;
-import org.micromanager.lightsheetmanager.model.data.MultiChannelModes;
 
 import java.io.IOException;
 import java.util.Arrays;

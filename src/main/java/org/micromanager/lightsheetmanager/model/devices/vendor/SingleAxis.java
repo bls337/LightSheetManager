@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.model.devices.vendor;
 
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.model.data.MultiChannelModes;
 import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 
 import java.util.Arrays;

@@ -21,7 +21,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.ToggleButton;
-import org.micromanager.lightsheetmanager.model.data.AcquisitionModes;
+import org.micromanager.lightsheetmanager.api.data.AcquisitionModes;
 
 import javax.swing.JLabel;
 import java.util.Objects;
