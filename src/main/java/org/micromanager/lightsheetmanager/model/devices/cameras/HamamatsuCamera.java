@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.model.devices.cameras;
 
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.LightSheetCamera;
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
 
@@ -45,10 +45,10 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public void setTriggerMode(final CameraModes cameraMode) {
+    public void setTriggerMode(final CameraMode cameraMode) {
         mode_ = cameraMode;
-        setProperty(Properties.TRIGGER_SOURCE, (cameraMode == CameraModes.INTERNAL) ? Values.INTERNAL : Values.EXTERNAL);
-        setProperty(Properties.SENSOR_MODE, (cameraMode == CameraModes.VIRTUAL_SLIT) ? Values.PROGRESSIVE : Values.AREA);
+        setProperty(Properties.TRIGGER_SOURCE, (cameraMode == CameraMode.INTERNAL) ? Values.INTERNAL : Values.EXTERNAL);
+        setProperty(Properties.SENSOR_MODE, (cameraMode == CameraMode.VIRTUAL_SLIT) ? Values.PROGRESSIVE : Values.AREA);
         switch (cameraMode) {
             case VIRTUAL_SLIT:
                 setProperty(Properties.TRIGGER_ACTIVE, Values.EDGE);
@@ -134,7 +134,7 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getReadoutTime(final CameraModes cameraMode) {
+    public float getReadoutTime(final CameraMode cameraMode) {
         float readoutTimeMs = 10.0f;
         switch (cameraMode) {
             case VIRTUAL_SLIT:
@@ -184,13 +184,13 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getResetTime(final CameraModes cameraMode) {
-        if (cameraMode == CameraModes.VIRTUAL_SLIT) {
+    public float getResetTime(final CameraMode cameraMode) {
+        if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             return 0.0f;
         } else {
             float resetTimeMs = 10.0f;
             final double rowReadoutTime = getRowReadoutTime();
-            final float camReadoutTime = getReadoutTime(CameraModes.EDGE);
+            final float camReadoutTime = getReadoutTime(CameraMode.EDGE);
 
             int numRowsOverhead;
             // don't know if this is different for Fusion; leave it all the same for time being

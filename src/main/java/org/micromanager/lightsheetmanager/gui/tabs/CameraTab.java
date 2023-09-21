@@ -1,6 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.TabPanel;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
@@ -51,7 +51,7 @@ public class CameraTab extends Panel {
         btnCustomROI_ = new Button("Custom", 120, 30);
         btnGetCurrentROI_ = new Button("Get Current ROI", 120, 30);
 
-        cmbCameraTriggerMode_ = new ComboBox(CameraModes.toArray(),
+        cmbCameraTriggerMode_ = new ComboBox(CameraMode.toArray(),
               model_.acquisitions().getAcquisitionSettings().cameraMode().toString());
 
         pnlROI.add(btnUnchangedROI_, "span 2, wrap");
@@ -77,7 +77,7 @@ public class CameraTab extends Panel {
 
         // camera trigger mode
         cmbCameraTriggerMode_.registerListener(e -> {
-            final CameraModes cameraMode = CameraModes.fromString(cmbCameraTriggerMode_.getSelected());
+            final CameraMode cameraMode = CameraMode.fromString(cmbCameraTriggerMode_.getSelected());
             model_.acquisitions().getAcquisitionSettingsBuilder().cameraMode(cameraMode);
             tabPanel_.getAcquisitionTab().getSliceSettingsPanel().switchUI(cameraMode);
             tabPanel_.swapSetupPathPanels(cameraMode);

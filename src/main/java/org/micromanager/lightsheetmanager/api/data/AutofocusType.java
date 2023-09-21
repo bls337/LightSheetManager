@@ -37,6 +37,10 @@ public enum AutofocusType {
                 .toArray(String[]::new);
     }
 
+    public static AutofocusType fromString(final String symbol) {
+        return stringToEnum.getOrDefault(symbol, AutofocusType.NONE);
+    }
+
     @Override
     public String toString() {
         return name;

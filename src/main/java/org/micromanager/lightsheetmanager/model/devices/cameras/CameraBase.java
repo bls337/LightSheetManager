@@ -2,18 +2,18 @@ package org.micromanager.lightsheetmanager.model.devices.cameras;
 
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.LightSheetCamera;
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 
 import java.awt.Rectangle;
 
 public class CameraBase extends DeviceBase implements LightSheetCamera {
 
-    protected CameraModes mode_;
+    protected CameraMode mode_;
 
     public CameraBase(final Studio studio, final String deviceName) {
         super(studio, deviceName);
-        mode_ = CameraModes.INTERNAL;
+        mode_ = CameraMode.INTERNAL;
     }
 
     // TODO: take binning into account
@@ -63,12 +63,12 @@ public class CameraBase extends DeviceBase implements LightSheetCamera {
     // needed for subclasses
 
     @Override
-    public void setTriggerMode(CameraModes cameraMode) {
+    public void setTriggerMode(CameraMode cameraMode) {
         mode_ = cameraMode;
     }
 
     @Override
-    public CameraModes getTriggerMode() {
+    public CameraMode getTriggerMode() {
         return mode_;
     }
 
@@ -93,12 +93,12 @@ public class CameraBase extends DeviceBase implements LightSheetCamera {
     }
 
     @Override
-    public float getReadoutTime(CameraModes cameraMode) {
+    public float getReadoutTime(CameraMode cameraMode) {
         return 0;
     }
 
     @Override
-    public float getResetTime(CameraModes cameraMode) {
+    public float getResetTime(CameraMode cameraMode) {
         return 0;
     }
 }

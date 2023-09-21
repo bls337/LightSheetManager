@@ -26,7 +26,7 @@ import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.data.internal.ndtiff.NDTiffAdapter;
 import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
@@ -674,7 +674,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         // TODO: code that doubles nrSlicesSoftware if (twoSided && acqBothCameras) missing
 
         CameraBase camera = model_.devices().getDevice("Imaging1Camera");
-        CameraModes camMode = camera.getTriggerMode();
+        CameraMode camMode = camera.getTriggerMode();
         final float cameraReadoutTime = camera.getReadoutTime(camMode);
         //final double exposureTime = acqSettings_.timingSettings().cameraExposure();
         final double exposureTime = asb_.timingSettingsBuilder().cameraExposure();
@@ -806,7 +806,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         // TODO: code that doubles nrSlicesSoftware if (twoSided && acqBothCameras) missing
 
         CameraBase camera = model_.devices().getDevice("ImagingCamera");
-        CameraModes camMode = camera.getTriggerMode();
+        CameraMode camMode = camera.getTriggerMode();
         final float cameraReadoutTime = camera.getReadoutTime(camMode);
         //final double exposureTime = acqSettings_.timingSettings().cameraExposure();
         final double exposureTime = asb_.timingSettingsBuilder().cameraExposure();
@@ -1451,7 +1451,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         camera.setTriggerMode(asb.cameraMode());
 
         System.out.println(camera.getDeviceName());
-        CameraModes camMode = camera.getTriggerMode();
+        CameraMode camMode = camera.getTriggerMode();
         System.out.println(camMode);
 
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
@@ -1647,7 +1647,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         final int numViews = acqSettings.volumeSettings().numViews();
         final double delayBeforeSide = acqSettings.volumeSettings().delayBeforeView();
         int numCameraTriggers = acqSettings.volumeSettings().slicesPerView();
-        if (acqSettings.cameraMode() == CameraModes.OVERLAP) {
+        if (acqSettings.cameraMode() == CameraMode.OVERLAP) {
             numCameraTriggers += 1;
         }
         // stackDuration is per-side, per-channel, per-position

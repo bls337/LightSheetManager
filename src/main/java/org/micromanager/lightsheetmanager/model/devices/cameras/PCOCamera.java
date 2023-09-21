@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.model.devices.cameras;
 
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.LightSheetCamera;
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
 
@@ -33,7 +33,7 @@ public class PCOCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public void setTriggerMode(CameraModes cameraMode) {
+    public void setTriggerMode(CameraMode cameraMode) {
         mode_ = cameraMode;
         switch (cameraMode) {
             case EDGE:
@@ -112,7 +112,7 @@ public class PCOCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getReadoutTime(CameraModes cameraMode) {
+    public float getReadoutTime(CameraMode cameraMode) {
         float readoutTimeMs = 10.0f;
         switch (cameraMode) {
             case VIRTUAL_SLIT:
@@ -148,10 +148,10 @@ public class PCOCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getResetTime(CameraModes cameraMode) {
+    public float getResetTime(CameraMode cameraMode) {
         float resetTimeMs = 10.0f;
         final double rowReadoutTime = getRowReadoutTime();
-        final float camReadoutTime = getReadoutTime(CameraModes.EDGE);
+        final float camReadoutTime = getReadoutTime(CameraMode.EDGE);
 
         int numRowsOverhead = 1;
         resetTimeMs = camReadoutTime + (float) (numRowsOverhead * rowReadoutTime);

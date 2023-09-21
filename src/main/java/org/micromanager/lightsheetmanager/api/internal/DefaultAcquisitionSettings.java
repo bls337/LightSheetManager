@@ -31,6 +31,7 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
             saveDuringAcq_ = acqSettings.saveDuringAcq_;
             demoMode_ = acqSettings.demoMode_;
             saveMode_ = acqSettings.saveMode_;
+            afsb_ = acqSettings.autofocusSettings_.copyBuilder();
         }
 
         /**

@@ -1,6 +1,6 @@
 package org.micromanager.lightsheetmanager.api;
 
-import org.micromanager.lightsheetmanager.api.data.CameraModes;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultScanSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
@@ -38,7 +38,7 @@ public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
          *
          * @param cameraMode the camera mode.
          */
-        T cameraMode(final CameraModes cameraMode);
+        T cameraMode(final CameraMode cameraMode);
 
         /**
          * Sets the acquisition to use channels.
@@ -217,7 +217,7 @@ public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
      *
      * @return the camera mode.
      */
-    CameraModes cameraMode();
+    CameraMode cameraMode();
 
     /**
      * Returns true if using channels.
