@@ -163,8 +163,8 @@ public class AcquisitionTab extends Panel {
         pnlButtons_.add(btnRunAcquisition_, "");
         pnlButtons_.add(btnPauseAcquisition_, "");
         pnlButtons_.add(btnTestAcquisition_, "");
-        pnlButtons_.add(btnOpenPlaylist_, "");
         pnlButtons_.add(btnRunOverviewAcq_, "");
+        pnlButtons_.add(btnOpenPlaylist_, "");
         pnlButtons_.add(btnSpeedTest_, "");
 
         // 3 panel layout
@@ -224,7 +224,7 @@ public class AcquisitionTab extends Panel {
         new Thread(() -> {
             try {
                 acqFinished.get();
-            } catch (Exception e ) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             // update the GUI when acquisition complete

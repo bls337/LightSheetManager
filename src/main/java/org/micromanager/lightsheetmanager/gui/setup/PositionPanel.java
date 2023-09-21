@@ -141,6 +141,8 @@ public class PositionPanel extends Panel {
                 add(txtImagingPosition_, "split 2");
                 add(btnImagingZero_, "wrap");
 
+                // TODO: enable when feature exists
+                btnTestAcq_.setEnabled(false);
                 add(btnTestAcq_, "wrap");
                 break;
             default:
