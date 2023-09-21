@@ -9,8 +9,8 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
-import org.micromanager.lightsheetmanager.model.data.AcquisitionModes;
-import org.micromanager.lightsheetmanager.model.data.MultiChannelModes;
+import org.micromanager.lightsheetmanager.api.data.AcquisitionModes;
+import org.micromanager.lightsheetmanager.api.data.MultiChannelModes;
 
 /**
  * Acquisition settings for diSPIM microscope geometries.

@@ -7,7 +7,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
-import org.micromanager.lightsheetmanager.model.data.MultiChannelModes;
+import org.micromanager.lightsheetmanager.api.data.MultiChannelModes;
 
 import javax.swing.JLabel;
 import java.util.ArrayList;

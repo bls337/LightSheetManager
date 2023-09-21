@@ -3,8 +3,8 @@ package org.micromanager.lightsheetmanager.api.internal;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
-import org.micromanager.lightsheetmanager.model.data.AcquisitionModes;
-import org.micromanager.lightsheetmanager.model.data.MultiChannelModes;
+import org.micromanager.lightsheetmanager.api.data.AcquisitionModes;
+import org.micromanager.lightsheetmanager.api.data.MultiChannelModes;
 
 public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings implements AcquisitionSettingsDISPIM {
 
