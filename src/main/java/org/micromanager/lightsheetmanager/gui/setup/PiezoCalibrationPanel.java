@@ -169,7 +169,7 @@ public class PiezoCalibrationPanel extends Panel {
         });
 
         btnRunAutofocus_.registerListener(e -> {
-
+            model_.getAcquisitionEngine().getAutofocusRunner().runAutofocus();
         });
     }
 

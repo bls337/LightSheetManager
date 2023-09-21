@@ -1,5 +1,7 @@
 package org.micromanager.lightsheetmanager.api;
 
+// TODO: this already exists in MM, avoid name clash?
+
 /**
  * The AutofocusManager takes AutofocusSettings and perform calibration.
  */
