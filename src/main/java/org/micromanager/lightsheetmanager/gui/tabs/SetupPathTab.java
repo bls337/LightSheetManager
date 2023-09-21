@@ -3,7 +3,7 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
-import org.micromanager.lightsheetmanager.gui.setup.SetupPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.setup.SetupPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import java.awt.Font;

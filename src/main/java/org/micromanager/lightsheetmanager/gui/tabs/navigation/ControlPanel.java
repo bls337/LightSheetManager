@@ -1,4 +1,4 @@
-package org.micromanager.lightsheetmanager.gui.navigation;
+package org.micromanager.lightsheetmanager.gui.tabs.navigation;
 
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;

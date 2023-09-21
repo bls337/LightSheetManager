@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.frames;
 
 import net.miginfocom.swing.MigLayout;
-import org.micromanager.lightsheetmanager.gui.navigation.NavigationPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.navigation.NavigationPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.internal.utils.WindowPositioning;
 
