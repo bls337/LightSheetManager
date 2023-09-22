@@ -3,7 +3,6 @@ package org.micromanager.lightsheetmanager.model.autofocus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import org.apache.commons.math3.analysis.function.Gaussian;
 import org.apache.commons.math3.exception.NotStrictlyPositiveException;
