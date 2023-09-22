@@ -128,6 +128,9 @@ public class NavigationPanel extends Panel {
                                 studio_, propertyName + ": X Axis", deviceName, deviceType, ControlPanel.Axis.X);
                         ControlPanel controlPanelY = new ControlPanel(
                                 studio_, propertyName + ": Y Axis", deviceName, deviceType, ControlPanel.Axis.Y);
+                        // TODO: check for ASI hardware when settings units
+                        controlPanelX.setUnits("°");
+                        controlPanelY.setUnits("°");
                         illumProperties.get(pathNum - 1).add(controlPanelX);
                         illumProperties.get(pathNum - 1).add(controlPanelY);
                     }

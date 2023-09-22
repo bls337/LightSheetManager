@@ -48,25 +48,24 @@ public class PLogicDISPIM {
     private ASIScanner scanner_;
     private ASIPiezo piezo_;
 
-    // TODO: private vars? (same for PLC down below)
     // generic variables
-    double scanDistance_;      // in microns; cached value from last call to prepareControllerForAcquisition()
-    double actualStepSizeUm_;  // cached value from last call to prepareControllerForAcquisition()
-    boolean zSpeedZero_;       // cached value from last call to prepareStageScanForAcquisition()
-    String lastDistanceStr_;   // cached value from last call to prepareControllerForAcquisition()
-    String lastPosStr_;        // cached value from last call to prepareControllerForAcquisition()
+    private double scanDistance_;      // in microns; cached value from last call to prepareControllerForAcquisition()
+    private double actualStepSizeUm_;  // cached value from last call to prepareControllerForAcquisition()
+    private boolean zSpeedZero_;       // cached value from last call to prepareStageScanForAcquisition()
+    private String lastDistanceStr_;   // cached value from last call to prepareControllerForAcquisition()
+    private String lastPosStr_;        // cached value from last call to prepareControllerForAcquisition()
 
     // PLC
-    static final int triggerStepDurationTics = 10;  // 2.5ms with 0.25ms tics
-    static final int acquisitionFlagAddr = 1;
-    static final int counterLSBAddr = 3;
-    static final int counterMSBAddr = 4;
-    static final int triggerStepEdgeAddr = 6;
-    static final int triggerStepPulseAddr = 7;
-    static final int triggerStepOutputAddr = 40;  // BNC #8
-    static final int triggerInAddr = 35;  // BNC #3
-    static final int triggerSPIMAddr = 46;  // backplane signal, same as XY card's TTL output
-    static final int laserTriggerAddress = 10;  // this should be set to (42 || 8) = (TTL1 || manual laser on)
+    private static final int triggerStepDurationTics = 10;  // 2.5ms with 0.25ms tics
+    private static final int acquisitionFlagAddr = 1;
+    private static final int counterLSBAddr = 3;
+    private static final int counterMSBAddr = 4;
+    private static final int triggerStepEdgeAddr = 6;
+    private static final int triggerStepPulseAddr = 7;
+    private static final int triggerStepOutputAddr = 40;  // BNC #8
+    private static final int triggerInAddr = 35;  // BNC #3
+    private static final int triggerSPIMAddr = 46;  // backplane signal, same as XY card's TTL output
+    private static final int laserTriggerAddress = 10;  // this should be set to (42 || 8) = (TTL1 || manual laser on)
 
     private final DefaultAcquisitionSettingsDISPIM.Builder asb_;
 
