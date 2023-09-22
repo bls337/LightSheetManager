@@ -4,7 +4,9 @@ import java.awt.*;
 import java.io.File;
 import java.util.EventObject;
 
+import org.micromanager.internal.utils.FileDialogs;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.gui.components.*;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Label;
@@ -23,13 +25,27 @@ public class DataTab extends Panel {
 
     private CheckBox cbxSaveWhileAcquiring_;
     private Button btnBrowse_;
-    private FileSelect fileSelect_;
     private RadioButton radSaveMode_;
 
-    private LightSheetManagerModel model_;
+    private final FileDialogs.FileType directorySelect_;
 
-    public DataTab(final LightSheetManagerModel model) {
+    private LightSheetManagerModel model_;
+    private LightSheetManagerFrame frame_;
+
+    public DataTab(final LightSheetManagerModel model,
+                   final LightSheetManagerFrame frame) {
         model_ = Objects.requireNonNull(model);
+        frame_ = Objects.requireNonNull(frame);
+
+        // file type filter
+        directorySelect_ = new FileDialogs.FileType(
+                "SAVE_DIRECTORY",
+                "All Directories",
+                "",
+                false,
+                ""
+        );
+
         createUserInterface();
         createEventHandlers();
     }
@@ -37,13 +53,9 @@ public class DataTab extends Panel {
     private void createUserInterface() {
         final Label lblTitle = new Label("Data Settings", Font.BOLD, 18);
 
+
         final DefaultAcquisitionSettingsDISPIM acqSettings =
                 model_.acquisitions().settings();
-
-        fileSelect_ = new FileSelect(
-                "Please select a directory to save image data...",
-                FileSelect.DIRECTORIES_ONLY
-        );
 
         final Panel pnlSave = new Panel("Image Save Settings");
         final Panel pnlDatastore = new Panel("Datastore Save Mode");
@@ -90,9 +102,15 @@ public class DataTab extends Panel {
                 model_.acquisitions().settingsBuilder();
 
         btnBrowse_.registerListener((EventObject e) -> {
-            final String path = fileSelect_.openDialogBox(this, new File(""));
-            asb_.saveDirectory(path);
-            txtSaveDirectory_.setText(path);
+            //final String path = fileSelect_.openDialogBox(this, new File(""));
+            final File result = FileDialogs.openDir(frame_,
+                    "Please select the directory to save images to...",
+                    directorySelect_
+            );
+            if (result != null) {
+                asb_.saveDirectory(result.toString());
+                txtSaveDirectory_.setText(result.toString());
+            }
             //System.out.println("getSaveDirectory: " + model_.acquisitions().getAcquisitionSettings().getSaveDirectory());
         });
 

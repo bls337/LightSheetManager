@@ -111,7 +111,7 @@ public class LightSheetManagerFrame extends JFrame {
         // main control area
         final int width = 900;
         final int height = 700;
-        tabPanel_ = new TabPanel(model_, width, height);
+        tabPanel_ = new TabPanel(model_, this, width, height);
 
         // add ui elements to the panel
         add(lblTitle, "wrap");

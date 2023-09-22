@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
+import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.gui.tabs.NavigationTab;
 import org.micromanager.lightsheetmanager.gui.tabs.SetupPathTab;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
@@ -39,10 +40,14 @@ public class TabPanel extends Panel {
     private DeviceManager devices_;
 
     private final LightSheetManagerModel model_;
+    private final LightSheetManagerFrame frame_;
 
     public TabPanel(final LightSheetManagerModel model,
+                    final LightSheetManagerFrame frame,
                     final int width, final int height) {
         model_ = Objects.requireNonNull(model);
+        frame_ = Objects.requireNonNull(frame);
+
         devices_ = model_.devices();
 
         setupPathTabs_ = new ArrayList<>(2);
@@ -60,7 +65,7 @@ public class TabPanel extends Panel {
         acquisitionTab_ = new AcquisitionTab(model_);
         autofocusTab_ = new AutofocusTab(model_);
         cameraTab_ = new CameraTab(model_,this);
-        dataTab_ = new DataTab(model_);
+        dataTab_ = new DataTab(model_, frame_);
         deviceTab_ = new DeviceTab(model_);
         settingsTab_ = new SettingsTab(model_);
         helpTab_ = new HelpTab();
