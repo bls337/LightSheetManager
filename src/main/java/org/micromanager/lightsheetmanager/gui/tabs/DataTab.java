@@ -87,7 +87,7 @@ public class DataTab extends Panel {
 
     private void createEventHandlers() {
         final DefaultAcquisitionSettingsDISPIM.Builder asb_ =
-                model_.acquisitions().getAcquisitionSettingsBuilder();
+                model_.acquisitions().settingsBuilder();
 
         btnBrowse_.registerListener((EventObject e) -> {
             final String path = fileSelect_.openDialogBox(this, new File(""));
@@ -101,7 +101,7 @@ public class DataTab extends Panel {
             //System.out.println("isSavingWhileAcquiring: " + model_.acquisitions().getAcquisitionSettings().isSavingWhileAcquiring());
         });
 
-        txtSaveFileName_.addDocumentListener(e -> {
+        txtSaveFileName_.registerListener(e -> {
             asb_.saveNamePrefix(txtSaveFileName_.getText());
             //System.out.println("getSaveNamePrefix: " + model_.acquisitions().getAcquisitionSettings().getSaveNamePrefix());
         });

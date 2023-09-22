@@ -88,13 +88,13 @@ public class SliceSettingsPanel extends Panel {
     private void createEventHandlers() {
 
         final DefaultSliceSettings.Builder ssb_ = model_.acquisitions()
-                .getAcquisitionSettingsBuilder().sliceSettingsBuilder();
+                .settingsBuilder().sliceSettingsBuilder();
 
         final DefaultSliceSettingsLS.Builder ssbLS_ = model_.acquisitions()
-                .getAcquisitionSettingsBuilder().sliceSettingsLSBuilder();
+                .settingsBuilder().sliceSettingsLSBuilder();
 
         final DefaultAcquisitionSettingsDISPIM.Builder asb =
-                model_.acquisitions().getAcquisitionSettingsBuilder();
+                model_.acquisitions().settingsBuilder();
 
         // regular panel
         cbxMinimizeSlicePeriod_.registerListener(e -> {

@@ -2,7 +2,6 @@ package org.micromanager.lightsheetmanager.model;
 
 import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
-import org.micromanager.Studio;
 import org.micromanager.UserProfile;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.propertymap.MutablePropertyMapView;
@@ -84,7 +83,7 @@ public class UserSettings {
     public void save() {
         // build settings before saving to make sure updates are saved
         model_.acquisitions().setAcquisitionSettings(
-                model_.acquisitions().getAcquisitionSettingsBuilder().build());
+                model_.acquisitions().settingsBuilder().build());
         // save in user settings
         settings.putString(DEVICES_KEY,
                 model_.acquisitions().settings().toJson());

@@ -77,7 +77,7 @@ public class CameraTab extends Panel {
         // camera trigger mode
         cmbCameraTriggerMode_.registerListener(e -> {
             final CameraMode cameraMode = CameraMode.fromString(cmbCameraTriggerMode_.getSelected());
-            model_.acquisitions().getAcquisitionSettingsBuilder().cameraMode(cameraMode);
+            model_.acquisitions().settingsBuilder().cameraMode(cameraMode);
             tabPanel_.getAcquisitionTab().getSliceSettingsPanel().switchUI(cameraMode);
             tabPanel_.swapSetupPathPanels(cameraMode);
             //System.out.println("getCameraMode: " + model_.acquisitions().getAcquisitionSettings().getCameraMode());

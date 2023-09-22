@@ -118,7 +118,7 @@ public class PiezoCalibrationPanel extends Panel {
 
     private void createEventHandlers() {
         final DefaultAcquisitionSettingsDISPIM.Builder asb =
-                model_.acquisitions().getAcquisitionSettingsBuilder();
+                model_.acquisitions().settingsBuilder();
 
         final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
         final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
@@ -156,11 +156,11 @@ public class PiezoCalibrationPanel extends Panel {
 
         });
 
-        txtSlope_.addDocumentListener(e -> {
+        txtSlope_.registerListener(e -> {
             asb.sliceCalibrationBuilder(pathNum_).sliceSlope(Double.parseDouble(txtSlope_.getText()));
         });
 
-        txtOffset_.addDocumentListener(e -> {
+        txtOffset_.registerListener(e -> {
             asb.sliceCalibrationBuilder(pathNum_).sliceOffset(Double.parseDouble(txtOffset_.getText()));
         });
 

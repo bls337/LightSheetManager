@@ -234,7 +234,7 @@ public class AcquisitionTab extends Panel {
 
     private void createEventHandlers() {
         final DefaultAcquisitionSettingsDISPIM.Builder asb_ =
-                model_.acquisitions().getAcquisitionSettingsBuilder();
+                model_.acquisitions().settingsBuilder();
 
         // start/stop acquisitions
         btnRunAcquisition_.registerListener(e -> {

@@ -48,7 +48,7 @@ public class MultiPositionPanel extends Panel {
 
     private void createEventHandlers() {
         final DefaultAcquisitionSettingsDISPIM.Builder asb_ =
-                model_.acquisitions().getAcquisitionSettingsBuilder();
+                model_.acquisitions().settingsBuilder();
 
         btnOpenXYZGrid_.registerListener(e -> xyzGridFrame_.setVisible(true));
         btnEditPositionList_.registerListener(e -> model_.studio().app().showPositionList());

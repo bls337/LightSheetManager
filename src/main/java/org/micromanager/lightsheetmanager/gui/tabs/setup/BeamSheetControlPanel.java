@@ -150,7 +150,7 @@ public class BeamSheetControlPanel extends Panel {
 
         // add panel based on camera trigger mode
         final CameraMode cameraMode =
-                model_.acquisitions().getAcquisitionSettingsBuilder().cameraMode();
+                model_.acquisitions().settingsBuilder().cameraMode();
         if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             add(pnlFirst_, "");
         } else {
@@ -160,7 +160,7 @@ public class BeamSheetControlPanel extends Panel {
 
     private void createEventHandlers() {
         final DefaultAcquisitionSettingsDISPIM.Builder asb_ = model_.acquisitions()
-                .getAcquisitionSettingsBuilder();
+                .settingsBuilder();
 
         // first panel
         btnPlotProfile_.registerListener(e -> {
@@ -188,7 +188,7 @@ public class BeamSheetControlPanel extends Panel {
             System.out.println("sheetOffset value: " + value);
         });
 
-        txtSheetOffset_.addDocumentListener(e -> {
+        txtSheetOffset_.registerListener(e -> {
             final double value = Double.parseDouble(txtSheetOffset_.getText());
             asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
             lblSlopeOffset_.setText(Double.toString(value));

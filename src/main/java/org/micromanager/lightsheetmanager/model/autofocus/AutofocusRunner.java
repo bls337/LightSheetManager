@@ -25,7 +25,7 @@ public class AutofocusRunner {
     }
 
     public void runAutofocus() {
-        DefaultAcquisitionSettingsDISPIM acqSettings = model_.getAcquisitionEngine().settings();
+        DefaultAcquisitionSettingsDISPIM acqSettings = model_.acquisitions().settings();
 
         // TODO: make this work for generic devices
         final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");

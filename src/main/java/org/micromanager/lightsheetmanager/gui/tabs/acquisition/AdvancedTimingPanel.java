@@ -91,7 +91,7 @@ public class AdvancedTimingPanel extends Panel {
 
     private void createEventHandlers() {
         final DefaultTimingSettings.Builder tsb_ = model_.acquisitions()
-                .getAcquisitionSettingsBuilder().timingSettingsBuilder();
+                .settingsBuilder().timingSettingsBuilder();
 
         spnDelayBeforeScan_.registerListener(e -> {
             tsb_.delayBeforeScan(spnDelayBeforeScan_.getDouble());

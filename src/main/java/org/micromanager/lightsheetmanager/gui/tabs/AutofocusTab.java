@@ -194,7 +194,7 @@ public class AutofocusTab extends Panel {
 
     private void createEventHandlers() {
         final DefaultAutofocusSettings.Builder afsb_ = model_
-                .acquisitions().getAcquisitionSettingsBuilder().autofocusSettingsBuilder();
+                .acquisitions().settingsBuilder().autofocusSettingsBuilder();
 
         // general autofocus settings
         cbxShowImages_.registerListener(e -> {

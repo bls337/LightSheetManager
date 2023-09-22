@@ -1703,6 +1703,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 
     }
 
+    // TODO: keep long method name versions or just use aliases?
 
     public DefaultAcquisitionSettingsDISPIM settings() {
         return acqSettings_;
@@ -1712,10 +1713,13 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         return acqSettings_;
     }
 
-    public DefaultAcquisitionSettingsDISPIM.Builder getAcquisitionSettingsBuilder() {
+    public DefaultAcquisitionSettingsDISPIM.Builder settingsBuilder() {
         return asb_;
     }
 
+    public DefaultAcquisitionSettingsDISPIM.Builder getAcquisitionSettingsBuilder() {
+        return asb_;
+    }
 
 //////////////////////// AcquisitionControl Callback methods ////////////////////////
     @Override
