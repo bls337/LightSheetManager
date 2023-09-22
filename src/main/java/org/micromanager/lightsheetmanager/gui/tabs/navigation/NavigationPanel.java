@@ -121,16 +121,16 @@ public class NavigationPanel extends Panel {
                     illumProperties.get(pathNum - 1).add(controlPanel);
                     System.out.println(propertyName + " " + pathNum + " added to illum properties.");
                 } else {
-                    // does not contain digit: SCAPE
+                    // does not contain digit: SCAPE geometry etc
                     final int pathNum = 1;
-                    ControlPanel.Axis axis = ControlPanel.Axis.NONE;
-                    // TODO: find a better way for properties that start with illum but need a specific axis...
                     if (deviceType == DeviceType.GalvoDevice) {
-                        axis = ControlPanel.Axis.X;
+                        ControlPanel controlPanelX = new ControlPanel(
+                                studio_, propertyName + ": X Axis", deviceName, deviceType, ControlPanel.Axis.X);
+                        ControlPanel controlPanelY = new ControlPanel(
+                                studio_, propertyName + ": Y Axis", deviceName, deviceType, ControlPanel.Axis.Y);
+                        illumProperties.get(pathNum - 1).add(controlPanelX);
+                        illumProperties.get(pathNum - 1).add(controlPanelY);
                     }
-                    ControlPanel controlPanel = new ControlPanel(
-                            studio_, propertyName, deviceName, deviceType, axis);
-                    illumProperties.get(pathNum - 1).add(controlPanel);
                     System.out.println(propertyName + " " + pathNum + " added to illum properties.");
                 }
             } else if (propertyName.startsWith(imaging)) {
