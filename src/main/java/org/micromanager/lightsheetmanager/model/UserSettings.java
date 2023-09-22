@@ -25,11 +25,10 @@ public class UserSettings {
 
     private final LightSheetManagerModel model_;
 
-    public UserSettings(final Studio studio, final LightSheetManagerModel model) {
+    public UserSettings(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
-        Objects.requireNonNull(studio);
         // setup user profile
-        profile = studio.getUserProfile();
+        profile = model_.getStudio().getUserProfile();
         userName = profile.getProfileName();
         settings = profile.getSettings(UserSettings.class);
     }
@@ -88,8 +87,8 @@ public class UserSettings {
                 model_.acquisitions().getAcquisitionSettingsBuilder().build());
         // save in user settings
         settings.putString(DEVICES_KEY,
-                model_.acquisitions().getAcquisitionSettings().toJson());
-        System.out.println("saved json: " + model_.acquisitions().getAcquisitionSettings().toPrettyJson());
+                model_.acquisitions().settings().toJson());
+        System.out.println("saved json: " + model_.acquisitions().settings().toPrettyJson());
     }
 
     /**

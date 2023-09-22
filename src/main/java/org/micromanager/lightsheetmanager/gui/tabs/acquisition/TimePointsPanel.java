@@ -27,7 +27,7 @@ public class TimePointsPanel extends Panel {
 
     private void createUserInterface() {
         final DefaultAcquisitionSettingsDISPIM acqSettings =
-                model_.acquisitions().getAcquisitionSettings();
+                model_.acquisitions().settings();
 
         setMigLayout(
                 "",

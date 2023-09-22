@@ -53,7 +53,7 @@ public class AutofocusTab extends Panel {
 
     public void createUserInterface() {
         final DefaultAcquisitionSettingsDISPIM acqSettings =
-                model_.acquisitions().getAcquisitionSettings();
+                model_.acquisitions().settings();
 
         final Label lblTitle = new Label("Autofocus Settings", Font.BOLD, 18);
 

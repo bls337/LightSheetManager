@@ -1,6 +1,5 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
-import net.miginfocom.swing.MigLayout;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
@@ -49,7 +48,7 @@ public class AdvancedTimingPanel extends Panel {
         final Label lblCameraExposure = new Label("Camera Exposure [ms]: ");
 
         final DefaultTimingSettings timingSettings = model_.acquisitions()
-                .getAcquisitionSettings().timingSettings();
+                .settings().timingSettings();
 
         spnDelayBeforeScan_ = Spinner.createDoubleSpinner(
                 timingSettings.delayBeforeScan(), 0.0, 10000.0, 0.25);

@@ -49,7 +49,7 @@ public class ChannelTablePanel extends Panel {
         cmbChannelGroup_ = new ComboBox(groupLabels, groupLabels[0]);
 
         cmbChannelMode_ = new ComboBox(MultiChannelMode.toArray(),
-                model_.acquisitions().getAcquisitionSettings().channelMode().toString());
+                model_.acquisitions().settings().channelMode().toString());
 
         add(lblChannelGroup_, "split 2");
         add(cmbChannelGroup_, "wrap");

@@ -42,10 +42,10 @@ public class SliceSettingsPanel extends Panel {
 
     private void createUserInterface() {
         final DefaultSliceSettingsLS sliceSettingsLS = model_.acquisitions()
-                .getAcquisitionSettings().sliceSettingsLS();
+                .settings().sliceSettingsLS();
 
         final DefaultSliceSettings sliceSettings = model_.acquisitions()
-                .getAcquisitionSettings().sliceSettings();
+                .settings().sliceSettings();
 
         final boolean isSlicePeriodMinimized = sliceSettings.isSlicePeriodMinimized();
 
@@ -79,7 +79,7 @@ public class SliceSettingsPanel extends Panel {
                 sliceSettingsLS.shutterSpeedFactor(), 1.0, 10.0, 1.0);
 
         // create the ui based on the camera trigger mode
-        switchUI(model_.acquisitions().getAcquisitionSettings().cameraMode());
+        switchUI(model_.acquisitions().settings().cameraMode());
     }
 
     /**

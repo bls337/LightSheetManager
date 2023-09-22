@@ -37,7 +37,7 @@ public class VolumeSettingsPanel extends Panel {
                 .getDeviceAdapter().getNumImagingPaths();
 
         final DefaultVolumeSettings volumeSettings = model_.acquisitions()
-                .getAcquisitionSettings().volumeSettings();
+                .settings().volumeSettings();
 
         // create labels for combo boxes
         ArrayList<String> labels = new ArrayList<>(numImagingPaths);

@@ -41,7 +41,7 @@ public class LightSheetManagerModel implements LightSheetManager {
         // displayed in the error ui
         errorText_ = "";
 
-        settings_ = new UserSettings(studio_, this);
+        settings_ = new UserSettings(this);
         acqEngine_ = new AcquisitionEngine(this);
         xyzGrid_ = new XYZGrid(this);
     }

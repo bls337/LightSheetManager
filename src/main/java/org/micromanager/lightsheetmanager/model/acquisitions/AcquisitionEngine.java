@@ -217,7 +217,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         if (!demoMode) {
 
             if (isUsingPLC) {
-                controller = new PLogicDISPIM(model_, studio_, model_.devices(), asb_);
+                controller = new PLogicDISPIM(model_);
 
                 final boolean success = doHardwareCalculationsSCAPE(controller);
                 if (!success) {
@@ -969,7 +969,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         if (!demoMode) {
 
             if (isUsingPLC) {
-                controller = new PLogicDISPIM(model_, studio_, model_.devices(), asb_);
+                controller = new PLogicDISPIM(model_);
 
                 final boolean success = doHardwareCalculations(controller);
                 if (!success) {
@@ -1703,6 +1703,10 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 
     }
 
+
+    public DefaultAcquisitionSettingsDISPIM settings() {
+        return acqSettings_;
+    }
 
     public DefaultAcquisitionSettingsDISPIM getAcquisitionSettings() {
         return acqSettings_;

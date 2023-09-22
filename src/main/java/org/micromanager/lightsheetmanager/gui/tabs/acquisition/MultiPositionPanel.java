@@ -31,7 +31,7 @@ public class MultiPositionPanel extends Panel {
 
     private void createUserInterface() {
         final DefaultAcquisitionSettingsDISPIM acqSettings =
-                model_.acquisitions().getAcquisitionSettings();
+                model_.acquisitions().settings();
 
         Spinner.setDefaultSize(7);
         lblPostMoveDelay_ = new Label("Post-move delay [ms]:");

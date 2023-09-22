@@ -51,7 +51,7 @@ public class CameraTab extends Panel {
         btnGetCurrentROI_ = new Button("Get Current ROI", 120, 30);
 
         cmbCameraTriggerMode_ = new ComboBox(CameraMode.toArray(),
-              model_.acquisitions().getAcquisitionSettings().cameraMode().toString());
+              model_.acquisitions().settings().cameraMode().toString());
 
         pnlROI.add(btnUnchangedROI_, "span 2, wrap");
         pnlROI.add(btnFullROI_, "");

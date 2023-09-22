@@ -81,7 +81,7 @@ public class AcquisitionTab extends Panel {
     private void createUserInterface() {
 
         final DefaultAcquisitionSettingsDISPIM acqSettings =
-                model_.acquisitions().getAcquisitionSettings();
+                model_.acquisitions().settings();
 
         Panel.setMigLayoutDefault(
                 "",
