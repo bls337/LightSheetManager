@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -139,18 +140,21 @@ public class SettingsTab extends Panel {
         cbxReturnToOriginalPosition_.registerListener(e ->
                 scsb.scanReturnToOriginalPosition(cbxReturnToOriginalPosition_.isSelected()));
 
-        // TODO: set these settings
-        // Light Sheet Scanner
-        spnSheetAxisFilterFreq_.registerListener(e -> {
+        // TODO: better method, change scanner methods to double?
+        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+        if (scanner != null) {
+            // Light Sheet Scanner
+            spnSheetAxisFilterFreq_.registerListener(e -> {
+                scanner.setFilterFreqX((float)spnSheetAxisFilterFreq_.getDouble());
+            });
 
-        });
-
-        spnSliceAxisFilterFreq_.registerListener(e -> {
-
-        });
-
+            spnSliceAxisFilterFreq_.registerListener(e -> {
+                scanner.setFilterFreqY((float)spnSliceAxisFilterFreq_.getDouble());
+            });
+        }
         spnLiveScanPeriod_.registerListener(e -> {
-
+            model_.acquisitions().getAcquisitionSettingsBuilder()
+                    .liveScanPeriod(spnLiveScanPeriod_.getDouble());
         });
 
     }
