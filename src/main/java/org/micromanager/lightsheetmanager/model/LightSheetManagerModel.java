@@ -7,6 +7,7 @@ import org.micromanager.lightsheetmanager.api.AutofocusSettings;
 import org.micromanager.lightsheetmanager.api.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
+import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionTableData;
 
 import java.util.Objects;
@@ -41,7 +42,7 @@ public class LightSheetManagerModel implements LightSheetManager {
         errorText_ = "";
 
         settings_ = new UserSettings(studio_, this);
-        acqEngine_ = new AcquisitionEngine(studio_, this);
+        acqEngine_ = new AcquisitionEngine(this);
         xyzGrid_ = new XYZGrid(this);
     }
 

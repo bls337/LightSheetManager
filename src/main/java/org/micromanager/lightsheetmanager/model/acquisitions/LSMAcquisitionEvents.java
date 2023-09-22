@@ -1,4 +1,4 @@
-package org.micromanager.lightsheetmanager.model;
+package org.micromanager.lightsheetmanager.model.acquisitions;
 
 import org.micromanager.MultiStagePosition;
 import org.micromanager.PositionList;

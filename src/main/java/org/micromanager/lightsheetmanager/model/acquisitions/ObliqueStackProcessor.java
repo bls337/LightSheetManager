@@ -1,4 +1,4 @@
-package org.micromanager.lightsheetmanager.model;
+package org.micromanager.lightsheetmanager.model.acquisitions;
 
 import ij.ImageJ;
 import ij.ImagePlus;
