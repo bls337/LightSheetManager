@@ -1,4 +1,4 @@
-package org.micromanager.lightsheetmanager.model;
+package org.micromanager.lightsheetmanager.model.acquisitions;
 
 import mmcorej.CMMCore;
 import mmcorej.StrVector;
@@ -30,6 +30,10 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
+import org.micromanager.lightsheetmanager.model.AutofocusRunner;
+import org.micromanager.lightsheetmanager.model.DataStorage;
+import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.model.PLogicDISPIM;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
@@ -54,23 +58,22 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     private DefaultAcquisitionSettingsDISPIM.Builder asb_;
     private DefaultAcquisitionSettingsDISPIM acqSettings_;
 
-    private DataStorage data_;
-
-    private ExecutorService acquisitionExecutor_ = Executors.newSingleThreadExecutor(
+    private final ExecutorService acquisitionExecutor_ = Executors.newSingleThreadExecutor(
             r -> new Thread(r, "Acquisition Thread"));
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
     private volatile Acquisition currentAcquisition_ = null;
 
     private AutofocusRunner autofocusRunner_;
 
+    private DataStorage data_;
     private Datastore curStore_;
     private Pipeline curPipeline_;
     private long nextWakeTime_ = -1;
 
-    public AcquisitionEngine(final Studio studio, final LightSheetManagerModel model) {
-        studio_ = Objects.requireNonNull(studio);
+    public AcquisitionEngine(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
-        core_ = studio_.core();
+        studio_ = model.studio();
+        core_ = model.core();
 
         data_ = new DataStorage(studio_);
         autofocusRunner_ = new AutofocusRunner(model_);
