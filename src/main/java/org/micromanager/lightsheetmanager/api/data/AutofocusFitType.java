@@ -8,27 +8,27 @@ import java.util.stream.Stream;
 /**
  * The curve fitting algorithm for the general autofocus settings.
  */
-public enum AutofocusFit {
+public enum AutofocusFitType {
     NO_FIT("No fit (take max)"),
     GAUSSIAN("Gaussian");
 
     private final String text_;
 
-    private static final Map<String, AutofocusFit> stringToEnum =
+    private static final Map<String, AutofocusFitType> stringToEnum =
             Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
-    AutofocusFit(final String text) {
+    AutofocusFitType(final String text) {
         this.text_ = text;
     }
 
     public static String[] toArray() {
         return Arrays.stream(values())
-                .map(AutofocusFit::toString)
+                .map(AutofocusFitType::toString)
                 .toArray(String[]::new);
     }
 
-    public static AutofocusFit fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, AutofocusFit.NO_FIT);
+    public static AutofocusFitType fromString(final String symbol) {
+        return stringToEnum.getOrDefault(symbol, AutofocusFitType.NO_FIT);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.api;
 
 
-import org.micromanager.lightsheetmanager.api.data.AutofocusFit;
+import org.micromanager.lightsheetmanager.api.data.AutofocusFitType;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 
@@ -53,7 +53,7 @@ public interface AutofocusSettings {
          *
          * @param type the curve fitting algorithm
          */
-        Builder fit(final AutofocusFit type);
+        Builder fit(final AutofocusFitType type);
 
         // TODO: maybe denote that these are related to acquisitions
 
@@ -134,7 +134,7 @@ public interface AutofocusSettings {
      */
     AutofocusType scoringAlgorithm();
 
-    AutofocusFit fit();
+    AutofocusFitType fit();
 
     /**
      * Returns the coefficient of determination used in the autofocus routine.
