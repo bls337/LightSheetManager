@@ -1,4 +1,4 @@
-package org.micromanager.lightsheetmanager.model;
+package org.micromanager.lightsheetmanager.model.autofocus;
 
 /**
  * The result of running built-in Micro-Manager autofocus routine.

@@ -1,4 +1,4 @@
-package org.micromanager.lightsheetmanager.model;
+package org.micromanager.lightsheetmanager.model.autofocus;
 
 public class AutofocusFitter {
 
