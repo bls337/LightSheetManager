@@ -168,7 +168,7 @@ public class PositionPanel extends Panel {
         btnImagingCenterSet_.registerListener(e -> {
             // FIXME: check for piezo limits!
             final double piezoPosition = piezo.getPosition();
-            model_.acquisitions().getAcquisitionSettingsBuilder()
+            model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).imagingCenter(piezoPosition);
             lblImagingCenterValue_.setText(Double.toString(piezoPosition));
         });
@@ -186,14 +186,14 @@ public class PositionPanel extends Panel {
 
         // FIXME: find a better way to check for devices existing
         if (scanner != null && piezo != null) {
-            txtImagingPosition_.addDocumentListener(e -> {
+            txtImagingPosition_.registerListener(e -> {
                 System.out.println("imaging position update: " + txtImagingPosition_.getText());
                 piezo.setPosition(Double.parseDouble(txtImagingPosition_.getText()));
                 lblImagingPositionValue_.setText(piezo.getPosition() + " μm");
                 //lblImagingPositionValue_.setText(txtImagingPosition_.getText() + " μm");
             });
 
-            txtSlicePosition_.addDocumentListener(e -> {
+            txtSlicePosition_.registerListener(e -> {
                 System.out.println("slice y position update: " + txtSlicePosition_.getText());
                 final double xValue = scanner.getPosition().x;
                 scanner.setPosition(xValue, Double.parseDouble(txtSlicePosition_.getText()));

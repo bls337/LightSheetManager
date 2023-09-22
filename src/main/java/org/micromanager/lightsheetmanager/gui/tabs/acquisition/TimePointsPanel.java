@@ -51,7 +51,7 @@ public class TimePointsPanel extends Panel {
     // TODO: update duration labels
     private void createEventHandlers() {
         final DefaultAcquisitionSettingsDISPIM.Builder asb_ =
-                model_.acquisitions().getAcquisitionSettingsBuilder();
+                model_.acquisitions().settingsBuilder();
 
         spnNumTimePoints_.registerListener(e -> {
             asb_.numTimePoints(spnNumTimePoints_.getInt());

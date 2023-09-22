@@ -101,7 +101,7 @@ public class VolumeSettingsPanel extends Panel {
 
     private void createEventHandlers() {
         final DefaultVolumeSettings.Builder vsb = model_.acquisitions()
-                .getAcquisitionSettingsBuilder().volumeSettingsBuilder();
+                .settingsBuilder().volumeSettingsBuilder();
 
         cmbNumViews_.registerListener(e -> {
             vsb.numViews(Integer.parseInt(cmbNumViews_.getSelected()));

@@ -121,7 +121,7 @@ public class SettingsTab extends Panel {
 
     private void createEventHandlers() {
         final DefaultScanSettings.Builder scsb = model_.acquisitions()
-                .getAcquisitionSettingsBuilder().scanSettingsBuilder();
+                .settingsBuilder().scanSettingsBuilder();
 
         // Scan Settings
         spnScanAcceleration_.registerListener(e ->
@@ -153,7 +153,7 @@ public class SettingsTab extends Panel {
             });
         }
         spnLiveScanPeriod_.registerListener(e -> {
-            model_.acquisitions().getAcquisitionSettingsBuilder()
+            model_.acquisitions().settingsBuilder()
                     .liveScanPeriod(spnLiveScanPeriod_.getDouble());
         });
 

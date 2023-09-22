@@ -78,7 +78,7 @@ public class PLogicDISPIM {
         devices_ = model_.devices();
         core_ = studio_.core();
 
-        asb_ = model_.acquisitions().getAcquisitionSettingsBuilder();
+        asb_ = model_.acquisitions().settingsBuilder();
 
         scanDistance_ = 0;
         actualStepSizeUm_ = 0;

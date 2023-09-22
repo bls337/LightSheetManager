@@ -105,8 +105,8 @@ public class XYZGrid {
         if (useX_) {
             // TODO: update GUI with values, aliases for asb and vsb?
             final double speedFactor = GeometryUtils.DISPIM.getStageGeometricSpeedFactor(true);
-            model_.acquisitions().getAcquisitionSettingsBuilder().volumeSettingsBuilder().sliceStepSize(Math.abs(deltaX_)/speedFactor);
-            model_.acquisitions().getAcquisitionSettingsBuilder().volumeSettingsBuilder().slicesPerVolume(numX);
+            model_.acquisitions().settingsBuilder().volumeSettingsBuilder().sliceStepSize(Math.abs(deltaX_)/speedFactor);
+            model_.acquisitions().settingsBuilder().volumeSettingsBuilder().slicesPerVolume(numX);
             // move to X center if we aren't generating a position list with it
             if (!useY_ && !useZ_) {
                 xyStage.setXYPosition(centerX, xyStage.getXYPosition().y); // TODO: make convenience method?

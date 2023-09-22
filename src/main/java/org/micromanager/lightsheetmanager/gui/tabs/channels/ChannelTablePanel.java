@@ -61,7 +61,7 @@ public class ChannelTablePanel extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultAcquisitionSettingsDISPIM.Builder asb_ = model_.acquisitions().getAcquisitionSettingsBuilder();
+        final DefaultAcquisitionSettingsDISPIM.Builder asb_ = model_.acquisitions().settingsBuilder();
 
         btnAddChannel_.registerListener(e -> {
             table_.getData().addEmptyChannel();
