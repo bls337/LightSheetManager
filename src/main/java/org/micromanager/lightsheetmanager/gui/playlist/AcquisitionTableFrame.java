@@ -29,7 +29,7 @@ import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionMetadata;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionTableData;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
-import org.micromanager.lightsheetmanager.model.utils.MyFileUtils;
+import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 
 import com.google.gson.JsonSyntaxException;
 
@@ -350,7 +350,7 @@ public class AcquisitionTableFrame extends JFrame {
         	if (result) {
         		saveSettings(); // update position list and acquisition settings before saving
                 final String json = acqTable_.getTableData().toJson(true);
-                MyFileUtils.writeStringToFile(filePath, json);
+                FileUtils.writeStringToFile(filePath, json);
         	}
         }
     }
@@ -366,7 +366,7 @@ public class AcquisitionTableFrame extends JFrame {
         if (fileBrowser_.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             // load data from json
             final String filePath = fileBrowser_.getSelectedFile().toString();
-            final String json = MyFileUtils.readFileToString(filePath);
+            final String json = FileUtils.readFileToString(filePath);
             //System.out.println(json);
 
             // parse the json file into an object
