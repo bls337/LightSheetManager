@@ -6,7 +6,6 @@ import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
-import org.micromanager.lightsheetmanager.model.autofocus.AutofocusResult;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
@@ -26,7 +25,7 @@ public class AutofocusRunner {
     }
 
     public void runAutofocus() {
-        DefaultAcquisitionSettingsDISPIM acqSettings = model_.getAcquisitionEngine().getAcquisitionSettings();
+        DefaultAcquisitionSettingsDISPIM acqSettings = model_.getAcquisitionEngine().settings();
 
         // TODO: make this work for generic devices
         final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");

@@ -38,7 +38,7 @@ public class DataTab extends Panel {
         final Label lblTitle = new Label("Data Settings", Font.BOLD, 18);
 
         final DefaultAcquisitionSettingsDISPIM acqSettings =
-                model_.acquisitions().getAcquisitionSettings();
+                model_.acquisitions().settings();
 
         fileSelect_ = new FileSelect(
                 "Please select a directory to save image data...",

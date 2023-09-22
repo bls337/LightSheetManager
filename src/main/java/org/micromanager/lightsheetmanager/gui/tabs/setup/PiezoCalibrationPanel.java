@@ -66,7 +66,7 @@ public class PiezoCalibrationPanel extends Panel {
         btnRunAutofocus_ = new Button("Run Autofocus", 120, 26);
 
         final DefaultAcquisitionSettingsDISPIM acqSettings =
-                model_.acquisitions().getAcquisitionSettings();
+                model_.acquisitions().settings();
 
         txtSlope_ = new TextField();
         txtOffset_ = new TextField();
@@ -133,7 +133,7 @@ public class PiezoCalibrationPanel extends Panel {
         if (scanner != null && piezo != null) {
             btnUpdate_.registerListener(e -> {
                 if (scanner.isBeamOn()) {
-                    final double rate = model_.acquisitions().getAcquisitionSettings()
+                    final double rate = model_.acquisitions().settings()
                             .sliceCalibration(pathNum_).sliceSlope();
                     final double piezoPosition = piezo.getPosition();
                     final double scannerPosition = scanner.getPosition().y;

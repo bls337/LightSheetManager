@@ -58,7 +58,7 @@ public class BeamSheetControlPanel extends Panel {
         createUserInterface();
         createEventHandlers();
 
-        currentOffset_ = model_.acquisitions().getAcquisitionSettings()
+        currentOffset_ = model_.acquisitions().settings()
                 .sheetCalibration(pathNum_).sheetOffset();
     }
 
@@ -67,7 +67,7 @@ public class BeamSheetControlPanel extends Panel {
                 .getDeviceAdapter().getMicroscopeGeometry();
 
         final DefaultAcquisitionSettingsDISPIM acqSettings = model_.acquisitions()
-                .getAcquisitionSettings();
+                .settings();
 
         pnlFirst_ = new Panel();
         pnlSecond_ = new Panel();
@@ -131,7 +131,7 @@ public class BeamSheetControlPanel extends Panel {
                 break;
             case SCAPE:
                 txtSheetOffset_ = new TextField(8);
-                final double value = model_.acquisitions().getAcquisitionSettings()
+                final double value = model_.acquisitions().settings()
                         .sheetCalibration(pathNum_).sheetOffset();
                 txtSheetOffset_.setText(Double.toString(value));
                 lblSlopeOffset_ = new JLabel("0.0");

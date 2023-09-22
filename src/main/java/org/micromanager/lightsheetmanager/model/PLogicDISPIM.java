@@ -72,13 +72,13 @@ public class PLogicDISPIM {
 
     private final LightSheetManagerModel model_;
 
-    public PLogicDISPIM(final LightSheetManagerModel model, final Studio studio, final DeviceManager devices, final DefaultAcquisitionSettingsDISPIM.Builder asb) {
+    public PLogicDISPIM(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
-        studio_ = Objects.requireNonNull(studio);
-        devices_ = Objects.requireNonNull(devices);
+        studio_ = model_.studio();
+        devices_ = model_.devices();
         core_ = studio_.core();
 
-        asb_ = asb;
+        asb_ = model_.acquisitions().getAcquisitionSettingsBuilder();
 
         scanDistance_ = 0;
         actualStepSizeUm_ = 0;
@@ -206,7 +206,7 @@ public class PLogicDISPIM {
         try {
             core_.setShutterDevice(plcLaser_.getDeviceName());
         } catch (Exception e) {
-            e.printStackTrace();
+            studio_.logs().showError("could not set shutter to " + plcLaser_.getDeviceName());
         }
 
         if (settings.isUsingStageScanning()) {
@@ -331,7 +331,7 @@ public class PLogicDISPIM {
         try {
             core_.setShutterDevice(plcLaser_.getDeviceName());
         } catch (Exception e) {
-            e.printStackTrace();
+            studio_.logs().showError("could not set shutter to " + plcLaser_.getDeviceName());
         }
 
         scanDistance_ = 0;
@@ -563,7 +563,7 @@ public class PLogicDISPIM {
                 if (centerAtCurrentZ) {
                     piezoCenter = (float)piezo.getPosition(); //(float) positions_.getUpdatedPosition(piezoDevice, Joystick.Directions.NONE);
                 } else {
-                    piezoCenter = (float)model_.acquisitions().getAcquisitionSettings()
+                    piezoCenter = (float)model_.acquisitions().settings()
                             .sheetCalibration(view).imagingCenter();
                 }
             }
@@ -1022,7 +1022,7 @@ public class PLogicDISPIM {
 //        final Properties.Keys widthProp = (side == Devices.Sides.A) ?
 //                Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_A : Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_B;
 //        sheetWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, widthProp);
-        sheetWidth = model_.getAcquisitionEngine().getAcquisitionSettings().sheetCalibration(view).sheetWidth();
+        sheetWidth = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetWidth();
 
         if (cameraName == null || cameraName.equals("")) {
             studio_.logs().logDebugMessage("Could not get sheet width for invalid device " + cameraName);
@@ -1041,13 +1041,13 @@ public class PLogicDISPIM {
 //            final float slopePolarity = (side == Devices.Sides.B) ? -1f : 1f;
 //            sheetWidth = roi.height * sheetSlope * slopePolarity / 1e6f;  // in microdegrees per pixel, convert to degrees
         } else {
-            final boolean autoSheet = model_.getAcquisitionEngine().getAcquisitionSettings().sheetCalibration(view).isUsingAutoSheetWidth();
+            final boolean autoSheet = model_.getAcquisitionEngine().settings().sheetCalibration(view).isUsingAutoSheetWidth();
             if (autoSheet) {
                 Rectangle roi = camera.getROI();
                 if (roi == null || roi.height == 0) {
                     studio_.logs().logDebugMessage("Could not get camera ROI for auto sheet mode");
                 }
-                final double sheetSlope = model_.getAcquisitionEngine().getAcquisitionSettings().sheetCalibration(view).autoSheetWidthPerPixel();
+                final double sheetSlope = model_.getAcquisitionEngine().settings().sheetCalibration(view).autoSheetWidthPerPixel();
                 sheetWidth = roi.height *  sheetSlope / 1000.0;  // in millidegrees per pixel, convert to degrees
                 sheetWidth *= 1.1f;  // 10% extra width just to be sure
             }
@@ -1076,12 +1076,12 @@ public class PLogicDISPIM {
         if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             // in millidegrees, convert to degrees
             // TODO: is this correct?
-            sheetOffset = model_.getAcquisitionEngine().getAcquisitionSettings().sheetCalibration(view).sheetOffset() / 1000.0;
+            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetOffset() / 1000.0;
             //sheetOffset = prefs_.getFloat(
                     //MyStrings.PanelNames.SETUP.toString() + side.toString(),
                     //Properties.Keys.PLUGIN_LIGHTSHEET_OFFSET, 0) / 1000f;  // in millidegrees, convert to degrees
         } else {
-            sheetOffset = model_.getAcquisitionEngine().getAcquisitionSettings().sheetCalibration(view).sheetOffset();
+            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetOffset();
             //final Properties.Keys offsetProp = (side == Devices.Sides.A) ?
                    // Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_A : Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_B;
            // sheetOffset = props_.getPropValueFloat(Devices.Keys.PLUGIN, offsetProp);
