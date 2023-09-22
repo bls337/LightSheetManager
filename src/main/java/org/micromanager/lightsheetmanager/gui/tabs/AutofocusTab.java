@@ -1,6 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
-import org.micromanager.lightsheetmanager.api.data.AutofocusFit;
+import org.micromanager.lightsheetmanager.api.data.AutofocusFitType;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
@@ -91,7 +91,7 @@ public class AutofocusTab extends Panel {
         ComboBox.setDefaultSize(120, 20);
         cmbScoringAlgorithm_ = new ComboBox(AutofocusType.toArray(),
                 acqSettings.autofocusSettings().scoringAlgorithm().toString());
-        cmbFittingFunction_ = new ComboBox(AutofocusFit.toArray(),
+        cmbFittingFunction_ = new ComboBox(AutofocusFitType.toArray(),
                 acqSettings.autofocusSettings().fit().toString());
         ComboBox.setDefaultSize(140, 20);
         cmbAutofocusMode_ = new ComboBox(AutofocusMode.toArray(),
@@ -224,7 +224,7 @@ public class AutofocusTab extends Panel {
         });
 
         cmbFittingFunction_.registerListener(e -> {
-            afsb_.fit(AutofocusFit.fromString(cmbFittingFunction_.getSelected()));
+            afsb_.fit(AutofocusFitType.fromString(cmbFittingFunction_.getSelected()));
         });
 
         // autofocus options during acquisition

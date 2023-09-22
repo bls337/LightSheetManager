@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AutofocusSettings;
-import org.micromanager.lightsheetmanager.api.data.AutofocusFit;
+import org.micromanager.lightsheetmanager.api.data.AutofocusFitType;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 
@@ -12,7 +12,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
         private double stepSize_ = 0.001;
         private AutofocusMode mode_ = AutofocusMode.FIXED_PIEZO_SWEEP_SLICE;
         private AutofocusType scoring_ = AutofocusType.VOLATH;
-        private AutofocusFit fit_ = AutofocusFit.GAUSSIAN;
+        private AutofocusFitType fit_ = AutofocusFitType.GAUSSIAN;
         private double r2_ = 1.0;
         private int timePointInterval_ = 1;
         private boolean useEveryStagePass_ = false;
@@ -91,7 +91,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          * @param type the curve fitting algorithm
          */
         @Override
-        public AutofocusSettings.Builder fit(final AutofocusFit type) {
+        public AutofocusSettings.Builder fit(final AutofocusFitType type) {
             fit_ = type;
             return this;
         }
@@ -185,7 +185,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
     private final double stepSize_;
     private final AutofocusMode mode_;
     private final AutofocusType scoring_;
-    private final AutofocusFit fit_;
+    private final AutofocusFitType fit_;
     private final double r2_;
     private final int timePointInterval_;
     private final boolean useEveryStagePass_;
@@ -256,7 +256,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
     }
 
     @Override
-    public AutofocusFit fit() {
+    public AutofocusFitType fit() {
         return fit_;
     }
 
