@@ -190,7 +190,8 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 //        System.out.println(asb_.build());
         final boolean isPolling = frame_.getNavigationPanel().isPolling();
         if (isPolling) {
-            System.out.println("stopped!");
+            studio_.logs().logMessage("stopped position polling");
+            //System.out.println("stopped!");
             frame_.getNavigationPanel().stopPolling();
         }
 
@@ -199,9 +200,6 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 
         asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
         asb_.sheetCalibrationBuilder(1).autoSheetWidthPerPixel(0.0);
-
-        // TODO: put this here for now... (make sure vars are updated)
-        setAcquisitionSettings(asb_.build());
 
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
@@ -634,6 +632,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
 
             // start polling for navigation panel
             if (isPolling) {
+                studio_.logs().logMessage("started position polling after acquisition");
                 frame_.getNavigationPanel().startPolling();
             }
         }
