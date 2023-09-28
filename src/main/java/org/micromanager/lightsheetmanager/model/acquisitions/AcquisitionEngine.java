@@ -1,6 +1,5 @@
 package org.micromanager.lightsheetmanager.model.acquisitions;
 
-import javafx.scene.effect.Light;
 import mmcorej.CMMCore;
 import mmcorej.StrVector;
 import mmcorej.org.json.JSONArray;
