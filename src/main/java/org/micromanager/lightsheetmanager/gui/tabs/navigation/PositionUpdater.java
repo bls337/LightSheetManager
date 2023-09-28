@@ -59,4 +59,9 @@ public class PositionUpdater {
     public void stopPolling() {
         isPolling_.set(false);
     }
+
+    public boolean isPolling() {
+        return isPolling_.get();
+    }
+
 }
