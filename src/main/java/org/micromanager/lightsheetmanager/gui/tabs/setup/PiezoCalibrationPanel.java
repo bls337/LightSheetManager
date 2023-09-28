@@ -84,6 +84,8 @@ public class PiezoCalibrationPanel extends Panel {
         btnStepUp_ = new Button(Icons.ARROW_UP);
         btnStepDown_ = new Button(Icons.ARROW_DOWN);
 
+        btnRunAutofocus_.setEnabled(false);
+
         switch (geometryType) {
             case DISPIM:
                 add(lblSlope, "");
