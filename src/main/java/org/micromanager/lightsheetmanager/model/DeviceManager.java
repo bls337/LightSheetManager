@@ -320,8 +320,8 @@ public class DeviceManager {
      * the Light Sheet Manager device adapter.
      */
     public void createConfigGroup() {
-        final String groupName = "LightSheetManager";
-        final String configName = "Devices";
+        final String groupName = "System";
+        final String configName = "Startup";
 
         // create group
         if (!core_.isGroupDefined(groupName)) {
