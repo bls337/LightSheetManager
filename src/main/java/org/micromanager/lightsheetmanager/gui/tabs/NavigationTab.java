@@ -6,7 +6,7 @@ import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import java.util.Objects;
 
-public class NavigationTab extends Panel  {
+public class NavigationTab extends Panel {
 
     private final NavigationPanel navigationPanel_;
 
