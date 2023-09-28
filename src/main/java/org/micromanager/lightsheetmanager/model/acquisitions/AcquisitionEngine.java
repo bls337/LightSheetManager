@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.model.acquisitions;
 
+import javafx.scene.effect.Light;
 import mmcorej.CMMCore;
 import mmcorej.StrVector;
 import mmcorej.org.json.JSONArray;
@@ -30,6 +31,7 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
+import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.model.autofocus.AutofocusRunner;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
@@ -70,6 +72,10 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     private Pipeline curPipeline_;
     private long nextWakeTime_ = -1;
 
+
+    // TODO: remove later, hacky method to stop position updater for now
+    private LightSheetManagerFrame frame_;
+
     public AcquisitionEngine(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model.studio();
@@ -81,6 +87,10 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         // default settings
         asb_ = new DefaultAcquisitionSettingsDISPIM.Builder();
         acqSettings_ = asb_.build();
+    }
+
+    public void setFrame(final LightSheetManagerFrame frame) {
+        frame_ = Objects.requireNonNull(frame);
     }
 
     /**
@@ -179,6 +189,11 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     private void runAcquisitionSCAPE() {
 //        System.out.println(asb_);
 //        System.out.println(asb_.build());
+        final boolean isPolling = frame_.getNavigationPanel().isPolling();
+        if (isPolling) {
+            System.out.println("stopped!");
+            frame_.getNavigationPanel().stopPolling();
+        }
 
         // TODO: remove this when acqSettings for SCAPE are implemented
         asb_.useAdvancedTiming(true);
@@ -617,6 +632,11 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
             // TODO: execute any end-acquisition runnables
 
             currentAcquisition_ = null;
+
+            // start polling for navigation panel
+            if (isPolling) {
+                frame_.getNavigationPanel().startPolling();
+            }
         }
     }
 

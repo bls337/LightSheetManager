@@ -13,6 +13,7 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.tabs.TabPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.navigation.NavigationPanel;
 import org.micromanager.lightsheetmanager.gui.utils.WindowUtils;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.internal.utils.WindowPositioning;
@@ -134,6 +135,11 @@ public class LightSheetManagerFrame extends JFrame {
             System.out.println("main window closed!");
         });
 
+    }
+
+    // TODO: remove when there is a better method to stop polling from acq engine
+    public NavigationPanel getNavigationPanel() {
+        return tabPanel_.getNavigationTab().getNavigationPanel();
     }
 
     public Studio getStudio_() {

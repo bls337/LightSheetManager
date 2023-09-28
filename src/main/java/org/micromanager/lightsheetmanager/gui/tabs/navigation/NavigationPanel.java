@@ -290,6 +290,10 @@ public class NavigationPanel extends Panel {
         positionUpdater_.stopPolling();
     }
 
+    public boolean isPolling() {
+        return positionUpdater_.isPolling();
+    }
+
     public void haltAllDevices() {
         System.out.println("Halt pressed!");
         for (ControlPanel controlPanel : controlPanels_) {
