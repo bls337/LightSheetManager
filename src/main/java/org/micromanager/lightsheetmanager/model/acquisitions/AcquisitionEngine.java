@@ -186,6 +186,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     }
 
     private void runAcquisitionSCAPE() {
+//        System.out.println("nTimePoints: " + acqSettings_.numTimePoints());
 //        System.out.println(asb_);
 //        System.out.println(asb_.build());
         final boolean isPolling = frame_.getNavigationPanel().isPolling();
@@ -777,7 +778,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         // make sure slice timings are up-to-date
         final double sliceDuration1 = getSliceDuration(asb_.timingSettingsBuilder());
         asb_.timingSettingsBuilder().sliceDuration(sliceDuration1);
-        
+
         recalculateSliceTiming(asb_);
         System.out.println("after recalculateSliceTiming: " + asb_.timingSettingsBuilder());
 
