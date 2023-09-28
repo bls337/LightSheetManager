@@ -47,11 +47,12 @@ public class SetupPanel extends Panel {
         excitationPanel_ = new ExcitationPanel(model_);
         cameraPanel_ = new CameraPanel(model_);
 
-        leftPanel_.add(joystickPanel_, "growx, wrap");
+        // TODO: add joystick panel back in
+        //leftPanel_.add(joystickPanel_, "growx, wrap");
         leftPanel_.add(excitationPanel_, "growx, wrap");
         if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
             singleAxisPanel_ = new SingleAxisPanel(model_);
-            leftPanel_.add(singleAxisPanel_, "growx, wrap");
+            //leftPanel_.add(singleAxisPanel_, "growx, wrap");
         }
         leftPanel_.add(cameraPanel_, "growx, wrap");
 

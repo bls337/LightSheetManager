@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
+import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
@@ -84,7 +85,7 @@ public class AcquisitionTab extends Panel {
                 model_.acquisitions().settings();
 
         Panel.setMigLayoutDefault(
-                "",
+                "insets 10 10 10 10",
                 "[]5[]",
                 "[]5[]"
         );
@@ -119,6 +120,11 @@ public class AcquisitionTab extends Panel {
 
         // acquisition buttons
         pnlButtons_ = new Panel();
+        pnlButtons_.setMigLayout(
+                "",
+                "[]24[]",
+                ""
+        );
 
         ToggleButton.setDefaultSize(120, 30);
         btnRunAcquisition_ = new ToggleButton(
@@ -144,6 +150,8 @@ public class AcquisitionTab extends Panel {
         cbxUseChannels_ = new CheckBox(
                 "Channels", acqSettings.isUsingChannels());
         pnlChannelTable_ = new ChannelTablePanel(model_, cbxUseChannels_);
+        pnlChannelTable_.setMaximumSize(new Dimension(300, 400));
+
         // disable elements based on acqSettings
         if (!acqSettings.isUsingChannels()) {
             pnlChannelTable_.setItemsEnabled(false);
@@ -199,7 +207,7 @@ public class AcquisitionTab extends Panel {
         add(pnlLeft, "");
         add(pnlCenter, "");
         add(pnlRight_, "wrap");
-        add(pnlButtons_, "span 3");
+        add(pnlButtons_, "span 3, gaptop 100");
     }
 
     private void acqFinishedCallback() {

@@ -40,6 +40,8 @@ public class MultiPositionPanel extends Panel {
         btnEditPositionList_ = new Button("Edit Position List", 120, 24);
         btnOpenXYZGrid_ = new Button("XYZ Grid", 80, 24);
 
+        btnOpenXYZGrid_.setEnabled(false);
+
         add(btnEditPositionList_, "");
         add(btnOpenXYZGrid_, "wrap");
         add(lblPostMoveDelay_, "");

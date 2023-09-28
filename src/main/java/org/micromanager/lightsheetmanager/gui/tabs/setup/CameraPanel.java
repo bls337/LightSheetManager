@@ -92,11 +92,12 @@ public class CameraPanel extends Panel {
                 });
                 break;
             case SCAPE:
+                btnInvertedPath_.setText("Preview");
                 btnInvertedPath_.registerListener(e -> {
                     // TODO: make this work, needs Device Adapter pull request and name for camera...
                     closeLiveModeWindow();
                     final String cameraName = model_.devices()
-                            .getDevice("InvertedCamera").getDeviceName();
+                            .getDevice("PreviewCamera").getDeviceName();
                     try {
                         model_.studio().core().setCameraDevice(cameraName);
                     } catch (Exception ex) {
