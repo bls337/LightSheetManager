@@ -636,6 +636,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                 studio_.logs().logMessage("started position polling after acquisition");
                 frame_.getNavigationPanel().startPolling();
             }
+
         }
     }
 
