@@ -20,6 +20,7 @@ public class ChannelTablePanel extends Panel {
 
     private Button btnAddChannel_;
     private Button btnRemoveChannel_;
+    private Button btnRefresh_;
 
     private ComboBox cmbChannelGroup_;
     private ComboBox cmbChannelMode_;
@@ -41,9 +42,14 @@ public class ChannelTablePanel extends Panel {
 
         table_ = new ChannelTable(model_);
 
-        Button.setDefaultSize(80, 24);
+        Button.setDefaultSize(72, 24);
         btnAddChannel_ = new Button("Add");
         btnRemoveChannel_ = new Button("Remove");
+        btnRefresh_ = new Button("Refresh");
+
+        btnAddChannel_.setToolTipText("Add a new channel to the table.");
+        btnRemoveChannel_.setToolTipText("Remove the currently selected channel from the table.");
+        btnRefresh_.setToolTipText("Refresh the channel panel with the latest configuration groups settings.");
 
         final String[] groupLabels = getAvailableGroups();
         cmbChannelGroup_ = new ComboBox(groupLabels, groupLabels[0]);
@@ -54,14 +60,15 @@ public class ChannelTablePanel extends Panel {
         add(lblChannelGroup_, "split 2");
         add(cmbChannelGroup_, "wrap");
         add(table_, "wrap");
-        add(btnAddChannel_, "split 2");
-        add(btnRemoveChannel_, "wrap");
+        add(btnAddChannel_, "split 3");
+        add(btnRemoveChannel_, "");
+        add(btnRefresh_, "wrap");
         add(lblChangeChannel_, "split 2");
         add(cmbChannelMode_, "");
     }
 
     private void createEventHandlers() {
-        final DefaultAcquisitionSettingsDISPIM.Builder asb_ = model_.acquisitions().settingsBuilder();
+        final DefaultAcquisitionSettingsDISPIM.Builder asb = model_.acquisitions().settingsBuilder();
 
         btnAddChannel_.registerListener(e -> {
             table_.getData().addEmptyChannel();
@@ -71,27 +78,41 @@ public class ChannelTablePanel extends Panel {
 //            repaint();
             System.out.println("add channel");
             table_.getData().printChannelData();
-            asb_.channels(table_.getData().getChannelArray());
+            asb.channels(table_.getData().getChannelArray());
         });
 
         btnRemoveChannel_.registerListener(e -> {
             final int row = table_.getTable().getSelectedRow();
             if (row != -1) {
                 table_.getData().removeChannel(row);
-                asb_.channels(table_.getData().getChannelArray());
+                asb.channels(table_.getData().getChannelArray());
                 table_.refreshData();
                 System.out.println("remove row index: " + row);
             }
         });
 
+        btnRefresh_.registerListener(e -> {
+            final Object currentLabel = cmbChannelGroup_.getSelectedItem();
+            final String[] groupLabels = getAvailableGroups();
+            cmbChannelGroup_.removeAllItems();
+            for (String label : groupLabels){
+                cmbChannelGroup_.addItem(label);
+                System.out.println(label);
+                if (label.equals(currentLabel)) {
+                    cmbChannelGroup_.setSelectedItem(currentLabel);
+                }
+            }
+            cmbChannelGroup_.updateUI();
+        });
+
         cmbChannelMode_.registerListener(e -> {
             final int index = cmbChannelMode_.getSelectedIndex();
-            asb_.channelMode(MultiChannelMode.getByIndex(index));
+            asb.channelMode(MultiChannelMode.getByIndex(index));
             //System.out.println("getChannelMode: " + model_.acquisitions().getAcquisitionSettings().getChannelMode());
         });
 
         cmbChannelGroup_.registerListener(e -> {
-            asb_.channelGroup(cmbChannelGroup_.getSelected());
+            asb.channelGroup(cmbChannelGroup_.getSelected());
             //System.out.println("getChannelGroup: " + model_.acquisitions().getAcquisitionSettings().getChannelGroup());
         });
     }

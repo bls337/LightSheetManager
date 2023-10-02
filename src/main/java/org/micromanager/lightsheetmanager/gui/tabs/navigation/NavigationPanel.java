@@ -176,7 +176,7 @@ public class NavigationPanel extends Panel {
         if (devicesFound == 0) {
             add(new JLabel("No devices or device adapter properties are not set."), "wrap");
             add(btnHaltDevices_, "wrap");
-            add(btnRefreshPanel_, "wrap");
+            //add(btnRefreshPanel_, "wrap");
             add(cbxPollPositions_, "");
             return;
         }
@@ -224,7 +224,7 @@ public class NavigationPanel extends Panel {
 
         add(miscPanel, "wrap");
         add(btnHaltDevices_, "split 3");
-        add(btnRefreshPanel_, "");
+        //add(btnRefreshPanel_, "");
         add(cbxPollPositions_, "");
     }
 
