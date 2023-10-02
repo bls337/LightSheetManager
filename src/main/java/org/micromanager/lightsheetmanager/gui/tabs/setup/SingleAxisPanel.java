@@ -48,12 +48,11 @@ public class SingleAxisPanel extends Panel {
         int periodY = 0;
         if (scanner != null) {
             pattern = scanner.sa().getPatternY().toString();
-            amplitudeY = (float)scanner.sa().getAmplitudeY();
+            amplitudeY = scanner.sa().getAmplitudeY();
             periodY = scanner.sa().getPeriodY();
         }
 
         cbxPattern_ = new ComboBox(patterns, pattern, 100, 24);
-
         spnAmplitude_ = Spinner.createDoubleSpinner(amplitudeY, 0.0, 100.0, 1.0);
         spnPeriod_ = Spinner.createIntegerSpinner(periodY, 0, 100, 1);
 

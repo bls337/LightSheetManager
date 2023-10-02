@@ -16,8 +16,8 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     public static class Properties {
         public static final String CAMERA_NAME = "CameraName";
         public static final String CAMERA_BUS = "Camera Bus";
-        public static final String TRIGGER_SOURCE = "TRIGGER_SOURCE";
-        public static final String TRIGGER_ACTIVE = "TRIGGER_ACTIVE";
+        public static final String TRIGGER_SOURCE = "TRIGGER SOURCE";
+        public static final String TRIGGER_ACTIVE = "TRIGGER ACTIVE";
         public static final String SENSOR_MODE = "SENSOR MODE";
         public static final String INTERNAL_LINE_INTERVAL = "INTERNAL LINE INTERVAL";
         public static final String SCAN_MODE = "ScanMode";
