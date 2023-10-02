@@ -97,7 +97,7 @@ public class ChannelTablePanel extends Panel {
             cmbChannelGroup_.removeAllItems();
             for (String label : groupLabels){
                 cmbChannelGroup_.addItem(label);
-                System.out.println(label);
+                //System.out.println(label);
                 if (label.equals(currentLabel)) {
                     cmbChannelGroup_.setSelectedItem(currentLabel);
                 }

@@ -1448,6 +1448,15 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
     public void recalculateSliceTiming(DefaultAcquisitionSettingsDISPIM.Builder asb) {
         // don't change timing settings if user is using advanced timing
         if (asb.isUsingAdvancedTiming()) {
+            // TODO: find a better place to set the camera trigger mode for SCAPE
+            if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+                CameraBase camera = model_.devices().getDevice("ImagingCamera");
+                camera.setTriggerMode(asb.cameraMode());
+                studio_.logs().logDebugMessage(
+                        "camera \"" + camera.getDeviceName() + "\" set to mode: " + camera.getTriggerMode());
+                //System.out.println(camera.getDeviceName());
+                //System.out.println(camMode);
+            }
             return;
         }
         // TODO: update builder here

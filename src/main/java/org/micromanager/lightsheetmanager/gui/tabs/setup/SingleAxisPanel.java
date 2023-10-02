@@ -25,7 +25,7 @@ public class SingleAxisPanel extends Panel {
     private final LightSheetManagerModel model_;
 
     public SingleAxisPanel(final LightSheetManagerModel model) {
-        super("Single Axis Y");
+        super("Scanner - Single Axis Y");
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
