@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs.channels;
 
+import mmcorej.StrVector;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.channels.ChannelTableData;
@@ -10,11 +11,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class ChannelTable extends JScrollPane {
 
     private JTable table_;
+    private JComboBox<String> cmbPresets_;
     private ChannelTableData tableData_;
     private ChannelTableModel tableModel_;
 
@@ -31,10 +34,16 @@ public class ChannelTable extends JScrollPane {
 
         // init presets combo box
         TableColumn column = table_.getColumnModel().getColumn(1);
-        JComboBox<String> cmbPresets = new JComboBox<>();
-        cmbPresets.addItem("None");
-        cmbPresets.setSelectedIndex(0);
-        column.setCellEditor(new DefaultCellEditor(cmbPresets));
+        cmbPresets_ = new JComboBox<>();
+
+        final String channelGroup = model_.acquisitions().settings().channelGroup();
+        final String[] presets = getAllPresets(channelGroup);
+        for (String preset : presets) {
+            cmbPresets_.addItem(preset);
+        }
+        //cmbPresets.addItem("None");
+        cmbPresets_.setSelectedItem(presets[0]);
+        column.setCellEditor(new DefaultCellEditor(cmbPresets_));
 
         // cancel JTable edits when focus is lost to prevent errors
         table_.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
@@ -72,4 +81,43 @@ public class ChannelTable extends JScrollPane {
         return table_;
     }
 
+    public void updatePresetCombos(final String channelGroup) {
+        //System.out.println("channelGroup: " + channelGroup);
+        final String[] presets = getAllPresets(channelGroup);
+        cmbPresets_.removeAllItems();
+        for (String preset : presets) {
+            cmbPresets_.addItem(preset);
+            //System.out.println("preset " + preset);
+        }
+        cmbPresets_.setSelectedItem(channelGroup);
+    }
+
+    // TODO: probably should be in the model
+    private String[] getAllPresets(final String configGroup) {
+        return model_.studio().core().getAvailableConfigs(configGroup).toArray();
+    }
+
+
+    // TODO: probably should be in the model
+    public String[] getAvailableGroups() {
+        StrVector groups;
+        try {
+            groups = model_.studio().core().getAllowedPropertyValues("Core", "ChannelGroup");
+        } catch (Exception e) {
+            model_.studio().logs().logError(e);
+            return new String[0];
+        }
+        ArrayList<String> strGroups = new ArrayList<>();
+        // strGroups.add("None");
+        for (String group : groups) {
+//            System.out.println("grp: " + group);
+//            StrVector st = model_.studio().core().getAvailableConfigGroups();
+//            for (String s : st)
+//                System.out.println(s);
+            if (model_.studio().core().getAvailableConfigs(group).size() > 1) {
+                strGroups.add(group);
+            }
+        }
+        return strGroups.toArray(new String[0]);
+    }
 }
