@@ -610,6 +610,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
             //   maybe not at all since we move when we switch to setup tab, something else??)
             if (isUsingPLC) {
                 controller.cleanUpControllerAfterAcquisition(acqSettings_, true);
+                controller.stopSPIMStateMachines();
             }
 
             // Restore shutter/autoshutter to original state
@@ -1410,6 +1411,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         //   maybe not at all since we move when we switch to setup tab, something else??)
         if (isUsingPLC && controller != null) {
             controller.cleanUpControllerAfterAcquisition(acqSettings_, true);
+            controller.stopSPIMStateMachines();
         }
 
         // Restore shutter/autoshutter to original state

@@ -1128,6 +1128,16 @@ public class PLogicDISPIM {
             studio_.logs().showError("Couldn't set the path config " + preset + " of group " + group);
         }
     }
+
+    public void stopSPIMStateMachines() {
+        if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+            scanner_.setSPIMState(ASIScanner.SPIMState.IDLE);
+        } else {
+            scanner1_.setSPIMState(ASIScanner.SPIMState.IDLE);
+            scanner2_.setSPIMState(ASIScanner.SPIMState.IDLE);
+        }
+    }
+
 }
 
 
