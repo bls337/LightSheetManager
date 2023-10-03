@@ -27,7 +27,7 @@ public class ChannelTablePanel extends Panel {
 
     private ChannelTable table_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public ChannelTablePanel(final LightSheetManagerModel model, final CheckBox checkBox) {
         super(checkBox);
