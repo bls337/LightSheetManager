@@ -17,6 +17,13 @@ public class ChannelSpec {
         offset_ = 0;
     }
 
+    public ChannelSpec(final String group) {
+        useChannel_ = false;
+        group_ = group;
+        name_ = "";
+        offset_ = 0;
+    }
+
     public ChannelSpec(final boolean useChannel, final String group, final String name, final double offset) {
         useChannel_ = useChannel;
         group_ = group;
