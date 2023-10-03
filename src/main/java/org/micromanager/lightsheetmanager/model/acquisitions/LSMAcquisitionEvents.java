@@ -221,7 +221,8 @@ public class LSMAcquisitionEvents {
             AcquisitionEvent channelEvent = event.copy();
             channelEvent.setConfigGroup(channelList[index].getGroup());
             channelEvent.setConfigPreset(channelList[index].getName());
-            channelEvent.setChannelName(channelList[index].getName());
+            channelEvent.setChannelName(Integer.toString(index));
+            //channelEvent.setChannelName(channelList[index].getName());
 
             double zPos;
             if (channelEvent.getZPosition() == null) {
