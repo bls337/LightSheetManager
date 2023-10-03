@@ -51,8 +51,9 @@ public class ChannelTablePanel extends Panel {
         btnRemoveChannel_.setToolTipText("Remove the currently selected channel from the table.");
         btnRefresh_.setToolTipText("Refresh the channel panel with the latest configuration groups settings.");
 
-        final String[] groupLabels = getAvailableGroups();
-        cmbChannelGroup_ = new ComboBox(groupLabels, groupLabels[0]);
+        final String[] groupLabels = table_.getAvailableGroups();
+        cmbChannelGroup_ = new ComboBox(groupLabels,
+                model_.acquisitions().settings().channelGroup());
 
         cmbChannelMode_ = new ComboBox(MultiChannelMode.toArray(),
                 model_.acquisitions().settings().channelMode().toString());
@@ -92,8 +93,10 @@ public class ChannelTablePanel extends Panel {
         });
 
         btnRefresh_.registerListener(e -> {
+            // TODO: use settings instead of GUI
+            table_.updatePresetCombos(cmbChannelGroup_.getSelected());
             final Object currentLabel = cmbChannelGroup_.getSelectedItem();
-            final String[] groupLabels = getAvailableGroups();
+            final String[] groupLabels = table_.getAvailableGroups();
             cmbChannelGroup_.removeAllItems();
             for (String label : groupLabels){
                 cmbChannelGroup_.addItem(label);
@@ -112,28 +115,11 @@ public class ChannelTablePanel extends Panel {
         });
 
         cmbChannelGroup_.registerListener(e -> {
-            asb.channelGroup(cmbChannelGroup_.getSelected());
+            final String selected = cmbChannelGroup_.getSelected();
+            table_.updatePresetCombos(selected);
+            asb.channelGroup(selected);
             //System.out.println("getChannelGroup: " + model_.acquisitions().getAcquisitionSettings().getChannelGroup());
         });
-    }
-
-    // TODO: probably should be in the model not gui
-    private String[] getAvailableGroups() {
-        StrVector groups;
-        try {
-            groups = model_.studio().core().getAllowedPropertyValues("Core", "ChannelGroup");
-        } catch (Exception e) {
-            model_.studio().logs().logError(e);
-            return new String[0];
-        }
-        ArrayList<String> strGroups = new ArrayList<>();
-        strGroups.add("None");
-        for (String group : groups) {
-            if (model_.studio().core().getAvailableConfigs(group).size() > 1) {
-                strGroups.add(group);
-            }
-        }
-        return strGroups.toArray(new String[0]);
     }
 
     /**
