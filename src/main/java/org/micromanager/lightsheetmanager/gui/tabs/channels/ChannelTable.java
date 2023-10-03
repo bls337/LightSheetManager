@@ -26,9 +26,10 @@ public class ChannelTable extends JScrollPane {
     public ChannelTable(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
 
+        final String channelGroup = model_.acquisitions().settings().channelGroup();
         final ChannelSpec[] channels = model_.acquisitions().settings().channels();
 
-        tableData_ = new ChannelTableData(channels);
+        tableData_ = new ChannelTableData(channels, channelGroup);
         tableModel_ = new ChannelTableModel(tableData_);
         table_ = new JTable(tableModel_);
 
@@ -36,7 +37,6 @@ public class ChannelTable extends JScrollPane {
         TableColumn column = table_.getColumnModel().getColumn(1);
         cmbPresets_ = new JComboBox<>();
 
-        final String channelGroup = model_.acquisitions().settings().channelGroup();
         final String[] presets = getAllPresets(channelGroup);
         for (String preset : presets) {
             cmbPresets_.addItem(preset);

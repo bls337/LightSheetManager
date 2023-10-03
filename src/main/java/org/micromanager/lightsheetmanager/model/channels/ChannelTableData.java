@@ -16,12 +16,12 @@ public class ChannelTableData {
         channelGroup_ = "None";
     }
 
-    public ChannelTableData(final ChannelSpec[] channels) {
+    public ChannelTableData(final ChannelSpec[] channels, final String channelGroup) {
         channels_ = new ArrayList<>();
         if (channels != null) {
             Collections.addAll(channels_, channels);
         }
-        channelGroup_ = "None";
+        channelGroup_ = channelGroup;
     }
 
     public ArrayList<ChannelSpec> getChannels() {
@@ -37,7 +37,7 @@ public class ChannelTableData {
     }
 
     public void addEmptyChannel() {
-        channels_.add(new ChannelSpec());
+        channels_.add(new ChannelSpec(channelGroup_));
     }
 
     public void addChannel(final ChannelSpec channel) {

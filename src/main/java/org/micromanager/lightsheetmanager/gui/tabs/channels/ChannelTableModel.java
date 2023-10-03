@@ -15,7 +15,7 @@ public class ChannelTableModel extends AbstractTableModel {
             "Offset"
     };
 
-    private ChannelTableData tableData_;
+    private final ChannelTableData tableData_;
 
     public ChannelTableModel(final ChannelTableData tableData) {
         tableData_ = Objects.requireNonNull(tableData);
