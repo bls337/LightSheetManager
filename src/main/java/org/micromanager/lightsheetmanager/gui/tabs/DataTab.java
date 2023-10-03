@@ -98,8 +98,6 @@ public class DataTab extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultAcquisitionSettingsDISPIM.Builder asb_ =
-                model_.acquisitions().settingsBuilder();
 
         btnBrowse_.registerListener((EventObject e) -> {
             //final String path = fileSelect_.openDialogBox(this, new File(""));
@@ -108,25 +106,25 @@ public class DataTab extends Panel {
                     directorySelect_
             );
             if (result != null) {
-                asb_.saveDirectory(result.toString());
+                model_.acquisitions().settingsBuilder().saveDirectory(result.toString());
                 txtSaveDirectory_.setText(result.toString());
             }
             //System.out.println("getSaveDirectory: " + model_.acquisitions().getAcquisitionSettings().getSaveDirectory());
         });
 
         cbxSaveWhileAcquiring_.registerListener(e -> {
-            asb_.saveImagesDuringAcquisition(cbxSaveWhileAcquiring_.isSelected());
+            model_.acquisitions().settingsBuilder().saveImagesDuringAcquisition(cbxSaveWhileAcquiring_.isSelected());
             //System.out.println("isSavingWhileAcquiring: " + model_.acquisitions().getAcquisitionSettings().isSavingWhileAcquiring());
         });
 
         txtSaveFileName_.registerListener(e -> {
-            asb_.saveNamePrefix(txtSaveFileName_.getText());
+            model_.acquisitions().settingsBuilder().saveNamePrefix(txtSaveFileName_.getText());
             //System.out.println("getSaveNamePrefix: " + model_.acquisitions().getAcquisitionSettings().getSaveNamePrefix());
         });
 
         radSaveMode_.registerListener(e -> {
+            model_.acquisitions().settingsBuilder().saveMode(DataStorage.SaveMode.fromString(radSaveMode_.getSelectedButtonText()));
             System.out.println("radSaveMode: " + radSaveMode_.getSelectedButtonText());
-            asb_.saveMode(DataStorage.SaveMode.fromString(radSaveMode_.getSelectedButtonText()));
         });
     }
 

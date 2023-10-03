@@ -241,8 +241,6 @@ public class AcquisitionTab extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultAcquisitionSettingsDISPIM.Builder asb_ =
-                model_.acquisitions().settingsBuilder();
 
         // start/stop acquisitions
         btnRunAcquisition_.registerListener(e -> {
@@ -277,14 +275,14 @@ public class AcquisitionTab extends Panel {
         // multiple positions
         cbxUseMultiplePositions_.registerListener(e -> {
             final boolean isSelected = cbxUseMultiplePositions_.isSelected();
-            asb_.useMultiplePositions(isSelected);
+            model_.acquisitions().settingsBuilder().useMultiplePositions(isSelected);
             pnlMultiPositions_.setEnabled(isSelected);
         });
 
         // time points
         cbxUseTimePoints_.registerListener(e -> {
             final boolean selected = cbxUseTimePoints_.isSelected();
-            asb_.useTimePoints(selected);
+            model_.acquisitions().settingsBuilder().useTimePoints(selected);
             pnlTimePoints_.setEnabled(selected);
             //updateDurationLabels();
         });
@@ -292,13 +290,13 @@ public class AcquisitionTab extends Panel {
         // use channels
         cbxUseChannels_.registerListener(e -> {
             final boolean state = cbxUseChannels_.isSelected();
-            asb_.useChannels(state);
+            model_.acquisitions().settingsBuilder().useChannels(state);
             pnlChannelTable_.setItemsEnabled(state);
         });
 
         cmbAcquisitionModes_.registerListener(e -> {
             final int index = cmbAcquisitionModes_.getSelectedIndex();
-            asb_.acquisitionMode(AcquisitionMode.getByIndex(index));
+            model_.acquisitions().settingsBuilder().acquisitionMode(AcquisitionMode.getByIndex(index));
             //System.out.println("getAcquisitionMode: " + model_.acquisitions().getAcquisitionSettings().getAcquisitionMode());
         });
 

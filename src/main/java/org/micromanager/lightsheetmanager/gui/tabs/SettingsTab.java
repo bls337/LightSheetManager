@@ -120,25 +120,30 @@ public class SettingsTab extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultScanSettings.Builder scsb = model_.acquisitions()
-                .settingsBuilder().scanSettingsBuilder();
 
         // Scan Settings
         spnScanAcceleration_.registerListener(e ->
-                scsb.scanAccelerationFactor(spnScanAcceleration_.getDouble()));
+                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                        .scanAccelerationFactor(spnScanAcceleration_.getDouble()));
         spnScanOvershootDist_.registerListener(e ->
-                scsb.scanOvershootDistance(spnScanOvershootDist_.getInt()));
+                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                        .scanOvershootDistance(spnScanOvershootDist_.getInt()));
         spnScanRetraceSpeed_.registerListener(e ->
-                scsb.scanRetraceSpeed(spnScanRetraceSpeed_.getDouble()));
+                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                        .scanRetraceSpeed(spnScanRetraceSpeed_.getDouble()));
         spnScanAngleFirstView_.registerListener(e ->
-                scsb.scanAngleFirstView(spnScanAngleFirstView_.getDouble()));
+                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                        .scanAngleFirstView(spnScanAngleFirstView_.getDouble()));
 
         cbxScanFromCurrentPosition_.registerListener(e ->
-                scsb.scanFromCurrentPosition(cbxScanFromCurrentPosition_.isSelected()));
+                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                        .scanFromCurrentPosition(cbxScanFromCurrentPosition_.isSelected()));
         cbxScanNegativeDirection_.registerListener(e ->
-                scsb.scanFromNegativeDirection(cbxScanNegativeDirection_.isSelected()));
+                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                        .scanFromNegativeDirection(cbxScanNegativeDirection_.isSelected()));
         cbxReturnToOriginalPosition_.registerListener(e ->
-                scsb.scanReturnToOriginalPosition(cbxReturnToOriginalPosition_.isSelected()));
+                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                        .scanReturnToOriginalPosition(cbxReturnToOriginalPosition_.isSelected()));
 
         // TODO: better method, change scanner methods to double?
         final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
