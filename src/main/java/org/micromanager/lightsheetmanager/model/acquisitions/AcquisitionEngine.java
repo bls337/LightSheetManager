@@ -797,7 +797,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         boolean changeChannelPerVolumeSoftware = false;
         boolean changeChannelPerVolumeDoneFirst = false;
         if (acqSettings_.isUsingChannels()) {
-            if (asb_.numChannels() > 1) {
+            if (asb_.numChannels() == 0) {
                 studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
                 return false; // early exit
             }
