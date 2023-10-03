@@ -42,7 +42,7 @@ public class ChannelTable extends JScrollPane {
             cmbPresets_.addItem(preset);
         }
         //cmbPresets.addItem("None");
-        cmbPresets_.setSelectedItem(presets[0]);
+        //cmbPresets_.setSelectedItem(presets[0]);
         column.setCellEditor(new DefaultCellEditor(cmbPresets_));
 
         // cancel JTable edits when focus is lost to prevent errors
