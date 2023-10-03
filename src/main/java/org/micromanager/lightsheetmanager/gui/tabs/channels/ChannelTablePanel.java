@@ -8,6 +8,7 @@ import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
+import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 import javax.swing.JLabel;
 import java.util.ArrayList;
@@ -79,14 +80,18 @@ public class ChannelTablePanel extends Panel {
 //            repaint();
             System.out.println("add channel");
             table_.getData().printChannelData();
-            asb.channels(table_.getData().getChannelArray());
+            final ChannelSpec[] channels = table_.getData().getChannelArray();
+            asb.channels(channels);
+            asb.numChannels(channels.length);
         });
 
         btnRemoveChannel_.registerListener(e -> {
             final int row = table_.getTable().getSelectedRow();
             if (row != -1) {
                 table_.getData().removeChannel(row);
-                asb.channels(table_.getData().getChannelArray());
+                final ChannelSpec[] channels = table_.getData().getChannelArray();
+                asb.channels(channels);
+                asb.numChannels(channels.length);
                 table_.refreshData();
                 System.out.println("remove row index: " + row);
             }
