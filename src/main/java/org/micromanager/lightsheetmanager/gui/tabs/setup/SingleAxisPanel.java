@@ -37,8 +37,8 @@ public class SingleAxisPanel extends Panel {
                 .getDevice("IllumSlice");
 
         final JLabel lblPattern = new JLabel("Pattern:");
-        final JLabel lblAmplitude = new JLabel("Amplitude");
-        final JLabel lblPeriod = new JLabel("Period");
+        final JLabel lblAmplitude = new JLabel("Amplitude:");
+        final JLabel lblPeriod = new JLabel("Period [ms]:");
 
 
         final String[] patterns = SingleAxis.Pattern.toArray();
