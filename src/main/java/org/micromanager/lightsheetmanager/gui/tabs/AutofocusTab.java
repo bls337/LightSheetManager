@@ -193,8 +193,6 @@ public class AutofocusTab extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultAutofocusSettings.Builder afsb_ = model_
-                .acquisitions().settingsBuilder().autofocusSettingsBuilder();
 
         // general autofocus settings
         cbxShowImages_.registerListener(e -> {
@@ -206,32 +204,40 @@ public class AutofocusTab extends Panel {
         });
 
         spnNumImages_.registerListener(e ->
-                afsb_.numImages(spnNumImages_.getInt()));
+                model_.acquisitions().settingsBuilder()
+                        .autofocusSettingsBuilder().numImages(spnNumImages_.getInt()));
 
         spnStepSize_.registerListener(e ->
-                afsb_.stepSize(spnStepSize_.getDouble()));
+                model_.acquisitions().settingsBuilder()
+                        .autofocusSettingsBuilder().stepSize(spnStepSize_.getDouble()));
 
         spnMinimumR2_.registerListener(e -> {
-            afsb_.r2(spnMinimumR2_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .autofocusSettingsBuilder().r2(spnMinimumR2_.getDouble());
         });
 
         cmbAutofocusMode_.registerListener(e -> {
-            afsb_.mode(AutofocusMode.fromString(cmbAutofocusMode_.getSelected()));
+            model_.acquisitions().settingsBuilder().autofocusSettingsBuilder()
+                    .mode(AutofocusMode.fromString(cmbAutofocusMode_.getSelected()));
         });
 
         cmbScoringAlgorithm_.registerListener(e -> {
-            afsb_.scoringAlgorithm(AutofocusType.fromString(cmbScoringAlgorithm_.getSelected()));
+            model_.acquisitions().settingsBuilder().autofocusSettingsBuilder()
+                    .scoringAlgorithm(AutofocusType.fromString(cmbScoringAlgorithm_.getSelected()));
         });
 
         cmbFittingFunction_.registerListener(e -> {
-            afsb_.fit(AutofocusFitType.fromString(cmbFittingFunction_.getSelected()));
+            model_.acquisitions().settingsBuilder().autofocusSettingsBuilder()
+                    .fit(AutofocusFitType.fromString(cmbFittingFunction_.getSelected()));
         });
 
         // autofocus options during acquisition
-        cbxAutofocusEveryPass_.registerListener(e -> System.out.println("cbxAutofocusEveryPass_: " + cbxAutofocusEveryPass_.isSelected()));
-        cbxAutofocusBeforeAcq_.registerListener(e -> System.out.println("cbxAutofocusBeforeAcq_: " + cbxAutofocusBeforeAcq_.isSelected()));
-
-        cmbAutofocusChannel_.registerListener(e -> System.out.println("cmbAutofocusChannel_"));
+        cbxAutofocusEveryPass_.registerListener(e ->
+                System.out.println("cbxAutofocusEveryPass_: " + cbxAutofocusEveryPass_.isSelected()));
+        cbxAutofocusBeforeAcq_.registerListener(e ->
+                System.out.println("cbxAutofocusBeforeAcq_: " + cbxAutofocusBeforeAcq_.isSelected()));
+        cmbAutofocusChannel_.registerListener(e ->
+                System.out.println("cmbAutofocusChannel_"));
 
         spnAutofocusEveryX_.registerListener(e -> {
 
