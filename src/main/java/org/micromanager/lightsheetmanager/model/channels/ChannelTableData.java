@@ -18,6 +18,7 @@ public class ChannelTableData {
 
     public ChannelTableData(final ChannelSpec[] channels, final String channelGroup) {
         channels_ = new ArrayList<>();
+        // TODO: Objects.requireNonNull
         if (channels != null) {
             Collections.addAll(channels_, channels);
         }
