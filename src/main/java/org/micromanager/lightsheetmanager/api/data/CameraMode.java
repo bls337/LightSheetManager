@@ -7,9 +7,10 @@ import java.util.stream.Stream;
 
 /**
  * Camera trigger modes.
+ *
+ * <p>All modes should use hardware triggering.
  */
 public enum CameraMode {
-    INTERNAL("Internal"),
     EDGE("Edge Trigger"),
     OVERLAP("Overlap/Synchronous"),
     LEVEL("Level Trigger"),
