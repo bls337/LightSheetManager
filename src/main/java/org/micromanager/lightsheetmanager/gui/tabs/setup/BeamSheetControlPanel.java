@@ -159,8 +159,6 @@ public class BeamSheetControlPanel extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultAcquisitionSettingsDISPIM.Builder asb_ = model_.acquisitions()
-                .settingsBuilder();
 
         // first panel
         btnPlotProfile_.registerListener(e -> {
@@ -170,19 +168,22 @@ public class BeamSheetControlPanel extends Panel {
         // second panel
         cbxAutoSheetWidth_.registerListener(e -> {
             final boolean state = cbxAutoSheetWidth_.isSelected();
-            asb_.sheetCalibrationBuilder(pathNum_).useAutoSheetWidth(state);
+            model_.acquisitions().settingsBuilder()
+                    .sheetCalibrationBuilder(pathNum_).useAutoSheetWidth(state);
             setEnabledSheetWidth(state);
         });
 
         sldSheetWidth_.registerListener(e -> {
             final double value = sldSheetWidth_.getDouble();
-            asb_.sheetCalibrationBuilder(pathNum_).sheetWidth(value);
+            model_.acquisitions().settingsBuilder()
+                    .sheetCalibrationBuilder(pathNum_).sheetWidth(value);
             System.out.println("sheetWidth value: " + value);
         });
 
         sldSheetOffset_.registerListener(e -> {
             final double value = sldSheetOffset_.getDouble();
-            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+            model_.acquisitions().settingsBuilder()
+                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
             txtSheetOffset_.setText(Double.toString(value));
             lblSlopeOffset_.setText(Double.toString(value));
             System.out.println("sheetOffset value: " + value);
@@ -190,7 +191,8 @@ public class BeamSheetControlPanel extends Panel {
 
         txtSheetOffset_.registerListener(e -> {
             final double value = Double.parseDouble(txtSheetOffset_.getText());
-            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+            model_.acquisitions().settingsBuilder()
+                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
             lblSlopeOffset_.setText(Double.toString(value));
             EventQueue.invokeLater(() -> {
                 sldSheetOffset_.setDouble(value);
@@ -199,7 +201,8 @@ public class BeamSheetControlPanel extends Panel {
 
         btnCenterOffset_.registerListener(e -> {
             System.out.println("center offset pressed");
-            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(0.0);
+            model_.acquisitions().settingsBuilder()
+                    .sheetCalibrationBuilder(pathNum_).sheetOffset(0.0);
             txtSheetOffset_.setText("0");
             lblSlopeOffset_.setText("0");
             sldSheetOffset_.setDouble(0);
@@ -212,7 +215,8 @@ public class BeamSheetControlPanel extends Panel {
             currentOffset_ -= 0.01;
             final double value = currentOffset_;
             System.out.println("value: " + value);
-            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+            model_.acquisitions().settingsBuilder()
+                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
             txtSheetOffset_.setText(Double.toString(value));
             sldSheetOffset_.setDouble(value);
         });
@@ -223,7 +227,8 @@ public class BeamSheetControlPanel extends Panel {
             currentOffset_ += 0.01;
             final double value = currentOffset_;
             System.out.println("value: " + value);
-            asb_.sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+            model_.acquisitions().settingsBuilder()
+                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
             txtSheetOffset_.setText(Double.toString(value));
             sldSheetOffset_.setDouble(value);
         });
