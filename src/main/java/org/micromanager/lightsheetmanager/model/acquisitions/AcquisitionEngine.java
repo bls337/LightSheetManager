@@ -1348,8 +1348,8 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
             }
         }
 
-        for (int positionIndex = 0; positionIndex < (acqSettings_.isUsingMultiplePositions() ?
-              pl.getNumberOfPositions() : 1); positionIndex++) {
+        final int numPositions = acqSettings_.isUsingMultiplePositions() ? pl.getNumberOfPositions() : 1;
+        for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
             AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
             if (acqSettings_.isUsingMultiplePositions()) {
                 baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
@@ -1371,8 +1371,8 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                 }
             } else {
                 // Loop 2: Multiple time points
-                for (int timeIndex = 0; timeIndex < (acqSettings_.isUsingTimePoints() ?
-                      acqSettings_.numTimePoints() : 1); timeIndex++) {
+                final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
+                for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
                     baseEvent.setTimeIndex(timeIndex);
                     // Loop 3: Channels; Loop 4: Z slices (non-interleaved)
                     // Loop 3: Channels; Loop 4: Z slices (interleaved)
