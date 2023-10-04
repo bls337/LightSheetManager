@@ -70,7 +70,6 @@ public class ChannelTablePanel extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultAcquisitionSettingsDISPIM.Builder asb = model_.acquisitions().settingsBuilder();
 
         btnAddChannel_.registerListener(e -> {
             table_.getData().addEmptyChannel();
@@ -81,8 +80,8 @@ public class ChannelTablePanel extends Panel {
             System.out.println("add channel");
             table_.getData().printChannelData();
             final ChannelSpec[] channels = table_.getData().getChannelArray();
-            asb.channels(channels);
-            asb.numChannels(channels.length);
+            model_.acquisitions().settingsBuilder().channels(channels);
+            model_.acquisitions().settingsBuilder().numChannels(channels.length);
         });
 
         btnRemoveChannel_.registerListener(e -> {
@@ -90,8 +89,8 @@ public class ChannelTablePanel extends Panel {
             if (row != -1) {
                 table_.getData().removeChannel(row);
                 final ChannelSpec[] channels = table_.getData().getChannelArray();
-                asb.channels(channels);
-                asb.numChannels(channels.length);
+                model_.acquisitions().settingsBuilder().channels(channels);
+                model_.acquisitions().settingsBuilder().numChannels(channels.length);
                 table_.refreshData();
                 System.out.println("remove row index: " + row);
             }
@@ -115,14 +114,14 @@ public class ChannelTablePanel extends Panel {
 
         cmbChannelMode_.registerListener(e -> {
             final int index = cmbChannelMode_.getSelectedIndex();
-            asb.channelMode(MultiChannelMode.getByIndex(index));
+            model_.acquisitions().settingsBuilder().channelMode(MultiChannelMode.getByIndex(index));
             //System.out.println("getChannelMode: " + model_.acquisitions().getAcquisitionSettings().getChannelMode());
         });
 
         cmbChannelGroup_.registerListener(e -> {
             final String selected = cmbChannelGroup_.getSelected();
             table_.updatePresetCombos(selected);
-            asb.channelGroup(selected);
+            model_.acquisitions().settingsBuilder().channelGroup(selected);
             //System.out.println("getChannelGroup: " + model_.acquisitions().getAcquisitionSettings().getChannelGroup());
         });
     }
