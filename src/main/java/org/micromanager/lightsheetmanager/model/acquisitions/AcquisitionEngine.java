@@ -1605,7 +1605,6 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                 delayBeforeLaser = delayBeforeCamera - scanLaserBufferTime; // trigger laser just before camera to make sure it's on already
                 laserDuration = (totalExposureMax*shutterSpeed) + scanLaserBufferTime; // laser will turn off as exposure is ending
                 break;
-            case INTERNAL: // case fall through
             default:
                 studio_.logs().showError("Invalid camera mode");
                 // FIXME: set to invalid!

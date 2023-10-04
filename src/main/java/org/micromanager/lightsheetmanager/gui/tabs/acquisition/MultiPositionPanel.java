@@ -49,14 +49,12 @@ public class MultiPositionPanel extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultAcquisitionSettingsDISPIM.Builder asb_ =
-                model_.acquisitions().settingsBuilder();
 
         btnOpenXYZGrid_.registerListener(e -> xyzGridFrame_.setVisible(true));
         btnEditPositionList_.registerListener(e -> model_.studio().app().showPositionList());
 
         spnPostMoveDelay_.registerListener(e -> {
-            asb_.postMoveDelay(spnPostMoveDelay_.getInt());
+            model_.acquisitions().settingsBuilder().postMoveDelay(spnPostMoveDelay_.getInt());
             //System.out.println("getPostMoveDelay: " + model_.acquisitions().getAcquisitionSettings().getPostMoveDelay());
         });
 

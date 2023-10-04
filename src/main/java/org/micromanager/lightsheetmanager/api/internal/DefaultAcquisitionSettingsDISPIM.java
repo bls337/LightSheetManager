@@ -18,7 +18,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NONE;
         private MultiChannelMode channelMode_ = MultiChannelMode.NONE;
-        private CameraMode cameraMode_ = CameraMode.INTERNAL;
+        private CameraMode cameraMode_ = CameraMode.EDGE;
 
         private boolean useChannels_ = false;
         private boolean useTimePoints_ = false;
