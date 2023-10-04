@@ -13,7 +13,7 @@ public class CameraBase extends DeviceBase implements LightSheetCamera {
 
     public CameraBase(final Studio studio, final String deviceName) {
         super(studio, deviceName);
-        mode_ = CameraMode.INTERNAL;
+        mode_ = CameraMode.EDGE;
     }
 
     // TODO: take binning into account

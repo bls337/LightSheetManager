@@ -90,51 +90,58 @@ public class AdvancedTimingPanel extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultTimingSettings.Builder tsb_ = model_.acquisitions()
-                .settingsBuilder().timingSettingsBuilder();
 
         spnDelayBeforeScan_.registerListener(e -> {
-            tsb_.delayBeforeScan(spnDelayBeforeScan_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .timingSettingsBuilder().delayBeforeScan(spnDelayBeforeScan_.getDouble());
             //System.out.println("delayBeforeScan: " + acqSettings.getTimingSettings().delayBeforeScan());
         });
 
         spnScansPerSlice_.registerListener(e -> {
-            tsb_.scansPerSlice(spnScansPerSlice_.getInt());
+            model_.acquisitions().settingsBuilder()
+                    .timingSettingsBuilder().scansPerSlice(spnScansPerSlice_.getInt());
             //System.out.println("scansPerSlice: " + acqSettings.getTimingSettings().scansPerSlice());
         });
 
         spnScanDuration_.registerListener(e -> {
-            tsb_.scanDuration(spnScanDuration_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .timingSettingsBuilder().scanDuration(spnScanDuration_.getDouble());
             //System.out.println("scanDuration: " + acqSettings.getTimingSettings().scanDuration());
         });
 
         spnDelayBeforeLaser_.registerListener(e -> {
-            tsb_.delayBeforeLaser(spnDelayBeforeLaser_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .timingSettingsBuilder().delayBeforeLaser(spnDelayBeforeLaser_.getDouble());
             //System.out.println("delayBeforeLaser: " + acqSettings.getTimingSettings().delayBeforeLaser());
         });
 
         spnLaserTriggerDuration_.registerListener(e -> {
-            tsb_.laserTriggerDuration(spnLaserTriggerDuration_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .timingSettingsBuilder().laserTriggerDuration(spnLaserTriggerDuration_.getDouble());
             //System.out.println("laserTriggerDuration: " + acqSettings.getTimingSettings().laserTriggerDuration());
         });
 
         spnDelayBeforeCamera_.registerListener(e -> {
-            tsb_.delayBeforeCamera(spnDelayBeforeCamera_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .timingSettingsBuilder().delayBeforeCamera(spnDelayBeforeCamera_.getDouble());
             //System.out.println("delayBeforeCamera: " + acqSettings.getTimingSettings().delayBeforeCamera());
         });
 
         spnCameraTriggerDuration_.registerListener(e -> {
-            tsb_.cameraTriggerDuration(spnCameraTriggerDuration_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .timingSettingsBuilder().cameraTriggerDuration(spnCameraTriggerDuration_.getDouble());
             //System.out.println("cameraTriggerDuration: " + acqSettings.getTimingSettings().cameraTriggerDuration());
         });
 
         spnCameraExposure_.registerListener(e -> {
-            tsb_.cameraExposure(spnCameraExposure_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .timingSettingsBuilder().cameraExposure(spnCameraExposure_.getDouble());
             //System.out.println("cameraExposure: " + acqSettings.getTimingSettings().cameraExposure());
         });
 
         cbxAlternateScanDirection_.registerListener(e -> {
-            tsb_.useAlternateScanDirection(cbxAlternateScanDirection_.isSelected());
+            model_.acquisitions().settingsBuilder()
+                    .timingSettingsBuilder().useAlternateScanDirection(cbxAlternateScanDirection_.isSelected());
             //System.out.println("useAlternateScanDirection: " + acqSettings.getTimingSettings().useAlternateScanDirection());
         });
     }

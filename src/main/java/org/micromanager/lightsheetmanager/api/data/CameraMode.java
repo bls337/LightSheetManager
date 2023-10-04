@@ -27,7 +27,7 @@ public enum CameraMode {
     }
 
     public static CameraMode fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, CameraMode.INTERNAL);
+        return stringToEnum.getOrDefault(symbol, CameraMode.EDGE);
     }
 
     public static CameraMode getByIndex(final int index) {

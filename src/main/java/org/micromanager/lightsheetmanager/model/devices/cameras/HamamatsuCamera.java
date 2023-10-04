@@ -47,7 +47,8 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     @Override
     public void setTriggerMode(final CameraMode cameraMode) {
         mode_ = cameraMode;
-        setProperty(Properties.TRIGGER_SOURCE, (cameraMode == CameraMode.INTERNAL) ? Values.INTERNAL : Values.EXTERNAL);
+        //setProperty(Properties.TRIGGER_SOURCE, (cameraMode == CameraMode.INTERNAL) ? Values.INTERNAL : Values.EXTERNAL);
+        setProperty(Properties.TRIGGER_SOURCE, Values.EXTERNAL);
         setProperty(Properties.SENSOR_MODE, (cameraMode == CameraMode.VIRTUAL_SLIT) ? Values.PROGRESSIVE : Values.AREA);
         switch (cameraMode) {
             case VIRTUAL_SLIT:

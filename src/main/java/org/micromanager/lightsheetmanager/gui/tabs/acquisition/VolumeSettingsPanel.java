@@ -100,27 +100,30 @@ public class VolumeSettingsPanel extends Panel {
     }
 
     private void createEventHandlers() {
-        final DefaultVolumeSettings.Builder vsb = model_.acquisitions()
-                .settingsBuilder().volumeSettingsBuilder();
 
         cmbNumViews_.registerListener(e -> {
-            vsb.numViews(Integer.parseInt(cmbNumViews_.getSelected()));
+            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+                    .numViews(Integer.parseInt(cmbNumViews_.getSelected()));
         });
 
         cmbFirstView_.registerListener(e -> {
-            vsb.firstView(Integer.parseInt(cmbFirstView_.getSelected()));
+            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+                    .firstView(Integer.parseInt(cmbFirstView_.getSelected()));
         });
 
         spnViewDelay_.registerListener(e -> {
-            vsb.delayBeforeView(spnViewDelay_.getDouble());
+            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+                    .delayBeforeView(spnViewDelay_.getDouble());
         });
 
         spnSlicesPerSide_.registerListener(e -> {
-            vsb.slicesPerVolume(spnSlicesPerSide_.getInt());
+            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+                    .slicesPerVolume(spnSlicesPerSide_.getInt());
         });
 
         spnSliceStepSize_.registerListener(e -> {
-            vsb.sliceStepSize(spnSliceStepSize_.getDouble());
+            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+                    .sliceStepSize(spnSliceStepSize_.getDouble());
         });
     }
 }

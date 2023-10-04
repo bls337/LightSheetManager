@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
@@ -87,52 +86,50 @@ public class SliceSettingsPanel extends Panel {
      */
     private void createEventHandlers() {
 
-        final DefaultSliceSettings.Builder ssb_ = model_.acquisitions()
-                .settingsBuilder().sliceSettingsBuilder();
-
-        final DefaultSliceSettingsLS.Builder ssbLS_ = model_.acquisitions()
-                .settingsBuilder().sliceSettingsLSBuilder();
-
-        final DefaultAcquisitionSettingsDISPIM.Builder asb =
-                model_.acquisitions().settingsBuilder();
-
         // regular panel
         cbxMinimizeSlicePeriod_.registerListener(e -> {
             final boolean selected = !cbxMinimizeSlicePeriod_.isSelected();
             lblSlicePeriod_.setEnabled(selected);
             spnSlicePeriod_.setEnabled(selected);
-            ssb_.minimizeSlicePeriod(!selected);
+            model_.acquisitions().settingsBuilder()
+                    .sliceSettingsBuilder().minimizeSlicePeriod(!selected);
             //System.out.println("isSlicePeriodMinimized: " + acqSettings.getSliceSettings().isSlicePeriodMinimized());
         });
 
         spnSlicePeriod_.registerListener(e -> {
-            ssb_.slicePeriod(spnSlicePeriod_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .sliceSettingsBuilder().slicePeriod(spnSlicePeriod_.getDouble());
             //System.out.println("slicePeriod: " + acqSettings.getSliceSettings().slicePeriod());
         });
 
         spnSampleExposure_.registerListener(e -> {
-            ssb_.sampleExposure(spnSampleExposure_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .sliceSettingsBuilder().sampleExposure(spnSampleExposure_.getDouble());
             //System.out.println("sampleExposure: " + acqSettings.getSliceSettings().sampleExposure());
         });
 
         // virtual slit panel
         spnScanResetTime_.registerListener(e -> {
-            ssbLS_.scanResetTime(spnScanResetTime_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .sliceSettingsLSBuilder().scanResetTime(spnScanResetTime_.getDouble());
             //System.out.println("scanResetTime: " + acqSettings.getSliceSettingsLS().scanResetTime());
         });
 
         spnScanSettleTime_.registerListener(e -> {
-            ssbLS_.scanSettleTime(spnScanSettleTime_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .sliceSettingsLSBuilder().scanSettleTime(spnScanSettleTime_.getDouble());
             //System.out.println("scanSettleTime: " + acqSettings.getSliceSettingsLS().scanSettleTime());
         });
 
         spnShutterWidth_.registerListener(e -> {
-            ssbLS_.shutterWidth(spnShutterWidth_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .sliceSettingsLSBuilder().shutterWidth(spnShutterWidth_.getDouble());
             //System.out.println("shutterWidth: " + acqSettings.getSliceSettingsLS().shutterWidth());
         });
 
         spnShutterSpeed_.registerListener(e -> {
-            ssbLS_.shutterSpeedFactor(spnShutterSpeed_.getDouble());
+            model_.acquisitions().settingsBuilder()
+                    .sliceSettingsLSBuilder().shutterSpeedFactor(spnShutterSpeed_.getDouble());
             //System.out.println("shutterSpeedFactor: " + acqSettings.getSliceSettingsLS().shutterSpeedFactor());
         });
     }
