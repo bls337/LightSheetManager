@@ -5,6 +5,7 @@ import mmcorej.StrVector;
 import mmcorej.org.json.JSONArray;
 import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
+import org.micromanager.MultiStagePosition;
 import org.micromanager.PositionList;
 import org.micromanager.Studio;
 import org.micromanager.acqj.api.AcquisitionHook;
@@ -552,6 +553,10 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
                 if (acqSettings_.isUsingMultiplePositions()) {
                     baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
+                    // is this the best way to do stage movements with new acq engine?
+                    MultiStagePosition position = pl.getPosition(positionIndex);
+                    baseEvent.setX(position.getX());
+                    baseEvent.setY(position.getY());
                 }
                 // TODO: what to do if multiple positions not defined: acquire at current stage position?
                 //  If yes, then nothing more to do here.

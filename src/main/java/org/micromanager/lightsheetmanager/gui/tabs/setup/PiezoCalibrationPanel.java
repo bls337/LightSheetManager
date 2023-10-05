@@ -12,6 +12,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
 import javax.swing.JLabel;
+import java.awt.Dimension;
 import java.util.Objects;
 
 public class PiezoCalibrationPanel extends Panel {
@@ -20,6 +21,8 @@ public class PiezoCalibrationPanel extends Panel {
     private Button btnUpdate_;
     private Button btnRunAutofocus_;
 
+    private JLabel lblSlopeValue_;
+    private JLabel lblOffsetValue_;
     private TextField txtSlope_;
     private TextField txtOffset_;
 
@@ -48,13 +51,17 @@ public class PiezoCalibrationPanel extends Panel {
         final JLabel lblStepSize = new JLabel("Step Size:");
         final JLabel lblMicronsPerDeg = new JLabel("μm/°");
 
+        lblSlopeValue_ = new JLabel("0");
+        lblOffsetValue_ = new JLabel("0");
+
         setMigLayout(
                 "",
                 "[]5[]",
                 "[]5[]"
         );
 
-        Button.setDefaultSize(80, 26);
+        // NOTE: was 80 width on dispim
+        Button.setDefaultSize(100, 26);
         btnTwoPoint_ = new Button("2-point");
 
         if (geometryType == GeometryType.DISPIM) {
@@ -68,23 +75,35 @@ public class PiezoCalibrationPanel extends Panel {
         final DefaultAcquisitionSettingsDISPIM acqSettings =
                 model_.acquisitions().settings();
 
-        txtSlope_ = new TextField();
-        txtOffset_ = new TextField();
+        txtSlope_ = new TextField(7);
+        txtOffset_ = new TextField(7);
         txtStepSize_ = new TextField();
 
-        if (pathNum_ == 1) {
-            txtSlope_.setText(String.valueOf(acqSettings.sliceCalibration(1).sliceSlope()));
-            txtOffset_.setText(String.valueOf(acqSettings.sliceCalibration(1).sliceOffset()));
-        } else {
-            txtSlope_.setText(String.valueOf(acqSettings.sliceCalibration(2).sliceSlope()));
-            txtOffset_.setText(String.valueOf(acqSettings.sliceCalibration(2).sliceOffset()));
-        }
+        txtSlope_.setText(String.valueOf(acqSettings.sliceCalibration(pathNum_).sliceSlope()));
+        txtOffset_.setText(String.valueOf(acqSettings.sliceCalibration(pathNum_).sliceOffset()));
+
+        lblSlopeValue_.setText(String.valueOf(acqSettings.sliceCalibration(pathNum_).sliceSlope()));
+        lblOffsetValue_.setText(String.valueOf(acqSettings.sliceCalibration(pathNum_).sliceOffset()));
 
         Button.setDefaultSize(26, 26);
         btnStepUp_ = new Button(Icons.ARROW_UP);
         btnStepDown_ = new Button(Icons.ARROW_DOWN);
 
         btnRunAutofocus_.setEnabled(false);
+
+        Panel pnlText = new Panel();
+        pnlText.setMinimumSize(new Dimension(100, 30));
+        pnlText.add(lblSlope, "");
+        pnlText.add(lblSlopeValue_, "");
+        pnlText.add(lblMicronsPerDeg, "wrap");
+        pnlText.add(lblOffset, "");
+        pnlText.add(lblOffsetValue_, "");
+        pnlText.add(new JLabel("μm"), "");
+
+        Panel pnlFields = new Panel();
+        pnlFields.setMinimumSize(new Dimension(20, 30));
+        pnlFields.add(txtSlope_, "wrap");
+        pnlFields.add(txtOffset_, "");
 
         switch (geometryType) {
             case DISPIM:
@@ -104,14 +123,20 @@ public class PiezoCalibrationPanel extends Panel {
                 add(btnRunAutofocus_, "span 3");
                 break;
             case SCAPE:
-                add(lblSlope, "");
-                add(txtSlope_, "");
-                add(lblMicronsPerDeg, "wrap");
-                add(lblOffset, "");
-                add(txtOffset_, "");
-                add(new JLabel("μm"), "wrap");
-                add(btnUpdate_, "wrap, span 3");
-                add(btnRunAutofocus_, "span 3");
+//                add(lblSlope, "");
+//                add(lblSlopeValue_, "");
+//                add(lblMicronsPerDeg, "");
+//                add(txtSlope_, "wrap");
+//                add(lblOffset, "");
+//                add(lblOffsetValue_, "");
+//                add(new JLabel("μm"), "");
+//                add(txtOffset_, "wrap");
+                add(pnlText, "");
+                add(pnlFields, "wrap");
+                ///add(txtSlope_, "");
+                //add(txtOffset_, "wrap");
+                add(btnUpdate_, "wrap, span 2, align center");
+                add(btnRunAutofocus_, "span 2, align center");
                 break;
             default:
                 break;
@@ -157,13 +182,17 @@ public class PiezoCalibrationPanel extends Panel {
         });
 
         txtSlope_.registerListener(e -> {
+            final double slope = Double.parseDouble(txtSlope_.getText());
             model_.acquisitions().settingsBuilder()
-                    .sliceCalibrationBuilder(pathNum_).sliceSlope(Double.parseDouble(txtSlope_.getText()));
+                    .sliceCalibrationBuilder(pathNum_).sliceSlope(slope);
+            lblSlopeValue_.setText(Double.toString(slope));
         });
 
         txtOffset_.registerListener(e -> {
+            final double offset = Double.parseDouble(txtOffset_.getText());
             model_.acquisitions().settingsBuilder()
-                    .sliceCalibrationBuilder(pathNum_).sliceOffset(Double.parseDouble(txtOffset_.getText()));
+                    .sliceCalibrationBuilder(pathNum_).sliceOffset(offset);
+            lblOffsetValue_.setText(Double.toString(offset));
         });
 
         txtStepSize_.registerListener(e -> {
