@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+// TODO: use hashmap to get different defaults for different microscope geometries? CameraMode.EDGE vs CameraMode.OVERLAP
+
 /**
  * Camera trigger modes.
  *
