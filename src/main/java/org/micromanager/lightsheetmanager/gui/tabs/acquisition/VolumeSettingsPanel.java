@@ -18,7 +18,7 @@ public class VolumeSettingsPanel extends Panel {
 
     private Spinner spnViewDelay_;
     private Spinner spnSliceStepSize_;
-    private Spinner spnSlicesPerSide_;
+    private Spinner spnNumSlices_;
 
     private LightSheetManagerModel model_;
 
@@ -69,9 +69,9 @@ public class VolumeSettingsPanel extends Panel {
         spnViewDelay_ = Spinner.createDoubleSpinner(
                 volumeSettings.delayBeforeView(), 0.0, Double.MAX_VALUE, 0.25);
         spnSliceStepSize_ = Spinner.createDoubleSpinner(
-                volumeSettings.sliceStepSize(), 0.0, 100.0, 0.1);
-        spnSlicesPerSide_ = Spinner.createIntegerSpinner(
-                volumeSettings.slicesPerView(), 0, 100, 1);
+                volumeSettings.sliceStepSize(), 0.0, Double.MAX_VALUE, 0.1);
+        spnNumSlices_ = Spinner.createIntegerSpinner(
+                volumeSettings.slicesPerView(), 0, Integer.MAX_VALUE, 1);
 
         switch (geometryType) {
             case DISPIM:
@@ -82,7 +82,7 @@ public class VolumeSettingsPanel extends Panel {
                 add(lblViewDelay, "");
                 add(spnViewDelay_, "wrap");
                 add(lblSlicesPerView, "");
-                add(spnSlicesPerSide_, "wrap");
+                add(spnNumSlices_, "wrap");
                 add(lblSliceStepSize, "");
                 add(spnSliceStepSize_, "");
                 break;
@@ -90,7 +90,7 @@ public class VolumeSettingsPanel extends Panel {
                 add(lblViewDelay, "");
                 add(spnViewDelay_, "wrap");
                 add(new Label("Number of slices:"), "");
-                add(spnSlicesPerSide_, "wrap");
+                add(spnNumSlices_, "wrap");
                 add(lblSliceStepSize, "");
                 add(spnSliceStepSize_, "");
                 break;
@@ -116,9 +116,9 @@ public class VolumeSettingsPanel extends Panel {
                     .delayBeforeView(spnViewDelay_.getDouble());
         });
 
-        spnSlicesPerSide_.registerListener(e -> {
+        spnNumSlices_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
-                    .slicesPerVolume(spnSlicesPerSide_.getInt());
+                    .slicesPerVolume(spnNumSlices_.getInt());
         });
 
         spnSliceStepSize_.registerListener(e -> {
