@@ -347,7 +347,7 @@ public class ControlPanel extends Panel {
 
     private void setOrigin() {
         try {
-            core_.setOrigin();
+            core_.setOrigin(deviceName_);
         } catch (Exception e) {
             studio_.logs().showError("failed to set origin!");
         }
