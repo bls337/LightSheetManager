@@ -9,6 +9,8 @@ import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
+import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineDISPIM;
+import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineSCAPE;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionTableData;
 
 import java.util.Objects;
@@ -68,13 +70,14 @@ public class LightSheetManagerModel implements LightSheetManager {
                 .getDeviceAdapter().getMicroscopeGeometry();
         switch (geometryType) {
             case SCAPE:
-                acqEngine_ = new AcquisitionEngine(this);
+                acqEngine_ = new AcquisitionEngineSCAPE(this);
                 break;
             case DISPIM:
-                acqEngine_ = new AcquisitionEngine(this);
+                acqEngine_ = new AcquisitionEngineDISPIM(this);
                 break;
             default:
-                studio_.logs().logError("did not create an AcquisitionEngine during setup!");
+                studio_.logs().logError(
+                        "setup error, AcquisitionEngine not implemented for " + geometryType);
                 return false; // early exit => error
         }
 
