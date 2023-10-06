@@ -7,6 +7,7 @@ import org.micromanager.lightsheetmanager.api.AutofocusSettings;
 import org.micromanager.lightsheetmanager.api.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionTableData;
 
@@ -37,13 +38,12 @@ public class LightSheetManagerModel implements LightSheetManager {
         core_ = studio_.core();
         logs_ = studio_.logs();
 
+        settings_ = new UserSettings(this);
+        xyzGrid_ = new XYZGrid(this);
+
         // set during setup if there is an error
         // displayed in the error ui
         errorText_ = "";
-
-        settings_ = new UserSettings(this);
-        acqEngine_ = new AcquisitionEngine(this);
-        xyzGrid_ = new XYZGrid(this);
     }
 
     /**
@@ -62,6 +62,21 @@ public class LightSheetManagerModel implements LightSheetManager {
 
         // setup devices
         deviceManager_.setup();
+
+        // create different acq engine based on microscope geometry
+        final GeometryType geometryType = deviceManager_
+                .getDeviceAdapter().getMicroscopeGeometry();
+        switch (geometryType) {
+            case SCAPE:
+                acqEngine_ = new AcquisitionEngine(this);
+                break;
+            case DISPIM:
+                acqEngine_ = new AcquisitionEngine(this);
+                break;
+            default:
+                studio_.logs().logError("did not create an AcquisitionEngine during setup!");
+                return false; // early exit => error
+        }
 
         // load settings
         settings_.load();
