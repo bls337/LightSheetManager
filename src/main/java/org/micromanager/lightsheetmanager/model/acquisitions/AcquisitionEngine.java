@@ -53,7 +53,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class AcquisitionEngine implements AcquisitionManager, MMAcquistionControlCallbacks {
+public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquistionControlCallbacks {
 
     private final Studio studio_;
     private final CMMCore core_;
@@ -89,6 +89,12 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         asb_ = new DefaultAcquisitionSettingsDISPIM.Builder();
         acqSettings_ = asb_.build();
     }
+
+    abstract boolean setup();
+
+    abstract boolean run();
+
+    abstract boolean finish();
 
     public void setFrame(final LightSheetManagerFrame frame) {
         frame_ = Objects.requireNonNull(frame);
@@ -126,27 +132,18 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
                         studio_.logs().showError(e);
                     }
                 } else {
-                    // TODO: put this here?
+                    // TODO: put this here? generic setup tasks?
                     if (acqSettings_.acquisitionMode() == AcquisitionMode.NONE) {
                         studio_.logs().showError("please select a valid acquisition mode!");
-                        return;
+                        return; // early exit
                     }
-                    // Every one of these modality-specific functions should block until the
-                    // acquisition is complete
-                    GeometryType geometryType = model_.devices()
-                            .getDeviceAdapter().getMicroscopeGeometry();
-                    switch (geometryType) {
-                        case DISPIM:
-                            runAcquisitionDISPIM();
-                            break;
-                        case SCAPE:
-                            runAcquisitionSCAPE();
-                            break;
-                        default:
-                            studio_.logs().showError(
-                                  "Acquisition Engine is not implemented for " + geometryType);
-                            break;
+                    // run abstract methods implemented by geometry types
+                    if (!setup()) {
+                        studio_.logs().logError("error during setup!");
+                        return; // early exit => stop acquisition
                     }
+                    run(); // run the acquisition and block until complete
+                    finish(); // cleanup any resources
                 }
             } catch (Exception e) {
                 studio_.logs().showError(e);
@@ -187,7 +184,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         return currentAcquisition_ != null && !currentAcquisition_.areEventsFinished();
     }
 
-    private void runAcquisitionSCAPE() {
+    protected void runAcquisitionSCAPE() {
 //        System.out.println("nTimePoints: " + acqSettings_.numTimePoints());
 //        System.out.println(asb_);
 //        System.out.println(asb_.build());
@@ -976,7 +973,7 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
         }
     }
 
-    private void runAcquisitionDISPIM() {
+    protected void runAcquisitionDISPIM() {
 
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
