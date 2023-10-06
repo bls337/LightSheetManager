@@ -42,6 +42,7 @@ import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
+import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import java.io.IOException;
@@ -636,6 +637,16 @@ public class AcquisitionEngine implements AcquisitionManager, MMAcquistionContro
             // TODO: execute any end-acquisition runnables
 
             currentAcquisition_ = null;
+
+            if (acqSettings_.isSavingImagesDuringAcquisition()) {
+                final String savePath = FileUtils.createUniquePath(saveDir, saveName);
+                //System.out.println("savePath: " + savePath);
+                try {
+                    curStore_.save(Datastore.SaveMode.MULTIPAGE_TIFF, savePath);
+                } catch (IOException e) {
+                    model_.studio().logs().showError("could not save the acquisition data to: \n" + savePath);
+                }
+            }
 
             // start polling for navigation panel
             if (isPolling) {
