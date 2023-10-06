@@ -653,7 +653,7 @@ public class PLogicDISPIM {
 
                 if (NumberUtils.outsideRange(piezoCenter - piezoAmplitude / 2, piezoMin, piezoMax)
                         || NumberUtils.outsideRange(piezoCenter + piezoAmplitude / 2, piezoMin, piezoMax)) {
-                    studio_.logs().showError("Imaging piezo for side " + view +
+                    studio_.logs().showError("Imaging piezo for view " + view +
                             " would travel outside the piezo limits during acquisition.");
                     return false;
                 }

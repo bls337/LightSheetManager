@@ -59,9 +59,27 @@ public class FileUtils {
         String path = "";
         int count = 0;
         boolean found = false;
-        while (!found && count < 1000) {
+        while (!found && count < 1_000_000) {
             path = directory + File.separator + name + "_" + count + "." + extension;
-            found = new File(directory).exists();
+            found = !(new File(directory).exists());
+            count++;
+        }
+        return path;
+    }
+
+    // directory version
+    public static String createUniquePath(final String directory, final String name) {
+        // check if the file path is available => early exit if true
+        if (!(new File(directory + File.separator + name).exists())) {
+            return directory + File.separator + name;
+        }
+        // otherwise look for an unused file path
+        String path = "";
+        int count = 0;
+        boolean found = false;
+        while (!found && count < 1_000_000) {
+            path = directory + File.separator + name + "_" + count;
+            found = !(new File(path).exists());
             count++;
         }
         return path;
