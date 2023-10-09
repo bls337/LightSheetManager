@@ -19,7 +19,6 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
@@ -35,8 +34,8 @@ import java.util.ArrayList;
 
 public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
-    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
-    private DefaultAcquisitionSettingsDISPIM acqSettings_;
+//    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
+//    private DefaultAcquisitionSettingsDISPIM acqSettings_;
 
     public AcquisitionEngineDISPIM(final LightSheetManagerModel model) {
         super(model);
