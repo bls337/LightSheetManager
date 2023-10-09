@@ -34,8 +34,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     protected final Studio studio_;
     protected final CMMCore core_;
 
-    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
-    private DefaultAcquisitionSettingsDISPIM acqSettings_;
+    protected DefaultAcquisitionSettingsDISPIM.Builder asb_;
+    protected DefaultAcquisitionSettingsDISPIM acqSettings_;
 
     private final ExecutorService acquisitionExecutor_ = Executors.newSingleThreadExecutor(
             r -> new Thread(r, "Acquisition Thread"));

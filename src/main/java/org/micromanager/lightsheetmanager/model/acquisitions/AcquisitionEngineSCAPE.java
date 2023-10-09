@@ -36,8 +36,8 @@ import java.util.ArrayList;
 
 public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
-    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
-    private DefaultAcquisitionSettingsDISPIM acqSettings_;
+//    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
+//    private DefaultAcquisitionSettingsDISPIM acqSettings_;
 
     public AcquisitionEngineSCAPE(final LightSheetManagerModel model) {
         super(model);
