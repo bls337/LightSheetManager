@@ -25,12 +25,4 @@ public interface AcquisitionManager {
      */
     void requestResume();
 
-
-    /**
-     * Returns true if the acquisition is running.
-     *
-     * @return true if the acquisition is running
-     */
-    boolean isRunning();
-
 }
