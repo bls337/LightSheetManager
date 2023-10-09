@@ -1138,6 +1138,19 @@ public class PLogicDISPIM {
         }
     }
 
+    //    private void stopSPIMStateMachines(DefaultAcquisitionSettingsDISPIM acqSettings) {
+//        final int numViews = acqSettings_.volumeSettings().numViews();
+//        if (numViews == 1) {
+//            ASIScanner scanner = model_.devices().getDevice("IllumBeam");
+//            scanner.setSPIMState(ASIScanner.SPIMState.IDLE);
+//        }
+//        for (int i = 1; i <= numViews; i++) {
+//            ASIScanner scanner = model_.devices().getDevice("Illum" + i + "Beam");
+//            scanner.setSPIMState(ASIScanner.SPIMState.IDLE);
+//        }
+//        // TODO: ASI stage scanning conditionals
+//    }
+
 }
 
 
