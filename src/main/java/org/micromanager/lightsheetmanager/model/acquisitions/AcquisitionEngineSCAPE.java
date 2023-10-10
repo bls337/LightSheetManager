@@ -24,7 +24,7 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSetting
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
-import org.micromanager.lightsheetmanager.model.PLogicDISPIM;
+import org.micromanager.lightsheetmanager.model.PLogicSCAPE;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -80,7 +80,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final String deviceLibrary = model_.devices().getDeviceLibrary(deviceName);
         boolean isUsingPLC = deviceLibrary.equals("ASITiger");
 
-        PLogicDISPIM controller = null;
+        PLogicSCAPE controller = null;
 
         // Assume demo mode if default camera is DemoCamera
         boolean demoMode = false;
@@ -94,7 +94,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         if (!demoMode) {
 
             if (isUsingPLC) {
-                controller = new PLogicDISPIM(model_);
+                controller = new PLogicSCAPE(model_);
 
                 final boolean success = doHardwareCalculations(controller);
                 if (!success) {
@@ -317,7 +317,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
 
 
-            final PLogicDISPIM controllerInstance = controller;
+            final PLogicSCAPE controllerInstance = controller;
             // TODO This after camera hook is called after the camera has been readied to acquire a
             //  sequence. I assume we want to tell the Tiger to start sending TTLs etc here
             currentAcquisition_.addHook(new AcquisitionHook() {
@@ -329,7 +329,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     if (isUsingPLC && controllerInstance != null) { // if not in demo mode
                         int side = 0;
                         // TODO: enable 2 sided acquisition
-                        controllerInstance.triggerControllerStartAcquisitionSCAPE(
+                        controllerInstance.triggerControllerStartAcquisition(
                                 asb_.acquisitionMode(), side);
                     }
                     return event;
@@ -525,7 +525,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         return true;
     }
 
-    private boolean doHardwareCalculations(PLogicDISPIM plc) {
+    private boolean doHardwareCalculations(PLogicSCAPE plc) {
 
         // make sure slice timings are up-to-date
         final double sliceDuration1 = getSliceDuration(asb_.timingSettingsBuilder());
