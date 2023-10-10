@@ -96,7 +96,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             if (isUsingPLC) {
                 controller = new PLogicDISPIM(model_);
 
-                final boolean success = doHardwareCalculationsSCAPE(controller);
+                final boolean success = doHardwareCalculations(controller);
                 if (!success) {
                     return false; // early exit => could not set up hardware
                 }
@@ -525,7 +525,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         return true;
     }
 
-    private boolean doHardwareCalculationsSCAPE(PLogicDISPIM plc) {
+    private boolean doHardwareCalculations(PLogicDISPIM plc) {
 
         // make sure slice timings are up-to-date
         final double sliceDuration1 = getSliceDuration(asb_.timingSettingsBuilder());
