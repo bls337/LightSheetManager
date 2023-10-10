@@ -443,8 +443,6 @@ public class PLogicDISPIM {
 //    }
 
 
-//     * @param numSides number of Sides from which we take data (diSPIM: 1 or 2)
-//     * @param firstSideIsA firstSide to take data from (A or B)
     /**
      * Returns the controller to "normal" state after an acquisition
      * @param centerPiezos true to move piezos to center position
