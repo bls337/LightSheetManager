@@ -249,7 +249,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
                     // Translate event to timeIndex/channel/etc
                     AcquisitionEvent firstAcqEvent = event.getSequence().get(0);
-                    int timePoint = firstAcqEvent.getTIndex();
+                    // TODO: add later when autofocus is complete, prevent errors if no time index is found for now
+                    //int timePoint = firstAcqEvent.getTIndex();
 
                     ////////////////////////////////////
                     ///////// Run autofocus ////////////
