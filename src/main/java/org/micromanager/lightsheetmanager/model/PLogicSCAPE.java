@@ -12,11 +12,15 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSetting
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
-import org.micromanager.lightsheetmanager.model.devices.vendor.*;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIZStage;
+import org.micromanager.lightsheetmanager.model.devices.vendor.SingleAxis;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import java.awt.Rectangle;
-import java.awt.geom.Point2D;
 import java.util.Objects;
 
 public class PLogicSCAPE {
@@ -63,6 +67,13 @@ public class PLogicSCAPE {
         core_ = studio_.core();
 
         asb_ = model_.acquisitions().settingsBuilder();
+
+        // init variables
+        scanDistance_ = 0;
+        actualStepSizeUm_ = 0;
+        zSpeedZero_ = true;
+        lastDistanceStr_ = "";
+        lastPosStr_ = "";
 
         // populate devices
         scanner_ = devices_.getDevice("IllumSlice");
