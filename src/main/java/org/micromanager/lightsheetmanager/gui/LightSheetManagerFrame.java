@@ -14,6 +14,7 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.tabs.TabPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.navigation.NavigationPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.setup.PositionPanel;
 import org.micromanager.lightsheetmanager.gui.utils.WindowUtils;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.internal.utils.WindowPositioning;
@@ -126,6 +127,11 @@ public class LightSheetManagerFrame extends JFrame {
 
         // register micro-manager events
         studio_.events().registerForEvents(this);
+
+        // TODO: better way to connect all of this together, maybe observer pattern for updater
+        PositionPanel positionPanel = tabPanel_.getSetupPathTab(1).getSetupPanel().getPositionPanel();
+        tabPanel_.getNavigationTab().getNavigationPanel()
+                .getPositionUpdater().setPositionPanel(positionPanel);
 
         tabPanel_.getNavigationTab().getNavigationPanel().startPolling();
 

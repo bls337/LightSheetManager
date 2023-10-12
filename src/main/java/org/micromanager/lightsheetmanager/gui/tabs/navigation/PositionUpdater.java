@@ -1,5 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs.navigation;
 
+import org.micromanager.lightsheetmanager.gui.tabs.setup.PositionPanel;
+
 import javax.swing.SwingWorker;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -11,13 +13,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class PositionUpdater {
 
-    private int pollingDelayMs_; // TODO: use this!
+    private int pollingDelayMs_;
 
     private SwingWorker<Void, Void> worker_;
 
-    private NavigationPanel navPanel_;
+    private PositionPanel positionPanel_; // TODO: update multiple setup panels
+
+    private final NavigationPanel navPanel_;
 
     private final AtomicBoolean isPolling_;
+
     public PositionUpdater(final NavigationPanel navPanel) {
         navPanel_ = Objects.requireNonNull(navPanel);
         isPolling_ = new AtomicBoolean(true);
@@ -33,6 +38,7 @@ public class PositionUpdater {
                     //System.out.println("updater tick");
                     try {
                         navPanel_.updatePositions();
+                        positionPanel_.updatePositions();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -62,6 +68,18 @@ public class PositionUpdater {
 
     public boolean isPolling() {
         return isPolling_.get();
+    }
+
+    public void setPollingDelayMs(final int delayMs) {
+        pollingDelayMs_ = delayMs;
+    }
+
+    public int getPollingDelayMs() {
+        return pollingDelayMs_;
+    }
+
+    public void setPositionPanel(final PositionPanel panel) {
+        positionPanel_ = panel;
     }
 
 }

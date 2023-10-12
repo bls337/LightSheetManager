@@ -33,7 +33,7 @@ public class NavigationPanel extends Panel {
     private PositionUpdater positionUpdater_;
     private ArrayList<ControlPanel> controlPanels_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public NavigationPanel(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
@@ -292,6 +292,10 @@ public class NavigationPanel extends Panel {
 
     public boolean isPolling() {
         return positionUpdater_.isPolling();
+    }
+
+    public PositionUpdater getPositionUpdater() {
+        return positionUpdater_;
     }
 
     public void haltAllDevices() {

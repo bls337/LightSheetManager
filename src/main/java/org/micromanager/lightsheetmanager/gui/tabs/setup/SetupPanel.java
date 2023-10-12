@@ -71,4 +71,9 @@ public class SetupPanel extends Panel {
     public int getPathNum() {
         return pathNum_;
     }
+
+    public PositionPanel getPositionPanel() {
+        return positionPanel_;
+    }
+
 }
