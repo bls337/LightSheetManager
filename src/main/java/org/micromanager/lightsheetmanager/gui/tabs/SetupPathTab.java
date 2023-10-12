@@ -40,4 +40,8 @@ public class SetupPathTab extends Panel {
         return pathNum_;
     }
 
+    public SetupPanel getSetupPanel() {
+        return setupPanel_;
+    }
+
 }

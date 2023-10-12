@@ -2,17 +2,8 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
-import org.micromanager.lightsheetmanager.gui.tabs.NavigationTab;
-import org.micromanager.lightsheetmanager.gui.tabs.SetupPathTab;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
-import org.micromanager.lightsheetmanager.gui.tabs.AcquisitionTab;
-import org.micromanager.lightsheetmanager.gui.tabs.AutofocusTab;
-import org.micromanager.lightsheetmanager.gui.tabs.CameraTab;
-import org.micromanager.lightsheetmanager.gui.tabs.DataTab;
-import org.micromanager.lightsheetmanager.gui.tabs.DeviceTab;
-import org.micromanager.lightsheetmanager.gui.tabs.HelpTab;
-import org.micromanager.lightsheetmanager.gui.tabs.SettingsTab;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TabbedPane;
 
@@ -130,6 +121,10 @@ public class TabPanel extends Panel {
 
     public CameraTab getCameraTab() {
         return cameraTab_;
+    }
+
+    public SetupPathTab getSetupPathTab(final int view) {
+        return setupPathTabs_.get(view-1);
     }
 
 }

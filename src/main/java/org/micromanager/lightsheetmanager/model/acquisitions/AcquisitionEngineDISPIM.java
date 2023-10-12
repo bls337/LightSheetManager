@@ -427,7 +427,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            };
+            }
             if (cameraDeviceNames.size() < 2) {
                 throw new RuntimeException("Need two cameras for diSPIM simulation");
             }

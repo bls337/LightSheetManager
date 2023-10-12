@@ -9,6 +9,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
 import javax.swing.JLabel;
+import java.awt.EventQueue;
 import java.util.Objects;
 
 public class PositionPanel extends Panel {
@@ -199,6 +200,19 @@ public class PositionPanel extends Panel {
                 scanner.setPosition(xValue, Double.parseDouble(txtSlicePosition_.getText()));
                 lblSlicePositionValue_.setText(scanner.getPosition().y + " °");
                 //lblSlicePositionValue_.setText(txtSlicePosition_.getText() + " °");
+            });
+        }
+    }
+
+    public void updatePositions() {
+        final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
+        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+        if (piezo != null && scanner != null) {
+            final double piezoPosition = piezo.getPosition();
+            final double scannerPosition = scanner.getPosition().y;
+            EventQueue.invokeLater(() -> {
+                lblImagingPositionValue_.setText(piezoPosition + " μm");
+                lblSlicePositionValue_.setText(scannerPosition + " °");
             });
         }
     }
