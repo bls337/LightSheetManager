@@ -20,21 +20,21 @@ import java.util.stream.Stream;
  */
 public class LSMAcquisitionEvents {
 
-    public static final String POSITION_AXIS = "position";
-    public static final String CAMERA_AXIS = "view";
+   public static final String POSITION_AXIS = "position";
+   public static final String CAMERA_AXIS = "view";
 
 
-      public static Iterator<AcquisitionEvent> createTimelapseMultiChannelVolumeAcqEvents(
-         AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
-         String[] cameraDeviceNames,
-         Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
+   public static Iterator<AcquisitionEvent> createTimelapseMultiChannelVolumeAcqEvents(
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           String[] cameraDeviceNames,
+           Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
       if (acquisitionSettings.numTimePoints() <= 1) {
          throw new RuntimeException("timelapse selected but only one timepoint");
       }
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> timelapse =
-            timelapse(acquisitionSettings.numTimePoints(),
-                  (double) acquisitionSettings.timePointInterval());
+              timelapse(acquisitionSettings.numTimePoints(),
+                      (double) acquisitionSettings.timePointInterval());
 
       if (acquisitionSettings.numChannels() == 1) {
          throw new RuntimeException("Expected multiple channels but only one found");
@@ -44,7 +44,7 @@ public class LSMAcquisitionEvents {
       channels = channels(acquisitionSettings.channels());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-            acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volumeSettings().slicesPerView());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
@@ -58,20 +58,20 @@ public class LSMAcquisitionEvents {
    }
 
    public static Iterator<AcquisitionEvent> createTimelapseVolumeAcqEvents(
-         AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
-         String[] cameraDeviceNames,
-         Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           String[] cameraDeviceNames,
+           Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
       if (acquisitionSettings.numTimePoints() <= 1) {
          throw new RuntimeException("timelapse selected but only one timepoint");
       }
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> timelapse =
-            timelapse(acquisitionSettings.numTimePoints(), null);
+              timelapse(acquisitionSettings.numTimePoints(), null);
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-            acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volumeSettings().slicesPerView());
 
       ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
 
@@ -88,15 +88,15 @@ public class LSMAcquisitionEvents {
     *                    false: do an entire volume in one channel, then the next one
     */
    public static Iterator<AcquisitionEvent> createMultiChannelVolumeAcqEvents(
-         AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
-         String[] cameraDeviceNames,
-         Function<AcquisitionEvent, AcquisitionEvent> eventMonitor, boolean interleaved) {
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           String[] cameraDeviceNames,
+           Function<AcquisitionEvent, AcquisitionEvent> eventMonitor, boolean interleaved) {
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
-            channels(acquisitionSettings.channels());
+              channels(acquisitionSettings.channels());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-            acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volumeSettings().slicesPerView());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
@@ -115,14 +115,14 @@ public class LSMAcquisitionEvents {
    }
 
    public static Iterator<AcquisitionEvent> createVolumeAcqEvents(
-         AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
-         String[] cameraDeviceNames,
-         Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           String[] cameraDeviceNames,
+           Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-            acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volumeSettings().slicesPerView());
 
       ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
       acqFunctions.add(cameras);
@@ -176,7 +176,7 @@ public class LSMAcquisitionEvents {
    }
 
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> timelapse(
-         int numTimePoints, Double intervalMs) {
+           int numTimePoints, Double intervalMs) {
       return (AcquisitionEvent event) -> new Iterator<AcquisitionEvent>() {
 
          int frameIndex_ = 0;
@@ -207,7 +207,7 @@ public class LSMAcquisitionEvents {
     * @return
     */
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels(
-         ChannelSpec[] channelList) {
+           ChannelSpec[] channelList) {
       return (AcquisitionEvent event) -> new Iterator<AcquisitionEvent>() {
          int index = 0;
 
@@ -253,7 +253,7 @@ public class LSMAcquisitionEvents {
     * @return
     */
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> positions(
-         PositionList positionList) {
+           PositionList positionList) {
       return (AcquisitionEvent event) -> {
          Stream.Builder<AcquisitionEvent> builder = Stream.builder();
          if (positionList == null) {
