@@ -417,53 +417,87 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 }
             }
 
+
             final int numPositions = acqSettings_.isUsingMultiplePositions() ? pl.getNumberOfPositions() : 1;
             final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
 
-            for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
+            // Loop 1: Multiple time points
+            for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
+                //System.out.println("time index: " + timeIndex);
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
-                if (acqSettings_.isUsingMultiplePositions()) {
-                    baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
-                    // is this the best way to do stage movements with new acq engine?
-                    MultiStagePosition position = pl.getPosition(positionIndex);
-                    baseEvent.setX(position.getX());
-                    baseEvent.setY(position.getY());
+                if (acqSettings_.isUsingTimePoints()) {
+                    baseEvent.setAxisPosition(LSMAcquisitionEvents.TIME_AXIS, timeIndex);
                 }
-                // TODO: what to do if multiple positions not defined: acquire at current stage position?
-                //  If yes, then nothing more to do here.
+                // Loop 2: XY positions
+                for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
+                    //System.out.println("pos index: " + positionIndex);
+                    if (acqSettings_.isUsingMultiplePositions()) {
+                        baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
+                        // is this the best way to do stage movements with new acq engine?
+                        MultiStagePosition position = pl.getPosition(positionIndex);
+                        baseEvent.setX(position.getX());
+                        baseEvent.setY(position.getY());
+                    }
+                    // TODO: what to do if multiple positions not defined: acquire at current stage position?
+                    //  If yes, then nothing more to do here.
 
-                if (acqSettings_.isUsingHardwareTimePoints()) {
-                    // create a full iterator of TCZ acquisition events, and Tiger controller
-                    // will handle everything else
+                    // Loop 3: Channels; Loop 4: Z slices
                     if (acqSettings_.isUsingChannels()) {
                         currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
+                                LSMAcquisitionEvents.createChannelAcqEvents(
                                         baseEvent.copy(), acqSettings_, cameraNames, null));
                     } else {
                         currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createTimelapseVolumeAcqEvents(
+                                LSMAcquisitionEvents.createAcqEvents(
                                         baseEvent.copy(), acqSettings_, cameraNames, null));
-                    }
-                } else {
-                    // Loop 2: Multiple time points
-                    for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
-                        baseEvent.setTimeIndex(timeIndex);
-                        // Loop 3: Channels; Loop 4: Z slices (non-interleaved)
-                        // Loop 3: Channels; Loop 4: Z slices (interleaved)
-                        if (acqSettings_.isUsingChannels()) {
-                            currentAcquisition_.submitEventIterator(
-                                    LSMAcquisitionEvents.createMultiChannelVolumeAcqEvents(
-                                            baseEvent.copy(), acqSettings_, cameraNames, null,
-                                            acqSettings_.acquisitionMode() ==
-                                                    AcquisitionMode.STAGE_SCAN_INTERLEAVED));
-                        } else {
-                            currentAcquisition_.submitEventIterator(
-                                    LSMAcquisitionEvents.createVolumeAcqEvents(
-                                            baseEvent.copy(), acqSettings_, cameraNames, null));
-                        }
                     }
                 }
             }
+
+//            for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
+//                AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
+//                if (acqSettings_.isUsingMultiplePositions()) {
+//                    baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
+//                    // is this the best way to do stage movements with new acq engine?
+//                    MultiStagePosition position = pl.getPosition(positionIndex);
+//                    baseEvent.setX(position.getX());
+//                    baseEvent.setY(position.getY());
+//                }
+//                // TODO: what to do if multiple positions not defined: acquire at current stage position?
+//                //  If yes, then nothing more to do here.
+//
+//                if (acqSettings_.isUsingHardwareTimePoints()) {
+//                    // create a full iterator of TCZ acquisition events, and Tiger controller
+//                    // will handle everything else
+//                    if (acqSettings_.isUsingChannels()) {
+//                        currentAcquisition_.submitEventIterator(
+//                                LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
+//                                        baseEvent.copy(), acqSettings_, cameraNames, null));
+//                    } else {
+//                        currentAcquisition_.submitEventIterator(
+//                                LSMAcquisitionEvents.createTimelapseVolumeAcqEvents(
+//                                        baseEvent.copy(), acqSettings_, cameraNames, null));
+//                    }
+//                } else {
+//                    // Loop 2: Multiple time points
+//                    for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
+//                        baseEvent.setTimeIndex(timeIndex);
+//                        // Loop 3: Channels; Loop 4: Z slices (non-interleaved)
+//                        // Loop 3: Channels; Loop 4: Z slices (interleaved)
+//                        if (acqSettings_.isUsingChannels()) {
+//                            currentAcquisition_.submitEventIterator(
+//                                    LSMAcquisitionEvents.createMultiChannelVolumeAcqEvents(
+//                                            baseEvent.copy(), acqSettings_, cameraNames, null,
+//                                            acqSettings_.acquisitionMode() ==
+//                                                    AcquisitionMode.STAGE_SCAN_INTERLEAVED));
+//                        } else {
+//                            currentAcquisition_.submitEventIterator(
+//                                    LSMAcquisitionEvents.createVolumeAcqEvents(
+//                                            baseEvent.copy(), acqSettings_, cameraNames, null));
+//                        }
+//                    }
+//                }
+//            }
 
 
 
