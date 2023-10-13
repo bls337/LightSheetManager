@@ -20,6 +20,7 @@ import java.util.stream.Stream;
  */
 public class LSMAcquisitionEvents {
 
+   public static final String TIME_AXIS = "time";
    public static final String POSITION_AXIS = "position";
    public static final String CAMERA_AXIS = "view";
 
@@ -130,6 +131,41 @@ public class LSMAcquisitionEvents {
       return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
    }
 
+   public static Iterator<AcquisitionEvent> createChannelAcqEvents(
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           String[] cameraDeviceNames,
+           Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
+
+      Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
+              channels(acquisitionSettings.channels());
+
+      Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
+
+      Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
+              acquisitionSettings.volumeSettings().slicesPerView());
+
+      ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
+      acqFunctions.add(channels);
+      acqFunctions.add(cameras);
+      acqFunctions.add(zStack);
+      return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
+   }
+
+   public static Iterator<AcquisitionEvent> createAcqEvents(
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           String[] cameraDeviceNames,
+           Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
+
+      Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
+
+      Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
+              acquisitionSettings.volumeSettings().slicesPerView());
+
+      ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
+      acqFunctions.add(cameras);
+      acqFunctions.add(zStack);
+      return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
+   }
 
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(String[] cameraDeviceNames) {
       return (AcquisitionEvent event) -> new Iterator<AcquisitionEvent>() {
