@@ -328,6 +328,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     //  to the tiger to tell it to start outputting TTLs
 
                     if (isUsingPLC && controllerInstance != null) { // if not in demo mode
+                        // TODO: is this the best place to set state to idle?
+                        ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+                        if (scanner.getSPIMState().equals(ASIScanner.SPIMState.RUNNING)) {
+                            scanner.setSPIMState(ASIScanner.SPIMState.IDLE);
+                        }
                         int side = 0;
                         // TODO: enable 2 sided acquisition
                         controllerInstance.triggerControllerStartAcquisition(
