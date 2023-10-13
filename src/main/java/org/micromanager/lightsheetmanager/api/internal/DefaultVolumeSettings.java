@@ -68,7 +68,7 @@ public class DefaultVolumeSettings implements VolumeSettings {
         }
 
         @Override
-        public VolumeSettings.Builder slicesPerVolume(final int n) {
+        public VolumeSettings.Builder slicesPerView(final int n) {
             slicesPerView_ = n;
             return this;
         }
