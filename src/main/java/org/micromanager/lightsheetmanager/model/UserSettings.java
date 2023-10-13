@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.model;
 import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
 import org.micromanager.UserProfile;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.propertymap.MutablePropertyMapView;
 
@@ -12,11 +13,11 @@ import java.util.Objects;
 public class UserSettings {
 
     private final String userName;
-    private final UserProfile profile;
     private final MutablePropertyMapView settings;
 
-    // JSON key for LightSheetDeviceManager selected device save settings
-    private static final String DEVICES_KEY = "Devices";
+    // This is the prefix String for saving the current acquisition settings
+    // based on the microscope geometry type, "LSM_ACQ_SETTINGS_SCAPE" for example.
+    private static final String SETTINGS_PREFIX_KEY = "LSM_ACQ_SETTINGS_";
     private static final String SETTINGS_NOT_FOUND = "Settings Not Found";
 
     // Note: increase this value based on the amount of nested json in the settings
@@ -27,7 +28,7 @@ public class UserSettings {
     public UserSettings(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
         // setup user profile
-        profile = model_.getStudio().getUserProfile();
+        UserProfile profile = model_.getStudio().getUserProfile();
         userName = profile.getProfileName();
         settings = profile.getSettings(UserSettings.class);
     }
@@ -61,13 +62,21 @@ public class UserSettings {
      * Load user settings.
      */
     public void load() {
-        String json = settings.getString(DEVICES_KEY, SETTINGS_NOT_FOUND);
-        System.out.println("loaded json: " + json);
+        final GeometryType geometryType = model_.devices()
+                .getDeviceAdapter().getMicroscopeGeometry();
+
+        // get json from settings based on microscope geometry type
+        final String key = SETTINGS_PREFIX_KEY + geometryType;
+        final String json = settings.getString(key, SETTINGS_NOT_FOUND);
+        System.out.println("loaded json from "
+                + SETTINGS_PREFIX_KEY + geometryType + ": " + json);
+
         // use default settings if settings data not found
         if (!json.equals(SETTINGS_NOT_FOUND)) {
             // validate user settings and create settings object
             JSONObject loadedJson = validateUserSettings(json);
             if (loadedJson != null) {
+                // TODO: switch this based on microscope geometry type
                 DefaultAcquisitionSettingsDISPIM acqSettings = DefaultAcquisitionSettingsDISPIM.fromJson(
                         loadedJson.toString(), DefaultAcquisitionSettingsDISPIM.class);
                 model_.acquisitions().setAcquisitionSettings(acqSettings);
@@ -84,16 +93,20 @@ public class UserSettings {
         // build settings before saving to make sure updates are saved
         model_.acquisitions().setAcquisitionSettings(
                 model_.acquisitions().settingsBuilder().build());
+        // settings key
+        final GeometryType geometryType = model_.devices()
+                .getDeviceAdapter().getMicroscopeGeometry();
+        final String key = SETTINGS_PREFIX_KEY + geometryType;
         // save in user settings
-        settings.putString(DEVICES_KEY,
-                model_.acquisitions().settings().toJson());
-        System.out.println("saved json: " + model_.acquisitions().settings().toPrettyJson());
+        settings.putString(key, model_.acquisitions().settings().toJson());
+        System.out.println("saved json to " + key + ": "
+                + model_.acquisitions().settings().toPrettyJson());
     }
 
     /**
      * Returns the JSONObject after checking if it matches the schema of the
      * default acquisition settings object. If it does not, then any new settings
-     * found in will be merged into the loaded settings as the default value.
+     * found will be merged into the loaded settings as the default value.
      *
      * @param loadedSettings the settings loaded as a JSON String
      * @return the settings object or null if an error occurred
