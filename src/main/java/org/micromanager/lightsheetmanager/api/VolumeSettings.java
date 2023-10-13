@@ -30,7 +30,7 @@ public interface VolumeSettings {
          */
         Builder delayBeforeView(final double viewDelayMs);
 
-        Builder slicesPerVolume(final int n);
+        Builder slicesPerView(final int n);
 
         Builder sliceStepSize(final double um);
 

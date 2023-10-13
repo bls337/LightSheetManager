@@ -118,7 +118,7 @@ public class VolumeSettingsPanel extends Panel {
 
         spnNumSlices_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
-                    .slicesPerVolume(spnNumSlices_.getInt());
+                    .slicesPerView(spnNumSlices_.getInt());
         });
 
         spnSliceStepSize_.registerListener(e -> {

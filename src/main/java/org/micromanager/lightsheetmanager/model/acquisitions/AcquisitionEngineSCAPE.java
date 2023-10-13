@@ -16,7 +16,6 @@ import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.ndtiff.NDTiffAdapter;
 import org.micromanager.internal.MMStudio;
-import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
@@ -653,16 +652,32 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     && (timepointIntervalMs < timepointDuration*1.2)) {
                 //acqSettings_.setHardwareTimesPoints(false);
                 asb_.useHardwareTimePoints(false);
-                // TODO: WARNING
+                // TODO: uncomment when working
+//                studio_.logs().showError("Time point interval may not be sufficient "
+//                        + "depending on actual time required to change positions. "
+//                        + "Proceed at your own risk.");
             }
         }
 
-        // TODO: make sure position updater is turned off!
+//        if (acqSettings_.isUsingHardwareTimePoints()) {
+//            final int numTimePoints = acqSettings_.numTimePoints();
+//            final int numChannels = acqSettings_.numChannels();
+//            final int slicePerView = acqSettings_.volumeSettings().slicesPerView();
+//            // in hardwareTimepoints case we trigger controller once for all timepoints => need to
+//            //   adjust number of frames we expect back from the camera during MM's SequenceAcquisition
+//            if (acqSettings_.cameraMode() == CameraMode.OVERLAP) {
+//                // For overlap mode we are send one extra trigger per channel per side for volume-switching (both PLogic and not)
+//                // This holds for all multichannel modes, just the order in which the extra trigger comes varies
+//                // Very last trigger won't ever return a frame so subtract 1.
+//                final int hardwareSlicesPerView = (slicePerView + 1) * numChannels * numTimePoints;
+//                asb_.volumeSettingsBuilder().slicesPerView(hardwareSlicesPerView - 1);
+//            } else {
+//                asb_.volumeSettingsBuilder().slicesPerView(slicePerView * numTimePoints);
+//            }
+//        }
 
-        // FIXME: what is happening here? getting timing error
         double sliceDuration = asb_.timingSettingsBuilder().sliceDuration();
         if (exposureTime + cameraReadoutTime > sliceDuration) {
-            //System.out.println(sliceDuration);
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
             studio_.logs().showError("Exposure time of " + exposureTime +
