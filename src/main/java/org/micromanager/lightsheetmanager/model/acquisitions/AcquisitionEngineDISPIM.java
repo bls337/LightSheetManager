@@ -779,7 +779,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
                 if (sliceDuration < (cameraExposure + cameraReadoutTime)) {
                     delayBeforeCamera += 0.25f;
-                    delayBeforeLaser += 0.25;
+                    delayBeforeLaser += 0.25f;
                     delayBeforeScan += 0.25f;
                 }
                 break;
