@@ -663,18 +663,17 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 && acqSettings_.numTimePoints() > 1
                 && timepointIntervalMs < (timepointDuration + 750)
                 && !acqSettings_.isUsingStageScanning()) {
-            // acqSettings_.useHardwareTimesPoints(true);
             asb_.useHardwareTimePoints(true);
             isUsingHardwareTimePoints = true;
         }
 
+        // TODO: implement multiple positions using hardware time points, currently
+        //  set hardware time points to false if using multiple positions
         if (acqSettings_.isUsingMultiplePositions()) {
-            if ((acqSettings_.isUsingHardwareTimePoints()
-                    || acqSettings_.numTimePoints() > 1)
-                    && (timepointIntervalMs < timepointDuration*1.2)) {
-                //acqSettings_.setHardwareTimesPoints(false);
+            if (acqSettings_.isUsingHardwareTimePoints()) {
+//                    || acqSettings_.numTimePoints() > 1)
+//                    && (timepointIntervalMs < timepointDuration*1.2)) {
                 asb_.useHardwareTimePoints(false);
-                // TODO: uncomment when timepointDuration is verified to be computed correctly
 //                studio_.logs().showError("Time point interval may not be sufficient "
 //                        + "depending on actual time required to change positions. "
 //                        + "Proceed at your own risk.");
