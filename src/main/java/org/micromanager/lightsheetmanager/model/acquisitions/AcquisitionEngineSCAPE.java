@@ -638,12 +638,14 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // experimentally need ~0.5 sec to set up acquisition, this gives a bit of cushion
         // cannot do this in getCurrentAcquisitionSettings because of mutually recursive
         // call with computeActualVolumeDuration()
+        boolean isUsingHardwareTimePoints = false; // TODO: asb_ not built yet
         if (acqSettings_.isUsingTimePoints()
                 && acqSettings_.numTimePoints() > 1
                 && timepointIntervalMs < (timepointDuration + 750)
                 && !acqSettings_.isUsingStageScanning()) {
             // acqSettings_.useHardwareTimesPoints(true);
             asb_.useHardwareTimePoints(true);
+            isUsingHardwareTimePoints = true;
         }
 
         if (acqSettings_.isUsingMultiplePositions()) {
@@ -686,6 +688,15 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     "This will result in dropped frames. " +
                     "Please change input");
             return false; // early exit
+        }
+
+        // must use PLogic for channels when using hardware time points
+        if (isUsingHardwareTimePoints) {
+            if (acqSettings_.isUsingChannels() && acqSettings_.channelMode() == MultiChannelMode.VOLUME) {
+                studio_.logs().showError("Cannot use hardware time points (small time point interval) " +
+                        "with software channels (need to use PLogic channel switching).");
+                return false;
+            }
         }
 
         double extraChannelOffset = 0.0;
@@ -807,7 +818,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
                 if (sliceDuration < (cameraExposure + cameraReadoutTime)) {
                     delayBeforeCamera += 0.25f;
-                    delayBeforeLaser += 0.25;
+                    delayBeforeLaser += 0.25f;
                     delayBeforeScan += 0.25f;
                 }
                 break;
