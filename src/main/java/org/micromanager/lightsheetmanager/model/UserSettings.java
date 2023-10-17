@@ -17,6 +17,7 @@ public class UserSettings {
 
     // This is the prefix String for saving the current acquisition settings
     // based on the microscope geometry type, "LSM_ACQ_SETTINGS_SCAPE" for example.
+    // Note: GeometryType will be converted to uppercase: "LSM_ACQ_SETTINGS_DISPIM".
     private static final String SETTINGS_PREFIX_KEY = "LSM_ACQ_SETTINGS_";
     private static final String SETTINGS_NOT_FOUND = "Settings Not Found";
 
@@ -62,14 +63,13 @@ public class UserSettings {
      * Load user settings.
      */
     public void load() {
+        // get json from settings based on microscope geometry type
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
-
-        // get json from settings based on microscope geometry type
-        final String key = SETTINGS_PREFIX_KEY + geometryType;
+        final String key = SETTINGS_PREFIX_KEY +
+                geometryType.toString().toUpperCase();
         final String json = settings.getString(key, SETTINGS_NOT_FOUND);
-        System.out.println("loaded json from "
-                + SETTINGS_PREFIX_KEY + geometryType + ": " + json);
+        System.out.println("loaded json from " + key + ": " + json);
 
         // use default settings if settings data not found
         if (!json.equals(SETTINGS_NOT_FOUND)) {
@@ -96,7 +96,8 @@ public class UserSettings {
         // settings key
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
-        final String key = SETTINGS_PREFIX_KEY + geometryType;
+        final String key = SETTINGS_PREFIX_KEY +
+                geometryType.toString().toUpperCase();
         // save in user settings
         settings.putString(key, model_.acquisitions().settings().toJson());
         System.out.println("saved json to " + key + ": "
