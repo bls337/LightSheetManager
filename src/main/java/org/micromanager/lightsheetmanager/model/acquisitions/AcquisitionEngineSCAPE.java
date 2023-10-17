@@ -674,9 +674,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     && (timepointIntervalMs < timepointDuration*1.2)) {
                 //acqSettings_.setHardwareTimesPoints(false);
                 asb_.useHardwareTimePoints(false);
-                studio_.logs().showError("Time point interval may not be sufficient "
-                        + "depending on actual time required to change positions. "
-                        + "Proceed at your own risk.");
+                // TODO: uncomment when timepointDuration is verified to be computed correctly
+//                studio_.logs().showError("Time point interval may not be sufficient "
+//                        + "depending on actual time required to change positions. "
+//                        + "Proceed at your own risk.");
             }
         }
 
