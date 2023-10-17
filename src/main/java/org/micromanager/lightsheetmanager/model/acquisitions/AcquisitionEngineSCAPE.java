@@ -329,13 +329,18 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     if (isUsingPLC && controllerInstance != null) { // if not in demo mode
                         // TODO: is this the best place to set state to idle?
                         ASIScanner scanner = model_.devices().getDevice("IllumSlice");
-                        if (scanner.getSPIMState().equals(ASIScanner.SPIMState.RUNNING)) {
-                            scanner.setSPIMState(ASIScanner.SPIMState.IDLE);
+                        // need to set to IDLE to re-arm for each z-stack
+                        if (!acqSettings_.isUsingHardwareTimePoints()) {
+                            if (scanner.getSPIMState().equals(ASIScanner.SPIMState.RUNNING)) {
+                                scanner.setSPIMState(ASIScanner.SPIMState.IDLE);
+                            }
                         }
                         int side = 0;
+                        // NOTE: not sure why this is being triggered twice with only 1 camera; so we need guard
                         // TODO: enable 2 sided acquisition
-                        controllerInstance.triggerControllerStartAcquisition(
-                                asb_.acquisitionMode(), side);
+                        if (scanner.getSPIMState().equals(ASIScanner.SPIMState.IDLE)) {
+                            controllerInstance.triggerControllerStartAcquisition(asb_.acquisitionMode(), side);
+                        }
                     }
                     return event;
                 }
@@ -416,41 +421,56 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 }
             }
 
-
-            final int numPositions = acqSettings_.isUsingMultiplePositions() ? pl.getNumberOfPositions() : 1;
-            final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
-
-            // Loop 1: Multiple time points
-            for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
-                //System.out.println("time index: " + timeIndex);
+            if (acqSettings_.isUsingHardwareTimePoints()) {
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
-                if (acqSettings_.isUsingTimePoints()) {
-                    baseEvent.setAxisPosition(LSMAcquisitionEvents.TIME_AXIS, timeIndex);
+                if (acqSettings_.isUsingChannels()) {
+                    currentAcquisition_.submitEventIterator(
+                            LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
+                                    baseEvent.copy(), acqSettings_, cameraNames, null));
+                } else {
+                    currentAcquisition_.submitEventIterator(
+                            LSMAcquisitionEvents.createTimelapseVolumeAcqEvents(
+                                    baseEvent.copy(), acqSettings_, cameraNames, null));
                 }
-                // Loop 2: XY positions
-                for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
-                    //System.out.println("pos index: " + positionIndex);
-                    if (acqSettings_.isUsingMultiplePositions()) {
-                        baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
-                        // is this the best way to do stage movements with new acq engine?
-                        MultiStagePosition position = pl.getPosition(positionIndex);
-                        baseEvent.setX(position.getX());
-                        baseEvent.setY(position.getY());
-                    }
-                    // TODO: what to do if multiple positions not defined: acquire at current stage position?
-                    //  If yes, then nothing more to do here.
 
-                    // Loop 3: Channels; Loop 4: Z slices
-                    if (acqSettings_.isUsingChannels()) {
-                        currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createChannelAcqEvents(
-                                        baseEvent.copy(), acqSettings_, cameraNames, null));
-                    } else {
-                        currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createAcqEvents(
-                                        baseEvent.copy(), acqSettings_, cameraNames, null));
+            } else {
+
+                final int numPositions = acqSettings_.isUsingMultiplePositions() ? pl.getNumberOfPositions() : 1;
+                final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
+
+                // Loop 1: Multiple time points
+                for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
+                    //System.out.println("time index: " + timeIndex);
+                    AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
+                    if (acqSettings_.isUsingTimePoints()) {
+                        baseEvent.setAxisPosition(LSMAcquisitionEvents.TIME_AXIS, timeIndex);
+                    }
+                    // Loop 2: XY positions
+                    for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
+                        //System.out.println("pos index: " + positionIndex);
+                        if (acqSettings_.isUsingMultiplePositions()) {
+                            baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
+                            // is this the best way to do stage movements with new acq engine?
+                            MultiStagePosition position = pl.getPosition(positionIndex);
+                            baseEvent.setX(position.getX());
+                            baseEvent.setY(position.getY());
+                        }
+                        // TODO: what to do if multiple positions not defined: acquire at current stage position?
+                        //  If yes, then nothing more to do here.
+
+                        // Loop 3: Channels; Loop 4: Z slices
+                        if (acqSettings_.isUsingChannels()) {
+                            currentAcquisition_.submitEventIterator(
+                                    LSMAcquisitionEvents.createChannelAcqEvents(
+                                            baseEvent.copy(), acqSettings_, cameraNames, null));
+                        } else {
+                            currentAcquisition_.submitEventIterator(
+                                    LSMAcquisitionEvents.createAcqEvents(
+                                            baseEvent.copy(), acqSettings_, cameraNames, null));
+                        }
                     }
                 }
+
             }
 
 //            for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
@@ -654,13 +674,13 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     && (timepointIntervalMs < timepointDuration*1.2)) {
                 //acqSettings_.setHardwareTimesPoints(false);
                 asb_.useHardwareTimePoints(false);
-                // TODO: uncomment when working
-//                studio_.logs().showError("Time point interval may not be sufficient "
-//                        + "depending on actual time required to change positions. "
-//                        + "Proceed at your own risk.");
+                studio_.logs().showError("Time point interval may not be sufficient "
+                        + "depending on actual time required to change positions. "
+                        + "Proceed at your own risk.");
             }
         }
 
+        // TODO: this is not necessary below
 //        if (acqSettings_.isUsingHardwareTimePoints()) {
 //            final int numTimePoints = acqSettings_.numTimePoints();
 //            final int numChannels = acqSettings_.numChannels();
