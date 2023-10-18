@@ -133,22 +133,21 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             String saveDir = acqSettings_.saveDirectory();
             String saveName = acqSettings_.saveNamePrefix();
 
-            DefaultDatastore result = new DefaultDatastore(studio_);
-            try {
-                if (acqSettings_.saveMode() == DataStorage.SaveMode.NDTIFF) {
-                    DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
-                } else if (acqSettings_.saveMode() == DataStorage.SaveMode.MULTIPAGE_TIFF) {
-                    DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);
-                } else if (acqSettings_.saveMode() == DataStorage.SaveMode.SINGLEPLANE_TIFF_SERIES) {
-                    DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.SINGLEPLANE_TIFF_SERIES);
-                } else {
-                    studio_.logs().showError("Unsupported save mode: " + acqSettings_.saveMode());
-                    return false;
-                }
-                result.setStorage(new NDTiffAdapter(result, saveDir, true));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            // This sets the preferred save mode for DefaultDatastore, this value
+            // is used in the MMAcquisition constructor to set the Storage object.
+            if (acqSettings_.saveMode() == DataStorage.SaveMode.NDTIFF) {
+                DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
+            } else if (acqSettings_.saveMode() == DataStorage.SaveMode.MULTIPAGE_TIFF) {
+                DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);
+            } else if (acqSettings_.saveMode() == DataStorage.SaveMode.SINGLEPLANE_TIFF_SERIES) {
+                DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.SINGLEPLANE_TIFF_SERIES);
+            } else {
+                studio_.logs().showError("Unsupported save mode: " + acqSettings_.saveMode());
+                return false;
             }
+
+            // TODO: once saving NDTiff images works, delete this line, always set to MULTIPAGE_TIFF for now
+            DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);
 
 
             // Projection mode
