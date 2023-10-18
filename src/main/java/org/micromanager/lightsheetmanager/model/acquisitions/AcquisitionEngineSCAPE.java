@@ -679,6 +679,13 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
         }
 
+        // only use hardware time points when use time points is checked
+        if (acqSettings_.isUsingHardwareTimePoints()) {
+            if (!acqSettings_.isUsingTimePoints()) {
+                asb_.useHardwareTimePoints(false);
+            }
+        }
+
         // TODO: this is not necessary below
 //        if (acqSettings_.isUsingHardwareTimePoints()) {
 //            final int numTimePoints = acqSettings_.numTimePoints();
