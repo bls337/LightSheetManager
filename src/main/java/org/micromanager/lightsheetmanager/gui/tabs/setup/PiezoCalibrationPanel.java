@@ -32,6 +32,8 @@ public class PiezoCalibrationPanel extends Panel {
 
     private final int pathNum_;
 
+    private boolean isUsingPLogic_;
+
     private final LightSheetManagerModel model_;
 
     public PiezoCalibrationPanel(final LightSheetManagerModel model, final int pathNum) {
@@ -45,6 +47,8 @@ public class PiezoCalibrationPanel extends Panel {
     private void createUserInterface() {
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
+
+        isUsingPLogic_ = model_.devices().getDeviceAdapter().isUsingPLogic();
 
         final JLabel lblSlope = new JLabel("Slope:");
         final JLabel lblOffset = new JLabel("Offset:");
@@ -145,17 +149,14 @@ public class PiezoCalibrationPanel extends Panel {
 
     private void createEventHandlers() {
 
-        final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
-        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
-//        System.out.println("piezo: " + piezo);
-//        System.out.println("scanner: " + scanner);
-
         btnTwoPoint_.registerListener(e -> {
 
         });
 
-        // FIXME: find a better way to check for devices existing
-        if (scanner != null && piezo != null) {
+        if (isUsingPLogic_) {
+            final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
+            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+
             btnUpdate_.registerListener(e -> {
                 if (scanner.isBeamOn()) {
                     final double rate = model_.acquisitions().settings()
