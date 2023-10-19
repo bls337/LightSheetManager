@@ -38,6 +38,8 @@ public class PositionPanel extends Panel {
 
     private int pathNum_;
 
+    private boolean isUsingPLogic_;
+
     private LightSheetManagerModel model_;
 
     public PositionPanel(final LightSheetManagerModel model, final int pathNum) {
@@ -88,10 +90,10 @@ public class PositionPanel extends Panel {
         lblImagingPositionValue_ = new JLabel("0.0 μm");
         lblIllumPositionValue_ = new JLabel("0.0 μm");
 
-        final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
-        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+        if (isUsingPLogic_) {
+            final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
+            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
 
-        if (piezo != null && scanner != null) {
             final double piezoPosition = piezo.getPosition();
             final double scannerPosition = scanner.getPosition().y;
             lblImagingPositionValue_.setText(piezoPosition + " μm");
@@ -151,42 +153,39 @@ public class PositionPanel extends Panel {
         }
     }
 
-    // TODO: prevent errors if there is no piezo/scanner selected in config (null values)
     // TODO: currently set up for SCAPE geometry, compare to original diSPIM plugin
     private void createEventHandlers() {
-        final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
-        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
-//        System.out.println("piezo: " + piezo);
-//        System.out.println("scanner: " + scanner);
 
-        btnImagingCenterGo_.registerListener(e -> {
-            // FIXME: make sure this is the same as original plugin, diSPIM also moves Scanner with computeGalvoFromPiezo
-            final double imagingCenter = model_.acquisitions().settings()
-                    .sheetCalibration(pathNum_).imagingCenter();
-            piezo.setPosition(imagingCenter);
-        });
+        if (isUsingPLogic_) {
+            final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
+            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
 
-        btnImagingCenterSet_.registerListener(e -> {
-            // FIXME: check for piezo limits!
-            final double piezoPosition = piezo.getPosition();
-            model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).imagingCenter(piezoPosition);
-            lblImagingCenterValue_.setText(Double.toString(piezoPosition));
-        });
+            btnImagingCenterSet_.registerListener(e -> {
+                // FIXME: check for piezo limits!
+                final double piezoPosition = piezo.getPosition();
+                model_.acquisitions().settingsBuilder()
+                        .sheetCalibrationBuilder(pathNum_).imagingCenter(piezoPosition);
+                lblImagingCenterValue_.setText(Double.toString(piezoPosition));
+            });
 
-        btnImagingZero_.registerListener(e -> {
-            piezo.setPosition(0.0);
-            lblSlicePositionValue_.setText(piezo.getPosition() + " μm");
-        });
+            btnImagingCenterGo_.registerListener(e -> {
+                // FIXME: make sure this is the same as original plugin, diSPIM also moves Scanner with computeGalvoFromPiezo
+                final double imagingCenter = model_.acquisitions().settings()
+                        .sheetCalibration(pathNum_).imagingCenter();
+                piezo.setPosition(imagingCenter);
+            });
 
-        btnSliceZero_.registerListener(e -> {
-            final double xValue = scanner.getPosition().x;
-            scanner.setPosition(xValue, 0.0);
-            lblSlicePositionValue_.setText(scanner.getPosition().y + " °");
-        });
+            btnImagingZero_.registerListener(e -> {
+                piezo.setPosition(0.0);
+                lblSlicePositionValue_.setText(piezo.getPosition() + " μm");
+            });
 
-        // FIXME: find a better way to check for devices existing
-        if (scanner != null && piezo != null) {
+            btnSliceZero_.registerListener(e -> {
+                final double xValue = scanner.getPosition().x;
+                scanner.setPosition(xValue, 0.0);
+                lblSlicePositionValue_.setText(scanner.getPosition().y + " °");
+            });
+
             txtImagingPosition_.registerListener(e -> {
                 System.out.println("imaging position update: " + txtImagingPosition_.getText());
                 piezo.setPosition(Double.parseDouble(txtImagingPosition_.getText()));
@@ -205,9 +204,10 @@ public class PositionPanel extends Panel {
     }
 
     public void updatePositions() {
-        final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
-        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
-        if (piezo != null && scanner != null) {
+        if (isUsingPLogic_) {
+            final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
+            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+
             final double piezoPosition = piezo.getPosition();
             final double scannerPosition = scanner.getPosition().y;
             EventQueue.invokeLater(() -> {
