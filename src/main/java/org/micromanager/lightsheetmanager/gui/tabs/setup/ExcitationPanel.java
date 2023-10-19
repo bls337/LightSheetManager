@@ -19,6 +19,8 @@ public class ExcitationPanel extends Panel {
     private CheckBox cbxBeamEpi_;
     private CheckBox cbxSheetEpi_;
 
+    private boolean isUsingPLogic_;
+
     private final LightSheetManagerModel model_;
 
     public ExcitationPanel(final LightSheetManagerModel model) {
@@ -32,6 +34,8 @@ public class ExcitationPanel extends Panel {
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
 
+        isUsingPLogic_ = model_.devices().getDeviceAdapter().isUsingPLogic();
+
         final JLabel lblExcitation = new JLabel("Excitation side:");
         final JLabel lblEpi = new JLabel("Epi side:");
 
@@ -40,9 +44,8 @@ public class ExcitationPanel extends Panel {
         cbxBeamEpi_ = new CheckBox("Beam", false);
         cbxSheetEpi_ = new CheckBox("Sheet", false);
 
-        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
-        // TODO: better way to check
-        if (scanner != null) {
+        if (isUsingPLogic_) {
+            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
             cbxBeamExc_.setSelected(scanner.isBeamOn());
         }
 
@@ -66,10 +69,9 @@ public class ExcitationPanel extends Panel {
 
     private void createEventHandlers() {
 
-        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+        if (isUsingPLogic_) {
+            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
 
-        // TODO: fix this
-        if (scanner != null) {
             cbxBeamExc_.registerListener(e -> {
                 scanner.setBeamOn(cbxBeamExc_.isSelected());
                 System.out.println("set beam on: " + cbxBeamExc_.isSelected());
