@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.model.devices;
 
 import mmcorej.DeviceType;
-import org.micromanager.Application;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.LightSheetType;
