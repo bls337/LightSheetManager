@@ -54,6 +54,8 @@ public class PositionPanel extends Panel {
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
 
+        isUsingPLogic_ = model_.devices().getDeviceAdapter().isUsingPLogic();
+
         final JLabel lblImagingCenter = new JLabel("Imaging Center:");
         final double imagingCenter = model_.acquisitions().settings()
                 .sheetCalibration(pathNum_).imagingCenter();

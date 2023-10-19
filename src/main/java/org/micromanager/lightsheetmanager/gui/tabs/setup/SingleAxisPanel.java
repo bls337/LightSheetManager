@@ -22,6 +22,8 @@ public class SingleAxisPanel extends Panel {
     private Spinner spnAmplitude_;
     private Spinner spnPeriod_;
 
+    private boolean isUsingPLogic_;
+
     private final LightSheetManagerModel model_;
 
     public SingleAxisPanel(final LightSheetManagerModel model) {
@@ -33,8 +35,7 @@ public class SingleAxisPanel extends Panel {
 
     private void createUserInterface() {
 
-        final ASIScanner scanner = model_.devices()
-                .getDevice("IllumSlice");
+        isUsingPLogic_ = model_.devices().getDeviceAdapter().isUsingPLogic();
 
         final JLabel lblPattern = new JLabel("Pattern:");
         final JLabel lblAmplitude = new JLabel("Amplitude:");
@@ -46,7 +47,9 @@ public class SingleAxisPanel extends Panel {
         String pattern = patterns[0];
         double amplitudeY = 0;
         int periodY = 0;
-        if (scanner != null) {
+        if (isUsingPLogic_) {
+            final ASIScanner scanner = model_.devices()
+                    .getDevice("IllumSlice");
             pattern = scanner.sa().getPatternY().toString();
             amplitudeY = scanner.sa().getAmplitudeY();
             periodY = scanner.sa().getPeriodY();
@@ -65,21 +68,24 @@ public class SingleAxisPanel extends Panel {
     }
 
     private void createEventHandlers() {
+
+        if (isUsingPLogic_) {
             final ASIScanner galvo = model_.devices()
                     .getDevice("IllumSlice");
 
-        cbxPattern_.registerListener(e -> {
-            galvo.sa().setPatternY(SingleAxis.Pattern.fromString(cbxPattern_.getSelected()));
-        });
+            cbxPattern_.registerListener(e -> {
+                galvo.sa().setPatternY(SingleAxis.Pattern.fromString(cbxPattern_.getSelected()));
+            });
 
-        spnAmplitude_.registerListener(e -> {
-            galvo.sa().setAmplitudeY(spnAmplitude_.getFloat());
-        });
+            spnAmplitude_.registerListener(e -> {
+                galvo.sa().setAmplitudeY(spnAmplitude_.getFloat());
+            });
 
-        spnPeriod_.registerListener(e -> {
-            galvo.sa().setPeriodY(spnPeriod_.getInt());
-        });
+            spnPeriod_.registerListener(e -> {
+                galvo.sa().setPeriodY(spnPeriod_.getInt());
+            });
 
+        }
     }
 
 }
