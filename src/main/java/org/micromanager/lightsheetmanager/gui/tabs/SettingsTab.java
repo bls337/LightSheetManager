@@ -30,6 +30,8 @@ public class SettingsTab extends Panel {
     private Spinner spnSliceAxisFilterFreq_;
     private Spinner spnLiveScanPeriod_;
 
+    private boolean isUsingPLogic_;
+
     private LightSheetManagerModel model_;
 
     public SettingsTab(final LightSheetManagerModel model) {
@@ -41,6 +43,8 @@ public class SettingsTab extends Panel {
     private void createUserInterface() {
         final DefaultAcquisitionSettingsDISPIM acqSettings =
                 model_.acquisitions().settings();
+
+        isUsingPLogic_ = model_.devices().getDeviceAdapter().isUsingPLogic();
 
         final Panel pnlScanSettings = new Panel("Stage Scan Settings");
         pnlScanSettings.setMigLayout(
@@ -108,10 +112,12 @@ public class SettingsTab extends Panel {
         pnlScanSettings.add(cbxReturnToOriginalPosition_, "wrap");
 
         // light sheet scanner settings panel
-        pnlLightSheet.add(lblSheetAxisFilterFreq, "");
-        pnlLightSheet.add(spnSheetAxisFilterFreq_, "wrap");
-        pnlLightSheet.add(lblSliceAxisFilterFreq, "");
-        pnlLightSheet.add(spnSliceAxisFilterFreq_, "wrap");
+        if (isUsingPLogic_) {
+            pnlLightSheet.add(lblSheetAxisFilterFreq, "");
+            pnlLightSheet.add(spnSheetAxisFilterFreq_, "wrap");
+            pnlLightSheet.add(lblSliceAxisFilterFreq, "");
+            pnlLightSheet.add(spnSliceAxisFilterFreq_, "wrap");
+        }
         pnlLightSheet.add(lblLiveScanPeriod, "");
         pnlLightSheet.add(spnLiveScanPeriod_, "");
 
@@ -145,9 +151,11 @@ public class SettingsTab extends Panel {
                 model_.acquisitions().settingsBuilder().scanSettingsBuilder()
                         .scanReturnToOriginalPosition(cbxReturnToOriginalPosition_.isSelected()));
 
-        // TODO: better method, change scanner methods to double?
-        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
-        if (scanner != null) {
+        // only create event handlers for filter freq if we are using PLogic
+        if (isUsingPLogic_) {
+            final ASIScanner scanner = model_.devices()
+                    .getDevice("IllumSlice");
+
             // Light Sheet Scanner
             spnSheetAxisFilterFreq_.registerListener(e -> {
                 scanner.setFilterFreqX((float)spnSheetAxisFilterFreq_.getDouble());
@@ -157,6 +165,7 @@ public class SettingsTab extends Panel {
                 scanner.setFilterFreqY((float)spnSliceAxisFilterFreq_.getDouble());
             });
         }
+
         spnLiveScanPeriod_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .liveScanPeriod(spnLiveScanPeriod_.getDouble());
