@@ -5,7 +5,6 @@ import org.micromanager.lightsheetmanager.api.LightSheetCamera;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
-import java.util.Objects;
 
 /**
  * Support for Teledyne Photometrics cameras.
