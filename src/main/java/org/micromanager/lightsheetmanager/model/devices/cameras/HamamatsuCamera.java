@@ -9,11 +9,12 @@ import java.awt.Rectangle;
 /**
  * Support for Hamamatsu cameras.
  * <p>Devices Adapter: HamamatsuHam
- * <p>Camera Support: ORCA-Flash4, ORCA-Fusion
+ * <p>Camera Support: ORCA-Flash4, ORCA-Fusion, ORCA-Fusion BT
  */
 public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
 
     public static class Models {
+        public static final String FUSION_BT = "C15440";
         public static final String FUSION = "C14440";
         public static final String FLASH4 = "C11440";
     }
@@ -105,8 +106,8 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
 
     @Override
     public Rectangle getResolution() {
-        int x = 0;
-        int y = 0;
+        int x;
+        int y;
         if (isFusion()) {
             x = 2304;
             y = 2304;
@@ -224,7 +225,8 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     }
 
     public boolean isFusion() {
-        return getProperty(Properties.CAMERA_NAME).startsWith(Models.FUSION);
+        return getProperty(Properties.CAMERA_NAME).startsWith(Models.FUSION)
+                || getProperty(Properties.CAMERA_NAME).startsWith(Models.FUSION_BT);
     }
 
     public boolean isFlash4() {

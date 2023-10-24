@@ -832,6 +832,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // special adjustment for Photometrics cameras that possibly has extra clear time which is counted in reset time
         //    but not in the camera exposure time
         // TODO: skipped PVCAM case, update comment
+
         float cameraExposure = NumberUtils.ceilToQuarterMs(cameraResetTime) + laserDuration;
 
         switch (asb.cameraMode()) {
