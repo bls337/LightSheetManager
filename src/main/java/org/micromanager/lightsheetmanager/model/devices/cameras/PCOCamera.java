@@ -6,6 +6,12 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
 
+
+/**
+ * Support for PCO cameras.
+ * Devices Adapter: PCO_Camera
+ * Camera Support: Edge 5.5, Panda
+ */
 public class PCOCamera extends CameraBase implements LightSheetCamera {
 
     public static class Models {
