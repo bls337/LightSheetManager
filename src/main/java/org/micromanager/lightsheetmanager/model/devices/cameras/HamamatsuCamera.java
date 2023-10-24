@@ -6,6 +6,11 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
 
+/**
+ * Support for Hamamatsu cameras.
+ * <p>Devices Adapter: HamamatsuHam
+ * <p>Camera Support: ORCA-Flash4, ORCA-Fusion
+ */
 public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
 
     public static class Models {

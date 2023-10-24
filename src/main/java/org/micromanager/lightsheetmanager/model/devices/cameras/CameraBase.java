@@ -7,6 +7,11 @@ import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 
 import java.awt.Rectangle;
 
+// TODO: consider removing implements LightSheetCamera so no default methods for subclasses
+
+/**
+ * This is the base camera class.
+ */
 public class CameraBase extends DeviceBase implements LightSheetCamera {
 
     protected CameraMode mode_;
