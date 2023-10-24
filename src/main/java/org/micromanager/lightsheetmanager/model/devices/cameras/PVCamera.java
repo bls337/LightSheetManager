@@ -5,6 +5,7 @@ import org.micromanager.lightsheetmanager.api.LightSheetCamera;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
+import java.util.Objects;
 
 /**
  * Support for Teledyne Photometrics cameras.
@@ -16,6 +17,7 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
     public static class Models {
         public static final String PRIME = "CIS2020F";
         public static final String PRIME_95B = "GS144BSI";
+        public static final String KINETIX = "TMP-Kinetix";
     }
 
     public static class Properties {
@@ -88,7 +90,7 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
     @Override
     public double getRowReadoutTime() {
         Rectangle roi = getROI();
-        if (getProperty(Properties.CHIP_NAME).equals(Models.PRIME_95B)) {
+        if (hasProperty(Properties.READOUT_TIME)) {
             final float readoutTimeMs = (float) getPropertyInt(Properties.READOUT_TIME) / 1e6f;
             return (readoutTimeMs / roi.height);
         } else {
@@ -104,7 +106,7 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
                 readoutTimeMs = 0.0f;
                 break;
             case PSEUDO_OVERLAP:
-                if (getProperty(Properties.CHIP_NAME).equals(Models.PRIME_95B)) {
+                if (isKinetix() || isPrime95B()) {
                     final int preTime = getPropertyInt(Properties.PRE_TRIGGER_TIME);
                     readoutTimeMs = (float) preTime / 1e6f;
                     // for safety we make sure to wait at least a quarter millisecond to trigger
@@ -134,23 +136,31 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
 
     @Override
     public float getResetTime(CameraMode cameraMode) {
-        float resetTimeMs = 10.0f;
-        switch (cameraMode) {
-            case VIRTUAL_SLIT:
-                break;
-            default: // all other camera modes
-                if (getProperty(Properties.CHIP_NAME).equals(Models.PRIME_95B)) {
-                    final int trigToGlobal = getPropertyInt(Properties.POST_TRIGGER_TIME)
-                            + getPropertyInt(Properties.READOUT_TIME);
-                    // it appears as of end-May 2017 that the clearing time is actually rolled into the post-trigger
-                    //    time despite Photometrics documentation to the contrary
-                    resetTimeMs = (float) trigToGlobal / 1e6f;
-                } else {
-                    resetTimeMs = 14.25f;  // strange number just to make it easy to find later; I think the original Prime needs to be added
-                }
-                break;
+        float resetTimeMs;
+        if (cameraMode == CameraMode.VIRTUAL_SLIT) {
+            resetTimeMs = 0.0f;
+        } else {
+            // TODO(Jon): Confirm that the Kinetix camera is like the Prime 95B
+
+            // Photometrics Prime 95B is very different from other cameras so handle it as special case
+            if (isKinetix() || isPrime95B()) {
+                final int trigToGlobal = getPropertyInt(Properties.POST_TRIGGER_TIME)
+                        + getPropertyInt(Properties.READOUT_TIME);
+                // it appears as of end-May 2017 that the clearing time is actually rolled into the post-trigger
+                //    time despite Photometrics documentation to the contrary
+                resetTimeMs = (float) trigToGlobal / 1e6f;
+            } else {
+                resetTimeMs = 14.25f;  // strange number just to make it easy to find later; I think the original Prime needs to be added
+            }
         }
         return resetTimeMs;
     }
 
+    private boolean isPrime95B() {
+        return getProperty(Properties.CHIP_NAME).equals(Models.PRIME_95B);
+    }
+
+    private boolean isKinetix() {
+        return getProperty(Properties.CHIP_NAME).equals(Models.KINETIX);
+    }
 }
