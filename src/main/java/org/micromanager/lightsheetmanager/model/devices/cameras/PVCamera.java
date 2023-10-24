@@ -13,6 +13,30 @@ import java.awt.Rectangle;
  */
 public class PVCamera extends CameraBase implements LightSheetCamera {
 
+    public static class Models {
+        public static final String PRIME = "CIS2020F";
+        public static final String PRIME_95B = "GS144BSI";
+    }
+
+    public static class Properties {
+        public static final String BINNING = "Binning";
+        public static final String CHIP_NAME = "ChipName";
+        public static final String TRIGGER_MODE = "TriggerMode";
+
+        public static final String X_RESOLUTION = "X-dimension";
+        public static final String Y_RESOLUTION = "Y-dimension";
+
+        public static final String READOUT_TIME = "Timing-ReadoutTimeNs";
+        public static final String PRE_TRIGGER_TIME = "Timing-PreTriggerDelayNs";
+        public static final String POST_TRIGGER_TIME = "Timing-PostTriggerDelayNs";
+
+    }
+
+    public static class Values {
+        public final static String INTERNAL_TRIGGER = "Internal Trigger";
+        public final static String EDGE_TRIGGER = "Edge Trigger";
+    }
+
     public PVCamera(Studio studio, String deviceName) {
         super(studio, deviceName);
     }
@@ -23,14 +47,10 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
             case EDGE:
             case PSEUDO_OVERLAP:
             case VIRTUAL_SLIT:
-//                props_.setPropValue(devKey,
-//                        Properties.Keys.TRIGGER_MODE,
-//                        Properties.Values.EDGE_TRIGGER);
-//                break;
+                setProperty(Properties.TRIGGER_MODE, Values.EDGE_TRIGGER);
+                break;
 //            case INTERNAL:
-//                props_.setPropValue(devKey,
-//                        Properties.Keys.TRIGGER_MODE,
-//                        Properties.Values.INTERNAL_TRIGGER);
+//                setProperty(Properties.TRIGGER_MODE, Values.INTERNAL_TRIGGER);
 //                break;
             default:
                 break;
@@ -39,7 +59,7 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
 
     @Override
     public CameraMode getTriggerMode() {
-        return null;
+        return CameraMode.fromString(getProperty(Properties.TRIGGER_MODE));
     }
 
     @Override
@@ -49,40 +69,88 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
 
     @Override
     public int getBinning() {
-        return 0;
+        final String binning = getProperty(Properties.BINNING);
+        final int factor = Integer.parseInt(binning.substring(0, 1));
+        if (factor < 1) {
+            studio_.logs().showError("Was not able to get camera binning factor");
+            return 1;
+        }
+        return Integer.parseInt(binning.substring(0, 1));
     }
 
     @Override
     public Rectangle getResolution() {
-//        final int x = props_.getPropValueInteger(camKey, Properties.Keys.CAMERA_X_DIMENSION);
-//        final int y = props_.getPropValueInteger(camKey, Properties.Keys.CAMERA_Y_DIMENSION);
-//        return new Rectangle(0, 0, x, y);;
-        return null;
+        final int x = getPropertyInt(Properties.X_RESOLUTION);
+        final int y = getPropertyInt(Properties.Y_RESOLUTION);
+        return new Rectangle(0, 0, x, y);
     }
 
     @Override
     public double getRowReadoutTime() {
-//        Rectangle roi = getCameraROI(camKey);
-//        if (props_.getPropValueString(camKey, Properties.Keys.PVCAM_CHIPNAME).equals(Properties.Values.PRIME_95B_CHIPNAME)) {
-//            float readoutTimeMs = (float) props_.getPropValueInteger(camKey, Properties.Keys.PVCAM_READOUT_TIME) / 1e6f;
-//            return (readoutTimeMs / roi.height);
-//        } else {
-//            return 0.01;  // TODO get more accurate value
-//        }
-        return 0;
+        Rectangle roi = getROI();
+        if (getProperty(Properties.CHIP_NAME).equals(Models.PRIME_95B)) {
+            final float readoutTimeMs = (float) getPropertyInt(Properties.READOUT_TIME) / 1e6f;
+            return (readoutTimeMs / roi.height);
+        } else {
+            return 0.01;  // TODO get more accurate value
+        }
     }
 
     @Override
     public float getReadoutTime(CameraMode cameraMode) {
-//        int endGlobalToTrig = props_.getPropValueInteger(camKey, Properties.Keys.PVCAM_PRE_TIME)
-//                + 2 * props_.getPropValueInteger(camKey, Properties.Keys.PVCAM_READOUT_TIME);
-//        // this factor of 2 is empirical 08-Jan-2021; I'm not sure why it's needed but that is the missing piece it seems
-//        readoutTimeMs = (float) endGlobalToTrig / 1e6f;
-        return 0;
+        float readoutTimeMs = 10.0f;
+        switch (cameraMode) {
+            case OVERLAP:
+                readoutTimeMs = 0.0f;
+                break;
+            case PSEUDO_OVERLAP:
+                if (getProperty(Properties.CHIP_NAME).equals(Models.PRIME_95B)) {
+                    final int preTime = getPropertyInt(Properties.PRE_TRIGGER_TIME);
+                    readoutTimeMs = (float) preTime / 1e6f;
+                    // for safety we make sure to wait at least a quarter millisecond to trigger
+                    //   (may have hidden assumptions in other code about at least one tic wait)
+                    if (readoutTimeMs < 0.249f) {
+                        readoutTimeMs = 0.25f;
+                    }
+                } else { // original Prime
+                    readoutTimeMs = 0.25f;
+                }
+                break;
+            case VIRTUAL_SLIT:
+                readoutTimeMs = (float) getPropertyInt(Properties.READOUT_TIME) / 1e6f;
+                break;
+            case EDGE: // fall through to next case
+            case LEVEL:
+                final int readoutTime = getPropertyInt(Properties.READOUT_TIME);
+                final int endGlobalToTrig = getPropertyInt(Properties.PRE_TRIGGER_TIME) + 2 * readoutTime;
+                // this factor of 2 is empirical 08-Jan-2021; I'm not sure why it's needed but that is the missing piece it seems
+                readoutTimeMs = (float) endGlobalToTrig / 1e6f;
+                break;
+            default:
+                break;
+        }
+        return readoutTimeMs;
     }
 
     @Override
     public float getResetTime(CameraMode cameraMode) {
-        return 14.25f;  // strange number just to make it easy to find later; I think the original Prime needs to be added
+        float resetTimeMs = 10.0f;
+        switch (cameraMode) {
+            case VIRTUAL_SLIT:
+                break;
+            default: // all other camera modes
+                if (getProperty(Properties.CHIP_NAME).equals(Models.PRIME_95B)) {
+                    final int trigToGlobal = getPropertyInt(Properties.POST_TRIGGER_TIME)
+                            + getPropertyInt(Properties.READOUT_TIME);
+                    // it appears as of end-May 2017 that the clearing time is actually rolled into the post-trigger
+                    //    time despite Photometrics documentation to the contrary
+                    resetTimeMs = (float) trigToGlobal / 1e6f;
+                } else {
+                    resetTimeMs = 14.25f;  // strange number just to make it easy to find later; I think the original Prime needs to be added
+                }
+                break;
+        }
+        return resetTimeMs;
     }
+
 }
