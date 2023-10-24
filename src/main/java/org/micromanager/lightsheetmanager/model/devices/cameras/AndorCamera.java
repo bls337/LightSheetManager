@@ -122,18 +122,19 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
 
     @Override
     public int getBinning() {
-        final String propVal = getProperty(Properties.BINNING);
-//        if (factor < 1) {
-//            // TODO: MyDialogUtils.showError("Was not able to get camera binning factor");
-//            return 1;
-//        }
-        return Integer.parseInt(propVal.substring(0, 1));
+        final String binning = getProperty(PCOCamera.Properties.BINNING);
+        final int factor = Integer.parseInt(binning.substring(0, 1));
+        if (factor < 1) {
+            studio_.logs().showError("Was not able to get camera binning factor");
+            return 1;
+        }
+        return Integer.parseInt(binning.substring(0, 1));
     }
 
     @Override
     public Rectangle getResolution() {
-        int x = 0;
-        int y = 0;
+        int x;
+        int y;
         if (isZyla55()) { // 5.5
             x = 2560;
             y = 2160;

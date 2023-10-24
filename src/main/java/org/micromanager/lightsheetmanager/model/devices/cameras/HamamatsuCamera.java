@@ -94,12 +94,13 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
 
     @Override
     public int getBinning() {
-        final String propVal = getProperty(Properties.BINNING);
-//        if (factor < 1) {
-//            // TODO: MyDialogUtils.showError("Was not able to get camera binning factor");
-//            return 1;
-//        }
-        return Integer.parseInt(propVal.substring(0, 1));
+        final String binning = getProperty(PCOCamera.Properties.BINNING);
+        final int factor = Integer.parseInt(binning.substring(0, 1));
+        if (factor < 1) {
+            studio_.logs().showError("Was not able to get camera binning factor");
+            return 1;
+        }
+        return Integer.parseInt(binning.substring(0, 1));
     }
 
     @Override
