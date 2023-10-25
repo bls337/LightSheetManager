@@ -46,8 +46,11 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
 
     }
 
+    private final boolean isFusion_;
+
     public HamamatsuCamera(final Studio studio, final String deviceName) {
         super(studio, deviceName);
+        isFusion_ = isFusion();
     }
 
     @Override
@@ -95,7 +98,7 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
 
     @Override
     public int getBinning() {
-        final String binning = getProperty(PCOCamera.Properties.BINNING);
+        final String binning = getProperty(Properties.BINNING);
         final int factor = Integer.parseInt(binning.substring(0, 1));
         if (factor < 1) {
             studio_.logs().showError("Was not able to get camera binning factor");
@@ -108,22 +111,19 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     public Rectangle getResolution() {
         int x;
         int y;
-        if (isFusion()) {
+        if (isFusion_) {
             x = 2304;
             y = 2304;
         } else { // Flash4
             x = 2048;
             y = 2048;
         }
-//        if (x == 0 || y == 0) {
-//            MyDialogUtils.showError("Was not able to get sensor size of camera " + devices_.getMMDevice(camKey));
-//        }
         return new Rectangle(0, 0, x, y);
     }
 
     @Override
     public double getRowReadoutTime() {
-       if (isFusion()) {
+       if (isFusion_) {
            final String mode = getProperty(Properties.SCAN_MODE);
             if (mode.equals(Values.SCAN_MODE_3)) {
                 return (11.22/2304);
@@ -165,7 +165,7 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
                     // trust the device adapter's calculation for USB3
                     readoutTimeMs = Float.parseFloat(getProperty(Properties.READOUT_TIME)) * 1000.0f;
                 } else {
-                    if (isFusion()) { // Fusion
+                    if (isFusion_) { // Fusion
                         numReadoutRows = roi.height;
                     } else {
                         // Camera Link interface, original implementation
@@ -196,39 +196,47 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
         if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             return 0.0f;
         } else {
-            float resetTimeMs = 10.0f;
             final double rowReadoutTime = getRowReadoutTime();
             final float camReadoutTime = getReadoutTime(CameraMode.EDGE);
 
-            int numRowsOverhead;
             // don't know if this is different for Fusion; leave it all the same for time being
             // global reset mode not yet exposed in Micro-manager
             // it will be 17+1 rows of overhead but nothing else
+            int numRowsOverhead;
             if (getProperty(Properties.TRIGGER_ACTIVE).equals(Values.SYNCREADOUT)) {
                 numRowsOverhead = 18; // overhead of 17 rows plus jitter of 1 row
             } else { // for EDGE and LEVEL trigger modes
                 numRowsOverhead = 10; // overhead of 9 rows plus jitter of 1 row
             }
-            resetTimeMs = camReadoutTime + (float) (numRowsOverhead * rowReadoutTime);
+            final float resetTimeMs = camReadoutTime + (float) (numRowsOverhead * rowReadoutTime);
 //        ReportingUtils.logDebugMessage("camera reset time computed as " + resetTimeMs +
 //                " for camera " + devices_.getMMDevice(camKey));
             return resetTimeMs; // assume 10ms readout if not otherwise possible to calculate
         }
     }
 
+    /**
+     * @return true if the camera is in the slow sensor readout mode.
+     */
     private boolean isSlowReadout() {
-        if (isFusion()) {
+        if (isFusion_) {
             return !getProperty(Properties.SCAN_MODE).equals(Values.SCAN_MODE_3);
         } else {
             return getProperty(Properties.SCAN_MODE).equals(Values.SCAN_MODE_1);
         }
     }
 
+    /**
+     * @return true if the camera is an ORCA-Fusion or ORCA-Fusion BT.
+     */
     public boolean isFusion() {
         return getProperty(Properties.CAMERA_NAME).startsWith(Models.FUSION)
                 || getProperty(Properties.CAMERA_NAME).startsWith(Models.FUSION_BT);
     }
 
+    /**
+     * @return true if the camera is an ORCA-Flash4.
+     */
     public boolean isFlash4() {
         return getProperty(Properties.CAMERA_NAME).startsWith(Models.FLASH4);
     }
