@@ -127,6 +127,14 @@ public class DeviceBase {
         }
     }
 
+    public String getDeviceLibrary() {
+        try {
+            return core_.getDeviceLibrary(deviceName_);
+        } catch (Exception e) {
+            return "Unknown";
+        }
+    }
+
     public String[] getDevicePropertyNames() {
         StrVector devices = new StrVector();
         try {
