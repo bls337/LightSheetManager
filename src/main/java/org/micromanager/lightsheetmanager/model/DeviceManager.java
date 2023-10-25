@@ -203,8 +203,8 @@ public class DeviceManager {
                 addDevice(propertyName, deviceName, demoCamera);
                 break;
             default:
-                studio_.logs().showError("No device type matches!");
-                // TODO: error "Camera library not supported"
+                studio_.logs().logError(
+                        "Device library not supported. No camera device added to the Device Manager!");
                 break;
         }
     }

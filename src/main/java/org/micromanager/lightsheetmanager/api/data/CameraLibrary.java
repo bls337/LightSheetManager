@@ -8,6 +8,7 @@ import java.util.stream.Stream;
  * This enum contains a list of device adapters that the plugin supports.
  */
 public enum CameraLibrary {
+    UNKNOWN("Unknown"),
     DEMOCAMERA("DemoCamera"),
     HAMAMATSU("HamamatsuHam"),
     PCOCAMERA("PCO_Camera"),
@@ -29,6 +30,6 @@ public enum CameraLibrary {
     }
 
     public static CameraLibrary fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, CameraLibrary.DEMOCAMERA);
+        return stringToEnum.getOrDefault(symbol, CameraLibrary.UNKNOWN);
     }
 }
