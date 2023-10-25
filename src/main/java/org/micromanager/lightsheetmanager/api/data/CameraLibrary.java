@@ -11,7 +11,8 @@ public enum CameraLibrary {
     DEMOCAMERA("DemoCamera"),
     HAMAMATSU("HamamatsuHam"),
     PCOCAMERA("PCO_Camera"),
-    ANDORSDK3("AndorSDK3");
+    ANDORSDK3("AndorSDK3"),
+    PVCAM("PVCAM");
 
     private final String text_;
 

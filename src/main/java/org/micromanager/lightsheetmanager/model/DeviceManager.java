@@ -16,6 +16,7 @@ import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.DemoCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.HamamatsuCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.PCOCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.PVCamera;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -192,6 +193,10 @@ public class DeviceManager {
             case PCOCAMERA:
                 PCOCamera pcoCamera = new PCOCamera(studio_, deviceName);
                 addDevice(propertyName, deviceName, pcoCamera);
+                break;
+            case PVCAM:
+                PVCamera pvCamera = new PVCamera(studio_, deviceName);
+                addDevice(propertyName, deviceName, pvCamera);
                 break;
             case DEMOCAMERA:
                 DemoCamera demoCamera = new DemoCamera(studio_, deviceName);
