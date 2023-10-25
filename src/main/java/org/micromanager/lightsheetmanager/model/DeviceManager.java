@@ -13,6 +13,7 @@ import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.Stage;
 import org.micromanager.lightsheetmanager.model.devices.XYStage;
 import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.cameras.DemoCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.HamamatsuCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.PCOCamera;
@@ -203,8 +204,10 @@ public class DeviceManager {
                 addDevice(propertyName, deviceName, demoCamera);
                 break;
             default:
+                CameraBase camera = new CameraBase(studio_, deviceName);
+                addDevice(propertyName, deviceName, camera);
                 studio_.logs().logError(
-                        "Device library not supported. No camera device added to the Device Manager!");
+                        "Camera device library \"" + cameraLibrary + "\" not supported, using basic camera.");
                 break;
         }
     }
