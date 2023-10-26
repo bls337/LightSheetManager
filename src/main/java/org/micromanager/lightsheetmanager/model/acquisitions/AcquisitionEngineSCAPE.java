@@ -830,7 +830,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         //    trigger the laser until 0.24ms after global exposure) use cameraReset_max
         // special adjustment for Photometrics cameras that possibly has extra clear time which is counted in reset time
         //    but not in the camera exposure time
-        // TODO: skipped PVCAM case, update comment
+        // TODO: skipped PVCAM case, this should already be handled by camera.getResetTime(camMode); but there may be differences
 
         float cameraExposure = NumberUtils.ceilToQuarterMs(cameraResetTime) + laserDuration;
 
@@ -858,9 +858,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 break;
             case PSEUDO_OVERLAP:// PCO or Photometrics, enforce 0.25ms between end exposure and start of next exposure by triggering camera 0.25ms into the slice
                 cameraDuration = 1;  // doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
-                // TODO: not dealing with PVCAM (maybe throw error on unknown cam lib)
-                sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
-                cameraExposure = (float)sliceDuration - delayBeforeCamera;  // s.cameraDelay should be 0.25ms for PCO
+                // leave cameraExposure alone if using PVCAM device library
+                if (!camera.getDeviceLibrary().equals("PVCAM")) {
+                    sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
+                    cameraExposure = (float) sliceDuration - delayBeforeCamera;  // s.cameraDelay should be 0.25ms for PCO
+                }
                 if (cameraReadoutMax < 0.24f) {
                     studio_.logs().showError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
                 }
