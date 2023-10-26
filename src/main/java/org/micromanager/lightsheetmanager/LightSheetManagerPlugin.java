@@ -14,7 +14,7 @@ public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
     public static final String copyright = "Applied Scientific Instrumentation (ASI), 2022-2023";
     public static final String description = "A plugin to control various types of light sheet microscopes.";
     public static final String menuName = "Light Sheet Manager";
-    public static final String version = "0.3.2";
+    public static final String version = "0.3.3";
 
     private Studio studio_;
     private LightSheetManagerFrame frame_;
@@ -42,7 +42,9 @@ public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
             model_ = new LightSheetManagerModel(studio_);
             final boolean isLoaded = model_.setup();
             frame_ = new LightSheetManagerFrame(model_, isLoaded);
-            model_.acquisitions().setFrame(frame_); // TODO: remove later
+            if (isLoaded) {
+                model_.acquisitions().setFrame(frame_); // TODO: remove later
+            }
             frame_.setVisible(true);
             frame_.toFront();
         } catch (Exception e) {

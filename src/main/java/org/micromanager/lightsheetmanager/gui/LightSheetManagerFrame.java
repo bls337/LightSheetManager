@@ -61,7 +61,8 @@ public class LightSheetManagerFrame extends JFrame {
                     break;
             }
         } else {
-            model_.setErrorText("Error creating the data model.");
+            model_.setErrorText("Error creating the data model. " +
+                    "Do you have the Light Sheet Manager device adapter in your hardware configuration?");
             createErrorUserInterface();
         }
 
