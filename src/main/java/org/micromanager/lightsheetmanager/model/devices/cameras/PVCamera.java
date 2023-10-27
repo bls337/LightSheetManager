@@ -90,7 +90,7 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
     public double getRowReadoutTime() {
         Rectangle roi = getROI();
         if (hasProperty(Properties.READOUT_TIME)) {
-            final float readoutTimeMs = (float) getPropertyInt(Properties.READOUT_TIME) / 1e6f;
+            final float readoutTimeMs = getPropertyFloat(Properties.READOUT_TIME) / 1e6f;
             return (readoutTimeMs / roi.height);
         } else {
             return 0.01;  // TODO get more accurate value
@@ -106,8 +106,8 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
                 break;
             case PSEUDO_OVERLAP:
                 if (isKinetix() || isPrime95B()) {
-                    final int preTime = getPropertyInt(Properties.PRE_TRIGGER_TIME);
-                    readoutTimeMs = (float) preTime / 1e6f;
+                    final float preTime = getPropertyFloat(Properties.PRE_TRIGGER_TIME);
+                    readoutTimeMs = preTime / 1e6f;
                     // for safety we make sure to wait at least a quarter millisecond to trigger
                     //   (may have hidden assumptions in other code about at least one tic wait)
                     if (readoutTimeMs < 0.249f) {
@@ -118,12 +118,12 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
                 }
                 break;
             case VIRTUAL_SLIT:
-                readoutTimeMs = (float) getPropertyInt(Properties.READOUT_TIME) / 1e6f;
+                readoutTimeMs = getPropertyFloat(Properties.READOUT_TIME) / 1e6f;
                 break;
             case EDGE: // fall through to next case
             case LEVEL:
-                final int readoutTime = getPropertyInt(Properties.READOUT_TIME);
-                final int endGlobalToTrig = getPropertyInt(Properties.PRE_TRIGGER_TIME) + 2 * readoutTime;
+                final float readoutTime = getPropertyFloat(Properties.READOUT_TIME);
+                final float endGlobalToTrig = getPropertyFloat(Properties.PRE_TRIGGER_TIME) + 2 * readoutTime;
                 // this factor of 2 is empirical 08-Jan-2021; I'm not sure why it's needed but that is the missing piece it seems
                 readoutTimeMs = (float) endGlobalToTrig / 1e6f;
                 break;
@@ -143,11 +143,11 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
 
             // Photometrics Prime 95B is very different from other cameras so handle it as special case
             if (isKinetix() || isPrime95B()) {
-                final int trigToGlobal = getPropertyInt(Properties.POST_TRIGGER_TIME)
-                        + getPropertyInt(Properties.READOUT_TIME);
+                final float trigToGlobal = getPropertyFloat(Properties.POST_TRIGGER_TIME)
+                        + getPropertyFloat(Properties.READOUT_TIME);
                 // it appears as of end-May 2017 that the clearing time is actually rolled into the post-trigger
                 //    time despite Photometrics documentation to the contrary
-                resetTimeMs = (float) trigToGlobal / 1e6f;
+                resetTimeMs = trigToGlobal / 1e6f;
             } else {
                 resetTimeMs = 14.25f;  // strange number just to make it easy to find later; I think the original Prime needs to be added
             }
