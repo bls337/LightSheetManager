@@ -68,7 +68,7 @@ public class DeviceBase {
         try {
             result = Integer.parseInt(core_.getProperty(deviceName_, propertyName));
         } catch (Exception e) {
-            studio_.logs().logError("Could not get the \"" + propertyName + "\" property as a float.");
+            studio_.logs().logError("Could not get the \"" + propertyName + "\" property as an integer.");
         }
         return result;
     }
