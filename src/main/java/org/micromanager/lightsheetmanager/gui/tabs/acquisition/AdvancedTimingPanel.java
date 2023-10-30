@@ -53,7 +53,7 @@ public class AdvancedTimingPanel extends Panel {
         spnDelayBeforeScan_ = Spinner.createDoubleSpinner(
                 timingSettings.delayBeforeScan(), 0.0, 10000.0, 0.25);
         spnDelayBeforeLaser_ = Spinner.createDoubleSpinner(
-                timingSettings.delayBeforeLaser(), 1.0, 10000.0, 0.25);
+                timingSettings.delayBeforeLaser(), 0.0, 10000.0, 0.25);
         spnDelayBeforeCamera_ = Spinner.createDoubleSpinner(
                 timingSettings.delayBeforeCamera(), 0.0, 10000.0, 0.25);
         spnLaserTriggerDuration_ = Spinner.createDoubleSpinner(
@@ -61,7 +61,7 @@ public class AdvancedTimingPanel extends Panel {
         spnCameraTriggerDuration_ = Spinner.createDoubleSpinner(
                 timingSettings.cameraTriggerDuration(), 0.0, 1000.0, 0.25);
         spnScanDuration_ = Spinner.createDoubleSpinner(
-                timingSettings.scanDuration(), 0.1, 10000.0, 0.25);
+                timingSettings.scanDuration(), 0.0, 10000.0, 0.25);
         spnScansPerSlice_ = Spinner.createIntegerSpinner(
                 timingSettings.scansPerSlice(), 1, 1000, 1);
         spnCameraExposure_ = Spinner.createDoubleSpinner(
