@@ -185,7 +185,6 @@ public class DeviceManager {
             case ANDORSDK3:
                 AndorCamera andorCamera = new AndorCamera(studio_, deviceName);
                 addDevice(propertyName, deviceName, andorCamera);
-                System.out.println("Added Andor Camera: " + deviceName);
                 break;
             case HAMAMATSU:
                 HamamatsuCamera hamaCamera = new HamamatsuCamera(studio_, deviceName);

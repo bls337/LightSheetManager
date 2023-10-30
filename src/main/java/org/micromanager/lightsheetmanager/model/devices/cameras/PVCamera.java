@@ -125,7 +125,7 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
                 final float readoutTime = getPropertyFloat(Properties.READOUT_TIME);
                 final float endGlobalToTrig = getPropertyFloat(Properties.PRE_TRIGGER_TIME) + 2 * readoutTime;
                 // this factor of 2 is empirical 08-Jan-2021; I'm not sure why it's needed but that is the missing piece it seems
-                readoutTimeMs = (float) endGlobalToTrig / 1e6f;
+                readoutTimeMs = endGlobalToTrig / 1e6f;
                 break;
             default:
                 break;
