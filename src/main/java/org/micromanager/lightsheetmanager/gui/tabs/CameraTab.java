@@ -83,6 +83,8 @@ public class CameraTab extends Panel {
             //System.out.println("getCameraMode: " + model_.acquisitions().getAcquisitionSettings().getCameraMode());
         });
 
+        //model_.studio().core().setROI();
+
     }
 
 }

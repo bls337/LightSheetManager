@@ -16,7 +16,7 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
     public static class Models {
         public static final String PRIME = "CIS2020F";
         public static final String PRIME_95B = "GS144BSI";
-        public static final String KINETIX = "TMP-Kinetix";
+        public static final String KINETIX = "GS2020";
     }
 
     public static class Properties {
