@@ -311,7 +311,7 @@ public class PLogicSCAPE {
         plcLaser_.setPreset(3);
 
         studio_.logs().logMessage("Finished preparing controller for acquisition with offset " + channelOffset +
-                " with mode " + settings.acquisitionMode() + " and settings:\n" + settings);
+                " with mode " + settings.acquisitionMode() + " and settings:\n" + settings.toPrettyJson());
         return true;
     }
 
