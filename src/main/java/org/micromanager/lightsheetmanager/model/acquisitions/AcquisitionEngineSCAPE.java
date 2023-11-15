@@ -337,7 +337,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                         // NOTE: not sure why this is being triggered twice with only 1 camera; so we need guard
                         // TODO: enable 2 sided acquisition
                         if (scanner.getSPIMState().equals(ASIScanner.SPIMState.IDLE)) {
-                            controllerInstance.triggerControllerStartAcquisition(asb_.acquisitionMode(), side);
+                            controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(), side);
                         }
                     }
                     return event;
