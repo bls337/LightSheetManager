@@ -48,13 +48,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     boolean run() {
-//        System.out.println("nTimePoints: " + acqSettings_.numTimePoints());
-//        System.out.println(asb_);
-//        System.out.println(asb_.build());
+
         final boolean isPolling = frame_.getNavigationPanel().isPolling();
         if (isPolling) {
             studio_.logs().logMessage("stopped position polling");
-            //System.out.println("stopped!");
             frame_.getNavigationPanel().stopPolling();
         }
 
@@ -63,6 +60,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
         asb_.sheetCalibrationBuilder(1).autoSheetWidthPerPixel(0.0);
+
+        // set acquisition settings from the builder
+        setAcquisitionSettings(asb_.build());
 
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
@@ -737,7 +737,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     public void recalculateSliceTiming(DefaultAcquisitionSettingsDISPIM.Builder asb) {
         // don't change timing settings if user is using advanced timing
-        if (asb.isUsingAdvancedTiming()) {
+        if (acqSettings_.isUsingAdvancedTiming()) {
             // TODO: find a better place to set the camera trigger mode for SCAPE
             if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
                 CameraBase camera = model_.devices().getDevice("ImagingCamera");
