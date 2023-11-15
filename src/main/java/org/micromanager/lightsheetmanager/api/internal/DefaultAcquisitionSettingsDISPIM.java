@@ -304,10 +304,6 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             return cameraMode_;
         }
 
-        public boolean isUsingAdvancedTiming() {
-            return useAdvancedTiming_;
-        }
-
         public int numChannels() {
             return numChannels_;
         }

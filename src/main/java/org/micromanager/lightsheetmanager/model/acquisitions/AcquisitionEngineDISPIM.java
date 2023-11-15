@@ -59,6 +59,15 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
     @Override
     boolean run() {
 
+        final boolean isPolling = frame_.getNavigationPanel().isPolling();
+        if (isPolling) {
+            studio_.logs().logMessage("stopped position polling");
+            frame_.getNavigationPanel().stopPolling();
+        }
+
+        // set acquisition settings from the builder
+        setAcquisitionSettings(asb_.build());
+
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
             studio_.live().setLiveModeOn(false);
@@ -673,7 +682,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
     public void recalculateSliceTiming(DefaultAcquisitionSettingsDISPIM.Builder asb) {
         // don't change timing settings if user is using advanced timing
-        if (asb.isUsingAdvancedTiming()) {
+        if (acqSettings_.isUsingAdvancedTiming()) {
             // TODO: find a better place to set the camera trigger mode for SCAPE
             if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
                 CameraBase camera = model_.devices().getDevice("ImagingCamera");
