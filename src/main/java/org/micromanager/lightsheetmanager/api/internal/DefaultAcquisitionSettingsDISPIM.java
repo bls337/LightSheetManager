@@ -300,10 +300,6 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
 
         // getters for builder
 
-        public AcquisitionMode acquisitionMode() {
-            return acquisitionMode_;
-        }
-
         public CameraMode cameraMode() {
             return cameraMode_;
         }

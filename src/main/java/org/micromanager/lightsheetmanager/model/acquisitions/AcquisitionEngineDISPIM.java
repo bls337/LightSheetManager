@@ -364,7 +364,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                     int side = 0;
                     // TODO: enable 2 sided acquisition
                     controllerInstance.triggerControllerStartAcquisition(
-                            asb_.acquisitionMode(), side);
+                            acqSettings_.acquisitionMode(), side);
                 }
                 return event;
             }
