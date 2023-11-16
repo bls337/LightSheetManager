@@ -643,8 +643,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         CameraBase camera = model_.devices().getDevice("ImagingCamera");
         CameraMode camMode = camera.getTriggerMode();
         final float cameraReadoutTime = camera.getReadoutTime(camMode);
-        //final double exposureTime = acqSettings_.timingSettings().cameraExposure();
-        final double exposureTime = asb_.timingSettingsBuilder().cameraExposure();
+        final double exposureTime = acqSettings_.timingSettings().cameraExposure();
 
         // test acq was here
 
@@ -703,7 +702,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 //        }
 
-        double sliceDuration = asb_.timingSettingsBuilder().sliceDuration();
+        final double sliceDuration = acqSettings_.timingSettings().sliceDuration();
         if (exposureTime + cameraReadoutTime > sliceDuration) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations

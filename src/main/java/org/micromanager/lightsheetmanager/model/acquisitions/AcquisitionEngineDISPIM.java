@@ -603,8 +603,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         CameraBase camera = model_.devices().getDevice("Imaging1Camera");
         CameraMode camMode = camera.getTriggerMode();
         final float cameraReadoutTime = camera.getReadoutTime(camMode);
-        //final double exposureTime = acqSettings_.timingSettings().cameraExposure();
-        final double exposureTime = asb_.timingSettingsBuilder().cameraExposure();
+        final double exposureTime = acqSettings_.timingSettings().cameraExposure();
 
         // test acq was here
 
@@ -634,10 +633,8 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
             }
         }
 
-        // TODO: make sure position updater is turned off!
 
-        //double sliceDuration = acqSettings_.timingSettings().sliceDuration();
-        double sliceDuration = asb_.timingSettingsBuilder().sliceDuration();
+        final double sliceDuration = acqSettings_.timingSettings().sliceDuration();
         if (exposureTime + cameraReadoutTime > sliceDuration) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
