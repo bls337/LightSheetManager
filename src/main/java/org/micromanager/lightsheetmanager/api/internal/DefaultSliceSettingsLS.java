@@ -46,22 +46,6 @@ public class DefaultSliceSettingsLS implements SliceSettingsLS {
             return this;
         }
 
-        public double shutterWidth() {
-            return shutterWidth_;
-        }
-
-        public double shutterSpeedFactor() {
-            return shutterSpeedFactor_;
-        }
-
-        public double scanSettleTime() {
-            return scanSettleTime_;
-        }
-
-        public double scanResetTime() {
-            return scanResetTime_;
-        }
-
         @Override
         public DefaultSliceSettingsLS build() {
             return new DefaultSliceSettingsLS(this);

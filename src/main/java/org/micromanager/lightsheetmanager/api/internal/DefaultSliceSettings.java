@@ -37,10 +37,6 @@ public class DefaultSliceSettings implements SliceSettings {
             return this;
         }
 
-        public double sampleExposure() {
-            return sampleExposure_;
-        }
-
         @Override
         public DefaultSliceSettings build() {
             return new DefaultSliceSettings(this);
