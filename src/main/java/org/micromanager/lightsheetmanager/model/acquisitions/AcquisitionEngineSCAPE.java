@@ -589,7 +589,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final double sliceDuration1 = getSliceDuration(asb_.timingSettingsBuilder());
         asb_.timingSettingsBuilder().sliceDuration(sliceDuration1);
 
-        recalculateSliceTiming(asb_);
+        recalculateSliceTiming();
         System.out.println("after recalculateSliceTiming: " + asb_.timingSettingsBuilder());
 
 
@@ -599,14 +599,14 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //        }
 
         // setup channels
-        int nrChannelsSoftware = asb_.numChannels();  // how many times we trigger the controller per stack
+        int nrChannelsSoftware = acqSettings_.numChannels();  // how many times we trigger the controller per stack
         int nrSlicesSoftware = asb_.volumeSettingsBuilder().slicesPerVolume();
         //acqSettings_.volumeSettings().slicesPerView();
         // TODO: channels need to modify panels and need extraChannelOffset_
         boolean changeChannelPerVolumeSoftware = false;
         boolean changeChannelPerVolumeDoneFirst = false;
         if (acqSettings_.isUsingChannels()) {
-            if (asb_.numChannels() == 0) {
+            if (acqSettings_.numChannels() == 0) {
                 studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
                 return false; // early exit
             }
@@ -630,7 +630,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                         return false; // early exit
                     }
                     nrChannelsSoftware = 1;
-                    nrSlicesSoftware = asb_.volumeSettingsBuilder().slicesPerVolume() * asb_.numChannels();
+                    nrSlicesSoftware = asb_.volumeSettingsBuilder().slicesPerVolume() * acqSettings_.numChannels();
                     break;
                 default:
                     studio_.logs().showError(
@@ -735,13 +735,13 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         //daq.setProperty("PropertyName", "1");
     }
 
-    public void recalculateSliceTiming(DefaultAcquisitionSettingsDISPIM.Builder asb) {
+    public void recalculateSliceTiming() {
         // don't change timing settings if user is using advanced timing
         if (acqSettings_.isUsingAdvancedTiming()) {
             // TODO: find a better place to set the camera trigger mode for SCAPE
             if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
                 CameraBase camera = model_.devices().getDevice("ImagingCamera");
-                camera.setTriggerMode(asb.cameraMode());
+                camera.setTriggerMode(acqSettings_.cameraMode());
                 studio_.logs().logDebugMessage(
                         "camera \"" + camera.getDeviceName() + "\" set to mode: " + camera.getTriggerMode());
                 //System.out.println(camera.getDeviceName());
@@ -750,13 +750,13 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             return;
         }
         // TODO: update builder here
-        DefaultTimingSettings.Builder tsb = getTimingFromPeriodAndLightExposure(asb);
+        DefaultTimingSettings.Builder tsb = getTimingFromPeriodAndLightExposure();
         asb_.timingSettingsBuilder(tsb);
         //acqSettings.timingSettings(getTimingFromPeriodAndLightExposure(acqSettings));
         // TODO: update gui (but not in the model)
     }
 
-    public DefaultTimingSettings.Builder getTimingFromPeriodAndLightExposure(DefaultAcquisitionSettingsDISPIM.Builder asb) {
+    public DefaultTimingSettings.Builder getTimingFromPeriodAndLightExposure() {
         // uses algorithm Jon worked out in Octave code; each slice period goes like this:
         // 1. camera readout time (none if in overlap mode, 0.25ms in pseudo-overlap)
         // 2. any extra delay time
@@ -773,7 +773,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             return new DefaultTimingSettings.Builder();
         }
         // TODO: do this in ui?
-        camera.setTriggerMode(asb.cameraMode());
+        camera.setTriggerMode(acqSettings_.cameraMode());
 
         System.out.println(camera.getDeviceName());
         CameraMode camMode = camera.getTriggerMode();
@@ -792,7 +792,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // we will wait cameraReadoutMax before triggering camera, then wait another cameraResetMax for global exposure
         // this will also be in 0.25ms increment
         final float globalExposureDelayMax = cameraReadoutMax + cameraResetMax;
-        float laserDuration = NumberUtils.roundToQuarterMs((float)asb.sliceSettingsBuilder().sampleExposure());
+        float laserDuration = NumberUtils.roundToQuarterMs((float)asb_.sliceSettingsBuilder().sampleExposure());
         float scanDuration = laserDuration + 2*scanLaserBufferTime;
         // scan will be longer than laser by 0.25ms at both start and end
 
@@ -834,7 +834,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         float cameraExposure = NumberUtils.ceilToQuarterMs(cameraResetTime) + laserDuration;
 
-        switch (asb.cameraMode()) {
+        switch (acqSettings_.cameraMode()) {
             case EDGE:
                 cameraDuration = 1;  // doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
                 cameraExposure += 0.1f; // add 0.1ms as safety margin, may require adding an additional 0.25ms to slice
@@ -876,8 +876,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 // 5. laser turns on 0.25ms before camera trigger and stays on until exposure is ending
                 // TODO revisit this after further experimentation
                 cameraDuration = 1;  // only need to trigger camera
-                final float shutterWidth = (float) asb.sliceSettingsLSBuilder().shutterWidth();
-                final float shutterSpeed = (float) asb.sliceSettingsLSBuilder().shutterSpeedFactor();
+                final float shutterWidth = (float) asb_.sliceSettingsLSBuilder().shutterWidth();
+                final float shutterSpeed = (float) asb_.sliceSettingsLSBuilder().shutterSpeedFactor();
                 ///final float shutterWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_WIDTH);
                 //final int shutterSpeed = props_.getPropValueInteger(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_SPEED);
                 float pixelSize = (float) core_.getPixelSizeUm();
@@ -888,8 +888,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 cameraExposure = (float)(rowReadoutTime * (int)(shutterWidth/pixelSize) * shutterSpeed);
                 // s.cameraExposure = (float) (rowReadoutTime * shutterWidth / pixelSize * shutterSpeed);
                 final float totalExposureMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime + cameraExposure + 0.05f);  // 50-300us extra cushion time
-                final float scanSettle = (float) asb.sliceSettingsLSBuilder().scanSettleTime();
-                final float scanReset = (float) asb.sliceSettingsLSBuilder().scanResetTime();
+                final float scanSettle = (float) asb_.sliceSettingsLSBuilder().scanSettleTime();
+                final float scanReset = (float) asb_.sliceSettingsLSBuilder().scanResetTime();
                 delayBeforeScan = scanReset - scanDelayFilter;
                 scanDuration = scanSettle + (totalExposureMax*shutterSpeed) + scanLaserBufferTime;
                 delayBeforeCamera = scanReset + scanSettle;
