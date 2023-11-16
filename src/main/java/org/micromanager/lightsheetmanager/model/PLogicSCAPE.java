@@ -58,6 +58,8 @@ public class PLogicSCAPE {
     private static final int laserTriggerAddress = 10;  // this should be set to (42 || 8) = (TTL1 || manual laser on)
 
     private final DefaultAcquisitionSettingsDISPIM.Builder asb_;
+    private final DefaultAcquisitionSettingsDISPIM acqSettings_;
+
     private final LightSheetManagerModel model_;
 
     public PLogicSCAPE(final LightSheetManagerModel model) {
@@ -67,6 +69,7 @@ public class PLogicSCAPE {
         core_ = studio_.core();
 
         asb_ = model_.acquisitions().settingsBuilder();
+        acqSettings_ = model_.acquisitions().settings();
 
         // init variables
         scanDistance_ = 0;
@@ -628,8 +631,8 @@ public class PLogicSCAPE {
             scanner_.setSPIMInterleaveSides(isInterleaved);
 
             // send sheet width/offset
-            double sheetWidth = getSheetWidth(asb_.cameraMode(), view);
-            double sheetOffset = getSheetOffset(asb_.cameraMode(), view);
+            double sheetWidth = getSheetWidth(acqSettings_.cameraMode(), view);
+            double sheetOffset = getSheetOffset(acqSettings_.cameraMode(), view);
             if (cameraMode == CameraMode.VIRTUAL_SLIT) {
                 // adjust sheet width and offset to account for settle time where scan is going but we aren't imaging yet
                 // FIXME: !!!

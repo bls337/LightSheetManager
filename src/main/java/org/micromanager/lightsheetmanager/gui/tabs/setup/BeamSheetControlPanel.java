@@ -149,8 +149,7 @@ public class BeamSheetControlPanel extends Panel {
         }
 
         // add panel based on camera trigger mode
-        final CameraMode cameraMode =
-                model_.acquisitions().settingsBuilder().cameraMode();
+        final CameraMode cameraMode = model_.acquisitions().settings().cameraMode();
         if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             add(pnlFirst_, "");
         } else {

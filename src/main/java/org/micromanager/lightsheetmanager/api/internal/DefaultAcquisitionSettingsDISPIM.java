@@ -300,14 +300,6 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
 
         // getters for builder
 
-        public CameraMode cameraMode() {
-            return cameraMode_;
-        }
-
-        public int numChannels() {
-            return numChannels_;
-        }
-
         public void timingSettingsBuilder(DefaultTimingSettings.Builder tsb) {
             tsb_ = tsb;
         }
