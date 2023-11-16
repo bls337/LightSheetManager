@@ -442,7 +442,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
             }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
-            if (asb_.vsb().numViews() > 1) {
+            if (acqSettings_.volumeSettings().numViews() > 1) {
                 cameraNames = new String[]{
                         model_.devices().getDevice("Imaging1Camera").getDeviceName(),
                         model_.devices().getDevice("Imaging2Camera").getDeviceName()
@@ -560,7 +560,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         // setup channels
         int nrChannelsSoftware = acqSettings_.numChannels();  // how many times we trigger the controller per stack
-        int nrSlicesSoftware = asb_.volumeSettingsBuilder().slicesPerVolume();
+        int nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView();
         //acqSettings_.volumeSettings().slicesPerView();
         // TODO: channels need to modify panels and need extraChannelOffset_
         boolean changeChannelPerVolumeSoftware = false;
@@ -590,7 +590,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                         return false; // early exit
                     }
                     nrChannelsSoftware = 1;
-                    nrSlicesSoftware = asb_.volumeSettingsBuilder().slicesPerVolume() * acqSettings_.numChannels();
+                    nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView() * acqSettings_.numChannels();
                     break;
                 default:
                     studio_.logs().showError(
@@ -689,15 +689,11 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 camera.setTriggerMode(acqSettings_.cameraMode());
                 studio_.logs().logDebugMessage(
                         "camera \"" + camera.getDeviceName() + "\" set to mode: " + camera.getTriggerMode());
-                //System.out.println(camera.getDeviceName());
-                //System.out.println(camMode);
             }
             return;
         }
-        // TODO: update builder here
         DefaultTimingSettings.Builder tsb = getTimingFromPeriodAndLightExposure();
         asb_.timingSettingsBuilder(tsb);
-        //acqSettings.timingSettings(getTimingFromPeriodAndLightExposure(acqSettings));
         // TODO: update gui (but not in the model)
     }
 
@@ -737,7 +733,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // we will wait cameraReadoutMax before triggering camera, then wait another cameraResetMax for global exposure
         // this will also be in 0.25ms increment
         final float globalExposureDelayMax = cameraReadoutMax + cameraResetMax;
-        float laserDuration = NumberUtils.roundToQuarterMs((float)asb_.sliceSettingsBuilder().sampleExposure());
+        float laserDuration = NumberUtils.roundToQuarterMs((float)acqSettings_.sliceSettings().sampleExposure());
         float scanDuration = laserDuration + 2*scanLaserBufferTime;
         // scan will be longer than laser by 0.25ms at both start and end
 
@@ -818,8 +814,8 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 // 5. laser turns on 0.25ms before camera trigger and stays on until exposure is ending
                 // TODO revisit this after further experimentation
                 cameraDuration = 1;  // only need to trigger camera
-                final float shutterWidth = (float) asb_.sliceSettingsLSBuilder().shutterWidth();
-                final float shutterSpeed = (float) asb_.sliceSettingsLSBuilder().shutterSpeedFactor();
+                final float shutterWidth = (float) acqSettings_.sliceSettingsLS().shutterWidth();
+                final float shutterSpeed = (float) acqSettings_.sliceSettingsLS().shutterSpeedFactor();
                 ///final float shutterWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_WIDTH);
                 //final int shutterSpeed = props_.getPropValueInteger(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_SPEED);
                 float pixelSize = (float) core_.getPixelSizeUm();
@@ -830,8 +826,8 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 cameraExposure = (float)(rowReadoutTime * (int)(shutterWidth/pixelSize) * shutterSpeed);
                 // s.cameraExposure = (float) (rowReadoutTime * shutterWidth / pixelSize * shutterSpeed);
                 final float totalExposureMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime + cameraExposure + 0.05f);  // 50-300us extra cushion time
-                final float scanSettle = (float) asb_.sliceSettingsLSBuilder().scanSettleTime();
-                final float scanReset = (float) asb_.sliceSettingsLSBuilder().scanResetTime();
+                final float scanSettle = (float) acqSettings_.sliceSettingsLS().scanSettleTime();
+                final float scanReset = (float) acqSettings_.sliceSettingsLS().scanResetTime();
                 delayBeforeScan = scanReset - scanDelayFilter;
                 scanDuration = scanSettle + (totalExposureMax*shutterSpeed) + scanLaserBufferTime;
                 delayBeforeCamera = scanReset + scanSettle;

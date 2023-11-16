@@ -298,8 +298,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             return ssb_;
         }
 
-        // getters for builder
-
         public void timingSettingsBuilder(DefaultTimingSettings.Builder tsb) {
             tsb_ = tsb;
         }

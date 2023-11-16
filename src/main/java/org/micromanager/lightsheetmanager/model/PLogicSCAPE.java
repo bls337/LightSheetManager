@@ -57,7 +57,6 @@ public class PLogicSCAPE {
     private static final int triggerSPIMAddr = 46;  // backplane signal, same as XY card's TTL output
     private static final int laserTriggerAddress = 10;  // this should be set to (42 || 8) = (TTL1 || manual laser on)
 
-    private final DefaultAcquisitionSettingsDISPIM.Builder asb_;
     private final DefaultAcquisitionSettingsDISPIM acqSettings_;
 
     private final LightSheetManagerModel model_;
@@ -68,7 +67,6 @@ public class PLogicSCAPE {
         devices_ = model_.devices();
         core_ = studio_.core();
 
-        asb_ = model_.acquisitions().settingsBuilder();
         acqSettings_ = model_.acquisitions().settings();
 
         // init variables
