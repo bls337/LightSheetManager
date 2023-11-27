@@ -35,7 +35,7 @@ public class SingleAxisPanel extends Panel {
 
     private void createUserInterface() {
 
-        isUsingPLogic_ = model_.devices().getDeviceAdapter().isUsingPLogic();
+        isUsingPLogic_ = model_.devices().isUsingPLogic();
 
         final JLabel lblPattern = new JLabel("Pattern:");
         final JLabel lblAmplitude = new JLabel("Amplitude:");

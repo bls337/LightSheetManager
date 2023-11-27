@@ -34,7 +34,7 @@ public class ExcitationPanel extends Panel {
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
 
-        isUsingPLogic_ = model_.devices().getDeviceAdapter().isUsingPLogic();
+        isUsingPLogic_ = model_.devices().isUsingPLogic();
 
         final JLabel lblExcitation = new JLabel("Excitation side:");
         final JLabel lblEpi = new JLabel("Epi side:");

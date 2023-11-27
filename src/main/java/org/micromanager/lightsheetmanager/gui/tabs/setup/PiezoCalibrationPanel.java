@@ -48,7 +48,7 @@ public class PiezoCalibrationPanel extends Panel {
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
 
-        isUsingPLogic_ = model_.devices().getDeviceAdapter().isUsingPLogic();
+        isUsingPLogic_ = model_.devices().isUsingPLogic();
 
         final JLabel lblSlope = new JLabel("Slope:");
         final JLabel lblOffset = new JLabel("Offset:");

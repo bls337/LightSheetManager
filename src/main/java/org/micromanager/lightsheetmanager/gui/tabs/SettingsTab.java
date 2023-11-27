@@ -44,7 +44,7 @@ public class SettingsTab extends Panel {
         final DefaultAcquisitionSettingsDISPIM acqSettings =
                 model_.acquisitions().settings();
 
-        isUsingPLogic_ = model_.devices().getDeviceAdapter().isUsingPLogic();
+        isUsingPLogic_ = model_.devices().isUsingPLogic();
 
         final Panel pnlScanSettings = new Panel("Stage Scan Settings");
         pnlScanSettings.setMigLayout(

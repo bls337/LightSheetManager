@@ -30,13 +30,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
-//TODO: merge this with LightSheetDeviceManager
-
 /**
  * A utility for extracting information from LightSheetDeviceManager.
- * <p>
- * The pre-init properties are cached as enums and integers.
  *
+ * <p>This class maps device strings to device objects.
  */
 public class DeviceManager {
 
@@ -80,9 +77,7 @@ public class DeviceManager {
         lsm.getPreInitProperties();
         deviceMap_.put("LightSheetDeviceManager", lsm);
 
-        //(); // TODO: maybe find a better place for this object?
-
-        // keep track of device we have already added to the map
+        // keep track of devices we have already added to the map
         // used when multiple properties are mapped to the same device
         //HashMap<String, DeviceBase> devicesAdded = new HashMap<>();
 
@@ -320,6 +315,25 @@ public class DeviceManager {
                     "hardware configuration to use this plugin.");
         }
         return count == 1;
+    }
+
+    // check for ASI hardware triggering device
+    public boolean isUsingPLogic() {
+        // make sure that we have devices set
+        if (deviceMap_.get("TriggerLaser") == null && deviceMap_.get("TriggerCamera") == null) {
+            return false;
+        }
+        // check if both device names contain "PLogic"
+        boolean result = false;
+        final boolean isLaserPLogic = deviceMap_.get("TriggerLaser").getDeviceName().contains("PLogic");
+        final boolean isCameraPLogic = deviceMap_.get("TriggerCamera").getDeviceName().contains("PLogic");
+        if (isLaserPLogic && !isCameraPLogic || !isLaserPLogic && isCameraPLogic) {
+            studio_.logs().showError("PLogic must be set as both the camera and laser trigger.");
+        }
+        if (isLaserPLogic && isCameraPLogic) {
+            result = true;
+        }
+        return result;
     }
 
     /**
