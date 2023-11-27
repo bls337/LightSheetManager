@@ -13,10 +13,13 @@ import java.util.stream.Collectors;
 
 /**
  * This class is for interacting with the LightSheetDeviceManager device adapter.
+ *
+ * <p>This class is contained in the DeviceManager object as "LightSheetDeviceManager".
  */
 public class LightSheetDeviceManager extends DeviceBase {
 
 
+    // used to indicate that the device is not set to any hardware
     public static final String UNDEFINED = "Undefined";
 
     // TODO: put this here?
@@ -79,22 +82,6 @@ public class LightSheetDeviceManager extends DeviceBase {
 
     private boolean isPropertyUndefined(final String propertyName) {
         return getProperty(propertyName).equals(UNDEFINED);
-    }
-
-    // check for ASI diSPIM hardware triggering device
-    public boolean isUsingPLogic() {
-        boolean result = false;
-        if (getMicroscopeGeometry().equals(GeometryType.DISPIM)) {
-            final boolean isLaserPLogic = getProperty("TriggerLaser").contains("PLogic");
-            final boolean isCameraPLogic = getProperty("TriggerCamera").contains("PLogic");
-            if (isLaserPLogic && !isCameraPLogic || !isLaserPLogic && isCameraPLogic) {
-                studio_.logs().showError("PLogic must be set as both the camera and laser trigger.");
-            }
-            if (isLaserPLogic && isCameraPLogic) {
-                result = true;
-            }
-        }
-        return result;
     }
 
     public Map<String, String> getDeviceMap() {

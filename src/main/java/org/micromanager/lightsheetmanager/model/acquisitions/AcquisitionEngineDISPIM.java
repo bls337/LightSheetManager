@@ -77,10 +77,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
             }
         }
 
-        // TODO: check for both TriggerCamera and TriggerLaser
-        final String deviceName = model_.devices().getDevice("TriggerCamera").getDeviceName();
-        final String deviceLibrary = model_.devices().getDeviceLibrary(deviceName);
-        boolean isUsingPLC = deviceLibrary.equals("ASITiger");
+        final boolean isUsingPLC = model_.devices().isUsingPLogic();
 
         PLogicDISPIM controller = null;
 
