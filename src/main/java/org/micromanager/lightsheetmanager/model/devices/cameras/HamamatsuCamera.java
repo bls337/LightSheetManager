@@ -12,7 +12,6 @@ import java.awt.Rectangle;
  * <p>Camera Support: ORCA-Flash4, ORCA-Fusion, ORCA-Fusion BT
  */
 public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
-
     public static class Models {
         public static final String FUSION_BT = "C15440";
         public static final String FUSION = "C14440";

@@ -400,9 +400,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     throw new RuntimeException(e);
                 }
             }
-            if (cameraDeviceNames.size() < 2) {
-                throw new RuntimeException("Need two cameras for diSPIM simulation");
-            }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
             if (acqSettings_.volumeSettings().numViews() > 1) {
