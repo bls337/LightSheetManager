@@ -15,6 +15,7 @@ import org.micromanager.data.Datastore;
 import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.internal.MMStudio;
+import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
@@ -24,7 +25,12 @@ import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.model.PLogicSCAPE;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
+import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
+import org.micromanager.lightsheetmanager.model.devices.cameras.DemoCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.HamamatsuCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.PCOCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.PVCamera;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
@@ -85,7 +91,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             studio_.logs().logError(e);
         }
 //        boolean demoMode = acqSettings_.demoMode();
-
+        
         if (!demoMode) {
 
             if (isUsingPLC) {
@@ -633,9 +639,42 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
         // TODO: code that doubles nrSlicesSoftware if (twoSided && acqBothCameras) missing
 
-        CameraBase camera = model_.devices().getDevice("ImagingCamera");
-        CameraMode camMode = camera.getTriggerMode();
-        final float cameraReadoutTime = camera.getReadoutTime(camMode);
+        // TODO: maybe wrap this up into a method for clarity
+        float cameraReadoutTime;
+        final CameraLibrary cameraLibrary = CameraLibrary.fromString(
+                model_.devices().getDeviceLibrary("ImagingCamera")
+        );
+        switch (cameraLibrary) {
+            case HAMAMATSU: {
+                HamamatsuCamera camera = model_.devices().getDevice("ImagingCamera");
+                cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
+                break;
+            }
+            case PVCAM: {
+                PVCamera camera = model_.devices().getDevice("ImagingCamera");
+                cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
+                break;
+            }
+            case PCOCAMERA: {
+                PCOCamera camera = model_.devices().getDevice("ImagingCamera");
+                cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
+                break;
+            }
+            case ANDORSDK3: {
+                AndorCamera camera = model_.devices().getDevice("ImagingCamera");
+                cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
+                break;
+            }
+            case DEMOCAMERA: {
+                DemoCamera camera = model_.devices().getDevice("ImagingCamera");
+                cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
+                break;
+            }
+            default:
+                CameraBase camera = model_.devices().getDevice("ImagingCamera");
+                cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
+                break;
+        }
         final double exposureTime = acqSettings_.timingSettings().cameraExposure();
 
         // test acq was here
