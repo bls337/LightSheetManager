@@ -60,6 +60,6 @@ public class DemoCamera extends CameraBase implements LightSheetCamera {
 
     @Override
     public float getReadoutTime(CameraMode cameraMode) {
-        return getPropertyInt(Properties.READOUT_TIME);
+        return getPropertyFloat(Properties.READOUT_TIME);
     }
 }

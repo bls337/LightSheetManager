@@ -14,6 +14,7 @@ import org.micromanager.data.Pipeline;
 import org.micromanager.data.SummaryMetadata;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.PropertyKey;
+import org.micromanager.lightsheetmanager.LightSheetManagerPlugin;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
@@ -114,12 +115,13 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                         studio_.logs().showError(e);
                     }
                 } else {
-                    // TODO: put this here? generic setup tasks?
+                    studio_.logs().logMessage("Preparing Acquisition: plugin version " + LightSheetManagerPlugin.version);
+                    // TODO: put this here? generic setup tasks? put in own method?
                     if (acqSettings_.acquisitionMode() == AcquisitionMode.NONE) {
                         studio_.logs().showError("please select a valid acquisition mode!");
                         return; // early exit
                     }
-                    // run abstract methods implemented by geometry types
+                    // run abstract methods implemented by acquisition engine geometry types
                     if (!setup()) {
                         studio_.logs().logError("error during setup!");
                         return; // early exit => stop acquisition

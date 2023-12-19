@@ -54,6 +54,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     boolean run() {
+        // TODO: delete later, this is the settings before everything is set up in doHardwareCalculations (used to debug)
+        studio_.logs().logMessage("debug info:\n" + acqSettings_.toPrettyJson());
 
         final boolean isPolling = frame_.getNavigationPanel().isPolling();
         if (isPolling) {
@@ -91,7 +93,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             studio_.logs().logError(e);
         }
 //        boolean demoMode = acqSettings_.demoMode();
-        
+
         if (!demoMode) {
 
             if (isUsingPLC) {
@@ -132,6 +134,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            System.out.println(jsonStr);
 
         setAcquisitionSettings(asb_.build());
+
+        studio_.logs().logMessage("Starting Acquisition with settings:\n" + acqSettings_.toPrettyJson());
 
         String saveDir = acqSettings_.saveDirectory();
         String saveName = acqSettings_.saveNamePrefix();
@@ -585,8 +589,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     private boolean doHardwareCalculations(PLogicSCAPE plc) {
 
         // make sure slice timings are up-to-date
-        final double sliceDuration1 = getSliceDuration(asb_.timingSettingsBuilder());
-        asb_.timingSettingsBuilder().sliceDuration(sliceDuration1);
+        final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder());
+        asb_.timingSettingsBuilder().sliceDuration(sliceDuration);
+
+        //studio_.logs().logMessage("TimingSettings sliceDuration: " + sliceDuration1);
+        System.out.println("computed sliceDuration: " +  sliceDuration);
 
         recalculateSliceTiming();
         System.out.println("after recalculateSliceTiming: " + asb_.timingSettingsBuilder());
@@ -734,7 +741,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 //        }
 
-        final double sliceDuration = acqSettings_.timingSettings().sliceDuration();
+        // sliceDuration is computed at start of this method and put into the AcquisitionSettingsBuilder
+        // because the asb is not built before this check, use the value computed above
         if (exposureTime + cameraReadoutTime > sliceDuration) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
@@ -742,7 +750,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     " is longer than time needed for a line scan with" +
                     " readout time of " + cameraReadoutTime + "\n" +
                     "This will result in dropped frames. " +
-                    "Please change input");
+                    "Please change input. " +
+                    "Formula: (" + exposureTime + " + " + cameraReadoutTime + ") > " + sliceDuration);
             return false; // early exit
         }
 
