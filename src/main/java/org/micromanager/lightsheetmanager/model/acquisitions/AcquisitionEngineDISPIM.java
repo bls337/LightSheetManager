@@ -171,6 +171,8 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 //        }
         setAcquisitionSettings(asb_.build());
 
+        studio_.logs().logMessage("Starting Acquisition with settings:\n" + acqSettings_.toPrettyJson());
+
         String saveDir = acqSettings_.saveDirectory();
         String saveName = acqSettings_.saveNamePrefix();
 
