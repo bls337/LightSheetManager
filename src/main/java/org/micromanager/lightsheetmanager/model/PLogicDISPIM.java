@@ -833,7 +833,7 @@ public class PLogicDISPIM {
                 // the LUT "MSB" is the laserTrigger, then the counter MSB, then the counter LSB
                 for (int channelNum = 0; channelNum < settings.numChannels(); ++channelNum) {
                     if (doesPLogicChannelIncludeLaser(laserNum, settings.channels()[channelNum], settings.channelGroup())) {
-                        lutValue += Math.pow(2, channelNum + 4);  // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
+                        lutValue += (int) Math.pow(2, channelNum + 4);  // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
                     }
                 }
                 plcLaser_.setCellConfig(lutValue);
@@ -878,7 +878,7 @@ public class PLogicDISPIM {
                 // if we are doing per-volume switching with side B first then counter will start at 1 instead of 0
                 // the following lines account for this by incrementing the channel number "match" by 1 in this special case
                 int adjustedChannelNum = channelNum;
-                if (channelMode == MultiChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 0)) {
+                if (channelMode == MultiChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 1)) {
                     adjustedChannelNum = (channelNum + 1) % settings.numChannels();
                 }
                 // map the channel number to the equivalent addresses for the AND4
@@ -889,9 +889,10 @@ public class PLogicDISPIM {
                 plcLaser_.setCellInput(3, in3);
                 plcLaser_.setCellInput(4, in4);
 
-                // make sure cells 13-16 are controlling BNCs 5-8
-                plcLaser_.setPreset(ASIPLogic.Preset.BNC5_8_ON_13_16);
             }
+
+            // make sure cells 13-16 are controlling BNCs 5-8
+            plcLaser_.setPreset(ASIPLogic.Preset.BNC5_8_ON_13_16);
         }
 
         // restore update setting
