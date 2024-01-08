@@ -14,7 +14,7 @@ public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
     public static final String copyright = "Applied Scientific Instrumentation (ASI), 2022-2024";
     public static final String description = "A plugin to control various types of light sheet microscopes.";
     public static final String menuName = "Light Sheet Manager";
-    public static final String version = "0.3.7";
+    public static final String version = "0.3.8";
 
     private Studio studio_;
     private LightSheetManagerFrame frame_;
