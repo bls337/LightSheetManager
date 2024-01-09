@@ -26,6 +26,11 @@ public class DemoCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
+    public void setTriggerMode(final CameraMode cameraMode) {
+        // do nothing - no camera trigger modes - always internal
+    }
+
+    @Override
     public void setBinning() {
         //setProperty(Properties.BINNING); // TODO: need to modify LightSheetCamera interface to take param
     }

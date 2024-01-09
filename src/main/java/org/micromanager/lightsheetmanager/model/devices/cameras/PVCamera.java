@@ -51,9 +51,9 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
             case VIRTUAL_SLIT:
                 setProperty(Properties.TRIGGER_MODE, Values.EDGE_TRIGGER);
                 break;
-//            case INTERNAL:
-//                setProperty(Properties.TRIGGER_MODE, Values.INTERNAL_TRIGGER);
-//                break;
+            case INTERNAL:
+                setProperty(Properties.TRIGGER_MODE, Values.INTERNAL_TRIGGER);
+                break;
             default:
                 break;
         }

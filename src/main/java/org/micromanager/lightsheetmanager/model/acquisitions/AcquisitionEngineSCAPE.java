@@ -561,6 +561,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // TODO: execute any end-acquisition runnables
 
+        // set the camera trigger mode back to internal for live mode
+        CameraBase camera = model_.devices().getDevice("ImagingCamera");
+        camera.setTriggerMode(CameraMode.INTERNAL);
+
         currentAcquisition_ = null;
 
         if (acqSettings_.isSavingImagesDuringAcquisition()) {
@@ -649,8 +653,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // TODO: maybe wrap this up into a method for clarity
         float cameraReadoutTime;
         final CameraLibrary cameraLibrary = CameraLibrary.fromString(
-                model_.devices().getDeviceLibrary("ImagingCamera")
-        );
+                model_.devices().getDeviceLibrary("ImagingCamera"));
         switch (cameraLibrary) {
             case HAMAMATSU: {
                 HamamatsuCamera camera = model_.devices().getDevice("ImagingCamera");
