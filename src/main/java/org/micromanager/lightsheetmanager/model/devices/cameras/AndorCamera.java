@@ -97,6 +97,13 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
                 //setProperty("LightScanPlus-ExposedPixelHeight", String.valueOf((int)(shutterWidth/pixelSize)));
 
                 break;
+            case INTERNAL:
+                setProperty(Properties.TRIGGER_MODE, Values.INTERNAL);
+                // check to see if we need to disable scan speed control
+                if (getProperty(Properties.SCAN_SPEED_CONTROL_ENABLE).equals(Values.ON)) {
+                    setProperty(Properties.SCAN_SPEED_CONTROL_ENABLE, Values.OFF);
+                }
+                break;
             case EDGE:
                 setProperty(Properties.TRIGGER_MODE, Values.EXTERNAL);
                 setProperty(Properties.OVERLAP, Values.OFF);

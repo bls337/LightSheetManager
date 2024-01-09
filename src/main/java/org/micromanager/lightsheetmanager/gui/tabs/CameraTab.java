@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
+import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
@@ -50,7 +51,17 @@ public class CameraTab extends Panel {
         btnCustomROI_ = new Button("Custom", 120, 30);
         btnGetCurrentROI_ = new Button("Get Current ROI", 120, 30);
 
-        cmbCameraTriggerMode_ = new ComboBox(CameraMode.toArray(),
+        // get the imaging camera library based on number of imaging paths
+        CameraLibrary camLib;
+        if (model_.devices().getDeviceAdapter().getNumImagingPaths() >= 2) {
+            camLib = CameraLibrary.fromString(
+                    model_.devices().getDevice("Imaging1Camera").getDeviceLibrary());
+        } else {
+            camLib = CameraLibrary.fromString(
+                    model_.devices().getDevice("ImagingCamera").getDeviceLibrary());
+        }
+        System.out.println("camLib = " + camLib);
+        cmbCameraTriggerMode_ = new ComboBox(CameraMode.getAvailableModes(camLib),
               model_.acquisitions().settings().cameraMode().toString());
 
         pnlROI.add(btnUnchangedROI_, "span 2, wrap");

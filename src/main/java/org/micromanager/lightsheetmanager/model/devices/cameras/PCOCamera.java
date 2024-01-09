@@ -49,6 +49,9 @@ public class PCOCamera extends CameraBase implements LightSheetCamera {
             case LEVEL:
                 setProperty(Properties.TRIGGER_MODE, Values.LEVEL);
                 break;
+            case INTERNAL:
+                setProperty(Properties.TRIGGER_MODE, Values.INTERNAL);
+                break;
             default:
                 break;
         }
