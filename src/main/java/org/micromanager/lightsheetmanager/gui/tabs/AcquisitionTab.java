@@ -7,6 +7,7 @@ import javax.swing.SwingUtilities;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
@@ -27,7 +28,7 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import javax.swing.JLabel;
 import java.util.Objects;
 
-public class AcquisitionTab extends Panel {
+public class AcquisitionTab extends Panel implements ListeningPanel {
 
     private Studio studio_;
 
@@ -327,6 +328,16 @@ public class AcquisitionTab extends Panel {
         }
         pnlRight_.revalidate();
         pnlRight_.repaint();
+    }
+
+    @Override
+    public void selected() {
+
+    }
+
+    @Override
+    public void unselected() {
+
     }
 
 //    private void updateDurationLabels() {

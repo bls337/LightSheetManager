@@ -7,6 +7,8 @@ import java.awt.Insets;
 
 public class TabbedPane extends JTabbedPane {
 
+    private int lastSelectedIndex_;
+
     public TabbedPane() {
         super(JTabbedPane.TOP);
         setFocusable(false);
@@ -18,6 +20,7 @@ public class TabbedPane extends JTabbedPane {
         setAbsoluteSize(width, height);
         setFocusable(false);
         uiSettings();
+        createEventHandlers();
     }
 
     private void uiSettings() {
@@ -37,4 +40,26 @@ public class TabbedPane extends JTabbedPane {
         setMaximumSize(size);
     }
 
+//    @Override
+//    public void addTab(String title, java.awt.Component component) throws Exception {
+//        if (component instanceof ListeningPanel) {
+//            super.addTab(title, component);
+//        } else {
+//            throw new Exception("asds");
+//        }
+//    }
+
+    /**
+     * The tabbed pane will call the selected and unselected methods when switching tabs.
+     */
+    private void createEventHandlers() {
+        lastSelectedIndex_ = getSelectedIndex();
+        addChangeListener(e -> {
+            if (lastSelectedIndex_ != -1) {
+                ((ListeningPanel)getComponentAt(lastSelectedIndex_)).unselected();
+                ((ListeningPanel)getSelectedComponent()).selected();
+            }
+            lastSelectedIndex_ = getSelectedIndex();
+        });
+    }
 }

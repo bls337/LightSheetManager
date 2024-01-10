@@ -1,12 +1,13 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.tabs.navigation.NavigationPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import java.util.Objects;
 
-public class NavigationTab extends Panel {
+public class NavigationTab extends Panel implements ListeningPanel {
 
     private final NavigationPanel navigationPanel_;
 
@@ -22,4 +23,13 @@ public class NavigationTab extends Panel {
         return navigationPanel_;
     }
 
+    @Override
+    public void selected() {
+
+    }
+
+    @Override
+    public void unselected() {
+
+    }
 }

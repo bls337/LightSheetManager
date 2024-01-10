@@ -1,8 +1,8 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
-import org.micromanager.lightsheetmanager.api.internal.DefaultScanSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
@@ -11,7 +11,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import javax.swing.JLabel;
 import java.util.Objects;
 
-public class SettingsTab extends Panel {
+public class SettingsTab extends Panel implements ListeningPanel {
 
     // scan settings
 
@@ -170,6 +170,16 @@ public class SettingsTab extends Panel {
             model_.acquisitions().settingsBuilder()
                     .liveScanPeriod(spnLiveScanPeriod_.getDouble());
         });
+
+    }
+
+    @Override
+    public void selected() {
+
+    }
+
+    @Override
+    public void unselected() {
 
     }
 }

@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
@@ -12,7 +13,7 @@ import java.util.Objects;
 /**
  * Activate lasers and light sheet.
  */
-public class ExcitationPanel extends Panel {
+public class ExcitationPanel extends Panel implements ListeningPanel {
 
     private CheckBox cbxBeamExc_;
     private CheckBox cbxSheetExc_;
@@ -89,5 +90,25 @@ public class ExcitationPanel extends Panel {
         cbxSheetEpi_.registerListener(e -> {
 
         });
+    }
+
+    // TODO: only handles SCAPE for now
+    @Override
+    public void selected() {
+        final boolean isBeamOn = cbxBeamExc_.isSelected();
+
+        if (isUsingPLogic_) {
+            final ASIScanner scanner =
+                    model_.devices().getDevice("IllumSlice");
+
+            if (scanner != null && isBeamOn && !scanner.isBeamOn()) {
+                scanner.setBeamOn(true);
+            }
+        }
+    }
+
+    @Override
+    public void unselected() {
+
     }
 }

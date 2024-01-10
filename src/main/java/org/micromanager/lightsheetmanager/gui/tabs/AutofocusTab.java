@@ -4,10 +4,10 @@ import org.micromanager.lightsheetmanager.api.data.AutofocusFitType;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAutofocusSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * This tab contains autofocus related settings.
  */
-public class AutofocusTab extends Panel {
+public class AutofocusTab extends Panel implements ListeningPanel {
 
     // general autofocus options
     private CheckBox cbxShowImages_;
@@ -252,4 +252,13 @@ public class AutofocusTab extends Panel {
                 setSetupOptionsState(cbxAutoUpdateFocusFound_.isSelected()));
     }
 
+    @Override
+    public void selected() {
+
+    }
+
+    @Override
+    public void unselected() {
+
+    }
 }
