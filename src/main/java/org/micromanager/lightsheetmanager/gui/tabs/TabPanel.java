@@ -64,9 +64,9 @@ public class TabPanel extends Panel {
         // add tabs to the pane
         tabbedPane_.addTab(createTabTitle("Navigation"), navigationTab_);
 
+        // create a setup path tab for each imaging path
         final int numImagingPaths = devices_.getDeviceAdapter().getNumImagingPaths();
         for (int i = 0; i < numImagingPaths; i++) {
-            // create the frame it opens
             SetupPathTab setupPathTab = new SetupPathTab(model_, i + 1);
             tabbedPane_.add(createTabTitle("Setup Path " + (i + 1)), setupPathTab);
             setupPathTabs_.add(setupPathTab);
@@ -87,9 +87,15 @@ public class TabPanel extends Panel {
         add(tabbedPane_, "growx, growy");
     }
 
-    // use HTML to make the tab labels look nice
+    /**
+     * Return a styled HTML String of tab title.
+     *
+     * @param title the text on the tab
+     * @return an HTML String
+     */
     private String createTabTitle(final String title) {
-        return "<html><body leftmargin=10 topmargin=8 marginwidth=10 marginheight=5><b><font size=4>" + title + "</font></b></body></html>";
+        return "<html><body leftmargin=10 topmargin=8 marginwidth=10 marginheight=5><b><font size=4>"
+                + title + "</font></b></body></html>";
     }
 
     /**

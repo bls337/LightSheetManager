@@ -95,7 +95,6 @@ public enum CameraMode {
 
     public static String[] getAvailableModes(CameraLibrary camLib) {
         ArrayList<CameraMode> modes = new ArrayList<>();
-        System.out.println("here");
         if (isCameraValid(camLib)) {
             modes.add(CameraMode.EDGE);
             if (hasLevelTrigger(camLib)) {

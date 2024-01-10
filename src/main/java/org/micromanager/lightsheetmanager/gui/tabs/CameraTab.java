@@ -5,13 +5,14 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import java.awt.Font;
 import java.util.Objects;
 
-public class CameraTab extends Panel {
+public class CameraTab extends Panel implements ListeningPanel {
 
     private Button btnUnchangedROI_;
     private Button btnFullROI_;
@@ -60,7 +61,7 @@ public class CameraTab extends Panel {
             camLib = CameraLibrary.fromString(
                     model_.devices().getDevice("ImagingCamera").getDeviceLibrary());
         }
-        System.out.println("camLib = " + camLib);
+
         cmbCameraTriggerMode_ = new ComboBox(CameraMode.getAvailableModes(camLib),
               model_.acquisitions().settings().cameraMode().toString());
 
@@ -98,4 +99,13 @@ public class CameraTab extends Panel {
 
     }
 
+    @Override
+    public void selected() {
+
+    }
+
+    @Override
+    public void unselected() {
+
+    }
 }

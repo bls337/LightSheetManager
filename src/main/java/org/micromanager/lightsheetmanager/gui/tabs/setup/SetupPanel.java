@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
@@ -11,7 +12,7 @@ import java.util.Objects;
 /**
  * A setup panel for diSPIM.
  */
-public class SetupPanel extends Panel {
+public class SetupPanel extends Panel implements ListeningPanel {
 
     private PiezoCalibrationPanel piezoPanel_;
     private BeamSheetControlPanel beamSheetPanel_;
@@ -76,4 +77,13 @@ public class SetupPanel extends Panel {
         return positionPanel_;
     }
 
+    @Override
+    public void selected() {
+        excitationPanel_.selected();
+    }
+
+    @Override
+    public void unselected() {
+
+    }
 }

@@ -221,7 +221,7 @@ public class DeviceManager {
 
     /**
      * Returns the device given by {@code deviceName} as type {@code T}.
-     * The client is responsible for assigning the returned
+     * The caller is responsible for assigning the returned
      * value to the correct type.
      * <P><P>
      * Typesafe: The client can only cast the return value to a subclass

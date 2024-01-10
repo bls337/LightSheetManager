@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.components.Label;
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.tabs.setup.SetupPanel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
@@ -9,7 +10,7 @@ import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import java.awt.Font;
 import java.util.Objects;
 
-public class SetupPathTab extends Panel {
+public class SetupPathTab extends Panel implements ListeningPanel {
 
     private int pathNum_;
     private SetupPanel setupPanel_;
@@ -44,4 +45,13 @@ public class SetupPathTab extends Panel {
         return setupPanel_;
     }
 
+    @Override
+    public void selected() {
+        setupPanel_.selected();
+    }
+
+    @Override
+    public void unselected() {
+
+    }
 }

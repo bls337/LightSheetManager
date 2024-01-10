@@ -1,12 +1,13 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextPane;
 
 /**
  *
  */
-public class HelpTab extends Panel {
+public class HelpTab extends Panel implements ListeningPanel {
 
     private TextPane textPane_;
 
@@ -47,4 +48,13 @@ public class HelpTab extends Panel {
 
     }
 
+    @Override
+    public void selected() {
+
+    }
+
+    @Override
+    public void unselected() {
+
+    }
 }

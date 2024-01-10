@@ -18,7 +18,7 @@ import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import javax.swing.JLabel;
 import java.util.Objects;
 
-public class DataTab extends Panel {
+public class DataTab extends Panel implements ListeningPanel {
 
     private TextField txtSaveDirectory_;
     private TextField txtSaveFileName_;
@@ -136,4 +136,13 @@ public class DataTab extends Panel {
         return txtSaveFileName_.getText();
     }
 
+    @Override
+    public void selected() {
+
+    }
+
+    @Override
+    public void unselected() {
+
+    }
 }
