@@ -133,9 +133,10 @@ public class BeamSheetControlPanel extends Panel {
                 txtSheetOffset_ = new TextField(8);
                 final double value = model_.acquisitions().settings()
                         .sheetCalibration(pathNum_).sheetOffset();
-                txtSheetOffset_.setText(Double.toString(value));
+                final String strValue = String.format("%.3f ", value);
+                txtSheetOffset_.setText(strValue);
                 lblSlopeOffset_ = new JLabel("0.0");
-                lblSlopeOffset_.setText(Double.toString(value));
+                lblSlopeOffset_.setText(strValue);
                 pnlSecond_.add(lblSheetOffset, "");
                 pnlSecond_.add(lblSlopeOffset_, "");
                 pnlSecond_.add(txtSheetOffset_, "span 2, wrap");
@@ -183,16 +184,17 @@ public class BeamSheetControlPanel extends Panel {
             final double value = sldSheetOffset_.getDouble();
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
-            txtSheetOffset_.setText(Double.toString(value));
-            lblSlopeOffset_.setText(Double.toString(value));
-            System.out.println("sheetOffset value: " + value);
+            final String strValue = String.format("%.3f ", value);
+            txtSheetOffset_.setText(strValue);
+            lblSlopeOffset_.setText(strValue);
+            System.out.println("sheetOffset value: " + strValue);
         });
 
         txtSheetOffset_.registerListener(e -> {
             final double value = Double.parseDouble(txtSheetOffset_.getText());
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
-            lblSlopeOffset_.setText(Double.toString(value));
+            lblSlopeOffset_.setText(String.format("%.3f ", value));
             EventQueue.invokeLater(() -> {
                 sldSheetOffset_.setDouble(value);
             });
@@ -216,7 +218,7 @@ public class BeamSheetControlPanel extends Panel {
             System.out.println("value: " + value);
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
-            txtSheetOffset_.setText(Double.toString(value));
+            txtSheetOffset_.setText(String.format("%.3f ", value));
             sldSheetOffset_.setDouble(value);
         });
 
@@ -228,7 +230,7 @@ public class BeamSheetControlPanel extends Panel {
             System.out.println("value: " + value);
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
-            txtSheetOffset_.setText(Double.toString(value));
+            txtSheetOffset_.setText(String.format("%.3f ", value));
             sldSheetOffset_.setDouble(value);
         });
 
