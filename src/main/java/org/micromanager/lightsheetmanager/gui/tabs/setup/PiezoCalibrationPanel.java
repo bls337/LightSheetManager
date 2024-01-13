@@ -167,7 +167,7 @@ public class PiezoCalibrationPanel extends Panel {
                     // FIXME: update channelOffset
                     // was: channelOffset = ASIdiSPIM.getFrame().getAcquisitionPanel().getChannelOffset();
                     final double newOffset = piezoPosition - rate * scannerPosition - channelOffset;
-                    txtOffset_.setText(Double.toString(newOffset));
+                    txtOffset_.setText(String.format("%.3f ", newOffset));
                     model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
                             newOffset + " (with channel offset of " + channelOffset + ")");
                 }
@@ -186,14 +186,14 @@ public class PiezoCalibrationPanel extends Panel {
             final double slope = Double.parseDouble(txtSlope_.getText());
             model_.acquisitions().settingsBuilder()
                     .sliceCalibrationBuilder(pathNum_).sliceSlope(slope);
-            lblSlopeValue_.setText(Double.toString(slope));
+            lblSlopeValue_.setText(String.format("%.3f ", slope));
         });
 
         txtOffset_.registerListener(e -> {
             final double offset = Double.parseDouble(txtOffset_.getText());
             model_.acquisitions().settingsBuilder()
                     .sliceCalibrationBuilder(pathNum_).sliceOffset(offset);
-            lblOffsetValue_.setText(Double.toString(offset));
+            lblOffsetValue_.setText(String.format("%.3f ", offset));
         });
 
         txtStepSize_.registerListener(e -> {

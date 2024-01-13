@@ -31,7 +31,6 @@ public class ControlPanel extends Panel {
     private DeviceType deviceType_;
     private Axis deviceAxis_;
     private String units_;
-    //private double position_; // TODO: needed?
 
     private JLabel lblPropertyName_;
     private JLabel lblPosition_;
@@ -52,9 +51,10 @@ public class ControlPanel extends Panel {
         deviceAxis_ = Objects.requireNonNull(axis);
         studio_ = Objects.requireNonNull(studio);
         core_ = studio.core();
-        units_ = "\u00B5m"; // microns
+        units_ = "µm"; // microns
         setUpdateMethod();
-        create();
+        createUserInterface();
+        createEventHandlers();
     }
 
     public String getPropertyName() {
@@ -69,7 +69,7 @@ public class ControlPanel extends Panel {
         return deviceType_;
     }
 
-    public void create() {
+    public void createUserInterface() {
 
         Button.setDefaultSize(120, 20);
         spnRelativeMove_ = Spinner.createDoubleSpinner(100.0, 0.0, Double.MAX_VALUE, 1.0);
@@ -96,12 +96,10 @@ public class ControlPanel extends Panel {
         lblPosition_ = new JLabel();
         lblPosition_.setMinimumSize(new Dimension(80, 20));
         if (isStageDevice()) {
-            lblPosition_.setText("0.000 \u00B5m");
+            lblPosition_.setText("0.000 µm");
         } else {
             lblPosition_.setText("0.000");
         }
-
-        createEventHandlers();
 
         add(lblPosition_, "");
         add(lblPropertyName_, "");
