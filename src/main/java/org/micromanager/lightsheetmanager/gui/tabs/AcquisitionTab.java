@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
@@ -151,7 +150,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cbxUseChannels_ = new CheckBox(
                 "Channels", acqSettings.isUsingChannels());
         pnlChannelTable_ = new ChannelTablePanel(model_, cbxUseChannels_);
-        pnlChannelTable_.setMaximumSize(new Dimension(300, 400));
+        pnlChannelTable_.setMaximumSize(new Dimension(270, 400));
 
         // disable elements based on acqSettings
         if (!acqSettings.isUsingChannels()) {
@@ -185,30 +184,25 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlCenter.add(new JLabel("Acquisition mode:"), "split 2");
         pnlCenter.add(cmbAcquisitionModes_, "");
 
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final boolean isUsingAdvSettings =
+                model_.acquisitions().settings().isUsingAdvancedTiming();
 
-        switch (geometryType) {
-            case DISPIM:
-                pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
-                pnlRight_.add(pnlSliceSettings_, "growx, wrap");
-                pnlRight_.add(cbxUseAdvancedTiming_, "growx");
-                break;
-            case SCAPE:
-                pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
-                pnlRight_.add(pnlAdvancedTiming_, "growx, wrap");
-                break;
-            default:
-                break;
+        pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
+        if (isUsingAdvSettings) {
+            pnlRight_.add(pnlAdvancedTiming_, "growx, wrap");
+        } else {
+            pnlRight_.add(pnlSliceSettings_, "growx, wrap");
         }
-        // TODO: consider putting durations into the model, since recalculating the slice timing shouldn't necessarily happen here
+        pnlRight_.add(cbxUseAdvancedTiming_, "growx");
+
+        // TODO: consider putting durations into the model, since recalculating the slice timing shouldn't happen here
         // includes calculating the slice timing
         //updateDurationLabels();
 
         add(pnlLeft, "");
         add(pnlCenter, "");
         add(pnlRight_, "wrap");
-        add(pnlButtons_, "span 3, gaptop 100");
+        add(pnlButtons_, "span 3, gaptop 60");
     }
 
     private void acqFinishedCallback() {
@@ -302,8 +296,11 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         });
 
         // switches timing panels based on check box
-        cbxUseAdvancedTiming_.registerListener(
-                e -> switchTimingSettings(cbxUseAdvancedTiming_.isSelected()));
+        cbxUseAdvancedTiming_.registerListener(e -> {
+            final boolean state = cbxUseAdvancedTiming_.isSelected();
+            model_.acquisitions().settingsBuilder().useAdvancedTiming(state);
+            switchTimingSettings(state);
+        });
     }
 
     public SliceSettingsPanel getSliceSettingsPanel() {
