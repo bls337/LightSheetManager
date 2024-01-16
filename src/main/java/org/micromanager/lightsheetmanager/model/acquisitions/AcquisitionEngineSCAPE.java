@@ -779,20 +779,34 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     public void recalculateSliceTiming() {
-        // don't change timing settings if user is using advanced timing
-        if (acqSettings_.isUsingAdvancedTiming()) {
-            // TODO: find a better place to set the camera trigger mode for SCAPE
-            if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
-                CameraBase camera = model_.devices().getDevice("ImagingCamera");
-                camera.setTriggerMode(acqSettings_.cameraMode());
-                studio_.logs().logDebugMessage(
-                        "camera \"" + camera.getDeviceName() + "\" set to mode: " + camera.getTriggerMode());
-            }
-            return;
+        // TODO: find a better place to set the camera trigger mode for SCAPE
+        CameraBase camera = model_.devices().getDevice("ImagingCamera");
+        camera.setTriggerMode(acqSettings_.cameraMode());
+        studio_.logs().logMessage("camera \"" + camera.getDeviceName()
+                + "\" set to mode: " + camera.getTriggerMode());
+        // update timing settings if not using advanced timing
+        if (!acqSettings_.isUsingAdvancedTiming()) {
+            DefaultTimingSettings.Builder tsb = getTimingFromExposure();
+            asb_.timingSettingsBuilder(tsb);
         }
-        DefaultTimingSettings.Builder tsb = getTimingFromPeriodAndLightExposure();
-        asb_.timingSettingsBuilder(tsb);
-        // TODO: update gui (but not in the model)
+    }
+
+    public DefaultTimingSettings.Builder getTimingFromExposure() {
+        DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
+
+        final double desiredExposure =
+                model_.acquisitions().settings().sliceSettings().sampleExposure();
+
+        tsb.scansPerSlice(1);
+        tsb.scanDuration(0.25);
+        tsb.cameraExposure(desiredExposure);
+        tsb.laserTriggerDuration(desiredExposure);
+        tsb.cameraTriggerDuration(1);
+        tsb.delayBeforeCamera(0);
+        tsb.delayBeforeLaser(0.25); // TODO: experiment with 0
+        tsb.delayBeforeScan(0.25);  // TODO: experiment with 0
+        //tsb.sliceDuration(desiredExposure); // FIXME: where does this get calculated?
+        return tsb;
     }
 
     public DefaultTimingSettings.Builder getTimingFromPeriodAndLightExposure() {
