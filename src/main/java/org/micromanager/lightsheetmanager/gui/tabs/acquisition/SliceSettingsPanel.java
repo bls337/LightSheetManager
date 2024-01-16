@@ -93,44 +93,37 @@ public class SliceSettingsPanel extends Panel {
             spnSlicePeriod_.setEnabled(selected);
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsBuilder().minimizeSlicePeriod(!selected);
-            //System.out.println("isSlicePeriodMinimized: " + acqSettings.getSliceSettings().isSlicePeriodMinimized());
         });
 
         spnSlicePeriod_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsBuilder().slicePeriod(spnSlicePeriod_.getDouble());
-            //System.out.println("slicePeriod: " + acqSettings.getSliceSettings().slicePeriod());
         });
 
         spnSampleExposure_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsBuilder().sampleExposure(spnSampleExposure_.getDouble());
-            //System.out.println("sampleExposure: " + acqSettings.getSliceSettings().sampleExposure());
         });
 
         // virtual slit panel
         spnScanResetTime_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsLSBuilder().scanResetTime(spnScanResetTime_.getDouble());
-            //System.out.println("scanResetTime: " + acqSettings.getSliceSettingsLS().scanResetTime());
         });
 
         spnScanSettleTime_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsLSBuilder().scanSettleTime(spnScanSettleTime_.getDouble());
-            //System.out.println("scanSettleTime: " + acqSettings.getSliceSettingsLS().scanSettleTime());
         });
 
         spnShutterWidth_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsLSBuilder().shutterWidth(spnShutterWidth_.getDouble());
-            //System.out.println("shutterWidth: " + acqSettings.getSliceSettingsLS().shutterWidth());
         });
 
         spnShutterSpeed_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsLSBuilder().shutterSpeedFactor(spnShutterSpeed_.getDouble());
-            //System.out.println("shutterSpeedFactor: " + acqSettings.getSliceSettingsLS().shutterSpeedFactor());
         });
     }
 
