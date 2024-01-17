@@ -17,7 +17,6 @@ import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
@@ -520,17 +519,15 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 
 
-
         // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
         // once everything finishes
         currentAcquisition_.finish();
 
-
         currentAcquisition_.waitForCompletion();
 
-        // cleanup
-        studio_.logs().logMessage("SCAPE plugin acquisition " +
-                " took: " + (System.currentTimeMillis() - acqButtonStart) + "ms");
+        // report elapsed time
+        final long elapsedTimeMs = System.currentTimeMillis() - acqButtonStart;
+        studio_.logs().logMessage("SCAPE plugin acquisition took: " + elapsedTimeMs + " milliseconds");
 
 
         // clean up controller settings after acquisition
@@ -590,16 +587,14 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     private boolean doHardwareCalculations(PLogicSCAPE plc) {
 
+        // TODO: find a better place to set the camera trigger mode for SCAPE
+        CameraBase camera1 = model_.devices().getDevice("ImagingCamera");
+        camera1.setTriggerMode(acqSettings_.cameraMode());
+        studio_.logs().logMessage("camera \"" + camera1.getDeviceName()
+                + "\" set to mode: " + camera1.getTriggerMode());
+
         // make sure slice timings are up-to-date
-        final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder());
-        asb_.timingSettingsBuilder().sliceDuration(sliceDuration);
-
-        //studio_.logs().logMessage("TimingSettings sliceDuration: " + sliceDuration1);
-        System.out.println("computed sliceDuration: " +  sliceDuration);
-
         recalculateSliceTiming();
-        System.out.println("after recalculateSliceTiming: " + asb_.timingSettingsBuilder());
-
 
         // TODO: was only checked in light sheet mode
 //        if (core_.getPixelSizeUm() < 1e-6) {
@@ -742,8 +737,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 //        }
 
-        // sliceDuration is computed at start of this method and put into the AcquisitionSettingsBuilder
-        // because the asb is not built before this check, use the value computed above
+        final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder());
         if (exposureTime + cameraReadoutTime > sliceDuration) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
@@ -772,24 +766,22 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     private void doHardwareCalculationsNIDAQ() {
         NIDAQ daq = model_.devices().getDevice("TriggerCamera");
-
         //daq.setProperty("PropertyName", "1");
     }
 
     public void recalculateSliceTiming() {
-        // TODO: find a better place to set the camera trigger mode for SCAPE
-        CameraBase camera = model_.devices().getDevice("ImagingCamera");
-        camera.setTriggerMode(acqSettings_.cameraMode());
-        studio_.logs().logMessage("camera \"" + camera.getDeviceName()
-                + "\" set to mode: " + camera.getTriggerMode());
         // update timing settings if not using advanced timing
         if (!acqSettings_.isUsingAdvancedTiming()) {
             DefaultTimingSettings.Builder tsb = getTimingFromExposure();
             asb_.timingSettingsBuilder(tsb);
         }
+        final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder());
+        asb_.timingSettingsBuilder().sliceDuration(sliceDuration);
     }
 
     public DefaultTimingSettings.Builder getTimingFromExposure() {
+        // Note: sliceDuration is computed in recalculateSliceTiming
+
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
 
         final double desiredExposure =
@@ -803,7 +795,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         tsb.delayBeforeCamera(0);
         tsb.delayBeforeLaser(0.25); // TODO: experiment with 0
         tsb.delayBeforeScan(0.25);  // TODO: experiment with 0
-        //tsb.sliceDuration(desiredExposure); // FIXME: where does this get calculated?
         return tsb;
     }
 
