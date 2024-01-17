@@ -54,23 +54,21 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     boolean run() {
-        // TODO: delete later, this is the settings before everything is set up in doHardwareCalculations (used to debug)
-        studio_.logs().logMessage("debug info:\n" + acqSettings_.toPrettyJson());
-
+        // TODO: make this happen for all acq types
         final boolean isPolling = frame_.getNavigationPanel().isPolling();
         if (isPolling) {
             studio_.logs().logMessage("stopped position polling");
             frame_.getNavigationPanel().stopPolling();
         }
 
-        // TODO: remove this when acqSettings for SCAPE are implemented
-        asb_.useAdvancedTiming(true);
-
         asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
         asb_.sheetCalibrationBuilder(1).autoSheetWidthPerPixel(0.0);
 
         // set acquisition settings from the builder
         setAcquisitionSettings(asb_.build());
+
+        // TODO: delete later, this is the settings before everything is set up in doHardwareCalculations (used to debug)
+        studio_.logs().logMessage("debug info:\n" + acqSettings_.toPrettyJson());
 
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
