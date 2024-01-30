@@ -844,11 +844,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // delay to start is (empirically) 0.07ms + 0.25/(freq in kHz)
         // delay to midpoint is empirically 0.38/(freq in kHz)
         // group delay for 5th-order bessel filter ~0.39/freq from theory and ~0.4/freq from IC datasheet
-        final float scanFilterFreq = Math.max(scanner1.getFilterFreqX(), scanner2.getFilterFreqX());
+        final double scanFilterFreq = Math.max(scanner1.getFilterFreqX(), scanner2.getFilterFreqX());
 
         float scanDelayFilter = 0;
         if (scanFilterFreq != 0) {
-            scanDelayFilter = NumberUtils.roundToQuarterMs(0.39f/scanFilterFreq);
+            scanDelayFilter = NumberUtils.roundToQuarterMs(0.39f/(float)scanFilterFreq);
         }
         // If the PLogic card is used, account for 0.25ms delay it introduces to
         // the camera and laser trigger signals => subtract 0.25ms from the scanner delay

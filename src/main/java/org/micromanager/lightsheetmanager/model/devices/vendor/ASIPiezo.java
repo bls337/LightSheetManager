@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 public class ASIPiezo extends ASITigerBase {
 
-    private SingleAxis singleAxis_;
+    private final SingleAxis singleAxis_;
 
     public ASIPiezo(final Studio studio, final String deviceName) {
         super(studio, deviceName);
@@ -48,11 +48,11 @@ public class ASIPiezo extends ASITigerBase {
         return getProperty(Properties.ReadOnly.AXIS_LETTER);
     }
 
-    public float getStepSize() {
+    public double getStepSize() {
         return getPropertyFloat(Properties.ReadOnly.STEP_SIZE);
     }
 
-    public float getTravelRange() {
+    public double getTravelRange() {
         return getPropertyFloat(Properties.ReadOnly.PIEZO_TRAVEL_RANGE);
     }
 
@@ -72,23 +72,23 @@ public class ASIPiezo extends ASITigerBase {
         return AxisPolarity.fromString(getProperty(Properties.AXIS_POLARITY));
     }
 
-    public void setHomePosition(final float um) {
+    public void setHomePosition(final double um) {
         setPropertyFloat(Properties.HOME_POSITION, um);
     }
 
-    public float getHomePosition() {
+    public double getHomePosition() {
         return getPropertyFloat(Properties.HOME_POSITION);
     }
 
-    public void setLowerLimit(final float limit) {
+    public void setLowerLimit(final double limit) {
         setPropertyFloat(Properties.LOWER_LIMIT, limit);
     }
 
-    public float getLowerLimit() {
+    public double getLowerLimit() {
         return getPropertyFloat(Properties.LOWER_LIMIT);
     }
 
-    public void setMaintainOneOvershoot(final float value) {
+    public void setMaintainOneOvershoot(final double value) {
         setPropertyFloat(Properties.PIEZO_MAINTAIN_ONE_OVERSHOOT, value);
     }
 
@@ -96,7 +96,7 @@ public class ASIPiezo extends ASITigerBase {
         return getPropertyInt(Properties.PIEZO_MAINTAIN_ONE_OVERSHOOT);
     }
 
-    public void setMaintainOneMaxTime(final float milliseconds) {
+    public void setMaintainOneMaxTime(final double milliseconds) {
         setPropertyFloat(Properties.PIEZO_MAINTAIN_ONE_MAX_TIME, milliseconds);
     }
 
@@ -153,15 +153,15 @@ public class ASIPiezo extends ASITigerBase {
         setProperty(Properties.SET_HOME_CURRENT_POSITION, Values.DO_IT);
     }
 
-    public void setUpperLimit(final float limit) {
+    public void setUpperLimit(final double limit) {
         setPropertyFloat(Properties.UPPER_LIMIT, limit);
     }
 
-    public float getUpperLimit() {
+    public double getUpperLimit() {
         return getPropertyFloat(Properties.UPPER_LIMIT);
     }
 
-    public void setVectorMove(final float value) {
+    public void setVectorMove(final double value) {
         setPropertyFloat(Properties.VECTOR_MOVE, value);
     }
 

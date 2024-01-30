@@ -6,14 +6,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO: needs pre-init properties
-
 /**
- * ASI's Programmable Logic Card is a field-programmable card for digital logic.
+ * The ASI Programmable Logic Card is a field-programmable card for digital logic.
  *
- * In LightSheetManager the PLogic card is used to coordinate hardware triggering.
+ * <p>In LightSheetManager the PLogic card is used to coordinate hardware triggering.
  *
- * Documentation:
+ * <p>Documentation:
  *      <a href="http://asiimaging.com/docs/tiger_programmable_logic_card">ASI PLogic</a>
  */
 public class ASIPLogic extends ASITigerBase {
