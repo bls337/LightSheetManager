@@ -38,51 +38,51 @@ public class ASIXYStage extends ASITigerBase {
         }
     }
 
-    public float getMaxSpeedX() {
+    public double getMaxSpeedX() {
         return getPropertyFloat(Properties.MAX_SPEED_X);
     }
 
-    public float getMaxSpeedY() {
+    public double getMaxSpeedY() {
         return getPropertyFloat(Properties.MAX_SPEED_Y);
     }
 
-    public void setSpeedX(final float speed) {
+    public void setSpeedX(final double speed) {
         setPropertyFloat(Properties.SPEED_X_MM, speed);
     }
 
-    public float getSpeedX() {
+    public double getSpeedX() {
         return getPropertyFloat(Properties.SPEED_X_MM);
     }
 
-    public void setSpeedY(final float speed) {
+    public void setSpeedY(final double speed) {
         setPropertyFloat(Properties.SPEED_Y_MM, speed);
     }
 
-    public float getSpeedY() {
+    public double getSpeedY() {
         return getPropertyFloat(Properties.SPEED_Y_MM);
     }
 
-    public float getSpeedXUm() {
+    public double getSpeedXUm() {
         return getPropertyFloat(Properties.SPEED_X_UM);
     }
 
-    public float getSpeedYUm() {
+    public double getSpeedYUm() {
         return getPropertyFloat(Properties.SPEED_Y_UM);
     }
 
-    public void setAccelerationX(final float value) {
+    public void setAccelerationX(final double value) {
         setPropertyFloat(Properties.ACCELERATION_X, value);
     }
 
-    public float getAccelerationX() {
+    public double getAccelerationX() {
         return getPropertyFloat(Properties.ACCELERATION_X);
     }
 
-    public void setAccelerationY(final float value) {
+    public void setAccelerationY(final double value) {
         setPropertyFloat(Properties.ACCELERATION_Y, value);
     }
 
-    public float getAccelerationY() {
+    public double getAccelerationY() {
         return getPropertyFloat(Properties.ACCELERATION_Y);
     }
 
@@ -118,35 +118,35 @@ public class ASIXYStage extends ASITigerBase {
         return ScanPattern.fromString(getProperty(Properties.SCAN_PATTERN));
     }
 
-    public void setFastAxisStart(final float position) {
+    public void setFastAxisStart(final double position) {
         setPropertyFloat(Properties.SCAN_FAST_AXIS_START_POSITION, position);
     }
 
-    public float getFastAxisStart() {
+    public double getFastAxisStart() {
         return getPropertyFloat(Properties.SCAN_FAST_AXIS_START_POSITION);
     }
 
-    public void setFastAxisStop(final float position) {
+    public void setFastAxisStop(final double position) {
         setPropertyFloat(Properties.SCAN_FAST_AXIS_STOP_POSITION, position);
     }
 
-    public float getFastAxisStop() {
+    public double getFastAxisStop() {
         return getPropertyFloat(Properties.SCAN_FAST_AXIS_STOP_POSITION);
     }
 
-    public void setSlowAxisStart(final float position) {
+    public void setSlowAxisStart(final double position) {
         setPropertyFloat(Properties.SCAN_SLOW_AXIS_START_POSITION, position);
     }
 
-    public float getSlowAxisStart() {
+    public double getSlowAxisStart() {
         return getPropertyFloat(Properties.SCAN_SLOW_AXIS_START_POSITION);
     }
 
-    public void setSlowAxisStop(final float position) {
+    public void setSlowAxisStop(final double position) {
         setPropertyFloat(Properties.SCAN_SLOW_AXIS_STOP_POSITION, position);
     }
 
-    public float getSlowAxisStop() {
+    public double getSlowAxisStop() {
         return getPropertyFloat(Properties.SCAN_SLOW_AXIS_STOP_POSITION);
     }
 

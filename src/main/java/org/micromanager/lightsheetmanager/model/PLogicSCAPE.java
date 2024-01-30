@@ -489,7 +489,7 @@ public class PLogicSCAPE {
                     settings.isUsingStageScanning() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
                             : (float) settings.volumeSettings().delayBeforeView()); // this is the usual behavior
         }
-        float piezoCenter;
+        double piezoCenter;
         if (settings.isUsingStageScanning()) {
             // for stage scanning we define the piezo position to be the home position (normally 0)
             // this is basically required for interleaved mode (otherwise piezo would be moving every slice)
@@ -540,18 +540,18 @@ public class PLogicSCAPE {
         final float offset2 = (float)(settings.sliceCalibration(2).sliceOffset() + channelOffset);
         float sliceOffset = (view == 1) ? offset1 : offset2;
         float sliceAmplitude = piezoAmplitude / sliceRate;
-        float sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
+        double sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
 
         if (settings.acquisitionMode() == AcquisitionMode.PIEZO_SCAN_ONLY) {
             if (cameraMode == CameraMode.OVERLAP) {
-                float actualPiezoCenter = piezoCenter - piezoAmplitude / (2 * (numSlicesHW - 1));
+                double actualPiezoCenter = piezoCenter - piezoAmplitude / (2 * (numSlicesHW - 1));
                 sliceCenter = (actualPiezoCenter - sliceOffset) / sliceRate;
             }
             sliceAmplitude = 0.0f;
         }
         // round to nearest 0.0001 degrees, which is approximately the DAC resolution
         sliceAmplitude = NumberUtils.roundFloatToPlace(sliceAmplitude, 4);
-        sliceCenter = NumberUtils.roundFloatToPlace(sliceCenter, 4);
+        sliceCenter = NumberUtils.roundFloatToPlace((float)sliceCenter, 4);
 
         if (offsetOnly) {
             scanner_.sa().setOffsetY(sliceCenter);
@@ -587,8 +587,8 @@ public class PLogicSCAPE {
                 piezoAmplitude = 0.0f;
             }
 
-            float piezoMin = piezo_.getLowerLimit() * 1000;
-            float piezoMax = piezo_.getUpperLimit() * 1000;
+            double piezoMin = piezo_.getLowerLimit() * 1000;
+            double piezoMax = piezo_.getUpperLimit() * 1000;
 
             if (NumberUtils.outsideRange(piezoCenter - piezoAmplitude / 2, piezoMin, piezoMax)
                     || NumberUtils.outsideRange(piezoCenter + piezoAmplitude / 2, piezoMin, piezoMax)) {
@@ -599,7 +599,7 @@ public class PLogicSCAPE {
 
             // round to nearest 0.001 micron, which is approximately the DAC resolution
             piezoAmplitude = NumberUtils.roundFloatToPlace(piezoAmplitude, 3);
-            piezoCenter = NumberUtils.roundFloatToPlace(piezoCenter, 3);
+            piezoCenter = NumberUtils.roundFloatToPlace((float)piezoCenter, 3);
             piezo_.sa().setAmplitude(piezoAmplitude);
             piezo_.sa().setOffset(piezoCenter);
 

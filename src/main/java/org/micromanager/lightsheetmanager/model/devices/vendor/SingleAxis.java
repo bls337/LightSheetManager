@@ -46,50 +46,50 @@ public class SingleAxis extends DeviceBase {
         return getPropertyInt(Properties.PERIOD_Y);
     }
 
-    public void setAmplitude(final float um) {
+    public void setAmplitude(final double um) {
         setPropertyFloat(Properties.AMPLITUDE, um);
     }
-    public float getAmplitude() {
+    public double getAmplitude() {
         return getPropertyFloat(Properties.AMPLITUDE);
     }
 
-    public void setAmplitudeX(final float degrees) {
+    public void setAmplitudeX(final double degrees) {
         setPropertyFloat(Properties.AMPLITUDE_X, degrees);
     }
 
-    public float getAmplitudeX() {
+    public double getAmplitudeX() {
         return getPropertyFloat(Properties.AMPLITUDE_X);
     }
 
-    public void setAmplitudeY(final float degrees) {
+    public void setAmplitudeY(final double degrees) {
         setPropertyFloat(Properties.AMPLITUDE_X, degrees);
     }
 
-    public float getAmplitudeY() {
+    public double getAmplitudeY() {
         return getPropertyFloat(Properties.AMPLITUDE_Y);
     }
 
-    public void setOffset(final float um) {
+    public void setOffset(final double um) {
         setPropertyFloat(Properties.OFFSET, um);
     }
 
-    public float getOffset() {
+    public double getOffset() {
         return getPropertyFloat(Properties.OFFSET);
     }
 
-    public void setOffsetX(final float degrees) {
+    public void setOffsetX(final double degrees) {
         setPropertyFloat(Properties.OFFSET_X, degrees);
     }
 
-    public float getOffsetX() {
+    public double getOffsetX() {
         return getPropertyFloat(Properties.OFFSET_X);
     }
 
-    public void setOffsetY(final float degrees) {
+    public void setOffsetY(final double degrees) {
         setPropertyFloat(Properties.OFFSET_Y, degrees);
     }
 
-    public float getOffsetY() {
+    public double getOffsetY() {
         return getPropertyFloat(Properties.OFFSET_Y);
     }
 

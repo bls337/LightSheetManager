@@ -43,19 +43,19 @@ public class ASIScanner extends ASITigerBase {
         }
     }
 
-    public void setAttenuateX(final float value) {
+    public void setAttenuateX(final double value) {
         setPropertyFloat(Properties.ATTENUATE_X, value);
     }
 
-    public float getAttenuateX() {
+    public double getAttenuateX() {
         return getPropertyFloat(Properties.ATTENUATE_X);
     }
 
-    public void setAttenuateY(final float value) {
+    public void setAttenuateY(final double value) {
         setPropertyFloat(Properties.ATTENUATE_Y, value);
     }
 
-    public float getAttenuateY() {
+    public double getAttenuateY() {
         return getPropertyFloat(Properties.ATTENUATE_Y);
     }
 
@@ -91,19 +91,19 @@ public class ASIScanner extends ASITigerBase {
         return getProperty(Properties.BEAM_ENABLED).equals(Values.YES);
     }
 
-    public void setFilterFreqX(final float kHz) {
+    public void setFilterFreqX(final double kHz) {
         setPropertyFloat(Properties.FILTER_FREQ_X, kHz);
     }
 
-    public float getFilterFreqX() {
+    public double getFilterFreqX() {
         return getPropertyFloat(Properties.FILTER_FREQ_X);
     }
 
-    public void setFilterFreqY(final float kHz) {
+    public void setFilterFreqY(final double kHz) {
         setPropertyFloat(Properties.FILTER_FREQ_Y, kHz);
     }
 
-    public float getFilterFreqY() {
+    public double getFilterFreqY() {
         return getPropertyFloat(Properties.FILTER_FREQ_Y);
     }
 
@@ -123,43 +123,43 @@ public class ASIScanner extends ASITigerBase {
         return LaserOutputMode.fromString(getProperty(Properties.LASER_OUTPUT_MODE));
     }
 
-    public void setLaserSwitchTime(final float milliseconds) {
+    public void setLaserSwitchTime(final double milliseconds) {
         setPropertyFloat(Properties.LASER_SWITCH_TIME, milliseconds);
     }
 
-    public float getLaserSwitchTime() {
+    public double getLaserSwitchTime() {
         return getPropertyFloat(Properties.LASER_SWITCH_TIME);
     }
 
-    public void setMinDeflectionX(final float value) {
+    public void setMinDeflectionX(final double value) {
         setPropertyFloat(Properties.MIN_DEFLECTION_X, value);
     }
 
-    public float getMinDeflectionX() {
+    public double getMinDeflectionX() {
         return getPropertyFloat(Properties.MIN_DEFLECTION_X);
     }
 
-    public void setMinDeflectionY(final float value) {
+    public void setMinDeflectionY(final double value) {
         setPropertyFloat(Properties.MIN_DEFLECTION_Y, value);
     }
 
-    public float getMinDeflectionY() {
+    public double getMinDeflectionY() {
         return getPropertyFloat(Properties.MIN_DEFLECTION_Y);
     }
 
-    public void setMaxDeflectionX(final float value) {
+    public void setMaxDeflectionX(final double value) {
         setPropertyFloat(Properties.MAX_DEFLECTION_X, value);
     }
 
-    public float getMaxDeflectionX() {
+    public double getMaxDeflectionX() {
         return getPropertyFloat(Properties.MAX_DEFLECTION_X);
     }
 
-    public void setMaxDeflectionY(final float value) {
+    public void setMaxDeflectionY(final double value) {
         setPropertyFloat(Properties.MAX_DEFLECTION_Y, value);
     }
 
-    public float getMaxDeflectionY() {
+    public double getMaxDeflectionY() {
         return getPropertyFloat(Properties.MAX_DEFLECTION_Y);
     }
 
@@ -171,51 +171,51 @@ public class ASIScanner extends ASITigerBase {
         return getProperty(Properties.SPIM_ALTERNATE_DIRECTIONS_ENABLE).equals(Values.YES);
     }
 
-    public void setSPIMCameraDuration(final float milliseconds) {
+    public void setSPIMCameraDuration(final double milliseconds) {
         setPropertyFloat(Properties.SPIM_CAMERA_DURATION, milliseconds);
     }
 
-    public float getSPIMCameraDuration() {
+    public double getSPIMCameraDuration() {
         return getPropertyFloat(Properties.SPIM_CAMERA_DURATION);
     }
 
-    public void setSPIMDelayBeforeCamera(final float milliseconds) {
+    public void setSPIMDelayBeforeCamera(final double milliseconds) {
         setPropertyFloat(Properties.SPIM_DELAY_BEFORE_CAMERA, milliseconds);
     }
 
-    public float getSPIMDelayBeforeCamera() {
+    public double getSPIMDelayBeforeCamera() {
         return getPropertyFloat(Properties.SPIM_DELAY_BEFORE_CAMERA);
     }
 
-    public void setSPIMDelayBeforeLaser(final float milliseconds) {
+    public void setSPIMDelayBeforeLaser(final double milliseconds) {
         setPropertyFloat(Properties.SPIM_DELAY_BEFORE_LASER, milliseconds);
     }
 
-    public float getSPIMDelayBeforeLaser() {
+    public double getSPIMDelayBeforeLaser() {
         return getPropertyFloat(Properties.SPIM_DELAY_BEFORE_LASER);
     }
 
-    public void setSPIMDelayBeforeRepeat(final float milliseconds) {
+    public void setSPIMDelayBeforeRepeat(final double milliseconds) {
         setPropertyFloat(Properties.SPIM_DELAY_BEFORE_REPEAT, milliseconds);
     }
 
-    public float getSPIMDelayBeforeRepeat() {
+    public double getSPIMDelayBeforeRepeat() {
         return getPropertyFloat(Properties.SPIM_DELAY_BEFORE_REPEAT);
     }
 
-    public void setSPIMDelayBeforeScan(final float milliseconds) {
+    public void setSPIMDelayBeforeScan(final double milliseconds) {
         setPropertyFloat(Properties.SPIM_DELAY_BEFORE_SCAN, milliseconds);
     }
 
-    public float getSPIMDelayBeforeScan() {
+    public double getSPIMDelayBeforeScan() {
         return getPropertyFloat(Properties.SPIM_DELAY_BEFORE_SCAN);
     }
 
-    public void setSPIMDelayBeforeSide(final float milliseconds) {
+    public void setSPIMDelayBeforeSide(final double milliseconds) {
         setPropertyFloat(Properties.SPIM_DELAY_BEFORE_SIDE, milliseconds);
     }
 
-    public float getSPIMDelayBeforeSide() {
+    public double getSPIMDelayBeforeSide() {
         return getPropertyFloat(Properties.SPIM_DELAY_BEFORE_SIDE);
     }
 
@@ -235,11 +235,11 @@ public class ASIScanner extends ASITigerBase {
         return getProperty(Properties.SPIM_INTERLEAVE_SIDES_ENABLE).equals(Values.YES);
     }
 
-    public void setSPIMLaserDuration(final float milliseconds) {
+    public void setSPIMLaserDuration(final double milliseconds) {
         setPropertyFloat(Properties.SPIM_LASER_DURATION, milliseconds);
     }
 
-    public float getSPIMLaserDuration() {
+    public double getSPIMLaserDuration() {
         return getPropertyFloat(Properties.SPIM_LASER_DURATION);
     }
 
@@ -299,11 +299,11 @@ public class ASIScanner extends ASITigerBase {
         return getProperty(Properties.SPIM_PIEZO_HOME_DISABLE).equals(Values.YES);
     }
 
-    public void setSPIMScanDuration(final float milliseconds) {
+    public void setSPIMScanDuration(final double milliseconds) {
         setPropertyFloat(Properties.SPIM_SCAN_DURATION, milliseconds);
     }
 
-    public float getSPIMScanDuration() {
+    public double getSPIMScanDuration() {
         return getPropertyFloat(Properties.SPIM_SCAN_DURATION);
     }
 
@@ -329,11 +329,11 @@ public class ASIScanner extends ASITigerBase {
 
     // TODO: getVectorMove X and Y?
 
-    public void setVectorMoveX(final float value) {
+    public void setVectorMoveX(final double value) {
         setPropertyFloat(Properties.VECTOR_MOVE_X, value);
     }
 
-    public void setVectorMoveY(final float value) {
+    public void setVectorMoveY(final double value) {
         setPropertyFloat(Properties.VECTOR_MOVE_Y, value);
     }
 

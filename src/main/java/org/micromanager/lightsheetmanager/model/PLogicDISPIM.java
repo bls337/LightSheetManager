@@ -233,7 +233,7 @@ public class PLogicDISPIM {
 
             final boolean isInterleaved = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
 
-            final float maxSpeed = xyStage_.getMaxSpeedX();
+            final double maxSpeed = xyStage_.getMaxSpeedX();
             if (requestedMotorSpeed > maxSpeed * 0.8) {
                 // trying to go near max speed smooth scanning will be compromised
                 studio_.logs().showError("Required stage speed is too fast, please reduce step size or increase sample exposure.");
@@ -548,7 +548,7 @@ public class PLogicDISPIM {
                         settings.isUsingStageScanning() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
                                 : (float) settings.volumeSettings().delayBeforeView()); // this is the usual behavior
             }
-            float piezoCenter = 0;
+            double piezoCenter;
             if (settings.isUsingStageScanning()) {
                 // for stage scanning we define the piezo position to be the home position (normally 0)
                 // this is basically required for interleaved mode (otherwise piezo would be moving every slice)
@@ -599,18 +599,18 @@ public class PLogicDISPIM {
             final float offset2 = (float)(settings.sliceCalibration(2).sliceOffset() + channelOffset);
             float sliceOffset = (view == 1) ? offset1 : offset2;
             float sliceAmplitude = piezoAmplitude / sliceRate;
-            float sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
+            double sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
 
             if (settings.acquisitionMode() == AcquisitionMode.PIEZO_SCAN_ONLY) {
                 if (cameraMode == CameraMode.OVERLAP) {
-                    float actualPiezoCenter = piezoCenter - piezoAmplitude / (2 * (numSlicesHW - 1));
+                    double actualPiezoCenter = piezoCenter - piezoAmplitude / (2 * (numSlicesHW - 1));
                     sliceCenter = (actualPiezoCenter - sliceOffset) / sliceRate;
                 }
                 sliceAmplitude = 0.0f;
             }
             // round to nearest 0.0001 degrees, which is approximately the DAC resolution
             sliceAmplitude = NumberUtils.roundFloatToPlace(sliceAmplitude, 4);
-            sliceCenter = NumberUtils.roundFloatToPlace(sliceCenter, 4);
+            sliceCenter = NumberUtils.roundFloatToPlace((float)sliceCenter, 4);
 
             if (offsetOnly) {
                 scanner.sa().setOffsetY(sliceCenter);
@@ -646,8 +646,8 @@ public class PLogicDISPIM {
                     piezoAmplitude = 0.0f;
                 }
 
-                float piezoMin = piezo.getLowerLimit() * 1000;
-                float piezoMax = piezo.getUpperLimit() * 1000;
+                double piezoMin = piezo.getLowerLimit() * 1000;
+                double piezoMax = piezo.getUpperLimit() * 1000;
 
                 if (NumberUtils.outsideRange(piezoCenter - piezoAmplitude / 2, piezoMin, piezoMax)
                         || NumberUtils.outsideRange(piezoCenter + piezoAmplitude / 2, piezoMin, piezoMax)) {
@@ -658,7 +658,7 @@ public class PLogicDISPIM {
 
                 // round to nearest 0.001 micron, which is approximately the DAC resolution
                 piezoAmplitude = NumberUtils.roundFloatToPlace(piezoAmplitude, 3);
-                piezoCenter = NumberUtils.roundFloatToPlace(piezoCenter, 3);
+                piezoCenter = NumberUtils.roundFloatToPlace((float)piezoCenter, 3);
                 piezo.sa().setAmplitude(piezoAmplitude);
                 piezo.sa().setOffset(piezoCenter);
 
