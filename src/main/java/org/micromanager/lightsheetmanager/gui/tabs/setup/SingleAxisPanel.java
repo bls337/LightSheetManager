@@ -78,7 +78,7 @@ public class SingleAxisPanel extends Panel {
             });
 
             spnAmplitude_.registerListener(e -> {
-                galvo.sa().setAmplitudeY(spnAmplitude_.getFloat());
+                galvo.sa().setAmplitudeY(spnAmplitude_.getDouble());
             });
 
             spnPeriod_.registerListener(e -> {
