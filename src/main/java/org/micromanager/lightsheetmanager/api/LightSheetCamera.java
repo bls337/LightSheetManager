@@ -18,6 +18,6 @@ public interface LightSheetCamera {
 
     Rectangle getResolution();
     double getRowReadoutTime();
-    float getReadoutTime(final CameraMode cameraMode);
-    float getResetTime(final CameraMode cameraMode);
+    double getReadoutTime(final CameraMode cameraMode);
+    double getResetTime(final CameraMode cameraMode);
 }

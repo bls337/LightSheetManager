@@ -140,8 +140,8 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getReadoutTime(final CameraMode cameraMode) {
-        float readoutTimeMs = 10.0f;
+    public double getReadoutTime(final CameraMode cameraMode) {
+        double readoutTimeMs = 10.0;
         switch (cameraMode) {
             case VIRTUAL_SLIT:
                 if (getProperty(Properties.CAMERA_BUS).equals(Values.USB3)) {
@@ -161,7 +161,7 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
 
                 if (getProperty(Properties.CAMERA_BUS).equals(Values.USB3)) {
                     // trust the device adapter's calculation for USB3
-                    readoutTimeMs = Float.parseFloat(getProperty(Properties.READOUT_TIME)) * 1000.0f;
+                    readoutTimeMs = Double.parseDouble(getProperty(Properties.READOUT_TIME)) * 1000.0;
                 } else {
                     if (isFusion_) { // Fusion
                         numReadoutRows = roi.height;
@@ -175,11 +175,11 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
                             numReadoutRows = roiReadoutRowsSplitReadout(roi, sensorSize);
                         }
                     }
-                    readoutTimeMs = ((float) (numReadoutRows * rowReadoutTime));
+                    readoutTimeMs = numReadoutRows * rowReadoutTime;
                 }
                 break;
             case OVERLAP:
-                readoutTimeMs = 0.0f;
+                readoutTimeMs = 0.0;
                 break;
             default:
                 break;
@@ -190,12 +190,12 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getResetTime(final CameraMode cameraMode) {
+    public double getResetTime(final CameraMode cameraMode) {
         if (cameraMode == CameraMode.VIRTUAL_SLIT) {
-            return 0.0f;
+            return 0.0;
         } else {
             final double rowReadoutTime = getRowReadoutTime();
-            final float camReadoutTime = getReadoutTime(CameraMode.EDGE);
+            final double camReadoutTime = getReadoutTime(CameraMode.EDGE);
 
             // don't know if this is different for Fusion; leave it all the same for time being
             // global reset mode not yet exposed in Micro-manager
@@ -206,7 +206,7 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
             } else { // for EDGE and LEVEL trigger modes
                 numRowsOverhead = 10; // overhead of 9 rows plus jitter of 1 row
             }
-            final float resetTimeMs = camReadoutTime + (float) (numRowsOverhead * rowReadoutTime);
+            final double resetTimeMs = camReadoutTime + (numRowsOverhead * rowReadoutTime);
 //        ReportingUtils.logDebugMessage("camera reset time computed as " + resetTimeMs +
 //                " for camera " + devices_.getMMDevice(camKey));
             return resetTimeMs; // assume 10ms readout if not otherwise possible to calculate

@@ -59,12 +59,12 @@ public class DemoCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getResetTime(CameraMode cameraMode) {
+    public double getResetTime(CameraMode cameraMode) {
         return 0;
     }
 
     @Override
-    public float getReadoutTime(CameraMode cameraMode) {
+    public double getReadoutTime(CameraMode cameraMode) {
         return getPropertyFloat(Properties.READOUT_TIME);
     }
 }
