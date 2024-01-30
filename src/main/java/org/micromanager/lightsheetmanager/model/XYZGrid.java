@@ -47,7 +47,7 @@ public class XYZGrid {
         double delta = deltaX_;
         final double range = startX_ - stopX_;
         if (Math.signum(range) != Math.signum(delta) &&
-                !NumberUtils.floatsEqual(Math.abs(range), 0.0)) {
+                !NumberUtils.doublesEqual(Math.abs(range), 0.0)) {
             delta *= -1;
             // gridXDeltaField_.setValue(delta); // TODO: set value
         }
@@ -60,7 +60,7 @@ public class XYZGrid {
         double delta = deltaY_;
         final double range = startY_ - stopY_;
         if (Math.signum(range) != Math.signum(delta) &&
-                !NumberUtils.floatsEqual(Math.abs(range), 0.0)) {
+                !NumberUtils.doublesEqual(Math.abs(range), 0.0)) {
             delta *= -1;
             // gridYDeltaField_.setValue(delta); // TODO: set value
         }
@@ -73,7 +73,7 @@ public class XYZGrid {
         double delta = deltaZ_;
         final double range = startX_ - stopX_;
         if (Math.signum(range) != Math.signum(delta) &&
-                !NumberUtils.floatsEqual(Math.abs(range), 0.0)) {
+                !NumberUtils.doublesEqual(Math.abs(range), 0.0)) {
             delta *= -1;
             // gridZDeltaField_.setValue(delta); // TODO: set value
         }
