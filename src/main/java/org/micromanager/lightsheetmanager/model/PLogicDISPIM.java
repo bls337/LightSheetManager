@@ -591,7 +591,7 @@ public class PLogicDISPIM {
             final float slope1 = (float)settings.sliceCalibration(1).sliceSlope();
             final float slope2 = (float)settings.sliceCalibration(2).sliceSlope();
             float sliceRate = (view == 1) ? slope1 : slope2;
-            if (NumberUtils.floatsEqual(sliceRate, 0.0f)) {
+            if (NumberUtils.doublesEqual(sliceRate, 0.0)) {
                 studio_.logs().showError("Calibration slope for view " + view + " cannot be zero. Re-do calibration on Setup tab.");
                 return false;
             }
