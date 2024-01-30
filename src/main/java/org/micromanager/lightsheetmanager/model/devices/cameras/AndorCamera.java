@@ -170,8 +170,8 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getReadoutTime(CameraMode cameraMode) {
-        float readoutTimeMs = 10.0f;
+    public double getReadoutTime(CameraMode cameraMode) {
+        double readoutTimeMs = 10.0;
         System.out.println("getReadoutTime: mode: " + cameraMode);
         switch (cameraMode) {
             case VIRTUAL_SLIT:
@@ -194,7 +194,7 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
                 readoutTimeMs = ((float) (numReadoutRows * rowReadoutTime2));
                 break;
             case OVERLAP:
-                readoutTimeMs = 0.0f;
+                readoutTimeMs = 0.0;
                 break;
             default:
                 break;
@@ -203,11 +203,11 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getResetTime(CameraMode cameraMode) {
+    public double getResetTime(CameraMode cameraMode) {
         final double rowReadoutTime = getRowReadoutTime();
-        final float cameraReadoutTime = getReadoutTime(cameraMode);
+        final double cameraReadoutTime = getReadoutTime(cameraMode);
         int numRowsOverhead = 1; // TODO: change? or keep for explanatory purposes
-        return cameraReadoutTime + (float) (numRowsOverhead * rowReadoutTime);
+        return cameraReadoutTime + (numRowsOverhead * rowReadoutTime);
     }
 
     // Note: at some point the Andor Zyla 4.2 camera changed it's PixelReadoutRate property value

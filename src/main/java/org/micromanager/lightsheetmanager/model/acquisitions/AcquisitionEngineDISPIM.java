@@ -601,7 +601,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         CameraBase camera = model_.devices().getDevice("Imaging1Camera");
         CameraMode camMode = camera.getTriggerMode();
-        final float cameraReadoutTime = camera.getReadoutTime(camMode);
+        final double cameraReadoutTime = camera.getReadoutTime(camMode);
         final double exposureTime = acqSettings_.timingSettings().cameraExposure();
 
         // test acq was here
@@ -720,11 +720,11 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         final float scanLaserBufferTime = NumberUtils.roundToQuarterMs(0.25f);  // below assumed to be multiple of 0.25ms
 
-        final float cameraResetTime = camera.getResetTime(camMode);      // recalculate for safety, 0 for light sheet
-        final float cameraReadoutTime = camera.getReadoutTime(camMode);  // recalculate for safety, 0 for overlap
+        final double cameraResetTime = camera.getResetTime(camMode);      // recalculate for safety, 0 for light sheet
+        final double cameraReadoutTime = camera.getReadoutTime(camMode);  // recalculate for safety, 0 for overlap
 
-        final float cameraReadoutMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime);
-        final float cameraResetMax = NumberUtils.ceilToQuarterMs(cameraResetTime);
+        final float cameraReadoutMax = NumberUtils.ceilToQuarterMs((float)cameraReadoutTime);
+        final float cameraResetMax = NumberUtils.ceilToQuarterMs((float)cameraResetTime);
 
         // we will wait cameraReadoutMax before triggering camera, then wait another cameraResetMax for global exposure
         // this will also be in 0.25ms increment
@@ -768,7 +768,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // special adjustment for Photometrics cameras that possibly has extra clear time which is counted in reset time
         //    but not in the camera exposure time
         // TODO: skipped PVCAM case, update comment
-        float cameraExposure = NumberUtils.ceilToQuarterMs(cameraResetTime) + laserDuration;
+        float cameraExposure = NumberUtils.ceilToQuarterMs((float)cameraResetTime) + laserDuration;
 
         switch (acqSettings_.cameraMode()) {
             case EDGE:
@@ -821,7 +821,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 final double rowReadoutTime = camera.getRowReadoutTime();
                 cameraExposure = (float)(rowReadoutTime * (int)(shutterWidth/pixelSize) * shutterSpeed);
                 // s.cameraExposure = (float) (rowReadoutTime * shutterWidth / pixelSize * shutterSpeed);
-                final float totalExposureMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime + cameraExposure + 0.05f);  // 50-300us extra cushion time
+                final float totalExposureMax = NumberUtils.ceilToQuarterMs((float)(cameraReadoutTime + cameraExposure + 0.05f));  // 50-300us extra cushion time
                 final float scanSettle = (float) acqSettings_.sliceSettingsLS().scanSettleTime();
                 final float scanReset = (float) acqSettings_.sliceSettingsLS().scanResetTime();
                 delayBeforeScan = scanReset - scanDelayFilter;
@@ -846,7 +846,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // fix corner case of (exposure time + readout time) being greater than the slice duration
         // most of the time the slice duration is already larger
         sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
-        float globalDelay = NumberUtils.ceilToQuarterMs((cameraExposure + cameraReadoutTime) - (float)sliceDuration);
+        float globalDelay = NumberUtils.ceilToQuarterMs((float)(cameraExposure + cameraReadoutTime) - (float)sliceDuration);
         if (globalDelay > 0) {
             delayBeforeCamera += globalDelay;
             delayBeforeLaser += globalDelay;

@@ -119,8 +119,8 @@ public class PCOCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getReadoutTime(CameraMode cameraMode) {
-        float readoutTimeMs = 10.0f;
+    public double getReadoutTime(CameraMode cameraMode) {
+        double readoutTimeMs = 10.0;
         switch (cameraMode) {
             case VIRTUAL_SLIT:
                 Rectangle roi = getROI();
@@ -129,7 +129,7 @@ public class PCOCamera extends CameraBase implements LightSheetCamera {
 //                if (speedFactor < 1) {
 //                    speedFactor = 1;
 //                }
-                readoutTimeMs = (float) rowReadoutTime * roi.height * speedFactor;
+                readoutTimeMs = rowReadoutTime * roi.height * speedFactor;
                 break;
             case EDGE:
             case LEVEL:
@@ -140,13 +140,13 @@ public class PCOCamera extends CameraBase implements LightSheetCamera {
                 Rectangle sensorSize = getResolution();
 
                 numReadoutRows = roiReadoutRowsSplitReadout(roi2, sensorSize);
-                readoutTimeMs = ((float) (numReadoutRows * rowReadoutTime2));;
+                readoutTimeMs = numReadoutRows * rowReadoutTime2;
                 break;
             case OVERLAP:
-                readoutTimeMs = 0.0f;
+                readoutTimeMs = 0.0;
                 break;
             case PSEUDO_OVERLAP:
-                readoutTimeMs = 0.25f;
+                readoutTimeMs = 0.25;
                 break;
             default:
                 break;
@@ -155,13 +155,13 @@ public class PCOCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public float getResetTime(CameraMode cameraMode) {
-        float resetTimeMs = 10.0f;
+    public double getResetTime(CameraMode cameraMode) {
+        double resetTimeMs = 10.0;
         final double rowReadoutTime = getRowReadoutTime();
-        final float camReadoutTime = getReadoutTime(CameraMode.EDGE);
+        final double camReadoutTime = getReadoutTime(CameraMode.EDGE);
 
         int numRowsOverhead = 1;
-        resetTimeMs = camReadoutTime + (float) (numRowsOverhead * rowReadoutTime);
+        resetTimeMs = camReadoutTime + (numRowsOverhead * rowReadoutTime);
         return resetTimeMs;
     }
 

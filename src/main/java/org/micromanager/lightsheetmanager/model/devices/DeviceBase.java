@@ -81,17 +81,19 @@ public class DeviceBase {
         }
     }
 
+    // Note: this refers to the Micro-Manager FloatProperty, not the Java float type.
+    // See: the FloatProperty class in mmCoreAndDevices/MMDevice/Property.h
     public float getPropertyFloat(final String propertyName) {
         float result = 0.0f;
         try {
             result = Float.parseFloat(core_.getProperty(deviceName_, propertyName));
         } catch (Exception e) {
-            studio_.logs().logError("Could not get the \"" + propertyName + "\" property as a float.");
+            studio_.logs().logError("Could not get the \"" + propertyName + "\" property as a double.");
         }
         return result;
     }
 
-    public void setPropertyFloat(final String propertyName, final float propertyValue) {
+    public void setPropertyFloat(final String propertyName, final double propertyValue) {
         try {
             core_.setProperty(deviceName_, propertyName, propertyValue);
         } catch (Exception e) {

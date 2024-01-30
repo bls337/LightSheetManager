@@ -98,12 +98,12 @@ public class CameraBase extends DeviceBase implements LightSheetCamera {
     }
 
     @Override
-    public float getReadoutTime(CameraMode cameraMode) {
+    public double getReadoutTime(CameraMode cameraMode) {
         return 0;
     }
 
     @Override
-    public float getResetTime(CameraMode cameraMode) {
+    public double getResetTime(CameraMode cameraMode) {
         return 0;
     }
 }
