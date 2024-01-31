@@ -2,6 +2,8 @@ package org.micromanager.lightsheetmanager.model.utils;
 
 import org.apache.commons.math3.util.Precision;
 
+import java.math.BigDecimal;
+
 /**
  * Utilities for dealing with double precision floating point numbers.
  */
@@ -32,32 +34,40 @@ public class NumberUtils {
     public static float roundFloatToPlace(float f, int place) {
         if (place < 0) throw new IllegalArgumentException();
         if (place > 9) throw new IllegalArgumentException();
-        long factor = (long) Math.pow(10, place);
+        final long factor = (long) Math.pow(10, place);
         return ((float) Math.round(f * factor)) / factor;
     }
 
     /**
-     * Return the value rounded to the specified decimal places.
+     * Return the double value rounded to the number of decimal places.
      *
      * @param value the value to round
-     * @param place number of places after decimal point, between 0 and 9
+     * @param place number of decimal places
      * @return the rounded value
      */
-    public static double roundDoubleToPlace(final double value, final int place) {
-        if (place < 0 || place > 9) {
-            throw new IllegalArgumentException();
-        }
-        long factor = (long) Math.pow(10, place);
-        return ((double) Math.round(value * factor)) / factor;
+    public static double roundToPlace(final double value, final int place) {
+        return Precision.round(value, place, BigDecimal.ROUND_HALF_UP);
     }
 
     /**
-     * "rounds up" to nearest increment of 0.25, e.g. 0.0 goes to 0.0 but 0.01 goes to 0.25
-     * @param f
-     * @return
+     * Return the double value rounded up to the nearest increment of 0.25.
+     * <p>Example: 0.0 goes to 0.0 but 0.01 goes to 0.25
+     *
+     * @param value the value to round up
+     * @return the value rounded up
      */
-    public static float ceilToQuarterMs(float f) {
-        return (float) (Math.ceil(f*4)/4);
+    public static double ceilToQuarterMs(final double value) {
+        return Math.ceil(value * 4) / 4;
+    }
+
+    /**
+     * Return the double value rounded to the nearest increment of 0.25.
+     *
+     * @param value the value to round
+     * @return the rounded value
+     */
+    public static double roundToQuarterMs(final double value) {
+        return (double) Math.round(value * 4) / 4;
     }
 
     /**
@@ -70,38 +80,15 @@ public class NumberUtils {
     }
 
     /**
-     * Tests whether a float is outside the range set by two others.  Don't need to know
-     *   which of the two range-specifying numbers is minimum and which is maximum.
-     * @param num
-     * @param end1
-     * @param end2
-     * @return
+     * Return true if the value is outside the range set by the bounds end1 and end2.
+     *
+     * @param value the value to check the bounds of
+     * @param end1 end of range
+     * @param end2 end of range
+     * @return true if value is outside of range
      */
-    public static boolean outsideRange(float num, float end1, float end2) {
-        return (num > Math.max(end1, end2) || num < Math.min(end1, end2));
+    public static boolean outsideRange(double value, double end1, double end2) {
+        return value > Math.max(end1, end2) || value < Math.min(end1, end2);
     }
 
-    /**
-     * Tests whether a float is outside the range set by two others.  Don't need to know
-     *   which of the two range-specifying numbers is minimum and which is maximum.
-     * @param num
-     * @param end1
-     * @param end2
-     * @return
-     */
-    public static boolean outsideRange(double num, double end1, double end2) {
-        return (num > Math.max(end1, end2) || num < Math.min(end1, end2));
-    }
-
-    /**
-     * Tests whether a float is outside the range set by two others.  Don't need to know
-     *   which of the two range-specifying numbers is minimum and which is maximum.
-     * @param num
-     * @param end1
-     * @param end2
-     * @return
-     */
-    public static boolean outsideRange(int num, int end1, int end2) {
-        return (num > Math.max(end1, end2) || num < Math.min(end1, end2));
-    }
 }

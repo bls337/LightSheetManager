@@ -608,7 +608,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         double volumeDuration = computeActualVolumeDuration(acqSettings_);
         double timepointDuration = computeTimePointDuration();
-        long timepointIntervalMs = Math.round(acqSettings_.timePointInterval() * 1000.0f);
+        long timepointIntervalMs = Math.round(acqSettings_.timePointInterval() * 1000.0);
 
         // use hardware timing if < 1 second between time points
         // experimentally need ~0.5 sec to set up acquisition, this gives a bit of cushion
@@ -718,19 +718,19 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
 
-        final float scanLaserBufferTime = NumberUtils.roundToQuarterMs(0.25f);  // below assumed to be multiple of 0.25ms
+        final double scanLaserBufferTime = NumberUtils.roundToQuarterMs(0.25f);  // below assumed to be multiple of 0.25ms
 
         final double cameraResetTime = camera.getResetTime(camMode);      // recalculate for safety, 0 for light sheet
         final double cameraReadoutTime = camera.getReadoutTime(camMode);  // recalculate for safety, 0 for overlap
 
-        final float cameraReadoutMax = NumberUtils.ceilToQuarterMs((float)cameraReadoutTime);
-        final float cameraResetMax = NumberUtils.ceilToQuarterMs((float)cameraResetTime);
+        final double cameraReadoutMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime);
+        final double cameraResetMax = NumberUtils.ceilToQuarterMs(cameraResetTime);
 
         // we will wait cameraReadoutMax before triggering camera, then wait another cameraResetMax for global exposure
         // this will also be in 0.25ms increment
-        final float globalExposureDelayMax = cameraReadoutMax + cameraResetMax;
-        float laserDuration = NumberUtils.roundToQuarterMs((float)acqSettings_.sliceSettings().sampleExposure());
-        float scanDuration = laserDuration + 2*scanLaserBufferTime;
+        final double globalExposureDelayMax = cameraReadoutMax + cameraResetMax;
+        double laserDuration = NumberUtils.roundToQuarterMs((float)acqSettings_.sliceSettings().sampleExposure());
+        double scanDuration = laserDuration + 2*scanLaserBufferTime;
         // scan will be longer than laser by 0.25ms at both start and end
 
 
@@ -753,14 +753,14 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // TODO: only do this when PLC exists
         scanDelayFilter -= 0.25f;
 
-        float delayBeforeScan = globalExposureDelayMax - scanLaserBufferTime   // start scan 0.25ms before camera's global exposure
+        double delayBeforeScan = globalExposureDelayMax - scanLaserBufferTime   // start scan 0.25ms before camera's global exposure
                 - scanDelayFilter; // start galvo moving early due to card's Bessel filter and delay of TTL signals via PLC
-        float delayBeforeLaser = globalExposureDelayMax; // turn on laser as soon as camera's global exposure is reached
-        float delayBeforeCamera = cameraReadoutMax; // camera must read out last frame before triggering again
+        double delayBeforeLaser = globalExposureDelayMax; // turn on laser as soon as camera's global exposure is reached
+        double delayBeforeCamera = cameraReadoutMax; // camera must read out last frame before triggering again
         int scansPerSlice = 1;
 
-        float cameraDuration = 0; // set in the switch statement below
-        double sliceDuration = 0;
+        double cameraDuration = 0; // set in the switch statement below
+        double sliceDuration;
 
         // figure out desired time for camera to be exposing (including reset time)
         // because both camera trigger and laser on occur on 0.25ms intervals (i.e. we may not
@@ -768,7 +768,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // special adjustment for Photometrics cameras that possibly has extra clear time which is counted in reset time
         //    but not in the camera exposure time
         // TODO: skipped PVCAM case, update comment
-        float cameraExposure = NumberUtils.ceilToQuarterMs((float)cameraResetTime) + laserDuration;
+        double cameraExposure = NumberUtils.ceilToQuarterMs(cameraResetTime) + laserDuration;
 
         switch (acqSettings_.cameraMode()) {
             case EDGE:
@@ -779,9 +779,9 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 // ensure not to miss triggers by not being done with readout in time for next trigger, add 0.25ms if needed
                 sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
                 if (sliceDuration < (cameraExposure + cameraReadoutTime)) {
-                    delayBeforeCamera += 0.25f;
-                    delayBeforeLaser += 0.25f;
-                    delayBeforeScan += 0.25f;
+                    delayBeforeCamera += 0.25;
+                    delayBeforeLaser += 0.25;
+                    delayBeforeScan += 0.25;
                 }
                 break;
             case LEVEL: // AKA "bulb mode", TTL rising starts exposure, TTL falling ends it
@@ -810,8 +810,8 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 // 5. laser turns on 0.25ms before camera trigger and stays on until exposure is ending
                 // TODO revisit this after further experimentation
                 cameraDuration = 1;  // only need to trigger camera
-                final float shutterWidth = (float) acqSettings_.sliceSettingsLS().shutterWidth();
-                final float shutterSpeed = (float) acqSettings_.sliceSettingsLS().shutterSpeedFactor();
+                final double shutterWidth = acqSettings_.sliceSettingsLS().shutterWidth();
+                final double shutterSpeed = acqSettings_.sliceSettingsLS().shutterSpeedFactor();
                 ///final float shutterWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_WIDTH);
                 //final int shutterSpeed = props_.getPropValueInteger(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_SPEED);
                 float pixelSize = (float) core_.getPixelSizeUm();
@@ -821,9 +821,9 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 final double rowReadoutTime = camera.getRowReadoutTime();
                 cameraExposure = (float)(rowReadoutTime * (int)(shutterWidth/pixelSize) * shutterSpeed);
                 // s.cameraExposure = (float) (rowReadoutTime * shutterWidth / pixelSize * shutterSpeed);
-                final float totalExposureMax = NumberUtils.ceilToQuarterMs((float)(cameraReadoutTime + cameraExposure + 0.05f));  // 50-300us extra cushion time
-                final float scanSettle = (float) acqSettings_.sliceSettingsLS().scanSettleTime();
-                final float scanReset = (float) acqSettings_.sliceSettingsLS().scanResetTime();
+                final double totalExposureMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime + cameraExposure + 0.05);  // 50-300us extra cushion time
+                final double scanSettle = (float) acqSettings_.sliceSettingsLS().scanSettleTime();
+                final double scanReset = (float) acqSettings_.sliceSettingsLS().scanResetTime();
                 delayBeforeScan = scanReset - scanDelayFilter;
                 scanDuration = scanSettle + (totalExposureMax*shutterSpeed) + scanLaserBufferTime;
                 delayBeforeCamera = scanReset + scanSettle;
@@ -846,7 +846,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // fix corner case of (exposure time + readout time) being greater than the slice duration
         // most of the time the slice duration is already larger
         sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
-        float globalDelay = NumberUtils.ceilToQuarterMs((float)(cameraExposure + cameraReadoutTime) - (float)sliceDuration);
+        double globalDelay = NumberUtils.ceilToQuarterMs((cameraExposure + cameraReadoutTime) - sliceDuration);
         if (globalDelay > 0) {
             delayBeforeCamera += globalDelay;
             delayBeforeLaser += globalDelay;
