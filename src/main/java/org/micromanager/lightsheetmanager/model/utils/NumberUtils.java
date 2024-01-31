@@ -71,15 +71,6 @@ public class NumberUtils {
     }
 
     /**
-     * rounds to nearest increment of 0.25
-     * @param f
-     * @return
-     */
-    public static float roundToQuarterMs(float f) {
-        return ((float) Math.round(f*4))/4;
-    }
-
-    /**
      * Return true if the value is outside the range set by the bounds end1 and end2.
      *
      * @param value the value to check the bounds of
