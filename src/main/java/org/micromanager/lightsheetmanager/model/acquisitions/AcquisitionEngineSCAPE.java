@@ -823,7 +823,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
 
-        final float scanLaserBufferTime = NumberUtils.roundToQuarterMs(0.25f);  // below assumed to be multiple of 0.25ms
+        final double scanLaserBufferTime = NumberUtils.roundToQuarterMs(0.25);  // below assumed to be multiple of 0.25ms
 
         final double cameraResetTime = camera.getResetTime(camMode);      // recalculate for safety, 0 for light sheet
         final double cameraReadoutTime = camera.getReadoutTime(camMode);  // recalculate for safety, 0 for overlap
@@ -834,7 +834,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // we will wait cameraReadoutMax before triggering camera, then wait another cameraResetMax for global exposure
         // this will also be in 0.25ms increment
         final double globalExposureDelayMax = cameraReadoutMax + cameraResetMax;
-        double laserDuration = NumberUtils.roundToQuarterMs((float)acqSettings_.sliceSettings().sampleExposure());
+        double laserDuration = NumberUtils.roundToQuarterMs(acqSettings_.sliceSettings().sampleExposure());
         double scanDuration = laserDuration + 2*scanLaserBufferTime;
         // scan will be longer than laser by 0.25ms at both start and end
 
@@ -846,9 +846,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // group delay for 5th-order bessel filter ~0.39/freq from theory and ~0.4/freq from IC datasheet
         final double scanFilterFreq = Math.max(scanner1.getFilterFreqX(), scanner2.getFilterFreqX());
 
-        float scanDelayFilter = 0;
+        double scanDelayFilter = 0;
         if (scanFilterFreq != 0) {
-            scanDelayFilter = NumberUtils.roundToQuarterMs(0.39f/(float)scanFilterFreq);
+            scanDelayFilter = NumberUtils.roundToQuarterMs(0.39/scanFilterFreq);
         }
         // If the PLogic card is used, account for 0.25ms delay it introduces to
         // the camera and laser trigger signals => subtract 0.25ms from the scanner delay
@@ -856,7 +856,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // this time-shift opposes the Bessel filter delay
         // scanDelayFilter won't be negative unless scanFilterFreq is more than 3kHz which shouldn't happen
         // TODO: only do this when PLC exists
-        scanDelayFilter -= 0.25f;
+        scanDelayFilter -= 0.25;
 
         double delayBeforeScan = globalExposureDelayMax - scanLaserBufferTime   // start scan 0.25ms before camera's global exposure
                 - scanDelayFilter; // start galvo moving early due to card's Bessel filter and delay of TTL signals via PLC
