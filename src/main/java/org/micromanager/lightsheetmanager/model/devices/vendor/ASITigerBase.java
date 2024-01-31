@@ -68,13 +68,13 @@ public abstract class ASITigerBase extends DeviceBase {
         return "";
     }
 
-    public float getFirmwareVersion() {
+    public double getFirmwareVersion() {
         try {
-            return Float.parseFloat(core_.getProperty(deviceName_, Properties.FIRMWARE_VERSION));
+            return Double.parseDouble(core_.getProperty(deviceName_, Properties.FIRMWARE_VERSION));
         } catch (Exception e) {
             studio_.logs().logError("could not get the firmware version property");
         }
-        return 0.0f;
+        return 0.0;
     }
 
     public int getTigerHexAddress() {

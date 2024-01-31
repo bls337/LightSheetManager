@@ -158,11 +158,11 @@ public class SettingsTab extends Panel implements ListeningPanel {
 
             // Light Sheet Scanner
             spnSheetAxisFilterFreq_.registerListener(e -> {
-                scanner.setFilterFreqX((float)spnSheetAxisFilterFreq_.getDouble());
+                scanner.setFilterFreqX(spnSheetAxisFilterFreq_.getDouble());
             });
 
             spnSliceAxisFilterFreq_.registerListener(e -> {
-                scanner.setFilterFreqY((float)spnSliceAxisFilterFreq_.getDouble());
+                scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble());
             });
         }
 

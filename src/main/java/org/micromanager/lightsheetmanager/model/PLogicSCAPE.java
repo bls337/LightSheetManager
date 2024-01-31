@@ -217,13 +217,13 @@ public class PLogicSCAPE {
 //                studio_.logs().showError("Required stage speed is too slow, please increase step size or decrease sample exposure.");
 //                return false;
 //            }
-//            xyStage_.setSpeedX((float)requestedMotorSpeed);
+//            xyStage_.setSpeedX(requestedMotorSpeed);
 //
 //            // ask for the actual speed to calculate the actual step size
 //            actualMotorSpeed = xyStage_.getSpeedXUm() / 1000;
 //
 //            // set the acceleration to a reasonable value for the (usually very slow) scan speed
-//            xyStage_.setAccelerationX((float)computeScanAcceleration(actualMotorSpeed,
+//            xyStage_.setAccelerationX(computeScanAcceleration(actualMotorSpeed,
 //                    xyStage_.getMaxSpeedX(), settings.scanSettings().scanAccelerationFactor()));
 //
 //            int numLines = settings.volumeSettings().numViews();
@@ -400,10 +400,10 @@ public class PLogicSCAPE {
             }
         }
 
-        xyStage_.setFastAxisStart((float) (xStartUm / 1000d));
-        xyStage_.setFastAxisStop((float) (xStopUm / 1000d));
-        xyStage_.setSlowAxisStart((float) (y / 1000d));
-        xyStage_.setSlowAxisStop((float) (y / 1000d));
+        xyStage_.setFastAxisStart(xStartUm / 1000);
+        xyStage_.setFastAxisStop(xStopUm / 1000);
+        xyStage_.setSlowAxisStart(y / 1000);
+        xyStage_.setSlowAxisStop(y / 1000);
 
         zSpeedZero_ = true;  // will turn false if we are doing planar correction
         return false;
@@ -475,10 +475,10 @@ public class PLogicSCAPE {
             // can either trigger controller once for all the time points and
             //  have the number of repeats pre-programmed (hardware timing)
             //  or let plugin send trigger for each time point (software timing)
-            float delayRepeats = 0.0f;
+            double delayRepeats = 0.0;
             if (settings.isUsingHardwareTimePoints() && settings.isUsingTimePoints()) {
-                float volumeDurationMs = 1.0f;
-                float volumeIntervalMs = (float) settings.timePointInterval();
+                double volumeDurationMs = 1.0;
+                double volumeIntervalMs = settings.timePointInterval();
                 delayRepeats = volumeIntervalMs - volumeDurationMs;
                 numVolumesPerTrigger = settings.numTimePoints();
             }
@@ -487,7 +487,7 @@ public class PLogicSCAPE {
 
             scanner_.setSPIMDelayBeforeSide(
                     settings.isUsingStageScanning() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
-                            : (float) settings.volumeSettings().delayBeforeView()); // this is the usual behavior
+                            : settings.volumeSettings().delayBeforeView()); // this is the usual behavior
         }
         double piezoCenter;
         if (settings.isUsingStageScanning()) {
@@ -499,19 +499,19 @@ public class PLogicSCAPE {
             // TODO: add centerAtCurrentZ to acqSettings
             final boolean centerAtCurrentZ = false;
             if (centerAtCurrentZ) {
-                piezoCenter = (float)piezo_.getPosition(); //(float) positions_.getUpdatedPosition(piezoDevice, Joystick.Directions.NONE);
+                piezoCenter = piezo_.getPosition(); //positions_.getUpdatedPosition(piezoDevice, Joystick.Directions.NONE);
             } else {
-                piezoCenter = (float)model_.acquisitions().settings()
+                piezoCenter = model_.acquisitions().settings()
                         .sheetCalibration(view).imagingCenter();
             }
         }
 
         // if we set piezoAmplitude to 0 here then sliceAmplitude will also be 0
-        float piezoAmplitude;
+        double piezoAmplitude;
         if (settings.isUsingStageScanning() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
-            piezoAmplitude = 0.0f;
+            piezoAmplitude = 0.0;
         } else {
-            piezoAmplitude = (float) ((settings.volumeSettings().slicesPerView() - 1) * settings.volumeSettings().sliceStepSize());
+            piezoAmplitude = (settings.volumeSettings().slicesPerView() - 1) * settings.volumeSettings().sliceStepSize();
         }
 
         // use this instead of settings.numSlices from here on out because
@@ -523,23 +523,23 @@ public class PLogicSCAPE {
         // N frames (piezo/scanner will move to N+1st position but no image taken)
         final CameraMode cameraMode = settings.cameraMode();
         if (cameraMode == CameraMode.OVERLAP) {
-            piezoAmplitude *= ((float) numSlicesHW) / ((float) numSlicesHW - 1f);
+            piezoAmplitude *= numSlicesHW / (numSlicesHW - 1.0);
             piezoCenter += piezoAmplitude / (2 * numSlicesHW);
             numSlicesHW += 1;
         }
 
         // FIXME: more light sheet setup
-        final float slope1 = (float)settings.sliceCalibration(1).sliceSlope();
-        final float slope2 = (float)settings.sliceCalibration(2).sliceSlope();
-        float sliceRate = (view == 1) ? slope1 : slope2;
+        final double slope1 = settings.sliceCalibration(1).sliceSlope();
+        final double slope2 = settings.sliceCalibration(2).sliceSlope();
+        double sliceRate = (view == 1) ? slope1 : slope2;
         if (NumberUtils.doublesEqual(sliceRate, 0.0)) {
             studio_.logs().showError("Calibration slope for view " + view + " cannot be zero. Re-do calibration on Setup tab.");
             return false;
         }
-        final float offset1 = (float)(settings.sliceCalibration(1).sliceOffset() + channelOffset);
-        final float offset2 = (float)(settings.sliceCalibration(2).sliceOffset() + channelOffset);
-        float sliceOffset = (view == 1) ? offset1 : offset2;
-        float sliceAmplitude = piezoAmplitude / sliceRate;
+        final double offset1 = settings.sliceCalibration(1).sliceOffset() + channelOffset;
+        final double offset2 = settings.sliceCalibration(2).sliceOffset() + channelOffset;
+        double sliceOffset = (view == 1) ? offset1 : offset2;
+        double sliceAmplitude = piezoAmplitude / sliceRate;
         double sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
 
         if (settings.acquisitionMode() == AcquisitionMode.PIEZO_SCAN_ONLY) {
@@ -547,11 +547,11 @@ public class PLogicSCAPE {
                 double actualPiezoCenter = piezoCenter - piezoAmplitude / (2 * (numSlicesHW - 1));
                 sliceCenter = (actualPiezoCenter - sliceOffset) / sliceRate;
             }
-            sliceAmplitude = 0.0f;
+            sliceAmplitude = 0.0;
         }
         // round to nearest 0.0001 degrees, which is approximately the DAC resolution
-        sliceAmplitude = NumberUtils.roundFloatToPlace(sliceAmplitude, 4);
-        sliceCenter = NumberUtils.roundFloatToPlace((float)sliceCenter, 4);
+        sliceAmplitude = NumberUtils.roundToPlace(sliceAmplitude, 4);
+        sliceCenter = NumberUtils.roundToPlace(sliceCenter, 4);
 
         if (offsetOnly) {
             scanner_.sa().setOffsetY(sliceCenter);
@@ -561,7 +561,7 @@ public class PLogicSCAPE {
             final boolean oppositeDirections = false;
 
             scanner_.setSPIMAlternateDirections(oppositeDirections);
-            scanner_.setSPIMScanDuration((float) settings.timingSettings().scanDuration());
+            scanner_.setSPIMScanDuration(settings.timingSettings().scanDuration());
             scanner_.sa().setAmplitudeY(sliceAmplitude);
             scanner_.sa().setOffsetY(sliceCenter);
             scanner_.setSPIMNumSlices(numSlicesHW);
@@ -584,7 +584,7 @@ public class PLogicSCAPE {
                 if (settings.cameraMode() == CameraMode.OVERLAP) {
                     piezoCenter -= piezoAmplitude / (2 * (numSlicesHW - 1));
                 }
-                piezoAmplitude = 0.0f;
+                piezoAmplitude = 0.0;
             }
 
             double piezoMin = piezo_.getLowerLimit() * 1000;
@@ -598,8 +598,8 @@ public class PLogicSCAPE {
             }
 
             // round to nearest 0.001 micron, which is approximately the DAC resolution
-            piezoAmplitude = NumberUtils.roundFloatToPlace(piezoAmplitude, 3);
-            piezoCenter = NumberUtils.roundFloatToPlace((float)piezoCenter, 3);
+            piezoAmplitude = NumberUtils.roundToPlace(piezoAmplitude, 3);
+            piezoCenter = NumberUtils.roundToPlace(piezoCenter, 3);
             piezo_.sa().setAmplitude(piezoAmplitude);
             piezo_.sa().setOffset(piezoCenter);
 
@@ -636,15 +636,14 @@ public class PLogicSCAPE {
                 // FIXME: !!!
                 //final float settleTime = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SCAN_SETTLE);
                 // infer the main scan time (during imaging) from the laser duration
-//                    final float readoutTime = (float) (settings.timingSettings().laserTriggerDuration() - 0.25f);  // -0.25 is for scanLaserBufferTime
+//                    final float readoutTime = settings.timingSettings().laserTriggerDuration() - 0.25;  // -0.25 is for scanLaserBufferTime
 //                    // offset should be decreased by half of the distance traveled during settle time (instead of re-extracting slope use existing sheetWidth/readoutTime)
 //                    sheetOffset -= (sheetWidth * settleTime/readoutTime)/2;
 //                    // width should be increased by ratio (1 + settle_fraction)
 //                    sheetWidth += (sheetWidth * settleTime/readoutTime);
             }
-            // TODO: change to double?
-            scanner_.sa().setAmplitudeX((float)sheetWidth);
-            scanner_.sa().setOffsetX((float)sheetOffset);
+            scanner_.sa().setAmplitudeX(sheetWidth);
+            scanner_.sa().setOffsetX(sheetOffset);
         }
         return true;
     }
@@ -943,8 +942,8 @@ public class PLogicSCAPE {
 //            if (roi == null || roi.height == 0) {
 //                studio_.logs().logDebugMessage("Could not get camera ROI for light sheet mode");
 //            }
-//            final float slopePolarity = (side == Devices.Sides.B) ? -1f : 1f;
-//            sheetWidth = roi.height * sheetSlope * slopePolarity / 1e6f;  // in microdegrees per pixel, convert to degrees
+//            final float slopePolarity = (side == Devices.Sides.B) ? -1 : 1;
+//            sheetWidth = roi.height * sheetSlope * slopePolarity / 1e6;  // in microdegrees per pixel, convert to degrees
         } else {
             final boolean autoSheet = model_.getAcquisitionEngine().settings().sheetCalibration(view).isUsingAutoSheetWidth();
             if (autoSheet) {
@@ -954,7 +953,7 @@ public class PLogicSCAPE {
                 }
                 final double sheetSlope = model_.getAcquisitionEngine().settings().sheetCalibration(view).autoSheetWidthPerPixel();
                 sheetWidth = roi.height *  sheetSlope / 1000.0;  // in millidegrees per pixel, convert to degrees
-                sheetWidth *= 1.1f;  // 10% extra width just to be sure
+                sheetWidth *= 1.1;  // 10% extra width just to be sure
             }
 //            final boolean autoSheet = prefs_.getBoolean(
 //                    MyStrings.PanelNames.SETUP.toString() + side.toString(),
@@ -966,10 +965,10 @@ public class PLogicSCAPE {
 //                }
 //                final float sheetSlope = prefs_.getFloat(MyStrings.PanelNames.SETUP.toString() + side.toString(),
 //                        Properties.Keys.PLUGIN_SLOPE_SHEET_WIDTH.toString(), 2);
-//                sheetWidth = roi.height *  sheetSlope / 1000f;  // in millidegrees per pixel, convert to degrees
+//                sheetWidth = roi.height *  sheetSlope / 1000;  // in millidegrees per pixel, convert to degrees
 //                // TODO add extra width to compensate for filter depending on sweep rate and filter freq
 //                // TODO calculation should account for sample exposure to make sure 0.25ms edges get appropriately compensated for
-//                sheetWidth *= 1.1f;  // 10% extra width just to be sure
+//                sheetWidth *= 1.1;  // 10% extra width just to be sure
 //            }
         }
         return sheetWidth;
@@ -984,7 +983,7 @@ public class PLogicSCAPE {
             sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetOffset() / 1000.0;
             //sheetOffset = prefs_.getFloat(
             //MyStrings.PanelNames.SETUP.toString() + side.toString(),
-            //Properties.Keys.PLUGIN_LIGHTSHEET_OFFSET, 0) / 1000f;  // in millidegrees, convert to degrees
+            //Properties.Keys.PLUGIN_LIGHTSHEET_OFFSET, 0) / 1000;  // in millidegrees, convert to degrees
         } else {
             sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetOffset();
             //final Properties.Keys offsetProp = (side == Devices.Sides.A) ?

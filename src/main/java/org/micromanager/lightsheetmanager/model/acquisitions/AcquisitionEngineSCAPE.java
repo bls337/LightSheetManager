@@ -879,7 +879,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         switch (acqSettings_.cameraMode()) {
             case EDGE:
                 cameraDuration = 1;  // doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
-                cameraExposure += 0.1f; // add 0.1ms as safety margin, may require adding an additional 0.25ms to slice
+                cameraExposure += 0.1; // add 0.1ms as safety margin, may require adding an additional 0.25ms to slice
                 // slight delay between trigger and actual exposure start
                 //   is included in exposure time for Hamamatsu and negligible for Andor and PCO cameras
                 // ensure not to miss triggers by not being done with readout in time for next trigger, add 0.25ms if needed
@@ -903,7 +903,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 // leave cameraExposure alone if using PVCAM device library
                 if (!camera.getDeviceLibrary().equals("PVCAM")) {
                     sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
-                    cameraExposure = (float) sliceDuration - delayBeforeCamera;  // s.cameraDelay should be 0.25ms for PCO
+                    cameraExposure = sliceDuration - delayBeforeCamera;  // s.cameraDelay should be 0.25ms for PCO
                 }
                 if (cameraReadoutMax < 0.24f) {
                     studio_.logs().showError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
@@ -920,15 +920,15 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 cameraDuration = 1;  // only need to trigger camera
                 final double shutterWidth = acqSettings_.sliceSettingsLS().shutterWidth();
                 final double shutterSpeed = acqSettings_.sliceSettingsLS().shutterSpeedFactor();
-                ///final float shutterWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_WIDTH);
+                ///final double shutterWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_WIDTH);
                 //final int shutterSpeed = props_.getPropValueInteger(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_SPEED);
-                float pixelSize = (float) core_.getPixelSizeUm();
+                double pixelSize = core_.getPixelSizeUm();
                 if (pixelSize < 1e-6) {  // can't compare equality directly with floating point values so call < 1e-9 is zero or negative
-                    pixelSize = 0.1625f;  // default to pixel size of 40x with sCMOS = 6.5um/40
+                    pixelSize = 0.1625;  // default to pixel size of 40x with sCMOS = 6.5um/40
                 }
                 final double rowReadoutTime = camera.getRowReadoutTime();
-                cameraExposure = (float)(rowReadoutTime * (int)(shutterWidth/pixelSize) * shutterSpeed);
-                // s.cameraExposure = (float) (rowReadoutTime * shutterWidth / pixelSize * shutterSpeed);
+                cameraExposure = rowReadoutTime * (int)(shutterWidth/pixelSize) * shutterSpeed;
+                // s.cameraExposure = (rowReadoutTime * shutterWidth / pixelSize * shutterSpeed);
                 final double totalExposureMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime + cameraExposure + 0.05);  // 50-300us extra cushion time
                 final double scanSettle = acqSettings_.sliceSettingsLS().scanSettleTime();
                 final double scanReset = acqSettings_.sliceSettingsLS().scanResetTime();
