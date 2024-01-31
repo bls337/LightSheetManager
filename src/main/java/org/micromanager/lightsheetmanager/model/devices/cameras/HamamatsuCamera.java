@@ -71,8 +71,8 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
                     // ignore => will set the HAMAMATSU_LINE_INTERVAL property
                     // to the rowTime without considering the lower limit
                 }
-                setProperty(Properties.INTERNAL_LINE_INTERVAL, String.valueOf((float)Math.max(rowTime, lowerLimit)));
-                //props_.setPropValue(devKey, Properties.Keys.HAMAMATSU_LINE_INTERVAL, (float)Math.max(rowTime, lowerLimit));
+                setProperty(Properties.INTERNAL_LINE_INTERVAL, String.valueOf((Math.max(rowTime, lowerLimit))));
+                //props_.setPropValue(devKey, Properties.Keys.HAMAMATSU_LINE_INTERVAL, Math.max(rowTime, lowerLimit));
                 break;
             case EDGE:
                 setProperty(Properties.TRIGGER_ACTIVE, Values.EDGE);
@@ -148,7 +148,7 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
                     readoutTimeMs = 10000;  // absurdly large, light sheet mode over USB3 isn't supported by Flash4, but we are set up to decide available modes by device library and not a property
                 } else {
                     Rectangle roi = getROI();
-                    readoutTimeMs = (float)(getRowReadoutTime() * roi.height);
+                    readoutTimeMs = getRowReadoutTime() * roi.height;
                 }
                 break;
             case EDGE:

@@ -26,19 +26,6 @@ public class NumberUtils {
     }
 
     /**
-     *
-     * @param f
-     * @param place number of places after decimal point, between 0 and 9
-     * @return
-     */
-    public static float roundFloatToPlace(float f, int place) {
-        if (place < 0) throw new IllegalArgumentException();
-        if (place > 9) throw new IllegalArgumentException();
-        final long factor = (long) Math.pow(10, place);
-        return ((float) Math.round(f * factor)) / factor;
-    }
-
-    /**
      * Return the double value rounded to the number of decimal places.
      *
      * @param value the value to round

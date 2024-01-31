@@ -68,16 +68,16 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
                 // Note: the following applies to single view mode, the issue is not present in dual view mode:
                 // only shutter speeds < 4 work with the 200 Mhz slow scan mode, shutter speeds >= 5 will miss 1 image
 
-                float maxLineScanSpeed = 104166.6667f;
+                double maxLineScanSpeed = 104166.6667;
                 if (isSlowReadout()) {
-                    maxLineScanSpeed = 41666.6667f;
+                    maxLineScanSpeed = 41666.6667;
                 }
 
                 // FIXME: need plugin properties
-//                final float shutterSpeed = props_.getPropValueFloat(
+//                final double shutterSpeed = props_.getPropValueFloat(
 //                        Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_SPEED);
 //
-//                final float shutterWidth = props_.getPropValueFloat(
+//                final double shutterWidth = props_.getPropValueFloat(
 //                        Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_WIDTH);
 
                 // this property must be set to "On" to change LineScanSpeed
@@ -85,9 +85,9 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
 
                 // TODO: should this be here?
                 // default to the same pixelSize as getTimingFromPeriodAndLightExposure
-                float pixelSize = (float) core_.getPixelSizeUm();
+                double pixelSize = core_.getPixelSizeUm();
                 if (pixelSize < 1e-6) {
-                    pixelSize = 0.1625f;
+                    pixelSize = 0.1625;
                 }
 
                 // these properties must be set in the correct order:
@@ -181,7 +181,7 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
 //                if (speedFactor < 1) {
 //                    speedFactor = 1;
 //                }
-                readoutTimeMs = (float) rowReadoutTime * roi.height * speedFactor;
+                readoutTimeMs = rowReadoutTime * roi.height * speedFactor;
                 break;
             case EDGE:
             case LEVEL:
@@ -191,7 +191,7 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
                 Rectangle roi2 = getROI();
                 Rectangle sensorSize = getResolution();
                 numReadoutRows = roiReadoutRowsSplitReadout(roi2, sensorSize);
-                readoutTimeMs = ((float) (numReadoutRows * rowReadoutTime2));
+                readoutTimeMs = numReadoutRows * rowReadoutTime2;
                 break;
             case OVERLAP:
                 readoutTimeMs = 0.0;
