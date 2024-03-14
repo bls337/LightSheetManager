@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
 
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -76,7 +76,7 @@ public class PiezoCalibrationPanel extends Panel {
         }
         btnRunAutofocus_ = new Button("Run Autofocus", 120, 26);
 
-        final DefaultAcquisitionSettingsDISPIM acqSettings =
+        final DefaultAcquisitionSettingsSCAPE acqSettings =
                 model_.acquisitions().settings();
 
         txtSlope_ = new TextField(7);

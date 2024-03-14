@@ -77,7 +77,10 @@ public class PLogicDISPIM {
         devices_ = model_.devices();
         core_ = studio_.core();
 
-        acqSettings_ = model_.acquisitions().settings();
+
+        // TODO: remove this when a more generic method is available and get from model
+        //acqSettings_ = model_.acquisitions().settings();
+        acqSettings_ = new DefaultAcquisitionSettingsDISPIM.Builder().build();
 
         scanDistance_ = 0;
         actualStepSizeUm_ = 0;

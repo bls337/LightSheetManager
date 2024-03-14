@@ -1,6 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -41,7 +41,7 @@ public class SettingsTab extends Panel implements ListeningPanel {
     }
 
     private void createUserInterface() {
-        final DefaultAcquisitionSettingsDISPIM acqSettings =
+        final DefaultAcquisitionSettingsSCAPE acqSettings =
                 model_.acquisitions().settings();
 
         isUsingPLogic_ = model_.devices().isUsingPLogic();

@@ -1,6 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -26,7 +26,7 @@ public class TimePointsPanel extends Panel {
     }
 
     private void createUserInterface() {
-        final DefaultAcquisitionSettingsDISPIM acqSettings =
+        final DefaultAcquisitionSettingsSCAPE acqSettings =
                 model_.acquisitions().settings();
 
         setMigLayout(

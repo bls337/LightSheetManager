@@ -6,7 +6,7 @@ import org.micromanager.acqj.internal.Engine;
 import org.micromanager.acqj.main.AcqEngMetadata;
 import org.micromanager.acqj.main.AcquisitionEvent;
 import org.micromanager.acqj.util.AcquisitionEventIterator;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class LSMAcquisitionEvents {
 
 
    public static Iterator<AcquisitionEvent> createTimelapseMultiChannelVolumeAcqEvents(
-           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsSCAPE acquisitionSettings,
            String[] cameraDeviceNames,
            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
@@ -59,7 +59,7 @@ public class LSMAcquisitionEvents {
    }
 
    public static Iterator<AcquisitionEvent> createTimelapseVolumeAcqEvents(
-           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsSCAPE acquisitionSettings,
            String[] cameraDeviceNames,
            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
@@ -89,7 +89,7 @@ public class LSMAcquisitionEvents {
     *                    false: do an entire volume in one channel, then the next one
     */
    public static Iterator<AcquisitionEvent> createMultiChannelVolumeAcqEvents(
-           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsSCAPE acquisitionSettings,
            String[] cameraDeviceNames,
            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor, boolean interleaved) {
 
@@ -116,7 +116,7 @@ public class LSMAcquisitionEvents {
    }
 
    public static Iterator<AcquisitionEvent> createVolumeAcqEvents(
-           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsSCAPE acquisitionSettings,
            String[] cameraDeviceNames,
            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
@@ -132,7 +132,7 @@ public class LSMAcquisitionEvents {
    }
 
    public static Iterator<AcquisitionEvent> createChannelAcqEvents(
-           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsSCAPE acquisitionSettings,
            String[] cameraDeviceNames,
            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
@@ -152,7 +152,7 @@ public class LSMAcquisitionEvents {
    }
 
    public static Iterator<AcquisitionEvent> createAcqEvents(
-           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsDISPIM acquisitionSettings,
+           AcquisitionEvent baseEvent, DefaultAcquisitionSettingsSCAPE acquisitionSettings,
            String[] cameraDeviceNames,
            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 

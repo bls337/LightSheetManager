@@ -5,7 +5,7 @@ import java.io.File;
 import java.util.EventObject;
 
 import org.micromanager.internal.utils.FileDialogs;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.gui.components.*;
 import org.micromanager.lightsheetmanager.gui.components.Button;
@@ -54,7 +54,7 @@ public class DataTab extends Panel implements ListeningPanel {
         final Label lblTitle = new Label("Data Settings", Font.BOLD, 18);
 
 
-        final DefaultAcquisitionSettingsDISPIM acqSettings =
+        final DefaultAcquisitionSettingsSCAPE acqSettings =
                 model_.acquisitions().settings();
 
         final Panel pnlSave = new Panel("Image Save Settings");

@@ -6,6 +6,7 @@ import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
@@ -81,7 +82,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
     private void createUserInterface() {
 
-        final DefaultAcquisitionSettingsDISPIM acqSettings =
+        final DefaultAcquisitionSettingsSCAPE acqSettings =
                 model_.acquisitions().settings();
 
         Panel.setMigLayoutDefault(

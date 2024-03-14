@@ -35,10 +35,13 @@ import java.util.ArrayList;
 public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
 //    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
-//    private DefaultAcquisitionSettingsDISPIM acqSettings_;
+   // TODO: remove this when a more generic method is available and get from base class
+    private DefaultAcquisitionSettingsDISPIM acqSettings_;
 
     public AcquisitionEngineDISPIM(final LightSheetManagerModel model) {
         super(model);
+        // TODO: remove this when a more generic method is available and get from base class
+        acqSettings_ = new DefaultAcquisitionSettingsDISPIM.Builder().build();
     }
 
 //    @Override
@@ -453,48 +456,49 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
             }
         }
 
-        final int numPositions = acqSettings_.isUsingMultiplePositions() ? pl.getNumberOfPositions() : 1;
-        for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
-            AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
-            if (acqSettings_.isUsingMultiplePositions()) {
-                baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
-            }
-            // TODO: what to do if multiple positions not defined: acquire at current stage position?
-            //  If yes, then nothing more to do here.
-
-            if (acqSettings_.isUsingHardwareTimePoints()) {
-                // create a full iterator of TCZ acquisition events, and Tiger controller
-                // will handle everything else
-                if (acqSettings_.isUsingChannels()) {
-                    currentAcquisition_.submitEventIterator(
-                            LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
-                                    baseEvent.copy(), acqSettings_, cameraNames, null));
-                } else {
-                    currentAcquisition_.submitEventIterator(
-                            LSMAcquisitionEvents.createTimelapseVolumeAcqEvents(
-                                    baseEvent.copy(), acqSettings_, cameraNames, null));
-                }
-            } else {
-                // Loop 2: Multiple time points
-                final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
-                for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
-                    baseEvent.setTimeIndex(timeIndex);
-                    // Loop 3: Channels; Loop 4: Z slices (non-interleaved)
-                    // Loop 3: Channels; Loop 4: Z slices (interleaved)
-                    if (acqSettings_.isUsingChannels()) {
-                        currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createMultiChannelVolumeAcqEvents(
-                                        baseEvent.copy(), acqSettings_, cameraNames, null,
-                                        acqSettings_.acquisitionMode() ==
-                                                AcquisitionMode.STAGE_SCAN_INTERLEAVED));
-                    } else {
-                        currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createVolumeAcqEvents(
-                                        baseEvent.copy(), acqSettings_, cameraNames, null));
-                    }
-                }
-            }
-        }
+        // TODO: make LSMAcquisitionEvents generic or have a separate class
+//        final int numPositions = acqSettings_.isUsingMultiplePositions() ? pl.getNumberOfPositions() : 1;
+//        for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
+//            AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
+//            if (acqSettings_.isUsingMultiplePositions()) {
+//                baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
+//            }
+//            // TODO: what to do if multiple positions not defined: acquire at current stage position?
+//            //  If yes, then nothing more to do here.
+//
+//            if (acqSettings_.isUsingHardwareTimePoints()) {
+//                // create a full iterator of TCZ acquisition events, and Tiger controller
+//                // will handle everything else
+//                if (acqSettings_.isUsingChannels()) {
+//                    currentAcquisition_.submitEventIterator(
+//                            LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
+//                                    baseEvent.copy(), acqSettings_, cameraNames, null));
+//                } else {
+//                    currentAcquisition_.submitEventIterator(
+//                            LSMAcquisitionEvents.createTimelapseVolumeAcqEvents(
+//                                    baseEvent.copy(), acqSettings_, cameraNames, null));
+//                }
+//            } else {
+//                // Loop 2: Multiple time points
+//                final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
+//                for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
+//                    baseEvent.setTimeIndex(timeIndex);
+//                    // Loop 3: Channels; Loop 4: Z slices (non-interleaved)
+//                    // Loop 3: Channels; Loop 4: Z slices (interleaved)
+//                    if (acqSettings_.isUsingChannels()) {
+//                        currentAcquisition_.submitEventIterator(
+//                                LSMAcquisitionEvents.createMultiChannelVolumeAcqEvents(
+//                                        baseEvent.copy(), acqSettings_, cameraNames, null,
+//                                        acqSettings_.acquisitionMode() ==
+//                                                AcquisitionMode.STAGE_SCAN_INTERLEAVED));
+//                    } else {
+//                        currentAcquisition_.submitEventIterator(
+//                                LSMAcquisitionEvents.createVolumeAcqEvents(
+//                                        baseEvent.copy(), acqSettings_, cameraNames, null));
+//                    }
+//                }
+//            }
+//        }
 
 
 

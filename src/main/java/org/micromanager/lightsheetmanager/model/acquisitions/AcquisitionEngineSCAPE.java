@@ -18,7 +18,7 @@ import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
@@ -38,9 +38,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class AcquisitionEngineSCAPE extends AcquisitionEngine {
-
-//    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
-//    private DefaultAcquisitionSettingsDISPIM acqSettings_;
 
     public AcquisitionEngineSCAPE(final LightSheetManagerModel model) {
         super(model);
@@ -1019,7 +1016,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         return volumeDuration;
     }
 
-    private double computeActualVolumeDuration(final DefaultAcquisitionSettingsDISPIM acqSettings) {
+    private double computeActualVolumeDuration(final DefaultAcquisitionSettingsSCAPE acqSettings) {
         final MultiChannelMode channelMode = acqSettings.channelMode();
         final int numChannels = acqSettings.numChannels();
         final int numViews = acqSettings.volumeSettings().numViews();
@@ -1050,14 +1047,5 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
         }
     }
-//    @Override
-//    public DefaultAcquisitionSettingsDISPIM settings() {
-//        return acqSettings_;
-//    }
-
-//    @Override
-//    public DefaultAcquisitionSettingsDISPIM.Builder settingsBuilder() {
-//        return asb_;
-//    }
 
 }
