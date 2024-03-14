@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -66,7 +66,7 @@ public class BeamSheetControlPanel extends Panel {
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
 
-        final DefaultAcquisitionSettingsDISPIM acqSettings = model_.acquisitions()
+        final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions()
                 .settings();
 
         pnlFirst_ = new Panel();

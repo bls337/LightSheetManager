@@ -3,7 +3,7 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 import org.micromanager.lightsheetmanager.api.data.AutofocusFitType;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
@@ -52,7 +52,7 @@ public class AutofocusTab extends Panel implements ListeningPanel {
     }
 
     public void createUserInterface() {
-        final DefaultAcquisitionSettingsDISPIM acqSettings =
+        final DefaultAcquisitionSettingsSCAPE acqSettings =
                 model_.acquisitions().settings();
 
         final Label lblTitle = new Label("Autofocus Settings", Font.BOLD, 18);

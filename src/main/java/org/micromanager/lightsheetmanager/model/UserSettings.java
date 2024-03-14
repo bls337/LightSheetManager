@@ -4,7 +4,7 @@ import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
 import org.micromanager.UserProfile;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.propertymap.MutablePropertyMapView;
 
 import java.util.Iterator;
@@ -77,8 +77,8 @@ public class UserSettings {
             JSONObject loadedJson = validateUserSettings(json);
             if (loadedJson != null) {
                 // TODO: switch this based on microscope geometry type
-                DefaultAcquisitionSettingsDISPIM acqSettings = DefaultAcquisitionSettingsDISPIM.fromJson(
-                        loadedJson.toString(), DefaultAcquisitionSettingsDISPIM.class);
+                DefaultAcquisitionSettingsSCAPE acqSettings = DefaultAcquisitionSettingsSCAPE.fromJson(
+                        loadedJson.toString(), DefaultAcquisitionSettingsSCAPE.class);
                 model_.acquisitions().setAcquisitionSettings(acqSettings);
                 //System.out.println("loadedJson: " + loadedJson);
             }
@@ -115,7 +115,7 @@ public class UserSettings {
     private JSONObject validateUserSettings(final String loadedSettings) {
         // get default settings from builder
         final String defaultSettings =
-                new DefaultAcquisitionSettingsDISPIM.Builder().build().toJson();
+                new DefaultAcquisitionSettingsSCAPE.Builder().build().toJson();
         // validate json strings and count the number of keys
         int numLoadedKeys, numDefaultKeys;
         JSONObject loadedJson, defaultJson;

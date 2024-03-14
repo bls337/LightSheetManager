@@ -17,6 +17,7 @@ import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.lightsheetmanager.LightSheetManagerPlugin;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.model.autofocus.AutofocusRunner;
 import org.micromanager.lightsheetmanager.model.DataStorage;
@@ -35,8 +36,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     protected final Studio studio_;
     protected final CMMCore core_;
 
-    protected DefaultAcquisitionSettingsDISPIM.Builder asb_;
-    protected DefaultAcquisitionSettingsDISPIM acqSettings_;
+    protected DefaultAcquisitionSettingsSCAPE.Builder asb_;
+    protected DefaultAcquisitionSettingsSCAPE acqSettings_;
 
     private final ExecutorService acquisitionExecutor_ = Executors.newSingleThreadExecutor(
             r -> new Thread(r, "Acquisition Thread"));
@@ -64,7 +65,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         autofocusRunner_ = new AutofocusRunner(model_);
 
         // default settings
-        asb_ = new DefaultAcquisitionSettingsDISPIM.Builder();
+        asb_ = new DefaultAcquisitionSettingsSCAPE.Builder();
         acqSettings_ = asb_.build();
     }
 
@@ -88,8 +89,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      *
      * @param acqSettings the acquisition settings to set
      */
-    public void setAcquisitionSettings(final DefaultAcquisitionSettingsDISPIM acqSettings) {
-        asb_ = new DefaultAcquisitionSettingsDISPIM.Builder(acqSettings);
+    public void setAcquisitionSettings(final DefaultAcquisitionSettingsSCAPE acqSettings) {
+        asb_ = new DefaultAcquisitionSettingsSCAPE.Builder(acqSettings);
         acqSettings_ = acqSettings;
     }
 
@@ -232,7 +233,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     // TODO: keep long method name versions or just use aliases?
 
-    public DefaultAcquisitionSettingsDISPIM settings() {
+    public DefaultAcquisitionSettingsSCAPE settings() {
         return acqSettings_;
     }
 //
@@ -240,7 +241,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 //        return acqSettings_;
 //    }
 //
-    public DefaultAcquisitionSettingsDISPIM.Builder settingsBuilder() {
+    public DefaultAcquisitionSettingsSCAPE.Builder settingsBuilder() {
         return asb_;
     }
 //
