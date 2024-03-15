@@ -15,8 +15,8 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private DefaultSliceSettings.Builder ssb_ = new DefaultSliceSettings.Builder();
         private DefaultSliceSettingsLS.Builder ssbLS_ = new DefaultSliceSettingsLS.Builder();
         private DefaultScanSettings.Builder scsb_ = new DefaultScanSettings.Builder();
-        private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
-        private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
+        private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[1];
+        private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[1];
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NONE;
         private MultiChannelMode channelMode_ = MultiChannelMode.NONE;
         private CameraMode cameraMode_ = CameraMode.EDGE;
@@ -39,7 +39,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private double liveScanPeriod_ = 20.0;
 
         public Builder() {
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 1; i++) {
                 shcb_[i] = new DefaultSheetCalibration.Builder();
                 slcb_[i] = new DefaultSliceCalibration.Builder();
             }
@@ -52,7 +52,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             ssb_ = acqSettings.sliceSettings_.copyBuilder();
             ssbLS_ = acqSettings.sliceSettingsLS_.copyBuilder();
             scsb_ = acqSettings.scanSettings_.copyBuilder();
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 1; i++) {
                 slcb_[i] = acqSettings.sliceCalibrations_[i].copyBuilder();
                 shcb_[i] = acqSettings.sheetCalibrations_[i].copyBuilder();
             }
@@ -361,9 +361,9 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         sliceSettings_ = builder.ssb_.build();
         sliceSettingsLS_ = builder.ssbLS_.build();
         scanSettings_ = builder.scsb_.build();
-        sheetCalibrations_ = new DefaultSheetCalibration[2];
-        sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
-        for (int i = 0; i < 2; i++) {
+        sheetCalibrations_ = new DefaultSheetCalibration[1];
+        sliceCalibrations_ = new DefaultSliceCalibration[1]; // TODO: use this object directly
+        for (int i = 0; i < 1; i ++) {
             sheetCalibrations_[i] = builder.shcb_[i].build();
             sliceCalibrations_[i] = builder.slcb_[i].build();
         }
