@@ -11,6 +11,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumn;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -119,5 +120,13 @@ public class ChannelTable extends JScrollPane {
             }
         }
         return strGroups.toArray(new String[0]);
+    }
+
+    public void setHeaderRowColor(final boolean state) {
+        if (state) {
+            table_.getTableHeader().setForeground(Color.BLACK);
+        } else {
+            table_.getTableHeader().setForeground(Color.GRAY);
+        }
     }
 }
