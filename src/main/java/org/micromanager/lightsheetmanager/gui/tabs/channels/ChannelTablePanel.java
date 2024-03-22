@@ -1,7 +1,5 @@
 package org.micromanager.lightsheetmanager.gui.tabs.channels;
 
-import mmcorej.StrVector;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
@@ -11,7 +9,6 @@ import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 import javax.swing.JLabel;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class ChannelTablePanel extends Panel {
@@ -140,6 +137,7 @@ public class ChannelTablePanel extends Panel {
         cmbChannelMode_.setEnabled(state);
         table_.setEnabled(state);
         table_.getTable().setEnabled(state);
+        table_.setHeaderRowColor(state);
     }
 
 }
