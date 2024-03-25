@@ -13,24 +13,27 @@ public class ChannelTableData {
 
     public ChannelTableData() {
         channels_ = new ArrayList<>();
-        channelGroup_ = "None";
+        channelGroup_ = "";
     }
 
     public ChannelTableData(final ChannelSpec[] channels, final String channelGroup) {
         channels_ = new ArrayList<>();
-        // TODO: Objects.requireNonNull
-        if (channels != null) {
-            Collections.addAll(channels_, channels);
-        }
         channelGroup_ = channelGroup;
+        Collections.addAll(channels_, channels);
     }
 
-    public ArrayList<ChannelSpec> getChannels() {
-        return channels_;
+    public ChannelSpec getChannelByIndex(final int index) {
+        return channels_.get(index);
     }
 
-    public ChannelSpec[] getChannelArray() {
+    public ChannelSpec[] getChannels() {
         return channels_.toArray(new ChannelSpec[0]);
+    }
+
+    public ChannelSpec[] getUsedChannels() {
+        return channels_.stream()
+                        .filter(ChannelSpec::isUsed)
+                        .toArray(ChannelSpec[]::new);
     }
 
     public int getNumChannels() {
@@ -59,6 +62,15 @@ public class ChannelTableData {
 
     public String getChannelGroup() {
         return channelGroup_;
+    }
+
+    public double getChannelOffset(final String channelName) {
+        for (ChannelSpec channel : channels_) {
+            if (channel.getName().equals(channelName)) {
+                return channel.getOffset();
+            }
+        }
+        return 0.0;
     }
 
     public void printChannelData() {

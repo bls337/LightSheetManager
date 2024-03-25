@@ -76,7 +76,7 @@ public class ChannelTablePanel extends Panel {
 //            repaint();
             System.out.println("add channel");
             table_.getData().printChannelData();
-            final ChannelSpec[] channels = table_.getData().getChannelArray();
+            final ChannelSpec[] channels = table_.getData().getChannels();
             model_.acquisitions().settingsBuilder().channels(channels);
             model_.acquisitions().settingsBuilder().numChannels(channels.length);
         });
@@ -85,7 +85,7 @@ public class ChannelTablePanel extends Panel {
             final int row = table_.getTable().getSelectedRow();
             if (row != -1) {
                 table_.getData().removeChannel(row);
-                final ChannelSpec[] channels = table_.getData().getChannelArray();
+                final ChannelSpec[] channels = table_.getData().getChannels();
                 model_.acquisitions().settingsBuilder().channels(channels);
                 model_.acquisitions().settingsBuilder().numChannels(channels.length);
                 table_.refreshData();

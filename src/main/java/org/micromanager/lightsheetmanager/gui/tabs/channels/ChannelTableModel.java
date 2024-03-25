@@ -23,7 +23,7 @@ public class ChannelTableModel extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return tableData_.getChannels().size();
+        return tableData_.getNumChannels();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ChannelTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        ChannelSpec channelSpec = tableData_.getChannels().get(row);
+        ChannelSpec channelSpec = tableData_.getChannelByIndex(row);
         switch (col) {
             case 0:
                 return channelSpec.isUsed();
@@ -65,7 +65,7 @@ public class ChannelTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        ChannelSpec channelSpec = tableData_.getChannels().get(row);
+        ChannelSpec channelSpec = tableData_.getChannelByIndex(row);
         switch (col) {
             case 0:
                 if (value instanceof Boolean) {
