@@ -15,6 +15,7 @@ import org.micromanager.data.Datastore;
 import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.internal.MMStudio;
+import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
@@ -31,6 +32,7 @@ import org.micromanager.lightsheetmanager.model.devices.cameras.HamamatsuCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.PCOCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.PVCamera;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
@@ -76,6 +78,25 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
+
+        // make sure stage scan is supported if selected
+        if (isUsingPLC) {
+            if (acqSettings_.isUsingStageScanning()) {
+                final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+                if (xyStage != null) {
+                    if (!xyStage.hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES)) {
+                        studio_.logs().showError("Must have stage with scan-enabled firmware for stage scanning.");
+                        return false;
+                    }
+                    if (acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
+                        if (acqSettings_.volumeSettings().numViews() < 2) {
+                            studio_.logs().showError("Interleaved stage scan requires two sides.");
+                        }
+                        return false;
+                    }
+                }
+            }
+        }
 
         PLogicSCAPE controller = null;
 
