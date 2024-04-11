@@ -20,6 +20,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.SingleAxis;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.util.Objects;
 
 public class PLogicSCAPE {
@@ -293,6 +294,18 @@ public class PLogicSCAPE {
 //            }
 //        }
 
+        if (settings.isUsingStageScanning()
+                && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
+            if (settings.volumeSettings().numViews() != 2) {
+                studio_.logs().showError("Interleaved stage scan only possible for 2-sided acquisition.");
+                return false;
+            }
+            if (settings.cameraMode() == CameraMode.OVERLAP) {
+                studio_.logs().showError("Interleaved stage scan not compatible with overlap camera mode.");
+                return false;
+            }
+        }
+
         // make sure set to use TTL signal from backplane in case PLOGIC_LASER is set to PLogicMode different from diSPIM shutter
         plcCamera_.setPreset(12);
         plcLaser_.setPreset(12);
@@ -304,7 +317,80 @@ public class PLogicSCAPE {
             studio_.logs().showError("could not set shutter to " + plcLaser_.getDeviceName());
         }
 
-        scanDistance_ = 0;
+        if (!acqSettings_.isUsingStageScanning()) {
+            scanDistance_ = 0;
+        } else {
+            // stage scanning with ASI stage
+            // algorithm is as follows:
+            // use the # of slices and slice spacing that the user specifies
+            // because the XY stage is 45 degrees from the objectives have to move it sqrt(2) * slice step size
+            // for now use the current X position as the start of acquisition and always start in positive X direction
+            // for now always do serpentine scan with 2 passes at the same Y location, one pass each direction over the sample
+            // => total scan distance = # slices * slice step size * sqrt(2)
+            //    scan start position = current X position
+            //    scan stop position = scan start position + total distance
+            //    slow axis start = current Y position
+            //    slow axis stop = current Y position
+            //    X motor speed = slice step size * sqrt(2) / slice duration
+            //    number of scans = number of sides (1 or 2)
+            //    scan mode = serpentine for 2-sided non-interleaved, raster otherwise (need to revisit for 2D stage scanning)
+            //    X acceleration time = use whatever current setting is
+            //    scan settling time = delay before side
+            final boolean isInterleaved = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
+
+            // figure out the speed we should be going according to slice period, slice spacing, geometry, etc.
+            final double requestedMotorSpeed = computeScanSpeed(settings, scanner_.getSPIMNumScansPerSlice());  // in mm/sec
+
+            final double maxSpeed = xyStage_.getMaxSpeedX();
+            if (requestedMotorSpeed > (maxSpeed * 0.8)) {
+                // trying to go near max speed smooth scanning will be compromised
+                studio_.logs().showError("Required stage speed is too fast, please reduce step size or increase sample exposure.");
+                return false;
+            }
+            if (requestedMotorSpeed < (maxSpeed / 2000)) {
+                // 1/2000 of the max speed is approximate place where smooth scanning breaks down (speed quantum is ~1/12000 max speed);
+                // this also prevents setting to 0 which the controller rejects
+                studio_.logs().showError("Required stage speed is too slow, please increase step size or decrease sample exposure.");
+                return false;
+            }
+            xyStage_.setSpeedX(requestedMotorSpeed);
+
+            // ask for the actual speed to calculate the actual step size
+            final double actualMotorSpeed = xyStage_.getSpeedXUm() / 1000;
+
+            // set the acceleration to a reasonable value for the (usually very slow) scan speed
+            xyStage_.setAccelerationX(computeScanAcceleration(actualMotorSpeed,
+                    xyStage_.getMaxSpeedX(), settings.scanSettings().scanAccelerationFactor()));
+
+            // set the scan pattern and number of scans appropriately
+            int numLines = settings.volumeSettings().numViews();
+            if (isInterleaved) {
+                numLines = 1;  // assure in acquisition code that we can't have single-sided interleaved
+            }
+            numLines *= (int)((double)settings.numChannels() / computeScanChannelsPerPass(settings));
+            xyStage_.setScanNumLines(numLines);
+
+            final boolean isStageScan2Sided = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN)
+                    && settings.volumeSettings().numViews() == 2;
+
+            xyStage_.setScanPattern(isStageScan2Sided ?
+                    ASIXYStage.ScanPattern.SERPENTINE : ASIXYStage.ScanPattern.RASTER);
+
+            if (xyStage_.getAxisPolarityX() != ASIXYStage.AxisPolarity.NORMAL) {
+                studio_.logs().showError(
+                        "Stage scanning requires X axis polarity set to " + ASIXYStage.AxisPolarity.NORMAL);
+                return false;
+            }
+
+            if (!settings.isUsingMultiplePositions()) {
+                // use current position as center position for stage scanning
+                // multi-position situation is handled in position-switching code instead
+                Point2D.Double p = xyStage_.getXYPosition();
+                // TODO: error if getXYPosition fails (return null?)
+                // TODO: prepareStageScanForAcquisition(p.x, p.y, settings.getSPIMMode())
+                prepareStageScanForAcquisition(p.x, p.y, settings);
+            }
+        }
 
         // sets PLogic "acquisition running" flag
         plcCamera_.setPreset(3);
@@ -381,11 +467,10 @@ public class PLogicSCAPE {
         double xStartUm;
         double xStopUm;
         if (scanFromCurrent) {
+            xStartUm = x;
             if (scanNegative) {
-                xStartUm = x;
                 xStopUm = x - scanDistance_;
             } else {
-                xStartUm = x;
                 xStopUm = x + scanDistance_;
             }
         } else {

@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
