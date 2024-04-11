@@ -6,7 +6,9 @@ import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.model.devices.XYStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -14,25 +16,24 @@ import java.util.Objects;
 public class SettingsTab extends Panel implements ListeningPanel {
 
     // scan settings
-
     private Spinner spnScanAcceleration_;
     private Spinner spnScanOvershootDist_;
     private Spinner spnScanRetraceSpeed_;
     private Spinner spnScanAngleFirstView_;
-
     private CheckBox cbxScanFromCurrentPosition_;
     private CheckBox cbxScanNegativeDirection_;
     private CheckBox cbxReturnToOriginalPosition_;
 
     // light sheet scanner settings
-
     private Spinner spnSheetAxisFilterFreq_;
     private Spinner spnSliceAxisFilterFreq_;
     private Spinner spnLiveScanPeriod_;
 
+    // changes the ui setup
     private boolean isUsingPLogic_;
+    private boolean isUsingScanSettings_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public SettingsTab(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
@@ -44,7 +45,16 @@ public class SettingsTab extends Panel implements ListeningPanel {
         final DefaultAcquisitionSettingsSCAPE acqSettings =
                 model_.acquisitions().settings();
 
+        // check for devices to set up the tab
         isUsingPLogic_ = model_.devices().isUsingPLogic();
+        if (isUsingPLogic_) {
+            final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+            if (xyStage != null) {
+                isUsingScanSettings_ = xyStage.hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES);
+            } else {
+                isUsingScanSettings_ = false;
+            }
+        }
 
         final Panel pnlScanSettings = new Panel("Stage Scan Settings");
         pnlScanSettings.setMigLayout(
@@ -53,11 +63,11 @@ public class SettingsTab extends Panel implements ListeningPanel {
                 "[]5[]");
 
         final JLabel lblScanAcceleration = new JLabel("Relative acceleration time:");
-        final JLabel lblScanOvershootDist = new JLabel("Scan overshoot distance [" + "\u00B5"+ "m]:");
+        final JLabel lblScanOvershootDist = new JLabel("Scan overshoot distance [µm]:");
         final JLabel lblScanRetraceSpeed = new JLabel("Scan retrace speed [% of max]:");
-        final JLabel lblScanAngleFirstView = new JLabel("Path A stage/objective angle [\u00B0]:");
+        final JLabel lblScanAngleFirstView = new JLabel("Path A stage/objective angle [°]:");
 
-        // Spinners
+        // Scan Spinners
         spnScanAcceleration_ = Spinner.createDoubleSpinner(
                 acqSettings.scanSettings().scanAccelerationFactor(),
                 0.1, 1000.0, 1.0);
@@ -74,7 +84,7 @@ public class SettingsTab extends Panel implements ListeningPanel {
                 acqSettings.scanSettings().scanAngleFirstView(),
                 1.0, 89.0, 1.0);
 
-        // CheckBoxes
+        // Scan CheckBoxes
         cbxScanFromCurrentPosition_ = new CheckBox("Scan from current position instead of center",
                 acqSettings.scanSettings().scanFromCurrentPosition());
         cbxScanNegativeDirection_ = new CheckBox("Scan negative direction",
@@ -99,17 +109,21 @@ public class SettingsTab extends Panel implements ListeningPanel {
         spnLiveScanPeriod_ = Spinner.createIntegerSpinner(20, 2, 10000, 100);
 
         // scan settings panel
-        pnlScanSettings.add(lblScanAcceleration, "");
-        pnlScanSettings.add(spnScanAcceleration_, "wrap");
-        pnlScanSettings.add(lblScanOvershootDist, "");
-        pnlScanSettings.add(spnScanOvershootDist_, "wrap");
-        pnlScanSettings.add(lblScanRetraceSpeed, "");
-        pnlScanSettings.add(spnScanRetraceSpeed_, "wrap");
-        pnlScanSettings.add(lblScanAngleFirstView, "");
-        pnlScanSettings.add(spnScanAngleFirstView_, "wrap");
-        pnlScanSettings.add(cbxScanFromCurrentPosition_, "wrap");
-        pnlScanSettings.add(cbxScanNegativeDirection_, "wrap");
-        pnlScanSettings.add(cbxReturnToOriginalPosition_, "wrap");
+        if (isUsingScanSettings_) {
+            pnlScanSettings.add(lblScanAcceleration, "");
+            pnlScanSettings.add(spnScanAcceleration_, "wrap");
+            pnlScanSettings.add(lblScanOvershootDist, "");
+            pnlScanSettings.add(spnScanOvershootDist_, "wrap");
+            pnlScanSettings.add(lblScanRetraceSpeed, "");
+            pnlScanSettings.add(spnScanRetraceSpeed_, "wrap");
+            pnlScanSettings.add(lblScanAngleFirstView, "");
+            pnlScanSettings.add(spnScanAngleFirstView_, "wrap");
+            pnlScanSettings.add(cbxScanFromCurrentPosition_, "span 2, wrap");
+            pnlScanSettings.add(cbxScanNegativeDirection_, "span 2, wrap");
+            pnlScanSettings.add(cbxReturnToOriginalPosition_, "span 2, wrap");
+        } else {
+            pnlScanSettings.add(new JLabel("Stage scanning not supported by your firmware."), "");
+        }
 
         // light sheet scanner settings panel
         if (isUsingPLogic_) {
@@ -121,55 +135,53 @@ public class SettingsTab extends Panel implements ListeningPanel {
         pnlLightSheet.add(lblLiveScanPeriod, "");
         pnlLightSheet.add(spnLiveScanPeriod_, "");
 
-        add(pnlLightSheet, "growx, wrap");
-        //add(pnlScanSettings, "");
+        add(pnlScanSettings, "wrap");
+        add(pnlLightSheet, "growx");
     }
 
     private void createEventHandlers() {
 
         // Scan Settings
-        spnScanAcceleration_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
-                        .scanAccelerationFactor(spnScanAcceleration_.getDouble()));
-        spnScanOvershootDist_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
-                        .scanOvershootDistance(spnScanOvershootDist_.getInt()));
-        spnScanRetraceSpeed_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
-                        .scanRetraceSpeed(spnScanRetraceSpeed_.getDouble()));
-        spnScanAngleFirstView_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
-                        .scanAngleFirstView(spnScanAngleFirstView_.getDouble()));
+        if (isUsingScanSettings_) {
+            spnScanAcceleration_.registerListener(e ->
+                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                            .scanAccelerationFactor(spnScanAcceleration_.getDouble()));
+            spnScanOvershootDist_.registerListener(e ->
+                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                            .scanOvershootDistance(spnScanOvershootDist_.getInt()));
+            spnScanRetraceSpeed_.registerListener(e ->
+                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                            .scanRetraceSpeed(spnScanRetraceSpeed_.getDouble()));
+            spnScanAngleFirstView_.registerListener(e ->
+                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                            .scanAngleFirstView(spnScanAngleFirstView_.getDouble()));
 
-        cbxScanFromCurrentPosition_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
-                        .scanFromCurrentPosition(cbxScanFromCurrentPosition_.isSelected()));
-        cbxScanNegativeDirection_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
-                        .scanFromNegativeDirection(cbxScanNegativeDirection_.isSelected()));
-        cbxReturnToOriginalPosition_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().scanSettingsBuilder()
-                        .scanReturnToOriginalPosition(cbxReturnToOriginalPosition_.isSelected()));
+            cbxScanFromCurrentPosition_.registerListener(e ->
+                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                            .scanFromCurrentPosition(cbxScanFromCurrentPosition_.isSelected()));
+            cbxScanNegativeDirection_.registerListener(e ->
+                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                            .scanFromNegativeDirection(cbxScanNegativeDirection_.isSelected()));
+            cbxReturnToOriginalPosition_.registerListener(e ->
+                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                            .scanReturnToOriginalPosition(cbxReturnToOriginalPosition_.isSelected()));
+        }
 
-        // only create event handlers for filter freq if we are using PLogic
+        // ASIScanner Filter Freq
         if (isUsingPLogic_) {
             final ASIScanner scanner = model_.devices()
                     .getDevice("IllumSlice");
 
-            // Light Sheet Scanner
-            spnSheetAxisFilterFreq_.registerListener(e -> {
-                scanner.setFilterFreqX(spnSheetAxisFilterFreq_.getDouble());
-            });
+            spnSheetAxisFilterFreq_.registerListener(
+                    e -> scanner.setFilterFreqX(spnSheetAxisFilterFreq_.getDouble()));
 
-            spnSliceAxisFilterFreq_.registerListener(e -> {
-                scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble());
-            });
+            spnSliceAxisFilterFreq_.registerListener(
+                    e -> scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble()));
         }
 
-        spnLiveScanPeriod_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder()
-                    .liveScanPeriod(spnLiveScanPeriod_.getDouble());
-        });
+        spnLiveScanPeriod_.registerListener(
+                e -> model_.acquisitions().settingsBuilder()
+                        .liveScanPeriod(spnLiveScanPeriod_.getDouble()));
 
     }
 

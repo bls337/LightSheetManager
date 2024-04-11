@@ -1,16 +1,19 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 import java.io.File;
 import java.util.EventObject;
 
 import org.micromanager.internal.utils.FileDialogs;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
-import org.micromanager.lightsheetmanager.gui.components.*;
 import org.micromanager.lightsheetmanager.gui.components.Button;
+import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.RadioButton;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
