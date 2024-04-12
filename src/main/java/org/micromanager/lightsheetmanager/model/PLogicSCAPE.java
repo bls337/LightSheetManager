@@ -1120,6 +1120,25 @@ public class PLogicSCAPE {
 
     public void stopSPIMStateMachines() {
         scanner_.setSPIMState(ASIScanner.SPIMState.IDLE);
+        if (acqSettings_.isUsingStageScanning()) {
+            // give the stage scan 5 seconds to clean itself up, after which we stop it
+            // once all images come in there is still a time when stage is moving back to its start/center position
+            final int timeoutStageScanCleanupMs = 5000;
+            final long deadline = System.currentTimeMillis() + timeoutStageScanCleanupMs;
+            while (xyStage_.getScanState() == ASIXYStage.ScanState.IDLE) {
+                if (System.currentTimeMillis() > deadline) {
+                    xyStage_.setScanState(ASIXYStage.ScanState.IDLE); // force-set to idle
+                    studio_.logs().logError("Force-set XY stage scan to IDLE state with stage speed "
+                            + xyStage_.getSpeedX() + ".");
+                } else {
+                    try {
+                        Thread.sleep(25); // still waiting...
+                    } catch (InterruptedException e) {
+                        // ignore => only need to busy wait
+                    }
+                }
+            }
+        }
     }
 
     //    private void stopSPIMStateMachines(DefaultAcquisitionSettingsDISPIM acqSettings) {
