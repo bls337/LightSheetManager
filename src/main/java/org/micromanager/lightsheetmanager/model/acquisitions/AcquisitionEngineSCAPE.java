@@ -36,6 +36,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -79,24 +80,37 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
 
+        // initialize stage scanning so we can restore state
+        Point2D.Double xyPosUm = new Point2D.Double();
+        double xSupPosUm = 0.0;
+        double origXSpeed = 1.0; // don't want 0 in case something goes wrong
+        double origXAccel = 1.0; // don't want 0 in case something goes wrong
+
         // make sure stage scan is supported if selected
-        if (isUsingPLC) {
-            if (acqSettings_.isUsingStageScanning()) {
-                final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
-                if (xyStage != null) {
-                    if (!xyStage.hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES)) {
-                        studio_.logs().showError("Must have stage with scan-enabled firmware for stage scanning.");
-                        return false;
-                    }
-                    if (acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
-                        if (acqSettings_.volumeSettings().numViews() < 2) {
-                            studio_.logs().showError("Interleaved stage scan requires two sides.");
-                        }
-                        return false;
-                    }
+        if (acqSettings_.isUsingStageScanning()) {
+            final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+            if (xyStage != null) {
+                if (!xyStage.hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES)) {
+                    studio_.logs().showError("Must have stage with scan-enabled firmware for stage scanning.");
+                    return false;
                 }
+                if (acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
+                    if (acqSettings_.volumeSettings().numViews() < 2) {
+                        studio_.logs().showError("Interleaved stage scan requires two sides.");
+                    }
+                    return false;
+                }
+
+                // second part: initialize stage scanning so we can restore state
+                xyPosUm = xyStage.getXYPosition();
+                origXSpeed = xyStage.getSpeedX();
+                origXAccel = xyStage.getAccelerationX();
+
+                // TODO: add more checks from orignal plugin here...
+                //  if (origXSpeed < 0.2 && resetXaxisSpeed_) { etc...
             }
         }
+
 
         PLogicSCAPE controller = null;
 
@@ -557,6 +571,23 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             controller.stopSPIMStateMachines();
         }
 
+        // if we did stage scanning restore the original position and speed
+        if (acqSettings_.isUsingStageScanning()) {
+            final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+            final boolean returnToOriginalPosition =
+                    acqSettings_.scanSettings().scanReturnToOriginalPosition();
+
+            // make sure stage scanning state machine is stopped,
+            // otherwise setting speed/position won't take
+            xyStage.setScanState(ASIXYStage.ScanState.IDLE);
+            xyStage.setSpeedX(origXSpeed);
+            xyStage.setAccelerationX(origXAccel);
+
+            if (returnToOriginalPosition) {
+                xyStage.setXYPosition(xyPosUm.x, xyPosUm.y);
+            }
+        }
+
         // Restore shutter/autoshutter to original state
         try {
             core_.setShutterOpen(isShutterOpen);
@@ -773,6 +804,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             if (acqSettings_.isUsingChannels() && acqSettings_.channelMode() == MultiChannelMode.VOLUME) {
                 studio_.logs().showError("Cannot use hardware time points (small time point interval) " +
                         "with software channels (need to use PLogic channel switching).");
+                return false;
+            }
+            if (acqSettings_.isUsingStageScanning()) {
+                // stage scanning needs to be triggered for each time point
+                studio_.logs().showError("Cannot use hardware time points (small time point interval) "
+                        + "with stage scanning.");
                 return false;
             }
         }
