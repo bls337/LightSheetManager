@@ -76,13 +76,21 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         }
 
         /**
-         * Sets the acquisition mode.
+         * Set the mode for the acquisition.
+         * <p>
+         * If the mode is a stage scanning mode,
+         * set internal stage scanning flag.
          *
          * @param acqMode the acquisition mode
          */
         @Override
         public Builder acquisitionMode(final AcquisitionMode acqMode) {
             acquisitionMode_ = acqMode;
+            if (acqMode == AcquisitionMode.STAGE_SCAN
+                    || acqMode == AcquisitionMode.STAGE_SCAN_INTERLEAVED
+                    || acqMode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL) {
+                useStageScanning_ = true;
+            }
             return this;
         }
 
@@ -160,17 +168,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         @Override
         public Builder useHardwareTimePoints(final boolean state) {
             useHardwareTimePoints_ = state;
-            return this;
-        }
-
-        /**
-         * Sets the acquisition to use stage scanning.
-         *
-         * @param state true to use stage scanning.
-         */
-        @Override
-        public Builder useStageScanning(final boolean state) {
-            useStageScanning_ = state;
             return this;
         }
 
