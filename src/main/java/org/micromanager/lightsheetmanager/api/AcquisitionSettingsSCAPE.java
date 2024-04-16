@@ -76,13 +76,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
         T useHardwareTimePoints(final boolean state);
 
         /**
-         * Sets the acquisition to use stage scanning.
-         *
-         * @param state true to use stage scanning.
-         */
-        T useStageScanning(final boolean state);
-
-        /**
          * Sets the acquisition to use advanced timing settings.
          *
          * @param state true to use advanced timing settings
@@ -131,6 +124,11 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
          */
         T channels(final ChannelSpec[] channels);
 
+        /**
+         * Sets the live scan period.
+         *
+         * @param liveScanPeriod the channel array
+         */
         T liveScanPeriod(final double liveScanPeriod);
 
         /**

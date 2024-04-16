@@ -53,11 +53,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     boolean run() {
-        // TODO: make this happen for all acq types
         final boolean isPolling = frame_.getNavigationPanel().isPolling();
         if (isPolling) {
-            studio_.logs().logMessage("stopped position polling");
             frame_.getNavigationPanel().stopPolling();
+            studio_.logs().logMessage("stopped position polling");
         }
 
         asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
@@ -82,7 +81,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // initialize stage scanning so we can restore state
         Point2D.Double xyPosUm = new Point2D.Double();
-        double xSupPosUm = 0.0;
         double origXSpeed = 1.0; // don't want 0 in case something goes wrong
         double origXAccel = 1.0; // don't want 0 in case something goes wrong
 
@@ -101,16 +99,15 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     return false;
                 }
 
-                // second part: initialize stage scanning so we can restore state
+                // second part: initialize stage scanning, so we can restore state later
                 xyPosUm = xyStage.getXYPosition();
                 origXSpeed = xyStage.getSpeedX();
                 origXAccel = xyStage.getAccelerationX();
 
-                // TODO: add more checks from orignal plugin here...
+                // TODO: add more checks from original plugin here...
                 //  if (origXSpeed < 0.2 && resetXaxisSpeed_) { etc...
             }
         }
-
 
         PLogicSCAPE controller = null;
 

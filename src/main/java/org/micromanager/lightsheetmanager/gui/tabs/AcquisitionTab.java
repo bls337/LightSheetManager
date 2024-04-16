@@ -289,6 +289,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
             pnlChannelTable_.setItemsEnabled(state);
         });
 
+        // select the acquisition mode
         cmbAcquisitionModes_.registerListener(e -> {
             final int index = cmbAcquisitionModes_.getSelectedIndex();
             model_.acquisitions().settingsBuilder().acquisitionMode(AcquisitionMode.getByIndex(index));
