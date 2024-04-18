@@ -1125,12 +1125,16 @@ public class PLogicSCAPE {
             // once all images come in there is still a time when stage is moving back to its start/center position
             final int timeoutStageScanCleanupMs = 5000;
             final long deadline = System.currentTimeMillis() + timeoutStageScanCleanupMs;
-            while (xyStage_.getScanState() == ASIXYStage.ScanState.IDLE) {
-                if (System.currentTimeMillis() > deadline) {
+            boolean done = false;
+            while (!done) {
+                done = xyStage_.getScanState() == ASIXYStage.ScanState.IDLE;
+                if (!done && System.currentTimeMillis() > deadline) {
                     xyStage_.setScanState(ASIXYStage.ScanState.IDLE); // force-set to idle
                     studio_.logs().logError("Force-set XY stage scan to IDLE state with stage speed "
                             + xyStage_.getSpeedX() + ".");
-                } else {
+                    done = true;
+                }
+                if (!done) {
                     try {
                         Thread.sleep(25); // still waiting...
                     } catch (InterruptedException e) {
