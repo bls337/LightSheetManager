@@ -17,6 +17,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIZStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.SingleAxis;
+import org.micromanager.lightsheetmanager.model.utils.GeometryUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import java.awt.Rectangle;
@@ -404,17 +405,17 @@ public class PLogicSCAPE {
     // Compute appropriate motor speed in mm/s for the given stage scanning settings
     public double computeScanSpeed(DefaultAcquisitionSettingsSCAPE settings, final int numScansPerSlice) {
         //double sliceDuration = settings.timingSettings().sliceDuration();
-        //double sliceDuration = 0.0; // TODO: get from SliceTiming
-        double sliceDuration = getSliceDuration(settings.timingSettings(), numScansPerSlice); // TODO: ???
+        // TODO: getSliceDuration only used here, but maybe should be computed elsewhere, and get with method above?
+        double sliceDuration = getSliceDuration(settings.timingSettings(), numScansPerSlice);
         if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             // pretend like our slice takes twice as long so that we move the correct speed
-            // this has the effect of halving the motor speed
-            // but keeping the scan distance the same
+            // this has the effect of halving the motor speed, but keeping the scan distance the same
             sliceDuration *= 2;
         }
         final int channelsPerPass = computeScanChannelsPerPass(settings);
-        //return settings.getStepSize() * du.getStageGeometricSpeedFactor(settings.firstSideIsA) / sliceDuration / channelsPerPass;
-        return settings.volumeSettings().sliceStepSize() / sliceDuration / channelsPerPass; // TODO: add getStageGeometricSpeedFactor
+        final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
+                settings.scanSettings().scanAngleFirstView(), settings.volumeSettings().firstView() == 1);
+        return settings.volumeSettings().sliceStepSize() * speedFactor / sliceDuration / channelsPerPass;
     }
 
     // compute how many channels we do in each one-way scan
