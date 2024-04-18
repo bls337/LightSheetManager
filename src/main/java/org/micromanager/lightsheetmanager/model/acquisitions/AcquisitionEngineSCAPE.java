@@ -118,7 +118,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         } catch (Exception e) {
             studio_.logs().logError(e);
         }
-//        boolean demoMode = acqSettings_.demoMode();
 
         if (!demoMode) {
 
