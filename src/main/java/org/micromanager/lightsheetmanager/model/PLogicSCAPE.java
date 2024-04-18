@@ -235,6 +235,12 @@ public class PLogicSCAPE {
                 return false;
             }
 
+            // cache how far we scan each pass for later use
+            final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
+                    settings.scanSettings().scanAngleFirstView(),true);
+            actualStepSizeUm_ = settings.volumeSettings().sliceStepSize() * (actualMotorSpeed / requestedMotorSpeed);
+            scanDistance_ = settings.volumeSettings().slicesPerView() * actualStepSizeUm_ * speedFactor;
+
             if (!settings.isUsingMultiplePositions()) {
                 // use current position as center position for stage scanning
                 // multi-position situation is handled in position-switching code instead

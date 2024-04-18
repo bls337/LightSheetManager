@@ -413,11 +413,10 @@ public class PLogicDISPIM {
         double xStartUm;
         double xStopUm;
         if (scanFromCurrent) {
+            xStartUm = x;
             if (scanNegative) {
-                xStartUm = x;
                 xStopUm = x - scanDistance_;
             } else {
-                xStartUm = x;
                 xStopUm = x + scanDistance_;
             }
         } else {
