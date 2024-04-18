@@ -811,7 +811,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         double extraChannelOffset = 0.0;
-        plc.prepareControllerForAcquisitionSCAPE(acqSettings_, extraChannelOffset);
+        plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
         return true;
     }
 
