@@ -104,7 +104,8 @@ public class XYZGrid {
 
         if (useX_) {
             // TODO: update GUI with values, aliases for asb and vsb?
-            final double speedFactor = GeometryUtils.DISPIM.getStageGeometricSpeedFactor(true);
+            final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
+                    model_.acquisitions().settings().scanSettings().scanAngleFirstView(),true);
             model_.acquisitions().settingsBuilder().volumeSettingsBuilder().sliceStepSize(Math.abs(deltaX_)/speedFactor);
             model_.acquisitions().settingsBuilder().volumeSettingsBuilder().slicesPerView(numX);
             // move to X center if we aren't generating a position list with it
@@ -171,7 +172,7 @@ public class XYZGrid {
     }
 
     public boolean getUseY() {
-        return useX_;
+        return useY_;
     }
 
     public void setUseY(final boolean state) {
@@ -179,7 +180,7 @@ public class XYZGrid {
     }
 
     public boolean getUseZ() {
-        return useX_;
+        return useZ_;
     }
 
     public void setUseZ(final boolean state) {
