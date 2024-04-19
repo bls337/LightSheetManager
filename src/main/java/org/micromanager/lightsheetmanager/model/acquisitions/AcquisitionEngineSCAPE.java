@@ -382,7 +382,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
         }, Acquisition.AFTER_CAMERA_HOOK);
 
-
         ///////////// Turn off autoshutter /////////////////
         final boolean isShutterOpen;
         try {
