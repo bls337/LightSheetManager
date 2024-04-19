@@ -8,6 +8,7 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
 import java.awt.Font;
 import java.util.Objects;
@@ -53,13 +54,19 @@ public class CameraTab extends Panel implements ListeningPanel {
         btnGetCurrentROI_ = new Button("Get Current ROI", 120, 30);
 
         // get the imaging camera library based on number of imaging paths
-        CameraLibrary camLib;
+        CameraLibrary camLib = CameraLibrary.UNKNOWN;
         if (model_.devices().getDeviceAdapter().getNumImagingPaths() >= 2) {
-            camLib = CameraLibrary.fromString(
-                    model_.devices().getDevice("Imaging1Camera").getDeviceLibrary());
+            final CameraBase camera = model_.devices()
+                    .getDevice("Imaging1Camera");
+            if (camera != null) {
+                camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
+            }
         } else {
-            camLib = CameraLibrary.fromString(
-                    model_.devices().getDevice("ImagingCamera").getDeviceLibrary());
+            final CameraBase camera = model_.devices()
+                    .getDevice("ImagingCamera");
+            if (camera != null) {
+                camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
+            }
         }
 
         cmbCameraTriggerMode_ = new ComboBox(CameraMode.getAvailableModes(camLib),
