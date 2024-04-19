@@ -545,7 +545,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //                }
 //            }
 
-
         // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
         // once everything finishes
         currentAcquisition_.finish();
