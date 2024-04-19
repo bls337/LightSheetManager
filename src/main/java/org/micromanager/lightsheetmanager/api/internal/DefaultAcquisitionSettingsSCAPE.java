@@ -86,11 +86,9 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         @Override
         public Builder acquisitionMode(final AcquisitionMode acqMode) {
             acquisitionMode_ = acqMode;
-            if (acqMode == AcquisitionMode.STAGE_SCAN
+            useStageScanning_ = acqMode == AcquisitionMode.STAGE_SCAN
                     || acqMode == AcquisitionMode.STAGE_SCAN_INTERLEAVED
-                    || acqMode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL) {
-                useStageScanning_ = true;
-            }
+                    || acqMode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL;
             return this;
         }
 

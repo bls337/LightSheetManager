@@ -6,13 +6,14 @@ import org.micromanager.acqj.internal.Engine;
 import org.micromanager.acqj.main.AcqEngMetadata;
 import org.micromanager.acqj.main.AcquisitionEvent;
 import org.micromanager.acqj.util.AcquisitionEventIterator;
+import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Function;
-import java.util.stream.Stream;
+// import java.util.stream.Stream;
 
 /**
  * This function creates lazy sequences (i.e. iterators) of acquisition events by translating
@@ -160,7 +161,7 @@ public class LSMAcquisitionEvents {
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
               acquisitionSettings.volumeSettings().slicesPerView());
-
+      
       ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
       acqFunctions.add(cameras);
       acqFunctions.add(zStack);
@@ -290,23 +291,58 @@ public class LSMAcquisitionEvents {
     */
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> positions(
            PositionList positionList) {
-      return (AcquisitionEvent event) -> {
-         Stream.Builder<AcquisitionEvent> builder = Stream.builder();
-         if (positionList == null) {
-            builder.accept(event);
-         } else {
-            for (int index = 0; index < positionList.getNumberOfPositions(); index++) {
-               AcquisitionEvent posEvent = event.copy();
-               MultiStagePosition msp = positionList.getPosition(index);
+      return (AcquisitionEvent event) -> new Iterator<AcquisitionEvent>() {
+         int index = 0;
+
+         @Override
+         public boolean hasNext() {
+            return index < positionList.getNumberOfPositions();
+         }
+
+         @Override
+         public AcquisitionEvent next() {
+            System.out.println("called! " + index);
+            AcquisitionEvent posEvent = event.copy();
+            MultiStagePosition msp = positionList.getPosition(index);
+            if (msp != null) {
                posEvent.setX(msp.getX());
                posEvent.setY(msp.getY());
-               posEvent.setAxisPosition(POSITION_AXIS, index);
-               builder.accept(posEvent);
             }
+            posEvent.setAxisPosition(POSITION_AXIS, index);
+
+            index++;
+            return posEvent;
          }
-         return builder.build().iterator();
       };
    }
+
+//   /**
+//    * Iterate over an arbitrary list of positions. Adds in position indices to
+//    * the axes that assume the order in the list provided correspond to the
+//    * desired indices
+//    *
+//    * @param positionList
+//    * @return
+//    */
+//   public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> positions(
+//           PositionList positionList) {
+//      return (AcquisitionEvent event) -> {
+//         Stream.Builder<AcquisitionEvent> builder = Stream.builder();
+//         if (positionList == null) {
+//            builder.accept(event);
+//         } else {
+//            for (int index = 0; index < positionList.getNumberOfPositions(); index++) {
+//               AcquisitionEvent posEvent = event.copy();
+//               MultiStagePosition msp = positionList.getPosition(index);
+//               posEvent.setX(msp.getX());
+//               posEvent.setY(msp.getY());
+//               posEvent.setAxisPosition(POSITION_AXIS, index);
+//               builder.accept(posEvent);
+//            }
+//         }
+//         return builder.build().iterator();
+//      };
+//   }
 
 
 }
