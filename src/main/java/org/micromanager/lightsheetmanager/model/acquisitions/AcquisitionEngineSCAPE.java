@@ -42,6 +42,11 @@ import java.util.ArrayList;
 
 public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
+    private double origSpeedX_;
+    private double origAccelX_;
+    private double scanSpeedX_;
+    private double scanAccelX_;
+
     public AcquisitionEngineSCAPE(final LightSheetManagerModel model) {
         super(model);
     }
@@ -81,8 +86,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // initialize stage scanning so we can restore state
         Point2D.Double xyPosUm = new Point2D.Double();
-        double origXSpeed = 1.0; // don't want 0 in case something goes wrong
-        double origXAccel = 1.0; // don't want 0 in case something goes wrong
+        origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
+        origAccelX_ = 1.0; // don't want 0 in case something goes wrong
 
         // make sure stage scan is supported if selected
         if (acqSettings_.isUsingStageScanning()) {
@@ -101,8 +106,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
                 // second part: initialize stage scanning, so we can restore state later
                 xyPosUm = xyStage.getXYPosition();
-                origXSpeed = xyStage.getSpeedX();
-                origXAccel = xyStage.getAccelerationX();
+                origSpeedX_ = xyStage.getSpeedX();
+                origAccelX_ = xyStage.getAccelerationX();
 
                 // TODO: add more checks from original plugin here...
                 //  if (origXSpeed < 0.2 && resetXaxisSpeed_) { etc...
@@ -336,7 +341,16 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //                        }
 //                    }
 //                }
-
+                // move between positions fast
+                scanSpeedX_ = 1.0;
+                scanAccelX_ = 1.0;
+                if (acqSettings_.isUsingStageScanning()) {
+                    final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+                    scanSpeedX_ = xyStage.getSpeedX();
+                    scanAccelX_ = xyStage.getAccelerationX();
+                    xyStage.setSpeedX(origSpeedX_);
+                    xyStage.setAccelerationX(origAccelX_);
+                }
                 return event;
             }
 
@@ -347,6 +361,27 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }, Acquisition.BEFORE_HARDWARE_HOOK);
 
 
+        final PLogicSCAPE finalController = controller;
+        currentAcquisition_.addHook(new AcquisitionHook() {
+            @Override
+            public AcquisitionEvent run(AcquisitionEvent event) {
+                // for stage scanning: restore speed and set up scan at new position
+                // non-multi-position situation is handled in prepareControllerForAcquisition instead
+                if (acqSettings_.isUsingStageScanning()) {
+                    final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+                    final Point2D.Double pos = xyStage.getXYPosition();
+                    xyStage.setSpeedX(scanSpeedX_);
+                    xyStage.setAccelerationX(scanAccelX_);
+                    finalController.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
+                }
+                return event;
+            }
+
+            @Override
+            public void close() {
+
+            }
+        }, Acquisition.AFTER_HARDWARE_HOOK);
 
         final PLogicSCAPE controllerInstance = controller;
         // TODO This after camera hook is called after the camera has been readied to acquire a
@@ -574,8 +609,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             // make sure stage scanning state machine is stopped,
             // otherwise setting speed/position won't take
             xyStage.setScanState(ASIXYStage.ScanState.IDLE);
-            xyStage.setSpeedX(origXSpeed);
-            xyStage.setAccelerationX(origXAccel);
+            xyStage.setSpeedX(origSpeedX_);
+            xyStage.setAccelerationX(origAccelX_);
 
             if (returnToOriginalPosition) {
                 xyStage.setXYPosition(xyPosUm.x, xyPosUm.y);
@@ -689,7 +724,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // TODO: maybe wrap this up into a method for clarity
         double cameraReadoutTime;
         final CameraLibrary cameraLibrary = CameraLibrary.fromString(
-                model_.devices().getDeviceLibrary("ImagingCamera"));
+                model_.devices().getDevice("ImagingCamera").getDeviceLibrary());
         switch (cameraLibrary) {
             case HAMAMATSU: {
                 HamamatsuCamera camera = model_.devices().getDevice("ImagingCamera");
