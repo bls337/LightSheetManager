@@ -373,6 +373,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     xyStage.setSpeedX(scanSpeedX_);
                     xyStage.setAccelerationX(scanAccelX_);
                     finalController.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
+                    finalController.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(),
+                            acqSettings_.volumeSettings().firstView());
                 }
                 return event;
             }

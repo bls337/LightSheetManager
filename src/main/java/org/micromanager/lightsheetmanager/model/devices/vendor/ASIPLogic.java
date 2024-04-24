@@ -326,7 +326,8 @@ public class ASIPLogic extends ASITigerBase {
         NONE("None"),
         FOUR_CHANNEL_SHUTTER("Four-channel shutter"),
         DISPIM_SHUTTER("diSPIM Shutter"),
-        SEVEN_CHANNEL_SHUTTER("Seven-channel shutter");
+        SEVEN_CHANNEL_SHUTTER("Seven-channel shutter"),
+        SEVEN_CHANNEL_TTL_SHUTTER("Seven-channel TTL shutter");
 
         private final String text_;
 
