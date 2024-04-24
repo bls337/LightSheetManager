@@ -220,7 +220,9 @@ public class PLogicSCAPE {
             if (isInterleaved) {
                 numLines = 1;  // assure in acquisition code that we can't have single-sided interleaved
             }
-            numLines *= (int)((double)settings.numChannels() / computeScanChannelsPerPass(settings));
+            if (settings.isUsingChannels()) {
+                numLines = numLines * (settings.numChannels() / computeScanChannelsPerPass(settings));
+            }
             xyStage_.setScanNumLines(numLines);
 
             final boolean isStageScan2Sided = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN)
@@ -611,7 +613,6 @@ public class PLogicSCAPE {
 //                break;
 //        }
 
-        //if (scanner_ != null && piezo_ != null) {
         // make sure SPIM state machine is stopped
         scanner_.setSPIMState(ASIScanner.SPIMState.IDLE);
 
@@ -624,7 +625,7 @@ public class PLogicSCAPE {
         if (movePiezo) {
             piezo_.setPosition(piezoPosition);
         }
-        //}
+
         // make sure we stop SPIM and SCAN state machines every time we trigger controller (in AcquisitionPanel code)
         return true;
     }
@@ -692,11 +693,17 @@ public class PLogicSCAPE {
             plcLaser_.setCellInput(3, acquisitionFlagAddr + ASIPLogic.addrEdge);
         }
 
-        if (plcLaser_.getShutterMode() == ASIPLogic.ShutterMode.SEVEN_CHANNEL_SHUTTER) {
-            // special 7-channel case
+        // there are 2 separate 7-channel cases different in the property value for "PLogicMode"
+        // 1. (original) with 7-channel laser on own PLogic card, seems to have some odd things that I won't change including only uses 6 lasers
+        // 2. (newer) with 7-channel TTL-triggered on PLogic card shared with single camera trigger output (i.e. not dual-view system)
+        // however they share some things like using cells 17-24 and building a 3-input LUT which code is just copy/paste right now
+        final boolean isSevenChannelShutter = plcLaser_.getShutterMode() == ASIPLogic.ShutterMode.SEVEN_CHANNEL_SHUTTER;
+        final boolean isSevenChannelShutterTTL = plcLaser_.getShutterMode() == ASIPLogic.ShutterMode.SEVEN_CHANNEL_SHUTTER;
+
+        if (isSevenChannelShutter) {
+            // original special 7-channel case
             if (plcLaser_.getNumCells() < 24) {
-                // restore update setting
-                plcLaser_.setAutoUpdateCells(editCellUpdates);
+                plcLaser_.setAutoUpdateCells(editCellUpdates); // restore update setting
                 studio_.logs().showError("Require 24-cell PLC firmware to use hardware channel switching with 7-channel shutter");
                 return false;
             }
@@ -715,6 +722,41 @@ public class PLogicSCAPE {
                 for (int channelNum = 0; channelNum < settings.numChannels(); ++channelNum) {
                     if (doesPLogicChannelIncludeLaser(laserNum, settings.channels()[channelNum], settings.channelGroup())) {
                         lutValue += (int) Math.pow(2, channelNum + 4);  // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
+                    }
+                }
+                plcLaser_.setCellConfig(lutValue);
+                plcLaser_.setCellInput(1, counterLSBAddr);
+                plcLaser_.setCellInput(2, counterMSBAddr);
+                plcLaser_.setCellInput(3, laserTriggerAddress);
+            }
+        } else if (isSevenChannelShutterTTL) {
+            // new 7-channel case with camera trigger on BNC #8
+            if  (plcLaser_.getNumCells() < 24) {
+                plcLaser_.setAutoUpdateCells(editCellUpdates); // restore update setting
+                studio_.logs().showError("Require 24-cell PLC firmware to use hardware channel switching with 7-channel shutter");
+                return false;
+            }
+
+            // set cells 17-24 to control BNCs 1-8, but then immediately change BNC8 to reflect camera (firmware ensures all are set to push-pull outputs)
+            // note that the device adapter should have already set BNC8 to be the camera so this is just resetting it
+            plcLaser_.setPreset(ASIPLogic.Preset.BNC1_8_ON_17_24);
+            final int addrFrontPanel8 = 40;
+            final int addrInternalTTLCameraA = 41;
+            plcLaser_.setPointerPosition(addrFrontPanel8); // address 40 is front panel #8
+            plcLaser_.setCellType(ASIPLogic.CellType.OUTPUT_PUSH_PULL);
+            plcLaser_.setCellConfig(addrInternalTTLCameraA); // address 41 is internal TTL0 signal for CameraA
+
+            // now set cells 17-23, so they reflect the counter state used to track state as well as the global laser trigger
+            for (int laserNum = 1; laserNum <= 7; ++laserNum) {
+                plcLaser_.setPointerPosition(laserNum + 16);
+                plcLaser_.setCellType(ASIPLogic.CellType.LUT3);
+                int lutValue = 0;
+                // populate a 3-input lookup table with the combinations of lasers present
+                // the LUT "MSB" is the laserTrigger, then the counter MSB, then the counter LSB
+                for (int channelNum = 0; channelNum < settings.numChannels(); ++channelNum) {
+                    if (doesPLogicChannelIncludeLaser(laserNum, settings.channels()[channelNum], settings.channelGroup())) {
+                        // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
+                        lutValue += (int) Math.pow(2, channelNum + 4);
                     }
                 }
                 plcLaser_.setCellConfig(lutValue);
