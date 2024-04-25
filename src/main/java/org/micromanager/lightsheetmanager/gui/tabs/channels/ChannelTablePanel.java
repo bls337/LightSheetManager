@@ -68,6 +68,7 @@ public class ChannelTablePanel extends Panel {
 
     private void createEventHandlers() {
 
+        // add channel
         btnAddChannel_.registerListener(e -> {
             table_.getData().addEmptyChannel();
 //            revalidate(); // updates JScrollBar when adding elements
@@ -81,6 +82,7 @@ public class ChannelTablePanel extends Panel {
             model_.acquisitions().settingsBuilder().numChannels(channels.length);
         });
 
+        // remove channel
         btnRemoveChannel_.registerListener(e -> {
             final int row = table_.getTable().getSelectedRow();
             if (row != -1) {
@@ -93,6 +95,7 @@ public class ChannelTablePanel extends Panel {
             }
         });
 
+        // refresh
         btnRefresh_.registerListener(e -> {
             // TODO: use settings instead of GUI
             table_.updatePresetCombos(cmbChannelGroup_.getSelected());
@@ -109,16 +112,19 @@ public class ChannelTablePanel extends Panel {
             cmbChannelGroup_.updateUI();
         });
 
+        // select channel mode
         cmbChannelMode_.registerListener(e -> {
             final int index = cmbChannelMode_.getSelectedIndex();
             model_.acquisitions().settingsBuilder().channelMode(MultiChannelMode.getByIndex(index));
             //System.out.println("getChannelMode: " + model_.acquisitions().getAcquisitionSettings().getChannelMode());
         });
 
+        // select channel group
         cmbChannelGroup_.registerListener(e -> {
-            final String selected = cmbChannelGroup_.getSelected();
-            table_.updatePresetCombos(selected);
-            model_.acquisitions().settingsBuilder().channelGroup(selected);
+            final String channelGroup = cmbChannelGroup_.getSelected();
+            table_.updatePresetCombos(channelGroup);
+            table_.getData().setChannelGroup(channelGroup);
+            model_.acquisitions().settingsBuilder().channelGroup(channelGroup);
             //System.out.println("getChannelGroup: " + model_.acquisitions().getAcquisitionSettings().getChannelGroup());
         });
     }
