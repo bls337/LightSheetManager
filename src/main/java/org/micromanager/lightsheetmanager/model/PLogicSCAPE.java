@@ -855,7 +855,7 @@ public class PLogicSCAPE {
                 studio_.logs().showError("Must include PLogic \"OutputChannel\" in preset for hardware switching");
                 return 0;
             }
-            String setting = configData.getSetting(plcLaser_.getDeviceName(), "OutputChannel").getPropertyValue();
+            final String setting = configData.getSetting(plcLaser_.getDeviceName(), "OutputChannel").getPropertyValue();
             if (setting.equals("output 5 only")) {
                 return 5;
             } else if (setting.equals("output 6 only")) {
