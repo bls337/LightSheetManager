@@ -709,18 +709,20 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 case SLICE_HW:
                     if (acqSettings_.numChannels() == 1) {
                         // only 1 channel selected so don't have to really use hardware switching
+                        //multiChannelPanel_.initializeChannelCycle();
+                        //extraChannelOffset_ = multiChannelPanel_.selectNextChannelAndGetOffset();
                     } else {
                         // we have at least 2 channels
                         // intentionally leave extraChannelOffset_ untouched so that it can be specified by user by choosing a preset
                         //   for the channel in the main Micro-Manager window
+                        final boolean success = plc.setupHardwareChannelSwitching(acqSettings_);
+                        if (!success) {
+                            studio_.logs().showError("Couldn't set up slice hardware channel switching.");
+                            return false; // early exit
+                        }
+                        nrChannelsSoftware = 1;
+                        nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView() * acqSettings_.numChannels();
                     }
-                    final boolean success = plc.setupHardwareChannelSwitching(acqSettings_);
-                    if (!success) {
-                        studio_.logs().showError("Couldn't set up slice hardware channel switching.");
-                        return false; // early exit
-                    }
-                    nrChannelsSoftware = 1;
-                    nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView() * acqSettings_.numChannels();
                     break;
                 default:
                     studio_.logs().showError(
@@ -874,20 +876,50 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     public DefaultTimingSettings.Builder getTimingFromExposure() {
         // Note: sliceDuration is computed in recalculateSliceTiming
-
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
 
-        final double desiredExposure =
-                model_.acquisitions().settings().sliceSettings().sampleExposure();
+        final CameraBase camera = model_.devices().getDevice("ImagingCamera");
+        final CameraMode cameraMode = acqSettings_.cameraMode();
 
-        tsb.scansPerSlice(1);
-        tsb.scanDuration(0.25);
-        tsb.cameraExposure(desiredExposure);
-        tsb.laserTriggerDuration(desiredExposure);
-        tsb.cameraTriggerDuration(1);
-        tsb.delayBeforeCamera(0);
-        tsb.delayBeforeLaser(0.25); // TODO: experiment with 0
-        tsb.delayBeforeScan(0.25);  // TODO: experiment with 0
+        final double cameraResetTime = camera.getResetTime(cameraMode);     // recalculate for safety, 0 for light sheet
+        final double cameraReadoutTime = camera.getReadoutTime(cameraMode); // recalculate for safety, 0 for overlap
+        final double cameraTotalTime = NumberUtils.ceilToQuarterMs(cameraResetTime + cameraReadoutTime);
+        final double laserDuration = NumberUtils.roundToQuarterMs(
+                model_.acquisitions().settings().sliceSettings().sampleExposure());
+
+        final boolean isSlicePeriodMinimized = acqSettings_.sliceSettings().isSlicePeriodMinimized();
+        final double desiredSlicePeriod = acqSettings_.sliceSettings().slicePeriod();
+
+        final double slicePeriod = Math.max(Math.max(laserDuration, cameraTotalTime),
+                isSlicePeriodMinimized ? 0 : desiredSlicePeriod);
+        final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriod - laserDuration);
+
+        switch (cameraMode) {
+            case PSEUDO_OVERLAP: // e.g. Kinetix
+                tsb.scansPerSlice(1);
+                tsb.scanDuration(0.25);
+                tsb.cameraExposure(laserDuration);
+                tsb.laserTriggerDuration(laserDuration);
+                tsb.cameraTriggerDuration(0.25);
+                tsb.delayBeforeCamera(0.25);
+                tsb.delayBeforeLaser(sliceDeadTime);
+                tsb.delayBeforeScan(0.0);
+                break;
+            case OVERLAP: // e.g. Fusion
+            case EDGE:
+                tsb.scansPerSlice(1);
+                tsb.scanDuration(0.0);
+                tsb.cameraExposure(laserDuration);
+                tsb.laserTriggerDuration(laserDuration);
+                tsb.cameraTriggerDuration(1);
+                tsb.delayBeforeCamera(0);
+                tsb.delayBeforeLaser(sliceDeadTime);
+                tsb.delayBeforeScan(0.25);
+                break;
+            default:
+                studio_.logs().showError("Invalid camera mode");
+                break;
+        }
         return tsb;
     }
 
