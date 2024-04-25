@@ -53,6 +53,16 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     boolean setup() {
+
+        // make sure that there are positions in the PositionList
+        if (acqSettings_.isUsingMultiplePositions()) {
+            final int numPositions = studio_.positions().getPositionList().getNumberOfPositions();
+            if (numPositions == 0) {
+                studio_.logs().showError(("XY positions expected but the position list is empty"));
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -394,7 +404,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 // TODO: Cameras are now ready to receive triggers, so we can send (software) trigger
                 //  to the tiger to tell it to start outputting TTLs
 
-                if (isUsingPLC && controllerInstance != null) { // if not in demo mode
+                if (isUsingPLC) { // if not in demo mode
                     // TODO: is this the best place to set state to idle?
                     ASIScanner scanner = model_.devices().getDevice("IllumSlice");
                     // need to set to IDLE to re-arm for each z-stack
@@ -454,9 +464,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // Loop 1: XY positions
         PositionList pl = MMStudio.getInstance().positions().getPositionList();
-        if (acqSettings_.isUsingMultiplePositions() && (pl.getNumberOfPositions() == 0)) {
-            throw new RuntimeException("XY positions expected but position list is empty");
-        }
 
         String[] cameraNames;
         if (demoMode) {
