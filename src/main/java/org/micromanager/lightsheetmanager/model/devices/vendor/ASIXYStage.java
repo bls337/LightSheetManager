@@ -158,6 +158,14 @@ public class ASIXYStage extends ASITigerBase {
         return ScanState.fromString(getProperty(Properties.SCAN_STATE));
     }
 
+    public void setScanSettlingTime(final double milliseconds) {
+        setPropertyFloat(Properties.SCAN_SETTLING_TIME, milliseconds);
+    }
+
+    public double getScanSettlingTime() {
+        return getPropertyFloat(Properties.SCAN_SETTLING_TIME);
+    }
+
     public static class Properties {
         public static final String AXIS_POLARITY_X = "AxisPolarityX";
         public static final String AXIS_POLARITY_Y = "AxisPolarityY";
@@ -173,6 +181,7 @@ public class ASIXYStage extends ASITigerBase {
         public static final String SCAN_NUM_LINES = "ScanNumLines";
         public static final String SCAN_PATTERN = "ScanPattern";
         public static final String SCAN_STATE = "ScanState";
+        public static final String SCAN_SETTLING_TIME = "ScanSettlingTime(ms)";
 
         public static final String SCAN_FAST_AXIS_START_POSITION = "ScanFastAxisStartPosition(mm)";
         public static final String SCAN_FAST_AXIS_STOP_POSITION = "ScanFastAxisStopPosition(mm)";

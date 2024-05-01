@@ -40,6 +40,7 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     private double origSpeedX_;
@@ -149,29 +150,33 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
             // --- testing code below ---
-//            String plcName = "Scanner:AB:33";
-//            StrVector propertyNames;
-//            try {
-//                propertyNames = core_.getDevicePropertyNames(plcName);
-//            } catch (Exception e) {
-//                propertyNames = null;
-//            }
-//
-//            Gson gsonObj = new Gson();
-//            HashMap<String, String> deviceProps = new HashMap<>();
-//            for (String propName : propertyNames) {
-//                String propValue;
+//            StrVector deviceNames = core_.getLoadedDevices();
+//            for (String deviceName : deviceNames) {
+//                System.out.println("deviceName: " + deviceName);
+//                StrVector propertyNames;
 //                try {
-//                    propValue = core_.getProperty(plcName, propName);
+//                    propertyNames = core_.getDevicePropertyNames(deviceName);
 //                } catch (Exception e) {
-//                    propValue = "";
-//                    System.out.println("failed!");
+//                    propertyNames = null;
 //                }
-//                deviceProps.put(propName, propValue);
-//                //System.out.println(propName);
+//
+//                Gson gsonObj = new Gson();
+//                HashMap<String, String> deviceProps = new HashMap<>();
+//                for (String propName : propertyNames) {
+//                    String propValue;
+//                    try {
+//                        propValue = core_.getProperty(deviceName, propName);
+//                    } catch (Exception e) {
+//                        propValue = "";
+//                        System.out.println("failed!");
+//                    }
+//                    deviceProps.put(propName, propValue);
+//                    //System.out.println(propName);
+//                }
+//
+//                String jsonStr = gsonObj.toJson(deviceProps);
+//                System.out.println(jsonStr);
 //            }
-//            String jsonStr = gsonObj.toJson(deviceProps);
-//            System.out.println(jsonStr);
 
         setAcquisitionSettings(asb_.build());
 
