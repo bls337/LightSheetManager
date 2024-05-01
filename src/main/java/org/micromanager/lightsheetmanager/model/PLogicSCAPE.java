@@ -230,6 +230,7 @@ public class PLogicSCAPE {
 
             xyStage_.setScanPattern(isStageScan2Sided ?
                     ASIXYStage.ScanPattern.SERPENTINE : ASIXYStage.ScanPattern.RASTER);
+            xyStage_.setScanSettlingTime(acqSettings_.volumeSettings().delayBeforeView());
 
             if (xyStage_.getAxisPolarityX() != ASIXYStage.AxisPolarity.NORMAL) {
                 studio_.logs().showError(
@@ -351,7 +352,7 @@ public class PLogicSCAPE {
         xyStage_.setSlowAxisStop(y / 1000);
 
         zSpeedZero_ = true;  // will turn false if we are doing planar correction
-        return false;
+        return true;
         // return preparePlanarCorrectionForAcquisition(); TODO: add planar correction later
     }
 
