@@ -297,6 +297,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 // TODO: add later when autofocus is complete, prevent errors if no time index is found for now
                 //int timePoint = firstAcqEvent.getTIndex();
 
+                try {
+                    core_.waitForSystem();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 ////////////////////////////////////
                 ///////// Run autofocus ////////////
                 ///////////////////////////////////
@@ -351,15 +356,18 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //                        }
 //                    }
 //                }
-                // move between positions fast
-                scanSpeedX_ = 1.0;
-                scanAccelX_ = 1.0;
-                if (acqSettings_.isUsingStageScanning()) {
-                    final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
-                    scanSpeedX_ = xyStage.getSpeedX();
-                    scanAccelX_ = xyStage.getAccelerationX();
-                    xyStage.setSpeedX(origSpeedX_);
-                    xyStage.setAccelerationX(origAccelX_);
+
+                if (isUsingPLC) {
+                    // move between positions fast
+                    scanSpeedX_ = 1.0;
+                    scanAccelX_ = 1.0;
+                    if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
+                        final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+                        scanSpeedX_ = xyStage.getSpeedX();
+                        scanAccelX_ = xyStage.getAccelerationX();
+                        xyStage.setSpeedX(origSpeedX_);
+                        xyStage.setAccelerationX(origAccelX_);
+                    }
                 }
                 return event;
             }
@@ -371,29 +379,31 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }, Acquisition.BEFORE_HARDWARE_HOOK);
 
 
-        final PLogicSCAPE finalController = controller;
-        currentAcquisition_.addHook(new AcquisitionHook() {
-            @Override
-            public AcquisitionEvent run(AcquisitionEvent event) {
-                // for stage scanning: restore speed and set up scan at new position
-                // non-multi-position situation is handled in prepareControllerForAcquisition instead
-                if (acqSettings_.isUsingStageScanning()) {
-                    final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
-                    final Point2D.Double pos = xyStage.getXYPosition();
-                    xyStage.setSpeedX(scanSpeedX_);
-                    xyStage.setAccelerationX(scanAccelX_);
-                    finalController.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
-                    finalController.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(),
-                            acqSettings_.volumeSettings().firstView());
-                }
-                return event;
-            }
-
-            @Override
-            public void close() {
-
-            }
-        }, Acquisition.AFTER_HARDWARE_HOOK);
+//        final PLogicSCAPE finalController = controller;
+//        currentAcquisition_.addHook(new AcquisitionHook() {
+//            @Override
+//            public AcquisitionEvent run(AcquisitionEvent event) {
+//                System.out.println("After hardware hook");
+//                // for stage scanning: restore speed and set up scan at new position
+//                // non-multi-position situation is handled in prepareControllerForAcquisition instead
+////                if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
+////                    final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+////                    final Point2D.Double pos = xyStage.getXYPosition();
+////                    xyStage.setSpeedX(scanSpeedX_);
+////                    xyStage.setAccelerationX(scanAccelX_);
+////                    System.out.println("AFTER_HARDWARE_HOOK trigger");
+////                    finalController.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
+/////                   finalController.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(),
+////                           acqSettings_.volumeSettings().firstView());
+////                }
+//                return event;
+//            }
+//
+//            @Override
+//            public void close() {
+//
+//            }
+//        }, Acquisition.AFTER_HARDWARE_HOOK);
 
         final PLogicSCAPE controllerInstance = controller;
         // TODO This after camera hook is called after the camera has been readied to acquire a
@@ -403,8 +413,18 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             public AcquisitionEvent run(AcquisitionEvent event) {
                 // TODO: Cameras are now ready to receive triggers, so we can send (software) trigger
                 //  to the tiger to tell it to start outputting TTLs
+                if (isUsingPLC) {
+                    if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
+                        final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+                        final Point2D.Double pos = xyStage.getXYPosition();
+                        xyStage.setSpeedX(scanSpeedX_);
+                        xyStage.setAccelerationX(scanAccelX_);
+                        controllerInstance.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
+                        controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(),
+                            acqSettings_.volumeSettings().firstView());
+                        return event;
+                    }
 
-                if (isUsingPLC) { // if not in demo mode
                     // TODO: is this the best place to set state to idle?
                     ASIScanner scanner = model_.devices().getDevice("IllumSlice");
                     // need to set to IDLE to re-arm for each z-stack
@@ -413,6 +433,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                             scanner.setSPIMState(ASIScanner.SPIMState.IDLE);
                         }
                     }
+
                     int side = 0;
                     // NOTE: not sure why this is being triggered twice with only 1 camera; so we need guard
                     // TODO: enable 2 sided acquisition
