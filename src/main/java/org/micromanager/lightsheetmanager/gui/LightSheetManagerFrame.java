@@ -47,6 +47,7 @@ public class LightSheetManagerFrame extends JFrame {
 
         // create the user interface
         if (isLoaded) {
+            initDialogs();
             GeometryType geometryType = model_.devices()
                     .getDeviceAdapter().getMicroscopeGeometry();
             switch (geometryType) {
@@ -139,7 +140,7 @@ public class LightSheetManagerFrame extends JFrame {
         WindowUtils.registerWindowClosingEvent(this, event -> {
             tabPanel_.getNavigationTab().getNavigationPanel().stopPolling();
             model_.getUserSettings().save();
-            System.out.println("main window closed!");
+            studio_.logs().logMessage("user settings saved");
         });
 
     }
@@ -151,6 +152,14 @@ public class LightSheetManagerFrame extends JFrame {
 
     public Studio getStudio_() {
         return studio_;
+    }
+
+    /**
+     * Detect settings after the model is loaded,
+     * ask to change settings with dialogs.
+     */
+    private void initDialogs() {
+        model_.devices().checkDevices(this);
     }
 
     public void toggleLiveMode() {

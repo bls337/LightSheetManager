@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import mmcorej.CMMCore;
 import mmcorej.DeviceType;
 import org.micromanager.Studio;
+import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 import org.micromanager.lightsheetmanager.model.devices.Galvo;
 import org.micromanager.lightsheetmanager.model.devices.LightSheetDeviceManager;
@@ -24,6 +25,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIZStage;
 
+import javax.swing.JFrame;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -417,6 +419,39 @@ public class DeviceManager {
             studio_.getApplication().refreshGUI();
         }
         return newProperties;
+    }
+
+    // TODO: adapt for diSPIM and multiple cameras
+    /**
+     * Check user settings and ask to change settings with dialogs.
+     */
+    public void checkDevices(final JFrame frame) {
+
+        final String cameraKey = "ImagingCamera";
+        CameraBase cameraDevice = getDevice(cameraKey);
+        CameraLibrary cameraLib = CameraLibrary.UNKNOWN;
+        if (cameraDevice != null) {
+            cameraLib = CameraLibrary.fromString(cameraDevice.getDeviceLibrary());
+        }
+
+        switch (cameraLib) {
+            case HAMAMATSU:
+                // Flash4, Fusion, etc
+                HamamatsuCamera camera = getDevice(cameraKey);
+                if (camera.getTriggerPolarity().equals(HamamatsuCamera.Values.NEGATIVE)) {
+                    final int result = DialogUtils.showYesNoDialog(frame, "Hamamatsu Camera",
+                            "The trigger polarity should be set to POSITIVE. Set it now?");
+                    if (result == 0) {
+                        camera.setTriggerPolarity(HamamatsuCamera.Values.POSITIVE);
+                    }
+                }
+                break;
+            case PVCAM:
+                // Kinetix, etc
+                break;
+            default:
+                break;
+        }
     }
 
 }

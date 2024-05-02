@@ -32,6 +32,10 @@ public class DialogUtils {
                 JOptionPane.PLAIN_MESSAGE, null, null, "");
     }
 
+    public static int showYesNoDialog(final JFrame frame, final String title, final String message) {
+        return JOptionPane.showConfirmDialog(frame, message, title, JOptionPane.YES_NO_OPTION);
+    }
+
     /**
      * Shows a customized message dialog box, this method does not log the error.<P>
      * This is used for reporting errors in the AcquisitionTable.
