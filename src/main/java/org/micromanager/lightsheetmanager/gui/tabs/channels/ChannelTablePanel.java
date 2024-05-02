@@ -40,7 +40,7 @@ public class ChannelTablePanel extends Panel {
 
         table_ = new ChannelTable(model_);
 
-        Button.setDefaultSize(72, 24);
+        Button.setDefaultSize(74, 24);
         btnAddChannel_ = new Button("Add");
         btnRemoveChannel_ = new Button("Remove");
         btnRefresh_ = new Button("Refresh");
@@ -51,10 +51,12 @@ public class ChannelTablePanel extends Panel {
 
         final String[] groupLabels = table_.getAvailableGroups();
         cmbChannelGroup_ = new ComboBox(groupLabels,
-                model_.acquisitions().settings().channelGroup());
+                model_.acquisitions().settings().channelGroup(),
+                120, 22);
 
         cmbChannelMode_ = new ComboBox(MultiChannelMode.toArray(),
-                model_.acquisitions().settings().channelMode().toString());
+                model_.acquisitions().settings().channelMode().toString(),
+                120, 22);
 
         add(lblChannelGroup_, "split 2");
         add(cmbChannelGroup_, "wrap");

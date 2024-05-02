@@ -168,14 +168,13 @@ public class LightSheetManagerFrame extends JFrame {
     // Note: doesn't seem to work for all cameras
     @Subscribe
     public void liveModeListener(LiveModeEvent event) {
-        if (!studio_.live().isLiveModeOn()) {
-        }
-        //System.out.println("LIVE MODE!");
+//        if (!studio_.live().isLiveModeOn()) {
+//        }
     }
 
     @Subscribe
     public void onExposureChanged(ExposureChangedEvent event) {
-        System.out.println("Exposure changed!");
+//        System.out.println("Exposure changed!");
     }
 
 }
