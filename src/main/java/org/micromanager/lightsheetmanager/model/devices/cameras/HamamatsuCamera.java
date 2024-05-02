@@ -23,6 +23,7 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
         public static final String CAMERA_BUS = "Camera Bus";
         public static final String TRIGGER_SOURCE = "TRIGGER SOURCE";
         public static final String TRIGGER_ACTIVE = "TRIGGER ACTIVE";
+        public static final String TRIGGER_POLARITY = "TriggerPolarity";
         public static final String SENSOR_MODE = "SENSOR MODE";
         public static final String INTERNAL_LINE_INTERVAL = "INTERNAL LINE INTERVAL";
         public static final String SCAN_MODE = "ScanMode";
@@ -39,6 +40,8 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
         public static final String PROGRESSIVE = "PROGRESSIVE";
         public static final String AREA = "AREA";
         public static final String USB3 = "USB3";
+        public static final String POSITIVE = "POSITIVE";
+        public static final String NEGATIVE = "NEGATIVE";
         public static final String SCAN_MODE_1 = "1";
         public static final String SCAN_MODE_2 = "2";
         public static final String SCAN_MODE_3 = "3";
@@ -238,4 +241,13 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
     public boolean isFlash4() {
         return getProperty(Properties.CAMERA_NAME).startsWith(Models.FLASH4);
     }
+
+    public String getTriggerPolarity() {
+        return getProperty(Properties.TRIGGER_POLARITY);
+    }
+
+    public void setTriggerPolarity(final String polarity) {
+        setProperty(Properties.TRIGGER_POLARITY, polarity);
+    }
+
 }

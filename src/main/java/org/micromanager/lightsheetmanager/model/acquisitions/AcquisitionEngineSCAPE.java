@@ -55,6 +55,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     @Override
     boolean setup() {
 
+        // this is needed for LSMAcquisitionEvents to work with multiple positions
+        if (core_.getFocusDevice().isEmpty()
+                && acqSettings_.isUsingMultiplePositions()) {
+            studio_.logs().showError("The default focus device \"Core-Focus\" needs to be set to use multiple positions.");
+        }
+
         // make sure that there are positions in the PositionList
         if (acqSettings_.isUsingMultiplePositions()) {
             final int numPositions = studio_.positions().getPositionList().getNumberOfPositions();
