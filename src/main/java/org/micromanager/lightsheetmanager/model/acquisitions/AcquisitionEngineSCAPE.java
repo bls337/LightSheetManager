@@ -882,6 +882,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
         }
 
+        // set imaging camera exposure
+        final CameraBase cam = model_.devices()
+                .getDevice("ImagingCamera");
+        cam.setExposure(exposureTime);
+        
         double extraChannelOffset = 0.0;
         plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
         return true;
