@@ -21,6 +21,24 @@ public class CameraBase extends DeviceBase implements LightSheetCamera {
         mode_ = CameraMode.EDGE;
     }
 
+    public void setExposure(final double milliseconds) {
+        try {
+            core_.setExposure(deviceName_, milliseconds);
+        } catch (Exception e) {
+            studio_.logs().logError("could not set camera exposure");
+        }
+    }
+
+    public double getExposure() {
+        double exposure = 0.0;
+        try {
+            exposure = core_.getExposure();
+        } catch (Exception e) {
+            studio_.logs().logError("could not get camera exposure");
+        }
+        return exposure;
+    }
+
     // TODO: take binning into account
     public Rectangle getROI() {
         Rectangle roi = new Rectangle();
