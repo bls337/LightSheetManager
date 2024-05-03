@@ -204,10 +204,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             return false;
         }
 
-        // TODO: once saving NDTiff images works, delete this line, always set to MULTIPAGE_TIFF for now
-        DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);
-
-
         // Projection mode
         //TODO: where should this come from in settings?
         boolean projectionMode = false;
