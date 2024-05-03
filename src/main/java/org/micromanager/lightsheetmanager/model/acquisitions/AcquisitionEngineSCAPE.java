@@ -99,6 +99,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
         }
 
+        // save current exposure to restore later
+        CameraBase cam = model_.devices()
+                .getDevice("ImagingCamera");
+        final double origExposure = cam.getExposure();
+
+        // used to detect if the plugin is using ASI hardware
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
 
         // initialize stage scanning so we can restore state
@@ -674,6 +680,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // set the camera trigger mode back to internal for live mode
         CameraBase camera = model_.devices().getDevice("ImagingCamera");
         camera.setTriggerMode(CameraMode.INTERNAL);
+        camera.setExposure(origExposure);
 
         currentAcquisition_ = null;
 
@@ -886,7 +893,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final CameraBase cam = model_.devices()
                 .getDevice("ImagingCamera");
         cam.setExposure(exposureTime);
-        
+
         double extraChannelOffset = 0.0;
         plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
         return true;
