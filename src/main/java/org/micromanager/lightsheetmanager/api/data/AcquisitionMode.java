@@ -2,20 +2,20 @@ package org.micromanager.lightsheetmanager.api.data;
 
 import java.util.Arrays;
 
-// TODO: replicate getValidModeKeys from 1.4 plugin to populate acq mode combo box
+// TODO: account for different naming on each geometry type (SLICE_SCAN_ONLY)
 
 /**
- * Acquisition modes for diSPIM.
+ * Acquisition modes for diSPIM and SCAPE.
  */
 public enum AcquisitionMode {
     NONE("None"),
-
     PIEZO_SLICE_SCAN("Synchronous piezo/slice scan"),
-    NO_SCAN("No Scan (Fixed Sheet)"),
-    STAGE_SCAN("Stage Scan"),
-    STAGE_SCAN_INTERLEAVED("Stage Scan Interleaved"),
-    STAGE_SCAN_UNIDIRECTIONAL("Stage Scan Unidirectional"),
-    SLICE_SCAN_ONLY("Slice scan only"),
+    NO_SCAN("No scan (fixed sheet)"),
+    STAGE_SCAN("Stage scan"),
+    STAGE_SCAN_INTERLEAVED("Stage scan interleaved"),
+    STAGE_SCAN_UNIDIRECTIONAL("Stage scan unidirectional"),
+    //SLICE_SCAN_ONLY("Slice scan only"), // for diSPIM
+    SLICE_SCAN_ONLY("Galvo scan"), // for SCAPE
     PIEZO_SCAN_ONLY("Piezo scan only");
 
     private final String text_;
@@ -39,4 +39,14 @@ public enum AcquisitionMode {
                 .toArray(String[]::new);
     }
 
+    // TODO: check if stage scanning exists
+    public static String[] getValidKeys() {
+        final AcquisitionMode[] keys = new AcquisitionMode[] {
+                NO_SCAN, STAGE_SCAN, SLICE_SCAN_ONLY, PIEZO_SCAN_ONLY
+        };
+        return Arrays.stream(keys)
+                .map(AcquisitionMode::toString)
+                .toArray(String[]::new);
+
+    }
 }
