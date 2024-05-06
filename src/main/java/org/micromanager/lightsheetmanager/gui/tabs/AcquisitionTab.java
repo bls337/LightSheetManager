@@ -157,7 +157,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
             pnlChannelTable_.setItemsEnabled(false);
         }
 
-        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.toArray(),
+        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.getValidKeys(),
                 acqSettings.acquisitionMode().toString(),
                 180, 24);
 
