@@ -21,6 +21,7 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
+import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.model.PLogicSCAPE;
@@ -132,8 +133,16 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 origSpeedX_ = xyStage.getSpeedX();
                 origAccelX_ = xyStage.getAccelerationX();
 
-                // TODO: add more checks from original plugin here...
-                //  if (origXSpeed < 0.2 && resetXaxisSpeed_) { etc...
+                // if X speed is less than 0.2 mm/s then it probably wasn't restored to correct speed some other time
+                if (origSpeedX_ < 0.2) {
+                    final int result = DialogUtils.showYesNoDialog(frame_, "Change Speed",
+                            "Max speed of X axis is small, perhaps it was not correctly restored after " +
+                                    "stage scanning previously. Do you want to set it to 1 mm/s now?");
+                    if (result == 0) {
+                        xyStage.setSpeedX(1.0);
+                    }
+                }
+                // TODO: add more checks from original plugin here... Z speed?
             }
         }
 
