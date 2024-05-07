@@ -321,9 +321,8 @@ public class DeviceManager {
 
     // check for ASI hardware triggering device
     public boolean isUsingPLogic() {
-        // make sure that we have devices set
         if (deviceMap_.get("TriggerLaser") == null && deviceMap_.get("TriggerCamera") == null) {
-            return false;
+            return false; // early exit => devices not set
         }
         // check if both device names contain "PLogic"
         boolean result = false;
@@ -336,6 +335,15 @@ public class DeviceManager {
             result = true;
         }
         return result;
+    }
+
+    // check for ASI stage scanning
+    public boolean isUsingStageScanning() {
+        if (deviceMap_.get("SampleXY") == null) {
+            return false; // early exit => device not set
+        }
+        return deviceMap_.get("SampleXY")
+                .hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES);
     }
 
     /**
