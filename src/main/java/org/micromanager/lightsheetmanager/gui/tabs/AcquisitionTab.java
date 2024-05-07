@@ -157,7 +157,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
             pnlChannelTable_.setItemsEnabled(false);
         }
 
-        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.getValidKeys(),
+        // acquisition mode combo box
+        final boolean isUsingScanSettings = model_.devices().isUsingStageScanning();
+        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.getValidKeys(isUsingScanSettings),
                 acqSettings.acquisitionMode().toString(),
                 180, 24);
 

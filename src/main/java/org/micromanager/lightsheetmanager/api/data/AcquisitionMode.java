@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.api.data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 // TODO: account for different naming on each geometry type (SLICE_SCAN_ONLY)
@@ -39,12 +40,21 @@ public enum AcquisitionMode {
                 .toArray(String[]::new);
     }
 
-    // TODO: check if stage scanning exists
-    public static String[] getValidKeys() {
-        final AcquisitionMode[] keys = new AcquisitionMode[] {
-                NO_SCAN, STAGE_SCAN, SLICE_SCAN_ONLY, PIEZO_SCAN_ONLY
-        };
-        return Arrays.stream(keys)
+    /**
+     * Returns an array of valid acquisition modes as strings.
+     *
+     * @param isStageScanning {@code true} if stage scanning
+     * @return an array of strings
+     */
+    public static String[] getValidKeys(final boolean isStageScanning) {
+        final ArrayList<AcquisitionMode> keys = new ArrayList<>();
+        keys.add(NO_SCAN);
+        if (isStageScanning) {
+            keys.add(STAGE_SCAN);
+        }
+        keys.add(SLICE_SCAN_ONLY);
+        keys.add(PIEZO_SCAN_ONLY);
+        return keys.stream()
                 .map(AcquisitionMode::toString)
                 .toArray(String[]::new);
 

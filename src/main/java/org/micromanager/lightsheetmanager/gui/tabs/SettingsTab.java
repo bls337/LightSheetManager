@@ -47,14 +47,7 @@ public class SettingsTab extends Panel implements ListeningPanel {
 
         // check for devices to set up the tab
         isUsingPLogic_ = model_.devices().isUsingPLogic();
-        if (isUsingPLogic_) {
-            final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
-            if (xyStage != null) {
-                isUsingScanSettings_ = xyStage.hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES);
-            } else {
-                isUsingScanSettings_ = false;
-            }
-        }
+        isUsingScanSettings_ = model_.devices().isUsingStageScanning();
 
         final Panel pnlScanSettings = new Panel("Stage Scan Settings");
         pnlScanSettings.setMigLayout(
