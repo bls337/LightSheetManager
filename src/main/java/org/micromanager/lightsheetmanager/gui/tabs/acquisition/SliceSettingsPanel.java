@@ -11,6 +11,7 @@ import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
 import java.util.Objects;
 
+// TODO: virtual slit panel not needed in SCAPE mode
 public class SliceSettingsPanel extends Panel {
 
     // regular panel
@@ -66,7 +67,7 @@ public class SliceSettingsPanel extends Panel {
         // virtual slit panel
         lblScanResetTime_ = new Label("Scan Reset Time [ms]:");
         lblScanSettleTime_ = new Label("Scan Settle Time [ms]:");
-        lblShutterWidth_ = new Label("Shutter Width [\u00B5s]:");
+        lblShutterWidth_ = new Label("Shutter Width [µs]:");
         lblShutterSpeed_ = new Label("1 / (shutter speed):");
         spnScanResetTime_ = Spinner.createDoubleSpinner(
                 sliceSettingsLS.scanResetTime(), 1.0, 100.0, 0.25);
@@ -88,11 +89,11 @@ public class SliceSettingsPanel extends Panel {
 
         // regular panel
         cbxMinimizeSlicePeriod_.registerListener(e -> {
-            final boolean selected = !cbxMinimizeSlicePeriod_.isSelected();
-            lblSlicePeriod_.setEnabled(selected);
-            spnSlicePeriod_.setEnabled(selected);
+            final boolean selected = cbxMinimizeSlicePeriod_.isSelected();
+            lblSlicePeriod_.setEnabled(!selected);
+            spnSlicePeriod_.setEnabled(!selected);
             model_.acquisitions().settingsBuilder()
-                    .sliceSettingsBuilder().minimizeSlicePeriod(!selected);
+                    .sliceSettingsBuilder().minimizeSlicePeriod(selected);
         });
 
         spnSlicePeriod_.registerListener(e -> {

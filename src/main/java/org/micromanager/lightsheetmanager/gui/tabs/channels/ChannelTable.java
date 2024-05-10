@@ -22,7 +22,7 @@ public class ChannelTable extends JScrollPane {
     private ChannelTableData tableData_;
     private ChannelTableModel tableModel_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public ChannelTable(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
@@ -83,12 +83,10 @@ public class ChannelTable extends JScrollPane {
     }
 
     public void updatePresetCombos(final String channelGroup) {
-        //System.out.println("channelGroup: " + channelGroup);
         final String[] presets = getAllPresets(channelGroup);
         cmbPresets_.removeAllItems();
         for (String preset : presets) {
             cmbPresets_.addItem(preset);
-            //System.out.println("preset " + preset);
         }
         cmbPresets_.setSelectedItem(channelGroup);
     }
@@ -97,7 +95,6 @@ public class ChannelTable extends JScrollPane {
     private String[] getAllPresets(final String configGroup) {
         return model_.studio().core().getAvailableConfigs(configGroup).toArray();
     }
-
 
     // TODO: probably should be in the model
     public String[] getAvailableGroups() {
@@ -123,10 +120,7 @@ public class ChannelTable extends JScrollPane {
     }
 
     public void setHeaderRowColor(final boolean state) {
-        if (state) {
-            table_.getTableHeader().setForeground(Color.BLACK);
-        } else {
-            table_.getTableHeader().setForeground(Color.GRAY);
-        }
+        table_.getTableHeader().setForeground(state ? Color.BLACK : Color.GRAY);
     }
+
 }

@@ -22,7 +22,7 @@ public class AdvancedTimingPanel extends Panel {
 
     private CheckBox cbxAlternateScanDirection_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public AdvancedTimingPanel(final LightSheetManagerModel model) {
         super("Advanced Timing Settings");
@@ -68,7 +68,7 @@ public class AdvancedTimingPanel extends Panel {
                 timingSettings.cameraExposure(), 0.0, 1000.0, 0.25);
 
         cbxAlternateScanDirection_ = new CheckBox(
-                "Alternate Scan Direction", false, CheckBox.LEFT);
+                "Alternate scan direction", false, CheckBox.LEFT);
 
         add(lblDelayBeforeScan, "");
         add(spnDelayBeforeScan_, "wrap");
@@ -94,55 +94,46 @@ public class AdvancedTimingPanel extends Panel {
         spnDelayBeforeScan_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingSettingsBuilder().delayBeforeScan(spnDelayBeforeScan_.getDouble());
-            //System.out.println("delayBeforeScan: " + acqSettings.getTimingSettings().delayBeforeScan());
         });
 
         spnScansPerSlice_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingSettingsBuilder().scansPerSlice(spnScansPerSlice_.getInt());
-            //System.out.println("scansPerSlice: " + acqSettings.getTimingSettings().scansPerSlice());
         });
 
         spnScanDuration_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingSettingsBuilder().scanDuration(spnScanDuration_.getDouble());
-            //System.out.println("scanDuration: " + acqSettings.getTimingSettings().scanDuration());
         });
 
         spnDelayBeforeLaser_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingSettingsBuilder().delayBeforeLaser(spnDelayBeforeLaser_.getDouble());
-            //System.out.println("delayBeforeLaser: " + acqSettings.getTimingSettings().delayBeforeLaser());
         });
 
         spnLaserTriggerDuration_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingSettingsBuilder().laserTriggerDuration(spnLaserTriggerDuration_.getDouble());
-            //System.out.println("laserTriggerDuration: " + acqSettings.getTimingSettings().laserTriggerDuration());
         });
 
         spnDelayBeforeCamera_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingSettingsBuilder().delayBeforeCamera(spnDelayBeforeCamera_.getDouble());
-            //System.out.println("delayBeforeCamera: " + acqSettings.getTimingSettings().delayBeforeCamera());
         });
 
         spnCameraTriggerDuration_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingSettingsBuilder().cameraTriggerDuration(spnCameraTriggerDuration_.getDouble());
-            //System.out.println("cameraTriggerDuration: " + acqSettings.getTimingSettings().cameraTriggerDuration());
         });
 
         spnCameraExposure_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingSettingsBuilder().cameraExposure(spnCameraExposure_.getDouble());
-            //System.out.println("cameraExposure: " + acqSettings.getTimingSettings().cameraExposure());
         });
 
         cbxAlternateScanDirection_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingSettingsBuilder().useAlternateScanDirection(cbxAlternateScanDirection_.isSelected());
-            //System.out.println("useAlternateScanDirection: " + acqSettings.getTimingSettings().useAlternateScanDirection());
         });
     }
 }
