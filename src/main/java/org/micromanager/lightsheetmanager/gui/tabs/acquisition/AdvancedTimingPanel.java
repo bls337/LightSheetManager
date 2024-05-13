@@ -136,4 +136,21 @@ public class AdvancedTimingPanel extends Panel {
                     .timingSettingsBuilder().useAlternateScanDirection(cbxAlternateScanDirection_.isSelected());
         });
     }
+
+    /**
+     * Updates the spinner values from the timing settings builder.
+     */
+    public void updateSpinners() {
+        final DefaultTimingSettings timingSettings = model_.acquisitions()
+                .settingsBuilder().timingSettingsBuilder().build();
+        spnDelayBeforeScan_.setDouble(timingSettings.delayBeforeScan());
+        spnScansPerSlice_.setInt(timingSettings.scansPerSlice());
+        spnScanDuration_.setDouble(timingSettings.scanDuration());
+        spnDelayBeforeLaser_.setDouble(timingSettings.delayBeforeLaser());
+        spnLaserTriggerDuration_.setDouble(timingSettings.laserTriggerDuration());
+        spnDelayBeforeCamera_.setDouble(timingSettings.delayBeforeCamera());
+        spnCameraTriggerDuration_.setDouble(timingSettings.cameraTriggerDuration());
+        spnCameraExposure_.setDouble(timingSettings.cameraExposure());
+        cbxAlternateScanDirection_.setSelected(timingSettings.useAlternateScanDirection());
+    }
 }

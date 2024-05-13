@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.model;
 
 import mmcorej.CMMCore;
-import org.micromanager.LogManager;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.AutofocusSettings;
 import org.micromanager.lightsheetmanager.api.LightSheetManager;
@@ -9,7 +8,6 @@ import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
-//import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineDISPIM;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineDISPIM;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineSCAPE;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionTableData;
@@ -23,7 +21,6 @@ public class LightSheetManagerModel implements LightSheetManager {
 
     private final Studio studio_;
     private final CMMCore core_;
-    private final LogManager logs_;
 
     private String errorText_;
 
@@ -39,7 +36,6 @@ public class LightSheetManagerModel implements LightSheetManager {
     public LightSheetManagerModel(final Studio studio) {
         studio_ = Objects.requireNonNull(studio);
         core_ = studio_.core();
-        logs_ = studio_.logs();
 
         settings_ = new UserSettings(this);
         xyzGrid_ = new XYZGrid(this);
