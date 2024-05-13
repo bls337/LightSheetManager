@@ -79,6 +79,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         createEventHandlers();
     }
 
+    /**
+     * Create the user interface.
+     */
     private void createUserInterface() {
 
         final DefaultAcquisitionSettingsSCAPE acqSettings =
@@ -207,56 +210,25 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         add(pnlButtons_, "span 3, gaptop 60");
     }
 
-    private void acqFinishedCallback() {
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                btnRunAcquisition_.setState(false);
-                btnPauseAcquisition_.setEnabled(false);
-                btnSpeedTest_.setEnabled(true);
-            });
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void runAcquisition(boolean speedTest) {
-        btnPauseAcquisition_.setEnabled(true);
-        btnSpeedTest_.setEnabled(false);
-        Future<?> acqFinished = model_.acquisitions().requestRun(speedTest);
-        // Launch new thread to update the button when the acquisition is complete
-        new Thread(() -> {
-            try {
-                acqFinished.get();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            // update the GUI when acquisition complete
-            acqFinishedCallback();
-        }).start();
-    }
-
+    /**
+     * Create event handlers for the user interface.
+     */
     private void createEventHandlers() {
 
         // start/stop acquisitions
         btnRunAcquisition_.registerListener(e -> {
             if (btnRunAcquisition_.isSelected()) {
                 runAcquisition(false);
-                System.out.println("request run");
             } else {
                 model_.acquisitions().requestStop();
-                System.out.println("request stop");
             }
         });
 
         btnPauseAcquisition_.registerListener(e -> {
             if (btnPauseAcquisition_.isSelected()) {
                 model_.acquisitions().requestPause();
-                System.out.println("request pause");
             } else {
                 model_.acquisitions().requestResume();
-                System.out.println("request resume");
             }
         });
 
@@ -265,7 +237,6 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
         btnSpeedTest_.registerListener(e -> runAcquisition(true));
         btnRunOverviewAcq_.registerListener(e -> {
-            System.out.println("run overview acquisition");
             // TODO: run the overview acq
         });
 
@@ -295,19 +266,21 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cmbAcquisitionModes_.registerListener(e -> {
             final int index = cmbAcquisitionModes_.getSelectedIndex();
             model_.acquisitions().settingsBuilder().acquisitionMode(AcquisitionMode.getByIndex(index));
-            //System.out.println("getAcquisitionMode: " + model_.acquisitions().getAcquisitionSettings().getAcquisitionMode());
         });
 
+        // TODO: should timing recalc be part of setting use advanced timing value in model?
         // switches timing panels based on check box
         cbxUseAdvancedTiming_.registerListener(e -> {
-            final boolean state = cbxUseAdvancedTiming_.isSelected();
-            model_.acquisitions().settingsBuilder().useAdvancedTiming(state);
-            switchTimingSettings(state);
+            final boolean useAdvTiming = cbxUseAdvancedTiming_.isSelected();
+            model_.acquisitions().settingsBuilder().useAdvancedTiming(useAdvTiming);
+            swapTimingSettingsPanels(useAdvTiming);
+            if (useAdvTiming) {
+                pnlAdvancedTiming_.updateSpinners();
+            } else {
+                model_.acquisitions().updateAcquisitionSettings();
+                model_.acquisitions().recalculateSliceTiming();
+            }
         });
-    }
-
-    public SliceSettingsPanel getSliceSettingsPanel() {
-        return pnlSliceSettings_;
     }
 
     /**
@@ -315,7 +288,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
      *
      * @param state the state of the CheckBox
      */
-    private void switchTimingSettings(final boolean state) {
+    private void swapTimingSettingsPanels(final boolean state) {
         pnlRight_.removeAll();
         if (state) {
             pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
@@ -328,6 +301,40 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         }
         pnlRight_.revalidate();
         pnlRight_.repaint();
+    }
+
+    public SliceSettingsPanel getSliceSettingsPanel() {
+        return pnlSliceSettings_;
+    }
+
+    private void acqFinishedCallback() {
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                btnRunAcquisition_.setState(false);
+                btnPauseAcquisition_.setEnabled(false);
+                btnSpeedTest_.setEnabled(true);
+            });
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void runAcquisition(boolean speedTest) {
+        btnPauseAcquisition_.setEnabled(true);
+        btnSpeedTest_.setEnabled(false);
+        Future<?> acqFinished = model_.acquisitions().requestRun(speedTest);
+        // Launch new thread to update the button when the acquisition is complete
+        new Thread(() -> {
+            try {
+                acqFinished.get();
+            } catch (Exception e) {
+                studio_.logs().logError("error in runAcquisition");
+            }
+            // update the GUI when acquisition complete
+            acqFinishedCallback();
+        }).start();
     }
 
     @Override

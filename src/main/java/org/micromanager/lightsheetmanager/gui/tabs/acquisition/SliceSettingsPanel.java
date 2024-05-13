@@ -94,16 +94,25 @@ public class SliceSettingsPanel extends Panel {
             spnSlicePeriod_.setEnabled(!selected);
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsBuilder().minimizeSlicePeriod(selected);
+            // update slice timing
+            model_.acquisitions().updateAcquisitionSettings();
+            model_.acquisitions().recalculateSliceTiming();
         });
 
         spnSlicePeriod_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsBuilder().slicePeriod(spnSlicePeriod_.getDouble());
+            // update slice timing
+            model_.acquisitions().updateAcquisitionSettings();
+            model_.acquisitions().recalculateSliceTiming();
         });
 
         spnSampleExposure_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .sliceSettingsBuilder().sampleExposure(spnSampleExposure_.getDouble());
+            // update slice timing
+            model_.acquisitions().updateAcquisitionSettings();
+            model_.acquisitions().recalculateSliceTiming();
         });
 
         // virtual slit panel

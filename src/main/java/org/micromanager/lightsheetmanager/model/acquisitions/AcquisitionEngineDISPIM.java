@@ -680,6 +680,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         //daq.setProperty("PropertyName", "1");
     }
 
+    @Override
     public void recalculateSliceTiming() {
         // don't change timing settings if user is using advanced timing
         if (acqSettings_.isUsingAdvancedTiming()) {

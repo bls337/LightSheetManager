@@ -16,7 +16,6 @@ import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.lightsheetmanager.LightSheetManagerPlugin;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.model.autofocus.AutofocusRunner;
@@ -69,7 +68,6 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         acqSettings_ = asb_.build();
     }
 
-
     //public abstract DefaultAcquisitionSettingsDISPIM settings();
 
     //public abstract <T extends DefaultAcquisitionSettings.Builder<Builder>> T settingsBuilder();
@@ -79,6 +77,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     abstract boolean run();
 
     abstract boolean finish();
+
+    public abstract void recalculateSliceTiming();
 
     public void setFrame(final LightSheetManagerFrame frame) {
         frame_ = Objects.requireNonNull(frame);
@@ -92,6 +92,10 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     public void setAcquisitionSettings(final DefaultAcquisitionSettingsSCAPE acqSettings) {
         asb_ = new DefaultAcquisitionSettingsSCAPE.Builder(acqSettings);
         acqSettings_ = acqSettings;
+    }
+
+    public void updateAcquisitionSettings() {
+        acqSettings_ = asb_.build();
     }
 
     @Override

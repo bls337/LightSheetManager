@@ -89,7 +89,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         setAcquisitionSettings(asb_.build());
 
         // TODO: delete later, this is the settings before everything is set up in doHardwareCalculations (used to debug)
-        studio_.logs().logMessage("debug info:\n" + acqSettings_.toPrettyJson());
+        //studio_.logs().logMessage("debug info:\n" + acqSettings_.toPrettyJson());
 
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
@@ -913,6 +913,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         //daq.setProperty("PropertyName", "1");
     }
 
+    @Override
     public void recalculateSliceTiming() {
         // update timing settings if not using advanced timing
         if (!acqSettings_.isUsingAdvancedTiming()) {
@@ -921,8 +922,14 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
         final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder());
         asb_.timingSettingsBuilder().sliceDuration(sliceDuration);
+        //System.out.println(asb_.timingSettingsBuilder());
     }
 
+    /**
+     * Single objective timing settings.
+     *
+     * @return a builder for DefaultTimingSettings
+     */
     public DefaultTimingSettings.Builder getTimingFromExposure() {
         // Note: sliceDuration is computed in recalculateSliceTiming
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
@@ -942,7 +949,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final double slicePeriod = Math.max(Math.max(laserDuration, cameraTotalTime),
                 isSlicePeriodMinimized ? 0 : desiredSlicePeriod);
         final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriod - laserDuration);
-
         switch (cameraMode) {
             case PSEUDO_OVERLAP: // e.g. Kinetix
                 tsb.scansPerSlice(1);
