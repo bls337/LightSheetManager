@@ -85,8 +85,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
         asb_.sheetCalibrationBuilder(1).autoSheetWidthPerPixel(0.0);
 
-        // set acquisition settings from the builder
-        setAcquisitionSettings(asb_.build());
+        // make settings current
+        updateAcquisitionSettings();
 
         // TODO: delete later, this is the settings before everything is set up in doHardwareCalculations (used to debug)
         //studio_.logs().logMessage("debug info:\n" + acqSettings_.toPrettyJson());
@@ -199,7 +199,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //                System.out.println(jsonStr);
 //            }
 
-        setAcquisitionSettings(asb_.build());
+        updateAcquisitionSettings();
 
         studio_.logs().logMessage("Starting Acquisition with settings:\n" + acqSettings_.toPrettyJson());
 
@@ -997,9 +997,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // TODO: do this in ui?
         camera.setTriggerMode(acqSettings_.cameraMode());
 
-        System.out.println(camera.getDeviceName());
+        //System.out.println(camera.getDeviceName());
         CameraMode camMode = camera.getTriggerMode();
-        System.out.println(camMode);
+        //System.out.println(camMode);
 
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
 

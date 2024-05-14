@@ -97,7 +97,7 @@ public class DeviceManager {
             final DeviceType deviceType = getDeviceType(deviceName);
             final String deviceLibrary = getDeviceLibrary(deviceName);
 
-            System.out.println(propertyName + " " + deviceType);
+            //System.out.println(propertyName + " " + deviceType);
 
             // skip properties with no known DeviceType
             if (deviceType == DeviceType.UnknownType) {
@@ -162,7 +162,7 @@ public class DeviceManager {
             }
             //deviceMap_.put(propertyName, "");
         }
-        System.out.println("----------------");
+        //System.out.println("----------------");
 
         // we don't need this array anymore
         devicesAdded_.clear();

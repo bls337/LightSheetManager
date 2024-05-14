@@ -301,7 +301,7 @@ public class LSMAcquisitionEvents {
 
          @Override
          public AcquisitionEvent next() {
-            System.out.println("called! " + index);
+            //System.out.println("called! " + index);
             AcquisitionEvent posEvent = event.copy();
             MultiStagePosition msp = positionList.getPosition(index);
             if (msp != null) {

@@ -9,15 +9,20 @@ import org.micromanager.propertymap.MutablePropertyMapView;
 
 import java.util.Iterator;
 import java.util.Objects;
+import java.util.Optional;
 
+/**
+ * This wraps Micro-Manager's settings profiles to store the plugin settings.
+ */
 public class UserSettings {
 
-    private final String userName;
-    private final MutablePropertyMapView settings;
+    private final String userName_;
+    private final MutablePropertyMapView settings_;
 
     // This is the prefix String for saving the current acquisition settings
     // based on the microscope geometry type, "LSM_ACQ_SETTINGS_SCAPE" for example.
     // Note: GeometryType will be converted to uppercase: "LSM_ACQ_SETTINGS_DISPIM".
+    private static final String SETTINGS_KEY =  "LSM_PLUGIN_SETTINGS";
     private static final String SETTINGS_PREFIX_KEY = "LSM_ACQ_SETTINGS_";
     private static final String SETTINGS_NOT_FOUND = "Settings Not Found";
 
@@ -30,8 +35,8 @@ public class UserSettings {
         model_ = Objects.requireNonNull(model);
         // setup user profile
         UserProfile profile = model_.getStudio().getUserProfile();
-        userName = profile.getProfileName();
-        settings = profile.getSettings(UserSettings.class);
+        userName_ = profile.getProfileName();
+        settings_ = profile.getSettings(UserSettings.class);
     }
 
     /**
@@ -40,7 +45,7 @@ public class UserSettings {
      * @return a reference to MutablePropertyMapView
      */
     public MutablePropertyMapView get() {
-        return settings;
+        return settings_;
     }
 
     /**
@@ -49,14 +54,14 @@ public class UserSettings {
      * @return a String containing the name
      */
     public String getUserName() {
-        return userName;
+        return userName_;
     }
 
     /**
      * Clears all user settings associated with this class name.
      */
     public void clear() {
-        settings.clear();
+        settings_.clear();
     }
 
     /**
@@ -66,23 +71,26 @@ public class UserSettings {
         // get json from settings based on microscope geometry type
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
-        final String key = SETTINGS_PREFIX_KEY +
-                geometryType.toString().toUpperCase();
-        final String json = settings.getString(key, SETTINGS_NOT_FOUND);
-        System.out.println("loaded json from " + key + ": " + json);
 
-        // use default settings if settings data not found
-        if (!json.equals(SETTINGS_NOT_FOUND)) {
+        final String key = SETTINGS_PREFIX_KEY + geometryType.toString().toUpperCase();
+        final String json = settings_.getString(key, SETTINGS_NOT_FOUND);
+
+        // use default settings if settings data not found in profile
+        if (json.equals(SETTINGS_NOT_FOUND)) {
+            model_.studio().logs().logDebugMessage(
+                    "settings not found, using default settings for " + geometryType);
+        } else {
             // validate user settings and create settings object
-            JSONObject loadedJson = validateUserSettings(json);
-            if (loadedJson != null) {
+            final Optional<JSONObject> loadedJson = validateUserSettings(json);
+            if (loadedJson.isPresent()) {
                 // TODO: switch this based on microscope geometry type
-                DefaultAcquisitionSettingsSCAPE acqSettings = DefaultAcquisitionSettingsSCAPE.fromJson(
-                        loadedJson.toString(), DefaultAcquisitionSettingsSCAPE.class);
-                model_.acquisitions().setAcquisitionSettings(acqSettings);
-                //System.out.println("loadedJson: " + loadedJson);
+                final DefaultAcquisitionSettingsSCAPE acqSettings = DefaultAcquisitionSettingsSCAPE.fromJson(
+                        loadedJson.get().toString(), DefaultAcquisitionSettingsSCAPE.class);
+                // update both the settings and builder
+                model_.acquisitions().setAcquisitionSettingsAndBuilder(acqSettings);
+                model_.studio().logs().logDebugMessage("loaded JSON from " + key + ": "
+                        + model_.acquisitions().settings().toPrettyJson());
             }
-            //System.out.println("acqSettings: " + acqSettings);
         }
     }
 
@@ -90,35 +98,36 @@ public class UserSettings {
      * Save user settings.
      */
     public void save() {
-        // build settings before saving to make sure updates are saved
-        model_.acquisitions().setAcquisitionSettings(
-                model_.acquisitions().settingsBuilder().build());
+        // make settings current before saving
+        model_.acquisitions().updateAcquisitionSettings();
         // settings key
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
         final String key = SETTINGS_PREFIX_KEY +
                 geometryType.toString().toUpperCase();
         // save in user settings
-        settings.putString(key, model_.acquisitions().settings().toJson());
-        System.out.println("saved json to " + key + ": "
+        settings_.putString(key, model_.acquisitions().settings().toJson());
+        model_.studio().logs().logDebugMessage("saved JSON to " + key + ": "
                 + model_.acquisitions().settings().toPrettyJson());
     }
 
     /**
-     * Returns the JSONObject after checking if it matches the schema of the
+     * Returns the {@code JSONObject} after checking if it matches the schema of the
      * default acquisition settings object. If it does not, then any new settings
      * found will be merged into the loaded settings as the default value.
      *
      * @param loadedSettings the settings loaded as a JSON String
      * @return the settings object or null if an error occurred
      */
-    private JSONObject validateUserSettings(final String loadedSettings) {
-        // get default settings from builder
+    private Optional<JSONObject> validateUserSettings(final String loadedSettings) {
+        // create default settings from builder
         final String defaultSettings =
                 new DefaultAcquisitionSettingsSCAPE.Builder().build().toJson();
         // validate json strings and count the number of keys
-        int numLoadedKeys, numDefaultKeys;
-        JSONObject loadedJson, defaultJson;
+        int numLoadedKeys;
+        int numDefaultKeys;
+        JSONObject loadedJson;
+        JSONObject defaultJson;
         try {
             loadedJson = new JSONObject(loadedSettings);
             defaultJson = new JSONObject(defaultSettings);
@@ -126,7 +135,7 @@ public class UserSettings {
             numDefaultKeys = countKeysJson(defaultJson);
         } catch (JSONException e) {
             model_.studio().logs().showError("could not validate the JSON data.");
-            return null;
+            return Optional.empty();
         }
         // different number of keys => merge loaded settings with default settings
         if (numLoadedKeys != numDefaultKeys) {
@@ -134,10 +143,10 @@ public class UserSettings {
                 mergeSettingsJson(defaultJson, loadedJson);
             } catch (JSONException e) {
                 model_.studio().logs().showError("could not merge new default settings into loaded settings.");
-                return null;
+                return Optional.empty();
             }
         }
-        return loadedJson;
+        return Optional.of(loadedJson);
     }
 
     // Overloaded method to give mergeSettingsJson a default parameter.
@@ -145,12 +154,15 @@ public class UserSettings {
         mergeSettingsJson(defaultJson, loadedJson, 0);
     }
 
-    private void mergeSettingsJson(JSONObject defaultJson, JSONObject loadedJson, final int level) throws JSONException {
+    private void mergeSettingsJson(
+            JSONObject defaultJson, JSONObject loadedJson, final int level) throws JSONException {
+
         // bail out if settings data is nested too deep
         if (level > MAX_RECURSION_DEPTH_JSON) {
             model_.studio().logs().logMessage("UserSettings: recursion too deep, increase max level.");
             return; // early exit => recursion too deep
         }
+
         // for every key in the default settings, check to make sure the loaded settings has that key
         Iterator<String> keys = defaultJson.keys();
         while (keys.hasNext()) {
@@ -159,7 +171,8 @@ public class UserSettings {
             // if the loaded settings are missing the key then add it
             if (!loadedJson.has(key)) {
                 loadedJson.put(key, value);
-                model_.studio().logs().logMessage("UserSettings: Added key \"" + key + "\" to the loaded settings.");
+                model_.studio().logs().logMessage(
+                        "UserSettings: Added key \"" + key + "\" to the loaded settings.");
             }
             // recursively call on sub-objects of type JSONObject
             if (value instanceof JSONObject) {
@@ -173,6 +186,14 @@ public class UserSettings {
         }
     }
 
+    /**
+     * Return the number of keys in the {@code JSONObject} object and
+     * all internal {@code JSONObject} objects.
+     *
+     * @param obj the root {@code JSONObject} object
+     * @return the number of keys in all objects
+     * @throws JSONException error getting value from key from object
+     */
     private int countKeysJson(final JSONObject obj) throws JSONException {
         int numKeys = obj.length();
         Iterator<String> keys = obj.keys();

@@ -68,8 +68,8 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
             frame_.getNavigationPanel().stopPolling();
         }
 
-        // set acquisition settings from the builder
-        setAcquisitionSettings(asb_.build());
+        // make settings current
+        updateAcquisitionSettings();
 
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
@@ -172,7 +172,8 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 //        } catch (Exception e1) {
 //            e1.printStackTrace();
 //        }
-        setAcquisitionSettings(asb_.build());
+
+        updateAcquisitionSettings();
 
         studio_.logs().logMessage("Starting Acquisition with settings:\n" + acqSettings_.toPrettyJson());
 
@@ -553,7 +554,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         // make sure slice timings are up-to-date
         recalculateSliceTiming();
-        System.out.println("after recalculateSliceTiming: " + asb_.timingSettingsBuilder());
+        //System.out.println("after recalculateSliceTiming: " + asb_.timingSettingsBuilder());
 
 
         // TODO: was only checked in light sheet mode (virtual slit mode now)
@@ -717,9 +718,9 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // TODO: do this in ui?
         camera.setTriggerMode(acqSettings_.cameraMode());
 
-        System.out.println(camera.getDeviceName());
+        //System.out.println(camera.getDeviceName());
         CameraMode camMode = camera.getTriggerMode();
-        System.out.println(camMode);
+        //System.out.println(camMode);
 
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
 

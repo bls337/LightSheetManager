@@ -85,15 +85,19 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     }
 
     /**
-     * Sets the acquisition settings and populates the acquisition settings builder with its values.
+     * Sets the acquisition settings and update the acquisition settings builder with current values.<p>
+     * This is used to load the plugin settings from JSON.
      *
-     * @param acqSettings the acquisition settings to set
+     * @param acqSettings the {@code DefaultAcquisitionSettingsSCAPE} to use
      */
-    public void setAcquisitionSettings(final DefaultAcquisitionSettingsSCAPE acqSettings) {
+    public void setAcquisitionSettingsAndBuilder(final DefaultAcquisitionSettingsSCAPE acqSettings) {
         asb_ = new DefaultAcquisitionSettingsSCAPE.Builder(acqSettings);
         acqSettings_ = acqSettings;
     }
 
+    /**
+     * Build the {@code DefaultAcquisitionSettingsSCAPE} with the builder and update settings.
+     */
     public void updateAcquisitionSettings() {
         acqSettings_ = asb_.build();
     }

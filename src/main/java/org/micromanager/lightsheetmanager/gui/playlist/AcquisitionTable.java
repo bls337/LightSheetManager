@@ -310,7 +310,7 @@ public class AcquisitionTable extends JScrollPane {
                 table_.clearSelection();
             }
             table_.repaint();
-            System.out.println("remove acquisition: " + name);
+            //System.out.println("remove acquisition: " + name);
         }
     }
 

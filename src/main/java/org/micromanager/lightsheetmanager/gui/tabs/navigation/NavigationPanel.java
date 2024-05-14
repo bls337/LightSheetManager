@@ -81,8 +81,8 @@ public class NavigationPanel extends Panel {
             illumProperties.add(new ArrayList<>());
         }
 
-        System.out.println("img props: " + imagingProperties.size());
-        System.out.println("ill props: " + illumProperties.size());
+        //System.out.println("img props: " + imagingProperties.size());
+        //System.out.println("ill props: " + illumProperties.size());
 
         int devicesFound = 0;
         for (String propertyName : deviceMap.keySet()) {
@@ -92,7 +92,7 @@ public class NavigationPanel extends Panel {
             }
 
             // TODO: only add certain kinds of devices
-            System.out.println(propertyName);
+            //System.out.println(propertyName);
             final DeviceType deviceType = deviceTypeMap.get(propertyName);
             if (deviceType == DeviceType.CameraDevice) {
                 continue; // don't add cameras to axis list
@@ -220,8 +220,6 @@ public class NavigationPanel extends Panel {
             controlPanels_.add(controlPanel);
         }
 
-        //createEventHandlers();
-
         add(miscPanel, "wrap");
         add(btnHaltDevices_, "split 3");
         //add(btnRefreshPanel_, "");
@@ -299,7 +297,7 @@ public class NavigationPanel extends Panel {
     }
 
     public void haltAllDevices() {
-        System.out.println("Halt pressed!");
+        //System.out.println("Halt pressed!");
         for (ControlPanel controlPanel : controlPanels_) {
             // only try to stop XY and 1D stages
             DeviceType deviceType = controlPanel.getDeviceType();

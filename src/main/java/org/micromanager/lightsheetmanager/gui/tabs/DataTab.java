@@ -127,7 +127,7 @@ public class DataTab extends Panel implements ListeningPanel {
 
         radSaveMode_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().saveMode(DataStorage.SaveMode.fromString(radSaveMode_.getSelectedButtonText()));
-            System.out.println("radSaveMode: " + radSaveMode_.getSelectedButtonText());
+            //System.out.println("radSaveMode: " + radSaveMode_.getSelectedButtonText());
         });
     }
 

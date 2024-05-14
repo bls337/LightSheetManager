@@ -43,7 +43,7 @@ public class PositionUpdater {
                         e.printStackTrace();
                     }
                     if (!isPolling_.get()) {
-                        System.out.println("break!");
+                        //System.out.println("break!");
                         break;
                     }
                     try {

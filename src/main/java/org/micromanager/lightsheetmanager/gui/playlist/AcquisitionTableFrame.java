@@ -458,7 +458,7 @@ public class AcquisitionTableFrame extends JFrame {
             }
             lstPositions_.removeItem(name); // remove name from JList
             acqTable_.removePositionList(name);
-            System.out.println("remove: " + name);
+            //System.out.println("remove: " + name);
         }
     }
 
