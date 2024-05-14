@@ -196,11 +196,11 @@ public class AutofocusTab extends Panel implements ListeningPanel {
 
         // general autofocus settings
         cbxShowImages_.registerListener(e -> {
-            System.out.println("cbxShowImages_: " + cbxShowImages_.isSelected());
+            //System.out.println("cbxShowImages_: " + cbxShowImages_.isSelected());
         });
 
         cbxShowPlot_.registerListener(e -> {
-            System.out.println("cbxShowPlot_: " + cbxShowPlot_.isSelected());
+            //System.out.println("cbxShowPlot_: " + cbxShowPlot_.isSelected());
         });
 
         spnNumImages_.registerListener(e ->
@@ -232,12 +232,15 @@ public class AutofocusTab extends Panel implements ListeningPanel {
         });
 
         // autofocus options during acquisition
-        cbxAutofocusEveryPass_.registerListener(e ->
-                System.out.println("cbxAutofocusEveryPass_: " + cbxAutofocusEveryPass_.isSelected()));
-        cbxAutofocusBeforeAcq_.registerListener(e ->
-                System.out.println("cbxAutofocusBeforeAcq_: " + cbxAutofocusBeforeAcq_.isSelected()));
-        cmbAutofocusChannel_.registerListener(e ->
-                System.out.println("cmbAutofocusChannel_"));
+        cbxAutofocusEveryPass_.registerListener(e -> {
+            //System.out.println("cbxAutofocusEveryPass_: " + cbxAutofocusEveryPass_.isSelected());
+        });
+        cbxAutofocusBeforeAcq_.registerListener(e -> {
+            //System.out.println("cbxAutofocusBeforeAcq_: " + cbxAutofocusBeforeAcq_.isSelected());
+        });
+        cmbAutofocusChannel_.registerListener(e -> {
+            //System.out.println("cmbAutofocusChannel_");
+        });
 
         spnAutofocusEveryX_.registerListener(e -> {
 

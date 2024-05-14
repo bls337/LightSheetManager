@@ -172,7 +172,6 @@ public class AndorCamera extends CameraBase implements LightSheetCamera {
     @Override
     public double getReadoutTime(CameraMode cameraMode) {
         double readoutTimeMs = 10.0;
-        System.out.println("getReadoutTime: mode: " + cameraMode);
         switch (cameraMode) {
             case VIRTUAL_SLIT:
                 Rectangle roi = getROI();

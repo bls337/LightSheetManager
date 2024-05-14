@@ -162,7 +162,7 @@ public class BeamSheetControlPanel extends Panel {
 
         // first panel
         btnPlotProfile_.registerListener(e -> {
-            System.out.println("do something here...");
+            //System.out.println("do something here...");
         });
 
         // second panel
@@ -177,7 +177,7 @@ public class BeamSheetControlPanel extends Panel {
             final double value = sldSheetWidth_.getDouble();
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetWidth(value);
-            System.out.println("sheetWidth value: " + value);
+            //System.out.println("sheetWidth value: " + value);
         });
 
         sldSheetOffset_.registerListener(e -> {
@@ -187,7 +187,7 @@ public class BeamSheetControlPanel extends Panel {
             final String strValue = String.format("%.3f ", value);
             txtSheetOffset_.setText(strValue);
             lblSlopeOffset_.setText(strValue);
-            System.out.println("sheetOffset value: " + strValue);
+            //System.out.println("sheetOffset value: " + strValue);
         });
 
         txtSheetOffset_.registerListener(e -> {
@@ -201,7 +201,7 @@ public class BeamSheetControlPanel extends Panel {
         });
 
         btnCenterOffset_.registerListener(e -> {
-            System.out.println("center offset pressed");
+            //System.out.println("center offset pressed");
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetOffset(0.0);
             txtSheetOffset_.setText("0");
@@ -215,7 +215,7 @@ public class BeamSheetControlPanel extends Panel {
             //        .sheetCalibration(pathNum_).sheetOffset() - 0.01;
             currentOffset_ -= 0.01;
             final double value = currentOffset_;
-            System.out.println("value: " + value);
+            //System.out.println("value: " + value);
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
             txtSheetOffset_.setText(String.format("%.3f ", value));
@@ -227,7 +227,7 @@ public class BeamSheetControlPanel extends Panel {
 //                    .sheetCalibration(pathNum_).sheetOffset() + 0.01;
             currentOffset_ += 0.01;
             final double value = currentOffset_;
-            System.out.println("value: " + value);
+            //System.out.println("value: " + value);
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
             txtSheetOffset_.setText(String.format("%.3f ", value));

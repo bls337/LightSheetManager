@@ -327,7 +327,7 @@ public class ControlPanel extends Panel {
 
     private void setOriginY() {
         try {
-            System.out.println("deviceName_: " + deviceName_);
+            //System.out.println("deviceName_: " + deviceName_);
             core_.setOriginY(deviceName_);
         } catch (Exception e) {
             studio_.logs().showError("failed to set y origin!");
@@ -336,7 +336,7 @@ public class ControlPanel extends Panel {
 
     private void setOriginX() {
         try {
-            System.out.println("deviceName_: " + deviceName_);
+            //System.out.println("deviceName_: " + deviceName_);
             core_.setOriginX(deviceName_);
         } catch (Exception e) {
             studio_.logs().showError("failed to set x origin!");

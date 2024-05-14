@@ -75,7 +75,7 @@ public class ExcitationPanel extends Panel implements ListeningPanel {
 
             cbxBeamExc_.registerListener(e -> {
                 scanner.setBeamOn(cbxBeamExc_.isSelected());
-                System.out.println("set beam on: " + cbxBeamExc_.isSelected());
+                //System.out.println("set beam on: " + cbxBeamExc_.isSelected());
             });
         }
 

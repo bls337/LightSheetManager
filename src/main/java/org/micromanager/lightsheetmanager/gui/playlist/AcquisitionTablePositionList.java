@@ -249,11 +249,11 @@ public class AcquisitionTablePositionList extends JScrollPane {
     public boolean validatePositionsSize() {
         final int positionsSize = table_.getTableData().getPositionsSize();
         if (positionsSize != model_.size()) {
-            System.out.println("Validate Error: The number of items in the AcquisitionTablePositionList "
-                    + "should be the same as the number of keys in AcquisitionTableData positions field.");
+            //System.out.println("Validate Error: The number of items in the AcquisitionTablePositionList "
+            //        + "should be the same as the number of keys in AcquisitionTableData positions field.");
             return false;
         } else {
-            System.out.println("Validate Success: The number of positions are the same.");
+            //System.out.println("Validate Success: The number of positions are the same.");
         }
         return true;
     }

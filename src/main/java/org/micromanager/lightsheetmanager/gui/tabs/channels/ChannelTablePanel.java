@@ -77,7 +77,7 @@ public class ChannelTablePanel extends Panel {
             table_.refreshData();
 //            table_.repaint();
 //            repaint();
-            System.out.println("add channel");
+            //System.out.println("add channel");
             table_.getData().printChannelData();
             final ChannelSpec[] channels = table_.getData().getChannels();
             model_.acquisitions().settingsBuilder().channels(channels);
@@ -93,7 +93,7 @@ public class ChannelTablePanel extends Panel {
                 model_.acquisitions().settingsBuilder().channels(channels);
                 model_.acquisitions().settingsBuilder().numChannels(channels.length);
                 table_.refreshData();
-                System.out.println("remove row index: " + row);
+                //System.out.println("remove row index: " + row);
             }
         });
 
