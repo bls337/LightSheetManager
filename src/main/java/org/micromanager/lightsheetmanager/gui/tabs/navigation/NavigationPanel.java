@@ -8,7 +8,7 @@ import mmcorej.DeviceType;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 
-import javax.swing.*;
+import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -229,7 +229,7 @@ public class NavigationPanel extends Panel {
     private void createEventHandlers() {
 
         btnRefreshPanel_.registerListener(e -> {
-            System.out.println("refresh pressed");
+            //System.out.println("refresh pressed");
             removeAll();
             createUserInterface();
             createEventHandlers();
@@ -248,7 +248,7 @@ public class NavigationPanel extends Panel {
             } else {
                 positionUpdater_.stopPolling();
             }
-            System.out.println("poll positions isSelected: " + cbxPollPositions_.isSelected());
+            //System.out.println("poll positions isSelected: " + cbxPollPositions_.isSelected());
         });
 
     }
@@ -274,7 +274,6 @@ public class NavigationPanel extends Panel {
      */
     public void updatePositions() {
         //System.out.println("isEDT: " + SwingUtilities.isEventDispatchThread());
-        //System.out.println("updating!");
         for (ControlPanel panel : controlPanels_) {
             panel.updatePosition();
         }
@@ -296,10 +295,11 @@ public class NavigationPanel extends Panel {
         return positionUpdater_;
     }
 
-    public void haltAllDevices() {
-        //System.out.println("Halt pressed!");
+    /**
+     * Halt all 2D and 1D stage devices.
+     */
+    private void haltAllDevices() {
         for (ControlPanel controlPanel : controlPanels_) {
-            // only try to stop XY and 1D stages
             DeviceType deviceType = controlPanel.getDeviceType();
             if (deviceType == DeviceType.XYStageDevice || deviceType == DeviceType.StageDevice) {
                 controlPanel.stop();
