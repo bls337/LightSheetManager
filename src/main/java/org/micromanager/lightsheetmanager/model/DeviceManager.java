@@ -45,7 +45,7 @@ public class DeviceManager {
     private Map<String, DeviceBase> deviceMap_;
     private Map<String, DeviceBase> devicesAdded_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     private static String deviceAdapterName_;
     public static final String LSM_DEVICE_LIBRARY = "LightSheetManager";

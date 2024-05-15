@@ -56,10 +56,19 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     @Override
     boolean setup() {
 
+//        // check pixel size
+//        if (core_.getPixelSizeUm() < 1e-6) {
+//            studio_.logs().showError(
+//                    "Pixel size not set, navigate to \"Devices > Pixel Size Calibration...\" to set the value.");
+//            return false;
+//        }
+
         // this is needed for LSMAcquisitionEvents to work with multiple positions
         if (core_.getFocusDevice().isEmpty()
                 && acqSettings_.isUsingMultiplePositions()) {
-            studio_.logs().showError("The default focus device \"Core-Focus\" needs to be set to use multiple positions.");
+            studio_.logs().showError(
+                    "The default focus device \"Core-Focus\" needs to be set to use multiple positions.");
+            return false;
         }
 
         // make sure that there are positions in the PositionList
