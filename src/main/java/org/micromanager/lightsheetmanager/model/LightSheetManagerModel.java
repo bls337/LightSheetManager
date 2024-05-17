@@ -24,7 +24,8 @@ public class LightSheetManagerModel implements LightSheetManager {
 
     private String errorText_;
 
-    private UserSettings settings_;
+    private UserSettings userSettings_;
+    private PluginSettings pluginSettings_;
 
     private DeviceManager deviceManager_;
 
@@ -37,7 +38,8 @@ public class LightSheetManagerModel implements LightSheetManager {
         studio_ = Objects.requireNonNull(studio);
         core_ = studio_.core();
 
-        settings_ = new UserSettings(this);
+        pluginSettings_ = new PluginSettings();
+        userSettings_ = new UserSettings(this);
         xyzGrid_ = new XYZGrid(this);
 
         // set during setup if there is an error
@@ -79,7 +81,7 @@ public class LightSheetManagerModel implements LightSheetManager {
         }
 
         // load settings
-        settings_.load();
+        userSettings_.load();
 
         // if we made it here then everything loaded correctly
         return true;
@@ -114,8 +116,16 @@ public class LightSheetManagerModel implements LightSheetManager {
         return deviceManager_;
     }
 
-    public UserSettings getUserSettings() {
-        return settings_;
+    public UserSettings userSettings() {
+        return userSettings_;
+    }
+
+    public PluginSettings pluginSettings() {
+        return pluginSettings_;
+    }
+
+    public void pluginSettings(final PluginSettings pluginSettings) {
+        pluginSettings_ = Objects.requireNonNull(pluginSettings);
     }
 
     public CMMCore getCore() {

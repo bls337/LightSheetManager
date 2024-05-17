@@ -12,7 +12,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * This wraps Micro-Manager's settings profiles to store the plugin settings.
+ * Micro-Manager user settings for the current user.
+ * <p>
+ * This class is used to save and load settings using JSON strings.
  */
 public class UserSettings {
 
@@ -34,9 +36,9 @@ public class UserSettings {
     public UserSettings(final LightSheetManagerModel model) {
         model_ = Objects.requireNonNull(model);
         // setup user profile
-        UserProfile profile = model_.getStudio().getUserProfile();
-        userName_ = profile.getProfileName();
+        final UserProfile profile = model_.getStudio().getUserProfile();
         settings_ = profile.getSettings(UserSettings.class);
+        userName_ = profile.getProfileName();
     }
 
     /**
@@ -51,14 +53,14 @@ public class UserSettings {
     /**
      * Returns the name of the user profile.
      *
-     * @return a String containing the name
+     * @return a {@code String} containing the name
      */
     public String getUserName() {
         return userName_;
     }
 
     /**
-     * Clears all user settings associated with this class name.
+     * Clears all user settings associated with this profile name.
      */
     public void clear() {
         settings_.clear();
@@ -92,6 +94,16 @@ public class UserSettings {
                         + model_.acquisitions().settings().toPrettyJson());
             }
         }
+
+        // load plugin settings or default plugin settings
+        final String jsonStr = settings_.getString(SETTINGS_KEY, SETTINGS_NOT_FOUND);
+        if (jsonStr.equals(SETTINGS_NOT_FOUND)) {
+            model_.studio().logs().logDebugMessage("settings not found, using default plugin settings.");
+        } else {
+            model_.pluginSettings(PluginSettings.fromJson(jsonStr));
+            model_.studio().logs().logDebugMessage("loaded PluginSettings from " + SETTINGS_KEY + ": "
+                    + model_.pluginSettings().toPrettyJson());
+        }
     }
 
     /**
@@ -100,17 +112,25 @@ public class UserSettings {
     public void save() {
         // make settings current before saving
         model_.acquisitions().updateAcquisitionSettings();
-        // settings key
+
+        // settings key based on geometry type
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
         final String key = SETTINGS_PREFIX_KEY +
                 geometryType.toString().toUpperCase();
-        // save in user settings
+
+        // save acquisition settings
         settings_.putString(key, model_.acquisitions().settings().toJson());
         model_.studio().logs().logDebugMessage("saved JSON to " + key + ": "
                 + model_.acquisitions().settings().toPrettyJson());
+
+        // save plugin settings
+        settings_.putString(SETTINGS_KEY, model_.pluginSettings().toJson());
+        model_.studio().logs().logDebugMessage("saved PluginSettings to " + SETTINGS_KEY + ": "
+                + model_.pluginSettings().toPrettyJson());
     }
 
+    // TODO: this can add new keys but doesn't delete renamed keys
     /**
      * Returns the {@code JSONObject} after checking if it matches the schema of the
      * default acquisition settings object. If it does not, then any new settings

@@ -135,11 +135,13 @@ public class LightSheetManagerFrame extends JFrame {
         tabPanel_.getNavigationTab().getNavigationPanel()
                 .getPositionUpdater().setPositionPanel(positionPanel);
 
-        tabPanel_.getNavigationTab().getNavigationPanel().startPolling();
+        if (model_.pluginSettings().isPollingPositions()) {
+            tabPanel_.getNavigationTab().getNavigationPanel().startPolling();
+        }
 
         WindowUtils.registerWindowClosingEvent(this, event -> {
             tabPanel_.getNavigationTab().getNavigationPanel().stopPolling();
-            model_.getUserSettings().save();
+            model_.userSettings().save();
             studio_.logs().logMessage("user settings saved");
         });
 
