@@ -17,7 +17,7 @@ public class PositionUpdater {
 
     private SwingWorker<Void, Void> worker_;
 
-    private PositionPanel positionPanel_; // TODO: update multiple setup panels
+    private PositionPanel positionPanel_; // TODO: update multiple setup panels for diSPIM
 
     private final NavigationPanel navPanel_;
 
@@ -25,12 +25,14 @@ public class PositionUpdater {
 
     public PositionUpdater(final NavigationPanel navPanel) {
         navPanel_ = Objects.requireNonNull(navPanel);
-        isPolling_ = new AtomicBoolean(true);
+        isPolling_ = new AtomicBoolean(false);
         pollingDelayMs_ = 500;
     }
 
+    /**
+     * Create the polling thread without starting it.
+     */
     private void createPollingTask() {
-        isPolling_.set(true);
         worker_ = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() {
@@ -40,11 +42,7 @@ public class PositionUpdater {
                         navPanel_.updatePositions();
                         positionPanel_.updatePositions();
                     } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    if (!isPolling_.get()) {
-                        //System.out.println("break!");
-                        break;
+                        //e.printStackTrace();
                     }
                     try {
                         Thread.sleep(pollingDelayMs_);
@@ -52,32 +50,61 @@ public class PositionUpdater {
                         throw new RuntimeException(e);
                     }
                 }
+                //System.out.println("done!");
                 return null;
             }
         };
     }
 
+    /**
+     * Create the polling task and start the thread.
+     */
     public void startPolling() {
+        isPolling_.set(true);
         createPollingTask();
         worker_.execute();
     }
 
+    /**
+     * Stops the position polling thread.
+     */
     public void stopPolling() {
         isPolling_.set(false);
     }
 
+    /**
+     * Return true if polling positions.
+     *
+     * @return true if polling positions
+     */
     public boolean isPolling() {
         return isPolling_.get();
     }
 
+    /**
+     * Set the polling delay in milliseconds.
+     *
+     * @param delayMs delay in milliseconds
+     */
     public void setPollingDelayMs(final int delayMs) {
         pollingDelayMs_ = delayMs;
     }
 
+    /**
+     * Return the polling delay in milliseconds.
+     *
+     * @return the polling delay in milliseconds
+     */
     public int getPollingDelayMs() {
         return pollingDelayMs_;
     }
 
+    // TODO: better way to connect this?
+    /**
+     * Set the position panel to update in addition to the {@code NavigationPanel}.
+     *
+     * @param panel the reference to the panel
+     */
     public void setPositionPanel(final PositionPanel panel) {
         positionPanel_ = panel;
     }

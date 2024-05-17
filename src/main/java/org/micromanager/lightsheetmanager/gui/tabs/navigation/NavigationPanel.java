@@ -41,13 +41,16 @@ public class NavigationPanel extends Panel {
         devices_ = model_.devices();
 
         controlPanels_ = new ArrayList<>();
+        positionUpdater_ = new PositionUpdater(this);
 
         createUserInterface();
         createEventHandlers();
-        positionUpdater_ = new PositionUpdater(this);
     }
 
-    public void createUserInterface() {
+    /**
+     * Create the control panels for each device.
+     */
+    private void createUserInterface() {
 
         Panel.setMigLayoutDefault(
                 "", //""debug 1000",
@@ -57,7 +60,9 @@ public class NavigationPanel extends Panel {
 
         btnHaltDevices_ = new Button("HALT", 120, 30);
         btnRefreshPanel_ = new Button("Refresh", 120, 30);
-        cbxPollPositions_ = new CheckBox("Poll Positions", true);
+
+        cbxPollPositions_ = new CheckBox("Poll Positions",
+                model_.pluginSettings().isPollingPositions());
 
         final int numImagingPaths = devices_.getDeviceAdapter().getNumImagingPaths();
         final int numIlluminationPaths = devices_.getDeviceAdapter().getNumIlluminationPaths();
@@ -228,22 +233,27 @@ public class NavigationPanel extends Panel {
 
     private void createEventHandlers() {
 
+        // refresh devices and ui
         btnRefreshPanel_.registerListener(e -> {
             //System.out.println("refresh pressed");
             removeAll();
             createUserInterface();
             createEventHandlers();
+            revalidate();
+            repaint();
             if (cbxPollPositions_.isSelected()) {
                 positionUpdater_.startPolling();
             }
-            revalidate();
-            repaint();
         });
 
+        // halt stage devices
         btnHaltDevices_.registerListener(e -> haltAllDevices());
 
+        // position polling
         cbxPollPositions_.registerListener(e -> {
-            if (cbxPollPositions_.isSelected()) {
+            final boolean isSelected = cbxPollPositions_.isSelected();
+            model_.pluginSettings().setPollingPositions(isSelected);
+            if (isSelected) {
                 positionUpdater_.startPolling();
             } else {
                 positionUpdater_.stopPolling();
@@ -306,4 +316,5 @@ public class NavigationPanel extends Panel {
             }
         }
     }
+
 }

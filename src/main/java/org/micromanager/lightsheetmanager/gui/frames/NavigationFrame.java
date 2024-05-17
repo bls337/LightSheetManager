@@ -18,11 +18,9 @@ public class NavigationFrame extends JFrame {
         add(navigationPanel_, "");
     }
 
+    // TODO: this would need ui and events
     public void init() {
-        navigationPanel_.createUserInterface();
+        //navigationPanel_.createUserInterface();
     }
 
-    public void stopTimer() {
-        navigationPanel_.stopPolling();
-    }
 }
