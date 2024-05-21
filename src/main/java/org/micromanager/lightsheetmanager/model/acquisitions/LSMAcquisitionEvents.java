@@ -6,14 +6,12 @@ import org.micromanager.acqj.internal.Engine;
 import org.micromanager.acqj.main.AcqEngMetadata;
 import org.micromanager.acqj.main.AcquisitionEvent;
 import org.micromanager.acqj.util.AcquisitionEventIterator;
-import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.function.Function;
-// import java.util.stream.Stream;
 
 /**
  * This function creates lazy sequences (i.e. iterators) of acquisition events by translating

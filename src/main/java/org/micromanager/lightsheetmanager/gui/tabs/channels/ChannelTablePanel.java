@@ -112,6 +112,9 @@ public class ChannelTablePanel extends Panel {
                 }
             }
             cmbChannelGroup_.updateUI();
+//            ChannelSpec[] ch = model_.acquisitions().settings().usedChannels();
+//            for (ChannelSpec c : ch)
+//                System.out.println(c);
         });
 
         // select channel mode

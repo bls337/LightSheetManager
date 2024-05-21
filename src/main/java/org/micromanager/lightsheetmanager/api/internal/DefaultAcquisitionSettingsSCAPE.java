@@ -6,6 +6,8 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
+import java.util.Arrays;
+
 public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings implements AcquisitionSettingsSCAPE {
 
     public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsSCAPE.Builder<Builder> {
@@ -648,6 +650,12 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         return channels_;
     }
 
+    public ChannelSpec[] usedChannels() {
+        return Arrays.stream(channels_)
+                .filter(ChannelSpec::isUsed)
+                .toArray(ChannelSpec[]::new);
+    }
+
     @Override
     public double liveScanPeriod() {
         return liveScanPeriod_;
@@ -658,6 +666,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     public String toString() {
         return String.format("[timingSettings_=%s]", timingSettings_);
     }
+
 //    public String toJson() {
 //        return new Gson().toJson(this);
 //    }

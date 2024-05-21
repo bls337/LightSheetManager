@@ -38,29 +38,26 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>This class maps device strings to device objects.
  */
 public class DeviceManager {
+    
+    public static final String LSM_DEVICE_LIBRARY = "LightSheetManager";
 
     private final Studio studio_;
     private final CMMCore core_;
 
     private Map<String, DeviceBase> deviceMap_;
-    private Map<String, DeviceBase> devicesAdded_;
-
-    private final LightSheetManagerModel model_;
 
     private static String deviceAdapterName_;
-    public static final String LSM_DEVICE_LIBRARY = "LightSheetManager";
+
+    private final LightSheetManagerModel model_;
 
     public DeviceManager(final Studio studio, final LightSheetManagerModel model) {
         studio_ = Objects.requireNonNull(studio);
         model_ = Objects.requireNonNull(model);
         core_ = studio_.core();
 
-        // set by hasDeviceAdapter
-        deviceAdapterName_ = "";
+        deviceAdapterName_ = "";  // set by hasDeviceAdapter
 
-        // TODO: ConcurrentHashMap or HashMap?
         deviceMap_ = new ConcurrentHashMap<>();
-        devicesAdded_ = new HashMap<>();
     }
 
     /**
@@ -71,90 +68,93 @@ public class DeviceManager {
     public void setup() {
         studio_.logs().logMessage("DeviceManager: [Begin Setup]");
 
-        // make sure this is empty
-        devicesAdded_.clear();
-
         // always add an entry for the device adapter
-        LightSheetDeviceManager lsm = new LightSheetDeviceManager(studio_, deviceAdapterName_);
+        final LightSheetDeviceManager lsm = new LightSheetDeviceManager(studio_, deviceAdapterName_);
         lsm.getPreInitProperties();
         deviceMap_.put("LightSheetDeviceManager", lsm);
 
         // keep track of devices we have already added to the map
         // used when multiple properties are mapped to the same device
-        //HashMap<String, DeviceBase> devicesAdded = new HashMap<>();
+        final HashMap<String, DeviceBase> devicesAdded = new HashMap<>();
 
         String[] props = lsm.getDevicePropertyNames();
         String[] properties = lsm.getEditableProperties(props);
 
         for (String propertyName : properties) {
-            final String deviceName = lsm.getProperty(propertyName);
-
             // skip properties that don't have a device assigned
+            final String deviceName = lsm.getProperty(propertyName);
             if (deviceName.equals(LightSheetDeviceManager.UNDEFINED)) {
                 continue;
             }
 
-            final DeviceType deviceType = getDeviceType(deviceName);
-            final String deviceLibrary = getDeviceLibrary(deviceName);
-
-            //System.out.println(propertyName + " " + deviceType);
-
             // skip properties with no known DeviceType
+            final DeviceType deviceType = getDeviceType(deviceName);
             if (deviceType == DeviceType.UnknownType) {
                 continue;
             }
 
             // object was already created so grab a reference to it
-            if (devicesAdded_.containsKey(deviceName)) {
-                deviceMap_.put(propertyName, devicesAdded_.get(deviceName));
-                final String className = devicesAdded_.get(deviceName).getClass().getSimpleName();
+            if (devicesAdded.containsKey(deviceName)) {
+                deviceMap_.put(propertyName, devicesAdded.get(deviceName));
+                final String className = devicesAdded.get(deviceName).getClass().getSimpleName();
                 studio_.logs().logMessage("DeviceManager: " + propertyName + " set to "
                         + className + "(" + deviceName + ") (reused)");
                 continue;
             }
+
+            final String deviceLibrary = getDeviceLibrary(deviceName);
 
             // add device objects to the device map
             if (deviceType == DeviceType.XYStageDevice) {
                 if (deviceLibrary.equals("ASITiger")) {
                     ASIXYStage xyStage = new ASIXYStage(studio_, deviceName);
                     addDevice(propertyName, deviceName, xyStage);
+                    devicesAdded.put(deviceName, xyStage);
                 } else {
                     // generic XY stage device
                     XYStage xyStage = new XYStage(studio_, deviceName);
                     addDevice(propertyName, deviceName, xyStage);
+                    devicesAdded.put(deviceName, xyStage);
                 }
             } else if (deviceType == DeviceType.StageDevice) {
                 if (deviceLibrary.equals("ASITiger")) {
                     if (deviceName.contains("Piezo")) {
                         ASIPiezo piezo = new ASIPiezo(studio_, deviceName);
                         addDevice(propertyName, deviceName, piezo);
+                        devicesAdded.put(deviceName, piezo);
                     }
                     if (deviceName.contains("ZStage")) {
                         ASIZStage zStage = new ASIZStage(studio_, deviceName);
                         addDevice(propertyName, deviceName, zStage);
+                        devicesAdded.put(deviceName, zStage);
                     }
                 } else {
                     // generic stage device
                     Stage stage = new Stage(studio_, deviceName);
                     addDevice(propertyName, deviceName, stage);
+                    devicesAdded.put(deviceName, stage);
                 }
             } else if (deviceType == DeviceType.GalvoDevice) {
                 if (deviceLibrary.equals("ASITiger")) {
                     ASIScanner scanner = new ASIScanner(studio_, deviceName);
                     addDevice(propertyName, deviceName, scanner);
+                    devicesAdded.put(deviceName, scanner);
                 } else {
                     // use generic galvo device
                     Galvo galvo = new Galvo(studio_);
                     addDevice(propertyName, deviceName, galvo);
+                    devicesAdded.put(deviceName, galvo);
                 }
             } else if (deviceType == DeviceType.ShutterDevice) {
                 // Check if ASI PLogic or NIDAQ board is present
                 if (deviceLibrary.equals("ASITiger")) {
                     ASIPLogic plc = new ASIPLogic(studio_, deviceName);
                     addDevice(propertyName, deviceName, plc);
+                    devicesAdded.put(deviceName, plc);
                 } else if (deviceLibrary.equals("NIDAQ")) {
                     NIDAQ nidaq = new NIDAQ(studio_, deviceName);
                     addDevice(propertyName, deviceName, nidaq);
+                    devicesAdded.put(deviceName, nidaq);
                 }
             } else if (deviceType == DeviceType.CameraDevice) {
                 createCameraDevice(propertyName, deviceName,
@@ -165,14 +165,13 @@ public class DeviceManager {
         //System.out.println("----------------");
 
         // we don't need this array anymore
-        devicesAdded_.clear();
+        //devicesAdded_.clear();
 
         studio_.logs().logMessage("DeviceManager: [End Setup]");
     }
 
     private void addDevice(final String propertyName, final String deviceName, final DeviceBase device) {
         deviceMap_.put(propertyName, device);
-        devicesAdded_.put(deviceName, device);
         studio_.logs().logMessage("DeviceManager: " + propertyName + " set to "
                 + device.getClass().getSimpleName() + "(" + deviceName + ")");
     }
