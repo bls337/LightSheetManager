@@ -34,7 +34,7 @@ public class LightSheetManagerFrame extends JFrame {
 
     private TabPanel tabPanel_;
 
-    private LightSheetManagerModel model_;
+    private final LightSheetManagerModel model_;
 
     public LightSheetManagerFrame(final LightSheetManagerModel model, final boolean isLoaded) {
         model_ = Objects.requireNonNull(model);
@@ -48,7 +48,7 @@ public class LightSheetManagerFrame extends JFrame {
         // create the user interface
         if (isLoaded) {
             initDialogs();
-            GeometryType geometryType = model_.devices()
+            final GeometryType geometryType = model_.devices()
                     .getDeviceAdapter().getMicroscopeGeometry();
             switch (geometryType) {
                 case DISPIM:

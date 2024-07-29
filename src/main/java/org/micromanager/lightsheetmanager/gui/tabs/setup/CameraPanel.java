@@ -1,9 +1,12 @@
 package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
+import com.google.common.eventbus.Subscribe;
+import org.micromanager.events.LiveModeEvent;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.ToggleButton;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
@@ -16,13 +19,18 @@ import java.util.Objects;
  */
 public class CameraPanel extends Panel {
 
+    private boolean isPreviewPressed = false;
+    private boolean isLivePressed = false;
+
     private Button btnImagingPath_;
     private Button btnEpiPath_;
     private Button btnMultiPath_;
-    private Button btnInvertedPath_;
-    private Button btnLiveMode_;
+
+    private ToggleButton btnInvertedPath_;
+    private ToggleButton btnLiveMode_;
 
     private final LightSheetManagerModel model_;
+
     public CameraPanel(final LightSheetManagerModel model) {
         super("Cameras");
         model_ = Objects.requireNonNull(model);
@@ -40,14 +48,23 @@ public class CameraPanel extends Panel {
                 "[]5[]"
         );
 
+        // register micro-manager events
+        model_.studio().events().registerForEvents(this);
+
         Button.setDefaultSize(80, 26);
         btnImagingPath_ = new Button("Imaging");
         btnMultiPath_ = new Button("Multi");
         btnEpiPath_ = new Button("Epi");
-        btnInvertedPath_ = new Button("Inverted");
 
-        Button.setDefaultSize(165, 26);
-        btnLiveMode_ = new Button("Live", Icons.CAMERA);
+        ToggleButton.setDefaultSize(165, 26);
+        btnInvertedPath_ = new ToggleButton(
+                "Preview", "Stop Preview",
+                Icons.CAMERA, Icons.CANCEL
+        );
+        btnLiveMode_ = new ToggleButton(
+                "Live", "Stop Live",
+                Icons.CAMERA, Icons.CANCEL
+        );
 
         switch (geometryType) {
             case DISPIM:
@@ -58,7 +75,7 @@ public class CameraPanel extends Panel {
                 add(btnLiveMode_, "span 2");
                 break;
             case SCAPE:
-                btnInvertedPath_.setAbsoluteSize(165, 26);
+                //btnInvertedPath_.setAbsoluteSize(165, 26);
                 add(btnInvertedPath_, "wrap");
                 add(btnLiveMode_, "");
                 break;
@@ -94,9 +111,8 @@ public class CameraPanel extends Panel {
                 });
                 break;
             case SCAPE:
-                btnInvertedPath_.setText("Preview");
+                //btnInvertedPath_.setText("Preview");
                 btnInvertedPath_.registerListener(e -> {
-                    // TODO: make this work, needs Device Adapter pull request and name for camera...
                     closeLiveModeWindow();
                     final CameraBase camera = model_.devices().getDevice("PreviewCamera");
                     if (camera != null) {
@@ -105,9 +121,12 @@ public class CameraPanel extends Panel {
                             camera.setTriggerMode(CameraMode.INTERNAL);
                         } catch (Exception ex) {
                             model_.studio().logs().showError("could not set camera to " + camera.getDeviceName());
+                            return; // early exit
                         }
+                        isPreviewPressed = true;
                         model_.studio().live().setLiveModeOn(true);
                     } else {
+                        btnInvertedPath_.setState(false);
                         model_.studio().logs().showError(
                                 "No device for \"PreviewCamera\" set in the device adapter.");
                     }
@@ -123,7 +142,9 @@ public class CameraPanel extends Panel {
                             camera.setTriggerMode(CameraMode.INTERNAL);
                         } catch (Exception ex) {
                             model_.studio().logs().showError("could not set camera to " + camera.getDeviceName());
+                            return; // early exit
                         }
+                        isLivePressed = true;
                         model_.studio().live().setLiveModeOn(true);
                     } else {
                         model_.studio().logs().showError(
@@ -146,6 +167,20 @@ public class CameraPanel extends Panel {
             // close the live mode window if it exists
             if (model_.studio().live().getDisplay() != null) {
                 model_.studio().live().getDisplay().close();
+            }
+        }
+    }
+
+    @Subscribe
+    public void liveModeListener(LiveModeEvent event) {
+        if (!model_.studio().live().isLiveModeOn()) {
+            if (isPreviewPressed) {
+                isPreviewPressed = false;
+                btnInvertedPath_.setState(false);
+            }
+            if (isLivePressed) {
+                isLivePressed = false;
+                btnLiveMode_.setState(false);;
             }
         }
     }
