@@ -2,6 +2,9 @@ package org.micromanager.lightsheetmanager.api.data;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 // TODO: account for different naming on each geometry type (SLICE_SCAN_ONLY)
 
@@ -21,6 +24,9 @@ public enum AcquisitionMode {
 
     private final String text_;
 
+    private static final Map<String, AcquisitionMode> stringToEnum =
+            Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
+
     AcquisitionMode(final String text) {
         text_ = text;
     }
@@ -30,8 +36,8 @@ public enum AcquisitionMode {
         return text_;
     }
 
-    public static AcquisitionMode getByIndex(final int index) {
-        return values()[index];
+    public static AcquisitionMode fromString(final String symbol) {
+        return stringToEnum.getOrDefault(symbol, AcquisitionMode.NONE);
     }
 
     public static String[] toArray() {

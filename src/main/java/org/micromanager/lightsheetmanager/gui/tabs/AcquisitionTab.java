@@ -264,8 +264,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
         // select the acquisition mode
         cmbAcquisitionModes_.registerListener(e -> {
-            final int index = cmbAcquisitionModes_.getSelectedIndex();
-            model_.acquisitions().settingsBuilder().acquisitionMode(AcquisitionMode.getByIndex(index));
+            final String selected = cmbAcquisitionModes_.getSelected();
+            model_.acquisitions().settingsBuilder()
+                    .acquisitionMode(AcquisitionMode.fromString(selected));
         });
 
         // TODO: should timing recalc be part of setting use advanced timing value in model?

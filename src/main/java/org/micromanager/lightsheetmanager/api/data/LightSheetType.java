@@ -12,15 +12,15 @@ public enum LightSheetType {
     private static final Map<String, LightSheetType> stringToEnum =
             Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
-    private final String label;
+    private final String label_;
 
     LightSheetType(final String label) {
-        this.label = label;
+        label_ = label;
     }
 
     @Override
     public String toString() {
-        return label;
+        return label_;
     }
 
     public static LightSheetType fromString(final String symbol) {

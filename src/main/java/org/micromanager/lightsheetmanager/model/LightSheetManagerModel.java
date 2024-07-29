@@ -27,9 +27,8 @@ public class LightSheetManagerModel implements LightSheetManager {
     private UserSettings userSettings_;
     private PluginSettings pluginSettings_;
 
-    private DeviceManager deviceManager_;
-
-    private XYZGrid xyzGrid_;
+    private final XYZGrid xyzGrid_;
+    private final DeviceManager deviceManager_;
 
     private AcquisitionEngine acqEngine_;
     private AcquisitionTableData acqTableData_;
@@ -41,9 +40,9 @@ public class LightSheetManagerModel implements LightSheetManager {
         pluginSettings_ = new PluginSettings();
         userSettings_ = new UserSettings(this);
         xyzGrid_ = new XYZGrid(this);
+        deviceManager_ = new DeviceManager(studio_, this);
 
-        // set during setup if there is an error
-        // displayed in the error ui
+        // set during setup if there is an errordisplayed in the error ui
         errorText_ = "";
     }
 
@@ -53,8 +52,6 @@ public class LightSheetManagerModel implements LightSheetManager {
      * @return true if the model loads with no errors
      */
     public boolean setup() {
-
-        deviceManager_ = new DeviceManager(studio_, this);
 
         // first we check to see if the device adapter is present
         if (!deviceManager_.hasDeviceAdapter()) {

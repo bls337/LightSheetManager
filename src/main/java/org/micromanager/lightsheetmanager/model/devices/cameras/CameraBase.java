@@ -87,6 +87,7 @@ public class CameraBase extends DeviceBase implements LightSheetCamera {
 
     @Override
     public void setTriggerMode(CameraMode cameraMode) {
+        System.out.println("this!");
         mode_ = cameraMode;
     }
 

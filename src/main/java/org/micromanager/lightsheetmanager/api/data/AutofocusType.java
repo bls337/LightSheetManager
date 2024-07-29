@@ -22,13 +22,13 @@ public enum AutofocusType {
     FFT_BANDPASS("FFTBandpass"),
     TENENGRAD("Tenengrad");
 
-    private final String name;
+    private final String name_;
 
     private static final Map<String, AutofocusType> stringToEnum =
             Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
     AutofocusType(final String name) {
-        this.name = name;
+        name_ = name;
     }
 
     public static String[] toArray() {
@@ -43,7 +43,7 @@ public enum AutofocusType {
 
     @Override
     public String toString() {
-        return name;
+        return name_;
     }
 
 }
