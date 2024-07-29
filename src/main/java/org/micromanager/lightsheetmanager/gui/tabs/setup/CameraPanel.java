@@ -1,10 +1,12 @@
 package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
 import java.util.Objects;
 
@@ -96,26 +98,37 @@ public class CameraPanel extends Panel {
                 btnInvertedPath_.registerListener(e -> {
                     // TODO: make this work, needs Device Adapter pull request and name for camera...
                     closeLiveModeWindow();
-                    final String cameraName = model_.devices()
-                            .getDevice("PreviewCamera").getDeviceName();
-                    try {
-                        model_.studio().core().setCameraDevice(cameraName);
-                    } catch (Exception ex) {
-                        model_.studio().logs().showError("could not set camera to " + cameraName);
+                    final CameraBase camera = model_.devices().getDevice("PreviewCamera");
+                    if (camera != null) {
+                        try {
+                            model_.studio().core().setCameraDevice(camera.getDeviceName());
+                            camera.setTriggerMode(CameraMode.INTERNAL);
+                        } catch (Exception ex) {
+                            model_.studio().logs().showError("could not set camera to " + camera.getDeviceName());
+                        }
+                        model_.studio().live().setLiveModeOn(true);
+                    } else {
+                        model_.studio().logs().showError(
+                                "No device for \"PreviewCamera\" set in the device adapter.");
                     }
-                    model_.studio().live().setLiveModeOn(true);
                 });
 
+                // live mode
                 btnLiveMode_.registerListener(e -> {
                     closeLiveModeWindow();
-                    final String cameraName = model_.devices()
-                            .getDevice("ImagingCamera").getDeviceName();
-                    try {
-                        model_.studio().core().setCameraDevice(cameraName);
-                    } catch (Exception ex) {
-                        model_.studio().logs().showError("could not set camera to " + cameraName);
+                    final CameraBase camera = model_.devices().getDevice("ImagingCamera");
+                    if (camera != null) {
+                        try {
+                            model_.studio().core().setCameraDevice(camera.getDeviceName());
+                            camera.setTriggerMode(CameraMode.INTERNAL);
+                        } catch (Exception ex) {
+                            model_.studio().logs().showError("could not set camera to " + camera.getDeviceName());
+                        }
+                        model_.studio().live().setLiveModeOn(true);
+                    } else {
+                        model_.studio().logs().showError(
+                                "No device for \"ImagingCamera\" set in the device adapter.");
                     }
-                    model_.studio().live().setLiveModeOn(true);
                 });
                 break;
             default:

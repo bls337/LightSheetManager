@@ -126,6 +126,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                 } else {
                     studio_.logs().logMessage("Preparing Acquisition: plugin version " + LightSheetManagerPlugin.version);
                     // TODO: put this here? generic setup tasks? put in own method?
+                    System.out.println("acqSettings_.acquisitionMode(): " + acqSettings_.acquisitionMode());
                     if (acqSettings_.acquisitionMode() == AcquisitionMode.NONE) {
                         studio_.logs().showError("please select a valid acquisition mode!");
                         return; // early exit

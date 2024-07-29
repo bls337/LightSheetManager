@@ -18,7 +18,7 @@ public enum AutofocusFitType {
             Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
     AutofocusFitType(final String text) {
-        this.text_ = text;
+        text_ = text;
     }
 
     public static String[] toArray() {

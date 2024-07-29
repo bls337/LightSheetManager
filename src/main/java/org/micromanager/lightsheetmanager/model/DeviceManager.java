@@ -220,8 +220,10 @@ public class DeviceManager {
 //        return deviceMap_.get(deviceName);
 //    }
 
+    // TODO: consider using Optional to improve the API
     /**
-     * Returns the device given by {@code deviceName} as type {@code T}.
+     * Returns the device given by {@code deviceName} as type {@code T},
+     * if the device is not found, {@code null} is returned.
      * The caller is responsible for assigning the returned
      * value to the correct type.
      * <P><P>
@@ -229,12 +231,11 @@ public class DeviceManager {
      * of DeviceBase, avoiding the ClassCastException at compile time.
      *
      * @param deviceName the device name
-     * @return the device as a subclass of DeviceBase
+     * @return the device or null if device not found
      * @param <T> the generic type to cast the result to
      */
     @SuppressWarnings("unchecked")
     public <T extends DeviceBase> T getDevice(final String deviceName) {
-        //System.out.println(deviceName + " " + deviceMap_.get(deviceName).getDeviceName());
         return (T) deviceMap_.get(deviceName);
     }
 

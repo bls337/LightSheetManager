@@ -16,15 +16,15 @@ public enum GeometryType {
     private static final Map<String, GeometryType> stringToEnum =
             Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
-    private final String label;
+    private final String label_;
 
     GeometryType(final String label) {
-        this.label = label;
+        label_ = label;
     }
 
     @Override
     public String toString() {
-        return label;
+        return label_;
     }
 
     public static GeometryType fromString(final String symbol) {

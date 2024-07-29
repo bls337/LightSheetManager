@@ -21,21 +21,17 @@ public enum CameraMode {
     PSEUDO_OVERLAP("Pseudo Overlap"),
     VIRTUAL_SLIT("Virtual Slit");
 
-    private final String text;
+    private final String text_;
 
     private static final Map<String, CameraMode> stringToEnum =
             Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
     CameraMode(final String text) {
-        this.text = text;
+        text_ = text;
     }
 
     public static CameraMode fromString(final String symbol) {
         return stringToEnum.getOrDefault(symbol, CameraMode.EDGE);
-    }
-
-    public static CameraMode getByIndex(final int index) {
-        return values()[index];
     }
 
     /**
@@ -117,7 +113,7 @@ public enum CameraMode {
 
     @Override
     public String toString() {
-        return text;
+        return text_;
     }
 
 }

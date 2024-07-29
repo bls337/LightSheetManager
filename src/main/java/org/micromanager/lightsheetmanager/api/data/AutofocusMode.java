@@ -12,13 +12,13 @@ public enum AutofocusMode {
     FIXED_PIEZO_SWEEP_SLICE("Fixed piezo, sweep slice"),
     FIXED_SLICE_SWEEP_PIEZO("Fixed slice, sweep piezo");
 
-    private final String name;
+    private final String name_;
 
     private static final Map<String, AutofocusMode> stringToEnum =
             Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
     AutofocusMode(final String name) {
-        this.name = name;
+        name_ = name;
     }
 
     public static String[] toArray() {
@@ -33,7 +33,7 @@ public enum AutofocusMode {
 
     @Override
     public String toString() {
-        return name;
+        return name_;
     }
 
 }
