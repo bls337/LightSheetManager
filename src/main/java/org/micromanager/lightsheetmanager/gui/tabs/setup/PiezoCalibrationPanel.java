@@ -7,7 +7,7 @@ import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
@@ -34,9 +34,9 @@ public class PiezoCalibrationPanel extends Panel {
 
     private boolean isUsingPLogic_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public PiezoCalibrationPanel(final LightSheetManagerModel model, final int pathNum) {
+    public PiezoCalibrationPanel(final LightSheetManager model, final int pathNum) {
         super("Piezo/Slice Calibration");
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;

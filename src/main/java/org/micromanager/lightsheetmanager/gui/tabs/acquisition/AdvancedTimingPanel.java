@@ -5,7 +5,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
@@ -22,9 +22,9 @@ public class AdvancedTimingPanel extends Panel {
 
     private CheckBox cbxAlternateScanDirection_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public AdvancedTimingPanel(final LightSheetManagerModel model) {
+    public AdvancedTimingPanel(final LightSheetManager model) {
         super("Advanced Timing Settings");
         model_ = Objects.requireNonNull(model);
         createUserInterface();

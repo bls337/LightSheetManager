@@ -17,10 +17,10 @@ import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.lightsheetmanager.LightSheetManagerPlugin;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
-import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
+import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.model.autofocus.AutofocusRunner;
 import org.micromanager.lightsheetmanager.model.DataStorage;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 
@@ -53,9 +53,9 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     // TODO: remove later, hacky method to stop position updater for now
     protected LightSheetManagerFrame frame_;
 
-    protected final LightSheetManagerModel model_;
+    protected final LightSheetManager model_;
 
-    public AcquisitionEngine(final LightSheetManagerModel model) {
+    public AcquisitionEngine(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model.studio();
         core_ = model.core();

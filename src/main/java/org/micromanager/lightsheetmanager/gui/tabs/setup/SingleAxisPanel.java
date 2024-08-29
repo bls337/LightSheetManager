@@ -4,7 +4,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.SingleAxis;
 
@@ -24,9 +24,9 @@ public class SingleAxisPanel extends Panel {
 
     private boolean isUsingPLogic_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public SingleAxisPanel(final LightSheetManagerModel model) {
+    public SingleAxisPanel(final LightSheetManager model) {
         super("Scanner - Single Axis Y");
         model_ = Objects.requireNonNull(model);
         createUserInterface();

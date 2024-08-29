@@ -7,7 +7,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.internal.utils.WindowPositioning;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.XYZGrid;
 
 import javax.swing.JFrame;
@@ -43,9 +43,9 @@ public class XYZGridFrame extends JFrame {
     private JLabel lblYCountValue_;
     private JLabel lblZCountValue_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public XYZGridFrame(final LightSheetManagerModel model) {
+    public XYZGridFrame(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         WindowPositioning.setUpBoundsMemory(this, this.getClass(), this.getClass().getSimpleName());
         createUserInterface();

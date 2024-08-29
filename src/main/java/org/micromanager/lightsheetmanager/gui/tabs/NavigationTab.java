@@ -3,7 +3,7 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.tabs.navigation.NavigationPanel;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
@@ -11,9 +11,9 @@ public class NavigationTab extends Panel implements ListeningPanel {
 
     private final NavigationPanel navigationPanel_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public NavigationTab(final LightSheetManagerModel model) {
+    public NavigationTab(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         navigationPanel_ = new NavigationPanel(model_);
         add(navigationPanel_, "");

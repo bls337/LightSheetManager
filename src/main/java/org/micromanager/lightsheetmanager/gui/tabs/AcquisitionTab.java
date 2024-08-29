@@ -12,7 +12,7 @@ import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPan
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.MultiPositionPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.tabs.channels.ChannelTablePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeSettingsPanel;
@@ -69,9 +69,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     // acquisition playlist
     private final AcquisitionTableFrame acqTableFrame_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public AcquisitionTab(final LightSheetManagerModel model) {
+    public AcquisitionTab(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
         acqTableFrame_ = new AcquisitionTableFrame(studio_);

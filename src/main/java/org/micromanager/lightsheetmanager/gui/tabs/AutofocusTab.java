@@ -10,7 +10,7 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.awt.Font;
 import java.util.Objects;
@@ -43,9 +43,9 @@ public class AutofocusTab extends Panel implements ListeningPanel {
     private Spinner spnMaxOffsetSetup_;
     private CheckBox cbxAutoUpdateFocusFound_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public AutofocusTab(final LightSheetManagerModel model) {
+    public AutofocusTab(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();

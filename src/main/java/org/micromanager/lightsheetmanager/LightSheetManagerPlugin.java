@@ -1,7 +1,5 @@
 package org.micromanager.lightsheetmanager;
 
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
-import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.gui.utils.WindowUtils;
 import org.micromanager.MenuPlugin;
 import org.micromanager.Studio;
@@ -14,11 +12,11 @@ public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
     public static final String copyright = "Applied Scientific Instrumentation (ASI), 2022-2024";
     public static final String description = "A plugin to control various types of light sheet microscopes.";
     public static final String menuName = "Light Sheet Manager";
-    public static final String version = "0.4.4";
+    public static final String version = "0.4.5";
 
     private Studio studio_;
+    private LightSheetManager model_;
     private LightSheetManagerFrame frame_;
-    private LightSheetManagerModel model_;
 
     @Override
     public void setContext(final Studio studio) {
@@ -39,11 +37,11 @@ public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
 
         // TODO: capture all errors like this?
         try {
-            model_ = new LightSheetManagerModel(studio_);
+            model_ = new LightSheetManager(studio_);
             final boolean isLoaded = model_.setup();
             frame_ = new LightSheetManagerFrame(model_, isLoaded);
             if (isLoaded) {
-                model_.acquisitions().setFrame(frame_); // TODO: remove later
+                model_.acquisitions().setFrame(frame_);
             }
             frame_.setVisible(true);
             frame_.toFront();

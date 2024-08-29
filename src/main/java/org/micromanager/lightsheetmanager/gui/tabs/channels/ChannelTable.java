@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs.channels;
 
 import mmcorej.StrVector;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.channels.ChannelTableData;
 
@@ -22,9 +22,9 @@ public class ChannelTable extends JScrollPane {
     private ChannelTableData tableData_;
     private ChannelTableModel tableModel_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public ChannelTable(final LightSheetManagerModel model) {
+    public ChannelTable(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
 
         final String channelGroup = model_.acquisitions().settings().channelGroup();

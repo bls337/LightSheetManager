@@ -23,7 +23,7 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSetting
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.PLogicSCAPE;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
@@ -49,7 +49,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     private double scanSpeedX_;
     private double scanAccelX_;
 
-    public AcquisitionEngineSCAPE(final LightSheetManagerModel model) {
+    public AcquisitionEngineSCAPE(final LightSheetManager model) {
         super(model);
     }
 

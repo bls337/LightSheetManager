@@ -4,7 +4,7 @@ import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -17,9 +17,9 @@ public class DeviceTab extends Panel implements ListeningPanel {
     private Button btnCreateConfigGroup_;
 
     private DeviceManager devices_;
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public DeviceTab(final LightSheetManagerModel model) {
+    public DeviceTab(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         devices_ = model_.devices();
         createUserInterface();

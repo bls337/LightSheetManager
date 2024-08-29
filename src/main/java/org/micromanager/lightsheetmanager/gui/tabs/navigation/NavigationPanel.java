@@ -6,7 +6,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import mmcorej.DeviceType;
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
@@ -33,9 +33,9 @@ public class NavigationPanel extends Panel {
     private PositionUpdater positionUpdater_;
     private ArrayList<ControlPanel> controlPanels_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public NavigationPanel(final LightSheetManagerModel model) {
+    public NavigationPanel(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
         devices_ = model_.devices();

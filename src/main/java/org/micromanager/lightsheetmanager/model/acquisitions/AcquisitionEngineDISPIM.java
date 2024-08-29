@@ -15,14 +15,13 @@ import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.ndtiff.NDTiffAdapter;
 import org.micromanager.internal.MMStudio;
-import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.PLogicDISPIM;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
@@ -38,7 +37,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
    // TODO: remove this when a more generic method is available and get from base class
     private DefaultAcquisitionSettingsDISPIM acqSettings_;
 
-    public AcquisitionEngineDISPIM(final LightSheetManagerModel model) {
+    public AcquisitionEngineDISPIM(final LightSheetManager model) {
         super(model);
         // TODO: remove this when a more generic method is available and get from base class
         acqSettings_ = new DefaultAcquisitionSettingsDISPIM.Builder().build();
