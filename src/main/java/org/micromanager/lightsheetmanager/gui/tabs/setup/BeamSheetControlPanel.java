@@ -8,7 +8,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Slider;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import javax.swing.JLabel;
 import java.awt.EventQueue;
@@ -49,9 +49,9 @@ public class BeamSheetControlPanel extends Panel {
     // TODO: this is temporary solution until, update this var so we don't have to rebuild the acqSettings
     private double currentOffset_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public BeamSheetControlPanel(final LightSheetManagerModel model, final int pathNum) {
+    public BeamSheetControlPanel(final LightSheetManager model, final int pathNum) {
         super("Light Sheet Synchronization");
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;

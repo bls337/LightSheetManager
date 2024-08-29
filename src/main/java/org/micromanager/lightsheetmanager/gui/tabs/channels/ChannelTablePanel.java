@@ -4,7 +4,7 @@ import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
@@ -25,9 +25,9 @@ public class ChannelTablePanel extends Panel {
 
     private ChannelTable table_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public ChannelTablePanel(final LightSheetManagerModel model, final CheckBox checkBox) {
+    public ChannelTablePanel(final LightSheetManager model, final CheckBox checkBox) {
         super(checkBox);
         model_ = Objects.requireNonNull(model);
         createUserInterface();

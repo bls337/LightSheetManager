@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.model;
 import mmcorej.CMMCore;
 import mmcorej.Configuration;
 import org.micromanager.Studio;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.DISPIMDevice;
@@ -69,9 +70,9 @@ public class PLogicDISPIM {
 
     private final DefaultAcquisitionSettingsDISPIM acqSettings_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public PLogicDISPIM(final LightSheetManagerModel model) {
+    public PLogicDISPIM(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
         devices_ = model_.devices();

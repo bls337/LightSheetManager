@@ -5,7 +5,7 @@ import org.micromanager.AutofocusPlugin;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
@@ -16,9 +16,9 @@ public class AutofocusRunner {
     private AutofocusResult lastAutofocusResult_;
 
     private final Studio studio_;
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public AutofocusRunner(final LightSheetManagerModel model) {
+    public AutofocusRunner(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
 

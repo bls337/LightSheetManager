@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.model;
 
 import mmcorej.Configuration;
 import mmcorej.StrVector;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import mmcorej.CMMCore;
 import mmcorej.DeviceType;
@@ -48,9 +49,9 @@ public class DeviceManager {
 
     private static String deviceAdapterName_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public DeviceManager(final Studio studio, final LightSheetManagerModel model) {
+    public DeviceManager(final Studio studio, final LightSheetManager model) {
         studio_ = Objects.requireNonNull(studio);
         model_ = Objects.requireNonNull(model);
         core_ = studio_.core();

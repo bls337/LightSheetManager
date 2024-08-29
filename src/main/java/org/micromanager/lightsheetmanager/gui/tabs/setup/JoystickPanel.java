@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -14,9 +14,9 @@ public class JoystickPanel extends Panel {
     private ComboBox cmbLeftWheel_;
     private ComboBox cmbRightWheel_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public JoystickPanel(final LightSheetManagerModel model) {
+    public JoystickPanel(final LightSheetManager model) {
         super("Joystick");
         model_ = Objects.requireNonNull(model);
         createUserInterface();

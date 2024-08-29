@@ -3,7 +3,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
@@ -30,9 +30,9 @@ public class SetupPanel extends Panel implements ListeningPanel {
 
     private SingleAxisPanel singleAxisPanel_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public SetupPanel(final LightSheetManagerModel model, final int pathNum) {
+    public SetupPanel(final LightSheetManager model, final int pathNum) {
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;
 

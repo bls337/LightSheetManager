@@ -4,7 +4,7 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
@@ -40,9 +40,9 @@ public class PositionPanel extends Panel {
 
     private boolean isUsingPLogic_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public PositionPanel(final LightSheetManagerModel model, final int pathNum) {
+    public PositionPanel(final LightSheetManager model, final int pathNum) {
         super("Positions");
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;

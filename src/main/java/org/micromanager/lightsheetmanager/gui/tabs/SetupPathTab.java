@@ -5,7 +5,7 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.tabs.setup.SetupPanel;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.awt.Font;
 import java.util.Objects;
@@ -15,9 +15,9 @@ public class SetupPathTab extends Panel implements ListeningPanel {
     private int pathNum_;
     private SetupPanel setupPanel_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public SetupPathTab(final LightSheetManagerModel model, final int pathNum) {
+    public SetupPathTab(final LightSheetManager model, final int pathNum) {
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;
         createUserInterface();

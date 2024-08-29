@@ -1,8 +1,8 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TabbedPane;
@@ -30,10 +30,10 @@ public class TabPanel extends Panel {
 
     private DeviceManager devices_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
     private final LightSheetManagerFrame frame_;
 
-    public TabPanel(final LightSheetManagerModel model,
+    public TabPanel(final LightSheetManager model,
                     final LightSheetManagerFrame frame,
                     final int width, final int height) {
         model_ = Objects.requireNonNull(model);

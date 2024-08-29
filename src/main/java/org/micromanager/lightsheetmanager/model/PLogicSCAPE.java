@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.model;
 import mmcorej.CMMCore;
 import mmcorej.Configuration;
 import org.micromanager.Studio;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
@@ -60,9 +61,9 @@ public class PLogicSCAPE {
 
     private final DefaultAcquisitionSettingsSCAPE acqSettings_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public PLogicSCAPE(final LightSheetManagerModel model) {
+    public PLogicSCAPE(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
         devices_ = model_.devices();

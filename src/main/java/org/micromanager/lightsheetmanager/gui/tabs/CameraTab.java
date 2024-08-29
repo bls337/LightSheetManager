@@ -7,7 +7,7 @@ import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
 import java.awt.Font;
@@ -25,9 +25,9 @@ public class CameraTab extends Panel implements ListeningPanel {
     private ComboBox cmbCameraTriggerMode_;
 
     private TabPanel tabPanel_;
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public CameraTab(final LightSheetManagerModel model, final TabPanel tabPanel) {
+    public CameraTab(final LightSheetManager model, final TabPanel tabPanel) {
         tabPanel_ = Objects.requireNonNull(tabPanel);
         model_ = Objects.requireNonNull(model);
         createUserInterface();

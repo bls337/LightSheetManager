@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.model;
 import org.micromanager.MultiStagePosition;
 import org.micromanager.PositionList;
 import org.micromanager.StagePosition;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.DISPIMDevice;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIZStage;
@@ -37,9 +38,9 @@ public class XYZGrid {
     private int overlapYZ_;
     private boolean clearYZ_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public XYZGrid(final LightSheetManagerModel model) {
+    public XYZGrid(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
     }
 

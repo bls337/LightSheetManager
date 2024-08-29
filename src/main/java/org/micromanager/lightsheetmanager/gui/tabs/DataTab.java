@@ -7,7 +7,7 @@ import java.util.EventObject;
 
 import org.micromanager.internal.utils.FileDialogs;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
-import org.micromanager.lightsheetmanager.gui.LightSheetManagerFrame;
+import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
@@ -16,7 +16,7 @@ import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.RadioButton;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.model.DataStorage;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -32,10 +32,10 @@ public class DataTab extends Panel implements ListeningPanel {
 
     private final FileDialogs.FileType directorySelect_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
     private LightSheetManagerFrame frame_;
 
-    public DataTab(final LightSheetManagerModel model,
+    public DataTab(final LightSheetManager model,
                    final LightSheetManagerFrame frame) {
         model_ = Objects.requireNonNull(model);
         frame_ = Objects.requireNonNull(frame);

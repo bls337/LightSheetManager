@@ -4,7 +4,7 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
 import javax.swing.JLabel;
@@ -22,9 +22,9 @@ public class ExcitationPanel extends Panel implements ListeningPanel {
 
     private boolean isUsingPLogic_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public ExcitationPanel(final LightSheetManagerModel model) {
+    public ExcitationPanel(final LightSheetManager model) {
         super("Scanner");
         model_ = Objects.requireNonNull(model);
         createUserInterface();

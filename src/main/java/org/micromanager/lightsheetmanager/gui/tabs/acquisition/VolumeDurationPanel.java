@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
@@ -16,9 +16,9 @@ public class VolumeDurationPanel extends Panel {
     private Label lblVolumeTimeValue_;
     private Label lblTotalTimeValue_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public VolumeDurationPanel(final LightSheetManagerModel model) {
+    public VolumeDurationPanel(final LightSheetManager model) {
         super("Durations");
         model_ = Objects.requireNonNull(model);
         createUserInterface();

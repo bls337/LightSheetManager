@@ -7,7 +7,7 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.gui.frames.XYZGridFrame;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
@@ -19,9 +19,9 @@ public class MultiPositionPanel extends Panel {
     private Button btnEditPositionList_;
 
     private final XYZGridFrame xyzGridFrame_;
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public MultiPositionPanel(final LightSheetManagerModel model, final CheckBox cbxUseMultiPositions) {
+    public MultiPositionPanel(final LightSheetManager model, final CheckBox cbxUseMultiPositions) {
         super(cbxUseMultiPositions);
         model_ = Objects.requireNonNull(model);
         xyzGridFrame_ = new XYZGridFrame(model_);

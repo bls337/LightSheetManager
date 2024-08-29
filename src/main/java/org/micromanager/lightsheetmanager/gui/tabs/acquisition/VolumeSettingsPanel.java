@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -20,9 +20,9 @@ public class VolumeSettingsPanel extends Panel {
     private Spinner spnSliceStepSize_;
     private Spinner spnNumSlices_;
 
-    private LightSheetManagerModel model_;
+    private LightSheetManager model_;
 
-    public VolumeSettingsPanel(final LightSheetManagerModel model) {
+    public VolumeSettingsPanel(final LightSheetManager model) {
         super("Volume Settings");
         model_ = Objects.requireNonNull(model);
         createUserInterface();

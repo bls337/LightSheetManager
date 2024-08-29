@@ -5,7 +5,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
@@ -16,9 +16,9 @@ public class TimePointsPanel extends Panel {
     private Spinner spnNumTimePoints_;
     private Spinner spnTimePointInterval_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public TimePointsPanel(final LightSheetManagerModel model, final CheckBox cbxUseTimePoints) {
+    public TimePointsPanel(final LightSheetManager model, final CheckBox cbxUseTimePoints) {
         super(cbxUseTimePoints);
         model_ = Objects.requireNonNull(model);
         createUserInterface();

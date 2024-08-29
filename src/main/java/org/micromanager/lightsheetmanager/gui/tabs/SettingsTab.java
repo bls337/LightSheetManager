@@ -5,10 +5,8 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
-import org.micromanager.lightsheetmanager.model.devices.XYStage;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
-import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 
 import javax.swing.JLabel;
 import java.util.Objects;
@@ -33,9 +31,9 @@ public class SettingsTab extends Panel implements ListeningPanel {
     private boolean isUsingPLogic_;
     private boolean isUsingScanSettings_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public SettingsTab(final LightSheetManagerModel model) {
+    public SettingsTab(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();

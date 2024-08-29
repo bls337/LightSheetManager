@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.model;
 import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
 import org.micromanager.UserProfile;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.propertymap.MutablePropertyMapView;
@@ -31,9 +32,9 @@ public class UserSettings {
     // Note: increase this value based on the amount of nested json in the settings
     private static final int MAX_RECURSION_DEPTH_JSON = 4;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public UserSettings(final LightSheetManagerModel model) {
+    public UserSettings(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         // setup user profile
         final UserProfile profile = model_.getStudio().getUserProfile();

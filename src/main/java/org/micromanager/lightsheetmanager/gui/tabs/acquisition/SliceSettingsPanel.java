@@ -7,7 +7,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
-import org.micromanager.lightsheetmanager.model.LightSheetManagerModel;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
@@ -31,9 +31,9 @@ public class SliceSettingsPanel extends Panel {
     private Spinner spnShutterWidth_;
     private Spinner spnShutterSpeed_;
 
-    private final LightSheetManagerModel model_;
+    private final LightSheetManager model_;
 
-    public SliceSettingsPanel(final LightSheetManagerModel model) {
+    public SliceSettingsPanel(final LightSheetManager model) {
         super("Slice Settings");
         model_ = Objects.requireNonNull(model);
         createUserInterface();
