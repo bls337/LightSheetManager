@@ -24,7 +24,7 @@ public class XYStage extends DeviceBase {
         }
     }
 
-    public void setXYPosition(final int x, final int y) {
+    public void setXYPosition(final double x, final double y) {
         try {
             core_.setXYPosition(deviceName_, x, y);
         } catch (Exception e) {

@@ -45,7 +45,8 @@ public class DeviceManager {
     private final Studio studio_;
     private final CMMCore core_;
 
-    private Map<String, DeviceBase> deviceMap_;
+    /* Maps the Device Adapter device name to a Device object */
+    private final Map<String, DeviceBase> deviceMap_;
 
     private static String deviceAdapterName_;
 
@@ -463,4 +464,13 @@ public class DeviceManager {
         }
     }
 
+    /**
+     * Return true if the device is set to a value other than "Undefined".
+     *
+     * @param deviceName the device adapter name ("SampleXY", "SampleZ", etc.)
+     * @return true if the device is present
+     */
+    public boolean hasDevice(final String deviceName) {
+        return !deviceMap_.get(deviceName).getDeviceName().equals("Undefined");
+    }
 }

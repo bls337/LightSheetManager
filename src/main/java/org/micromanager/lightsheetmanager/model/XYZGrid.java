@@ -4,9 +4,8 @@ import org.micromanager.MultiStagePosition;
 import org.micromanager.PositionList;
 import org.micromanager.StagePosition;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.api.data.DISPIMDevice;
-import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
-import org.micromanager.lightsheetmanager.model.devices.vendor.ASIZStage;
+import org.micromanager.lightsheetmanager.model.devices.Stage;
+import org.micromanager.lightsheetmanager.model.devices.XYStage;
 import org.micromanager.lightsheetmanager.model.utils.GeometryUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
@@ -38,7 +37,7 @@ public class XYZGrid {
     private int overlapYZ_;
     private boolean clearYZ_;
 
-    private LightSheetManager model_;
+    private final LightSheetManager model_;
 
     public XYZGrid(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
@@ -88,8 +87,8 @@ public class XYZGrid {
      */
     public void computeGrid() {
 
-        ASIXYStage xyStage = model_.devices().getDevice(DISPIMDevice.SAMPLE_XY);
-        ASIZStage zStage = model_.devices().getDevice(DISPIMDevice.SAMPLE_Z);
+        XYStage xyStage = model_.devices().getDevice("SampleXY");
+        Stage zStage = model_.devices().getDevice("SampleZ");
 
         final int numX = useX_ ? updateGridXCount() : 1;
         final int numY = useY_ ? updateGridYCount() : 1;

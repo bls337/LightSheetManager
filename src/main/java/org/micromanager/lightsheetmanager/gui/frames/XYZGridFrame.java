@@ -63,6 +63,7 @@ public class XYZGridFrame extends JFrame {
                 "[]10[]"
         ));
 
+        Spinner.setDefaultSize(7);
         Button.setDefaultSize(160, 26);
         btnComputeGrid_ = new Button("Compute Grid");
         btnEditPositionList_ = new Button("Edit Position List...");
@@ -80,7 +81,7 @@ public class XYZGridFrame extends JFrame {
 
         Panel.setMigLayoutDefault(
                 "insets 10 10 10 10",
-                "[]15[]",
+                "[]10[]",
                 "[]10[]"
         );
         final Panel pnlX = new Panel(cbxUseX_);
@@ -89,9 +90,9 @@ public class XYZGridFrame extends JFrame {
         final Panel pnlButtons = new Panel();
 
         // X
-        final JLabel lblXStart = new JLabel("X start [\u00B5m]:");
-        final JLabel lblXStop = new JLabel("X stop [\u00B5m]:");
-        final JLabel lblXDelta = new JLabel("X delta [\u00B5m]:");
+        final JLabel lblXStart = new JLabel("X start [µm]:");
+        final JLabel lblXStop = new JLabel("X stop [µm]:");
+        final JLabel lblXDelta = new JLabel("X delta [µm]:");
         final JLabel lblXCount = new JLabel("Slice count:");
 
         spnXStart_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
@@ -99,9 +100,9 @@ public class XYZGridFrame extends JFrame {
         spnXDelta_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
 
         // Y
-        final JLabel lblYStart = new JLabel("Y start [\u00B5m]:");
-        final JLabel lblYStop = new JLabel("Y stop [\u00B5m]:");
-        final JLabel lblYDelta = new JLabel("Y delta [\u00B5m]:");
+        final JLabel lblYStart = new JLabel("Y start [µm]:");
+        final JLabel lblYStop = new JLabel("Y stop [µm]:");
+        final JLabel lblYDelta = new JLabel("Y delta [µm]:");
         final JLabel lblYCount = new JLabel("Y count:");
 
         spnYStart_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
@@ -109,9 +110,9 @@ public class XYZGridFrame extends JFrame {
         spnYDelta_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
 
         // Z
-        final JLabel lblZStart = new JLabel("Z start [\u00B5m]:");
-        final JLabel lblZStop = new JLabel("Z stop [\u00B5m]:");
-        final JLabel lblZDelta = new JLabel("Z delta [\u00B5m]:");
+        final JLabel lblZStart = new JLabel("Z start [µm]:");
+        final JLabel lblZStop = new JLabel("Z stop [µm]:");
+        final JLabel lblZDelta = new JLabel("Z delta [µm]:");
         final JLabel lblZCount = new JLabel("Z count:");
 
         spnZStart_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
@@ -120,6 +121,7 @@ public class XYZGridFrame extends JFrame {
 
         final Panel pnlSettings = new Panel("Grid Settings");
         final JLabel lblOverlap = new JLabel("Overlap (Y and Z) [%]");
+        Spinner.setDefaultSize(4);
         spnOverlapYZ_ = Spinner.createIntegerSpinner(10, 0, 100, 1);
         cbxClearPositions_ = new CheckBox("Clear position list if YZ unused", false);
 
@@ -160,12 +162,13 @@ public class XYZGridFrame extends JFrame {
         pnlButtons.add(btnRunOverviewAcq_, "");
 
         add(pnlY, "growx");
-        add(pnlZ, "wrap");
+        add(pnlZ, "growx, wrap");
         add(pnlX, "growx");
         add(pnlSettings, "wrap");
         add(pnlButtons, "");
 
-        pack();
+        pack(); // fit window size to layout
+        setIconImage(Icons.MICROSCOPE.getImage());
     }
 
     private void createEventHandlers() {

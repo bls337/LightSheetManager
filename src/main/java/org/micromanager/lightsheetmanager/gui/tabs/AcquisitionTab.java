@@ -112,7 +112,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
                 "Multiple positions (XY)", acqSettings.isUsingMultiplePositions());
         pnlMultiPositions_ = new MultiPositionPanel(model_, cbxUseMultiplePositions_);
         // disable elements based on acqSettings
-        pnlMultiPositions_.setEnabled(acqSettings.isUsingMultiplePositions());
+        pnlMultiPositions_.setPanelEnabled(acqSettings.isUsingMultiplePositions());
 
         // time points
         cbxUseTimePoints_ = new CheckBox(
@@ -306,6 +306,10 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
     public SliceSettingsPanel getSliceSettingsPanel() {
         return pnlSliceSettings_;
+    }
+
+    public MultiPositionPanel getMultiPositionPanel() {
+        return pnlMultiPositions_;
     }
 
     private void acqFinishedCallback() {
