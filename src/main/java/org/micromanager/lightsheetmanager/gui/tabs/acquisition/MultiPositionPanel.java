@@ -1,6 +1,5 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
@@ -30,17 +29,17 @@ public class MultiPositionPanel extends Panel {
     }
 
     private void createUserInterface() {
-        final DefaultAcquisitionSettingsSCAPE acqSettings =
-                model_.acquisitions().settings();
 
-        Spinner.setDefaultSize(7);
+        // post move delay
         lblPostMoveDelay_ = new Label("Post-move delay [ms]:");
+        Spinner.setDefaultSize(8);
         spnPostMoveDelay_ = Spinner.createIntegerSpinner(
-                acqSettings.postMoveDelay(), 0, Integer.MAX_VALUE, 100);
-        btnEditPositionList_ = new Button("Edit Position List", 120, 24);
-        btnOpenXYZGrid_ = new Button("XYZ Grid", 80, 24);
+                model_.acquisitions().settings().postMoveDelay(),
+                0, Integer.MAX_VALUE, 100);
 
-        btnOpenXYZGrid_.setEnabled(false);
+        // XYZ grid
+        btnEditPositionList_ = new Button("Edit Position List...", 130, 24);
+        btnOpenXYZGrid_ = new Button("XYZ Grid...", 90, 24);
 
         add(btnEditPositionList_, "");
         add(btnOpenXYZGrid_, "wrap");
@@ -50,21 +49,32 @@ public class MultiPositionPanel extends Panel {
 
     private void createEventHandlers() {
 
-        btnOpenXYZGrid_.registerListener(e -> xyzGridFrame_.setVisible(true));
+        // open XYZ grid
+        btnOpenXYZGrid_.registerListener(e -> {
+            if (model_.devices().hasDevice("SampleXY")
+                    && model_.devices().hasDevice("SampleZ")) {
+                xyzGridFrame_.setVisible(true);
+            } else {
+                model_.studio().logs().showError(
+                        "SampleXY and SampleZ must not be \"Undefined\" to use the XYZ grid.");
+            }
+        });
+
+        // open position list
         btnEditPositionList_.registerListener(e -> model_.studio().app().showPositionList());
 
-        spnPostMoveDelay_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().postMoveDelay(spnPostMoveDelay_.getInt());
-            //System.out.println("getPostMoveDelay: " + model_.acquisitions().getAcquisitionSettings().getPostMoveDelay());
-        });
+        spnPostMoveDelay_.registerListener(e -> model_.acquisitions()
+                .settingsBuilder().postMoveDelay(spnPostMoveDelay_.getInt()));
 
     }
 
-    @Override
-    public void setEnabled(final boolean state) {
+    public void setPanelEnabled(final boolean state) {
         lblPostMoveDelay_.setEnabled(state);
         spnPostMoveDelay_.setEnabled(state);
         btnEditPositionList_.setEnabled(state);
     }
 
+    public XYZGridFrame getXYZGridFrame() {
+        return xyzGridFrame_;
+    }
 }

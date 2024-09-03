@@ -35,6 +35,7 @@ public class TimePointsPanel extends Panel {
                 "[]5[]"
         );
 
+        Spinner.setDefaultSize(6);
         lblNumTimePoints_ = new Label("Number:");
         lblTimePointInterval_ = new Label("Interval [s]:");
         spnNumTimePoints_ = Spinner.createIntegerSpinner(
