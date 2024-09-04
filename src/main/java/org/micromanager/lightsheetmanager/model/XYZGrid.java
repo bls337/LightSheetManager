@@ -9,8 +9,6 @@ import org.micromanager.lightsheetmanager.model.devices.XYStage;
 import org.micromanager.lightsheetmanager.model.utils.GeometryUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
-import java.util.Objects;
-
 /**
  * Creates an XYZ grid and puts it in a Micro-Manager {@code PositionList}.
  * <p>
@@ -34,13 +32,10 @@ public class XYZGrid {
     private double deltaY_;
     private double deltaZ_;
 
-    private int overlapYZ_;
-    private boolean clearYZ_;
+    private int overlapPercentYZ_;
+    private boolean clearPositions_;
 
-    private final LightSheetManager model_;
-
-    public XYZGrid(final LightSheetManager model) {
-        model_ = Objects.requireNonNull(model);
+    public XYZGrid() {
     }
 
     private int updateGridXCount() {
@@ -85,10 +80,10 @@ public class XYZGrid {
     /**
      * Computes grid (position list as well as slices/spacing) based on current settings
      */
-    public void computeGrid() {
+    public void computeGrid(final LightSheetManager model) {
 
-        XYStage xyStage = model_.devices().getDevice("SampleXY");
-        Stage zStage = model_.devices().getDevice("SampleZ");
+        XYStage xyStage = model.devices().getDevice("SampleXY");
+        Stage zStage = model.devices().getDevice("SampleZ");
 
         final int numX = useX_ ? updateGridXCount() : 1;
         final int numY = useY_ ? updateGridYCount() : 1;
@@ -105,9 +100,9 @@ public class XYZGrid {
         if (useX_) {
             // TODO: update GUI with values, aliases for asb and vsb?
             final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
-                    model_.acquisitions().settings().scanSettings().scanAngleFirstView(),true);
-            model_.acquisitions().settingsBuilder().volumeSettingsBuilder().sliceStepSize(Math.abs(deltaX_)/speedFactor);
-            model_.acquisitions().settingsBuilder().volumeSettingsBuilder().slicesPerView(numX);
+                    model.acquisitions().settings().scanSettings().scanAngleFirstView(),true);
+            model.acquisitions().settingsBuilder().volumeSettingsBuilder().sliceStepSize(Math.abs(deltaX_)/speedFactor);
+            model.acquisitions().settingsBuilder().volumeSettingsBuilder().slicesPerView(numX);
             // move to X center if we aren't generating a position list with it
             if (!useY_ && !useZ_) {
                 xyStage.setXYPosition(centerX, xyStage.getXYPosition().y); // TODO: make convenience method?
@@ -126,7 +121,7 @@ public class XYZGrid {
             startY = xyStage.getXYPosition().y; // Note: only the Y coordinate
         }
 
-        if (!useY_ && !useZ_ && !clearYZ_) {
+        if (!useY_ && !useZ_ && !clearPositions_) {
             return; // early exit => YZ unused
         }
 
@@ -160,7 +155,7 @@ public class XYZGrid {
                 }
             }
         }
-        model_.studio().positions().setPositionList(positionList);
+        model.studio().positions().setPositionList(positionList);
     }
 
     public boolean getUseX() {
@@ -188,19 +183,19 @@ public class XYZGrid {
     }
 
     public boolean getClearYZ() {
-        return clearYZ_;
+        return clearPositions_;
     }
 
     public void setClearYZ(final boolean state) {
-        clearYZ_ = state;
+        clearPositions_ = state;
     }
 
     public void setOverlapYZ(final int value) {
-        overlapYZ_ = value;
+        overlapPercentYZ_ = value;
     }
 
     public int getOverlapYZ() {
-        return overlapYZ_;
+        return overlapPercentYZ_;
     }
 
     public double getStartX() {
