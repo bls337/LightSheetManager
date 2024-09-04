@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.frames;
 
 import net.miginfocom.swing.MigLayout;
+import org.micromanager.PositionList;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
@@ -8,6 +9,7 @@ import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.internal.utils.WindowPositioning;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.XYZGrid;
 
 import javax.swing.JFrame;
@@ -241,11 +243,21 @@ public class XYZGridFrame extends JFrame {
         spnOverlapYZ_.registerListener(e ->
                 grid.setOverlapYZ(spnOverlapYZ_.getInt()));
 
-        // Buttons
+        // compute XYZ grid
         btnComputeGrid_.registerListener(e -> {
-                grid.computeGrid(model_);
-                loadFromSettings();
+            final PositionList positionList = model_.studio().positions().getPositionList();
+            if (positionList.getNumberOfPositions() != 0) {
+                final int result = DialogUtils.showYesNoDialog(this, "Warning",
+                        "Do you want to overwrite the existing position list?");
+                if (result == 1) {
+                    return; // early exit => do not overwrite
+                }
+            }
+            // no positions in list
+            grid.computeGrid(model_);
+            loadFromSettings();
         });
+
         btnEditPositionList_.registerListener(e ->
                 model_.studio().app().showPositionList());
         btnRunOverviewAcq_.registerListener(e ->
