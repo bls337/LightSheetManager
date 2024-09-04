@@ -119,7 +119,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
                 "Time Points", acqSettings.isUsingTimePoints());
         pnlTimePoints_ = new TimePointsPanel(model_, cbxUseTimePoints_);
         // disable elements based on acqSettings
-        pnlTimePoints_.setEnabled(acqSettings.isUsingTimePoints());
+        pnlTimePoints_.setPanelEnabled(acqSettings.isUsingTimePoints());
 
         // acquisition buttons
         pnlButtons_ = new Panel();
@@ -244,14 +244,14 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cbxUseMultiplePositions_.registerListener(e -> {
             final boolean isSelected = cbxUseMultiplePositions_.isSelected();
             model_.acquisitions().settingsBuilder().useMultiplePositions(isSelected);
-            pnlMultiPositions_.setEnabled(isSelected);
+            pnlMultiPositions_.setPanelEnabled(isSelected);
         });
 
         // time points
         cbxUseTimePoints_.registerListener(e -> {
             final boolean selected = cbxUseTimePoints_.isSelected();
             model_.acquisitions().settingsBuilder().useTimePoints(selected);
-            pnlTimePoints_.setEnabled(selected);
+            pnlTimePoints_.setPanelEnabled(selected);
             //updateDurationLabels();
         });
 
