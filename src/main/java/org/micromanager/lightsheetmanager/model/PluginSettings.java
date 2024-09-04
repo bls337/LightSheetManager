@@ -10,6 +10,12 @@ public class PluginSettings {
 
     private boolean isPollingPositions_ = true;
 
+    private XYZGrid xyzGrid_ = new XYZGrid();
+
+    public XYZGrid xyzGrid() {
+        return xyzGrid_;
+    }
+
     public void setPollingPositions(final boolean state) {
         isPollingPositions_ = state;
     }

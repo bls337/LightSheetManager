@@ -20,6 +20,22 @@ public class XYZGridFrame extends JFrame {
     private Button btnComputeGrid_;
     private Button btnRunOverviewAcq_;
 
+    private JLabel lblXStart_;
+    private JLabel lblYStart_;
+    private JLabel lblZStart_;
+
+    private JLabel lblXStop_;
+    private JLabel lblYStop_;
+    private JLabel lblZStop_;
+
+    private JLabel lblXDelta_;
+    private JLabel lblYDelta_;
+    private JLabel lblZDelta_;
+
+    private JLabel lblXCount_;
+    private JLabel lblYCount_;
+    private JLabel lblZCount_;
+
     private CheckBox cbxUseX_;
     private CheckBox cbxUseY_;
     private CheckBox cbxUseZ_;
@@ -50,6 +66,7 @@ public class XYZGridFrame extends JFrame {
         WindowPositioning.setUpBoundsMemory(this, this.getClass(), this.getClass().getSimpleName());
         createUserInterface();
         createEventHandlers();
+        loadFromSettings();
     }
 
     private void createUserInterface() {
@@ -90,67 +107,67 @@ public class XYZGridFrame extends JFrame {
         final Panel pnlButtons = new Panel();
 
         // X
-        final JLabel lblXStart = new JLabel("X start [µm]:");
-        final JLabel lblXStop = new JLabel("X stop [µm]:");
-        final JLabel lblXDelta = new JLabel("X delta [µm]:");
-        final JLabel lblXCount = new JLabel("Slice count:");
+        lblXStart_ = new JLabel("X start [µm]:");
+        lblXStop_ = new JLabel("X stop [µm]:");
+        lblXDelta_ = new JLabel("X delta [µm]:");
+        lblXCount_ = new JLabel("Slice count:");
 
         spnXStart_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
         spnXStop_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
         spnXDelta_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
 
         // Y
-        final JLabel lblYStart = new JLabel("Y start [µm]:");
-        final JLabel lblYStop = new JLabel("Y stop [µm]:");
-        final JLabel lblYDelta = new JLabel("Y delta [µm]:");
-        final JLabel lblYCount = new JLabel("Y count:");
+        lblYStart_ = new JLabel("Y start [µm]:");
+        lblYStop_ = new JLabel("Y stop [µm]:");
+        lblYDelta_ = new JLabel("Y delta [µm]:");
+        lblYCount_ = new JLabel("Y count:");
 
         spnYStart_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
         spnYStop_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
         spnYDelta_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
 
         // Z
-        final JLabel lblZStart = new JLabel("Z start [µm]:");
-        final JLabel lblZStop = new JLabel("Z stop [µm]:");
-        final JLabel lblZDelta = new JLabel("Z delta [µm]:");
-        final JLabel lblZCount = new JLabel("Z count:");
+        lblZStart_ = new JLabel("Z start [µm]:");
+        lblZStop_ = new JLabel("Z stop [µm]:");
+        lblZDelta_ = new JLabel("Z delta [µm]:");
+        lblZCount_ = new JLabel("Z count:");
 
         spnZStart_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
         spnZStop_ = Spinner.createDoubleSpinner(0.0, -Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
         spnZDelta_ = Spinner.createDoubleSpinner(0.0,-Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
 
         final Panel pnlSettings = new Panel("Grid Settings");
-        final JLabel lblOverlap = new JLabel("Overlap (Y and Z) [%]");
+        final JLabel lblOverlap = new JLabel("Overlap (Y and Z) [%]:");
         Spinner.setDefaultSize(4);
         spnOverlapYZ_ = Spinner.createIntegerSpinner(10, 0, 100, 1);
         cbxClearPositions_ = new CheckBox("Clear position list if YZ unused", false);
 
 
-        pnlX.add(lblXStart, "");
+        pnlX.add(lblXStart_, "");
         pnlX.add(spnXStart_, "wrap");
-        pnlX.add(lblXStop, "");
+        pnlX.add(lblXStop_, "");
         pnlX.add(spnXStop_, "wrap");
-        pnlX.add(lblXDelta, "");
+        pnlX.add(lblXDelta_, "");
         pnlX.add(spnXDelta_, "wrap");
-        pnlX.add(lblXCount, "");
+        pnlX.add(lblXCount_, "");
         pnlX.add(lblXCountValue_, "");
 
-        pnlY.add(lblYStart, "");
+        pnlY.add(lblYStart_, "");
         pnlY.add(spnYStart_, "wrap");
-        pnlY.add(lblYStop, "");
+        pnlY.add(lblYStop_, "");
         pnlY.add(spnYStop_, "wrap");
-        pnlY.add(lblYDelta, "");
+        pnlY.add(lblYDelta_, "");
         pnlY.add(spnYDelta_, "wrap");
-        pnlY.add(lblYCount, "");
+        pnlY.add(lblYCount_, "");
         pnlY.add(lblYCountValue_, "");
 
-        pnlZ.add(lblZStart, "");
+        pnlZ.add(lblZStart_, "");
         pnlZ.add(spnZStart_, "wrap");
-        pnlZ.add(lblZStop, "");
+        pnlZ.add(lblZStop_, "");
         pnlZ.add(spnZStop_, "wrap");
-        pnlZ.add(lblZDelta, "");
+        pnlZ.add(lblZDelta_, "");
         pnlZ.add(spnZDelta_, "wrap");
-        pnlZ.add(lblZCount, "");
+        pnlZ.add(lblZCount_, "");
         pnlZ.add(lblZCountValue_, "");
 
         pnlSettings.add(lblOverlap, "split 2");
@@ -172,50 +189,127 @@ public class XYZGridFrame extends JFrame {
     }
 
     private void createEventHandlers() {
-        final XYZGrid xyzGrid = model_.getXYZGrid();
+        final XYZGrid grid = model_.pluginSettings().xyzGrid();
 
         // Check Boxes
-        cbxUseX_.registerListener(e ->
-                xyzGrid.setUseX(cbxUseX_.isSelected()));
-        cbxUseY_.registerListener(e ->
-                xyzGrid.setUseY(cbxUseY_.isSelected()));
-        cbxUseZ_.registerListener(e ->
-                xyzGrid.setUseZ(cbxUseZ_.isSelected()));
+        cbxUseX_.registerListener(e -> {
+            final boolean selected = cbxUseX_.isSelected();
+            grid.setUseX(selected);
+            setEnabledX(selected);
+        });
+
+        cbxUseY_.registerListener(e -> {
+            final boolean selected = cbxUseY_.isSelected();
+            grid.setUseY(selected);
+            setEnabledY(selected);
+        });
+
+        cbxUseZ_.registerListener(e -> {
+            final boolean selected = cbxUseZ_.isSelected();
+            grid.setUseZ(selected);
+            setEnabledZ(selected);
+        });
+
+        cbxClearPositions_.registerListener(e ->
+                grid.setClearYZ(cbxClearPositions_.isSelected()));
 
         // Spinners X
         spnXStart_.registerListener(e ->
-                xyzGrid.setStartX(spnXStart_.getDouble()));
+                grid.setStartX(spnXStart_.getDouble()));
         spnXStop_.registerListener(e ->
-                xyzGrid.setStopX(spnXStop_.getDouble()));
+                grid.setStopX(spnXStop_.getDouble()));
         spnXDelta_.registerListener(e ->
-                xyzGrid.setDeltaX(spnXDelta_.getDouble()));
+                grid.setDeltaX(spnXDelta_.getDouble()));
 
         // Spinners Y
         spnYStart_.registerListener(e ->
-                xyzGrid.setStartY(spnYStart_.getDouble()));
+                grid.setStartY(spnYStart_.getDouble()));
         spnYStop_.registerListener(e ->
-                xyzGrid.setStopY(spnYStop_.getDouble()));
+                grid.setStopY(spnYStop_.getDouble()));
         spnYDelta_.registerListener(e ->
-                xyzGrid.setDeltaY(spnYDelta_.getDouble()));
+                grid.setDeltaY(spnYDelta_.getDouble()));
 
         // Spinners Z
         spnZStart_.registerListener(e ->
-                xyzGrid.setStartZ(spnZStart_.getDouble()));
+                grid.setStartZ(spnZStart_.getDouble()));
         spnZStop_.registerListener(e ->
-                xyzGrid.setStopZ(spnZStop_.getDouble()));
+                grid.setStopZ(spnZStop_.getDouble()));
         spnZDelta_.registerListener(e ->
-                xyzGrid.setDeltaZ(spnZDelta_.getDouble()));
+                grid.setDeltaZ(spnZDelta_.getDouble()));
 
         // Overlap
         spnOverlapYZ_.registerListener(e ->
-                xyzGrid.setOverlapYZ(spnOverlapYZ_.getInt()));
+                grid.setOverlapYZ(spnOverlapYZ_.getInt()));
 
         // Buttons
-        btnComputeGrid_.registerListener(e ->
-                xyzGrid.computeGrid());
+        btnComputeGrid_.registerListener(e -> {
+                grid.computeGrid(model_);
+                loadFromSettings();
+        });
         btnEditPositionList_.registerListener(e ->
                 model_.studio().app().showPositionList());
         btnRunOverviewAcq_.registerListener(e ->
-                model_.studio().logs().showError("Not implemented yet!"));
+                model_.studio().logs().showError("Not implemented yet!")); // TODO: !!!
+    }
+
+    private void loadFromSettings() {
+        final XYZGrid grid = model_.pluginSettings().xyzGrid();
+
+        cbxUseX_.setSelected(grid.getUseX());
+        cbxUseY_.setSelected(grid.getUseY());
+        cbxUseZ_.setSelected(grid.getUseZ());
+        cbxClearPositions_.setSelected(grid.getClearYZ());
+
+        spnXStart_.setValue(grid.getStartX());
+        spnYStart_.setValue(grid.getStartY());
+        spnZStart_.setValue(grid.getStartZ());
+
+        spnXStop_.setValue(grid.getStopX());
+        spnYStop_.setValue(grid.getStopY());
+        spnZStop_.setValue(grid.getStopZ());
+
+        spnXDelta_.setValue(grid.getDeltaX());
+        spnYDelta_.setValue(grid.getDeltaY());
+        spnZDelta_.setValue(grid.getDeltaZ());
+
+        spnOverlapYZ_.setValue(grid.getOverlapYZ());
+
+        // enable/disable based on loaded settings
+        setEnabledX(grid.getUseX());
+        setEnabledY(grid.getUseY());
+        setEnabledZ(grid.getUseZ());
+    }
+
+    private void setEnabledX(final boolean state) {
+        lblXStart_.setEnabled(state);
+        lblXStop_.setEnabled(state);
+        lblXDelta_.setEnabled(state);
+        spnXStart_.setEnabled(state);
+        spnXStop_.setEnabled(state);
+        spnXDelta_.setEnabled(state);
+        lblXCount_.setEnabled(state);
+        lblXCountValue_.setEnabled(state);
+    }
+
+    private void setEnabledY(final boolean state) {
+        lblYStart_.setEnabled(state);
+        lblYStop_.setEnabled(state);
+        lblYDelta_.setEnabled(state);
+        spnYStart_.setEnabled(state);
+        spnYStop_.setEnabled(state);
+        spnYDelta_.setEnabled(state);
+        lblYCount_.setEnabled(state);
+        lblYCountValue_.setEnabled(state);
+    }
+
+    private void setEnabledZ(final boolean state) {
+        lblZStart_.setEnabled(state);
+        lblZStop_.setEnabled(state);
+        lblZDelta_.setEnabled(state);
+        spnZStart_.setEnabled(state);
+        spnZStop_.setEnabled(state);
+        spnZDelta_.setEnabled(state);
+        lblZCount_.setEnabled(state);
+        lblZCountValue_.setEnabled(state);
     }
 }

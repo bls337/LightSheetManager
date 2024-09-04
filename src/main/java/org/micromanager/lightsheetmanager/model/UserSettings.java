@@ -22,11 +22,12 @@ public class UserSettings {
     private final String userName_;
     private final MutablePropertyMapView settings_;
 
+    private static final String SETTINGS_PLUGIN =  "LSM_PLUGIN_SETTINGS";
+
     // This is the prefix String for saving the current acquisition settings
     // based on the microscope geometry type, "LSM_ACQ_SETTINGS_SCAPE" for example.
     // Note: GeometryType will be converted to uppercase: "LSM_ACQ_SETTINGS_DISPIM".
-    private static final String SETTINGS_KEY =  "LSM_PLUGIN_SETTINGS";
-    private static final String SETTINGS_PREFIX_KEY = "LSM_ACQ_SETTINGS_";
+    private static final String SETTINGS_PREFIX = "LSM_ACQ_SETTINGS_";
     private static final String SETTINGS_NOT_FOUND = "Settings Not Found";
 
     // Note: increase this value based on the amount of nested json in the settings
@@ -75,7 +76,7 @@ public class UserSettings {
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
 
-        final String key = SETTINGS_PREFIX_KEY + geometryType.toString().toUpperCase();
+        final String key = SETTINGS_PREFIX + geometryType.toString().toUpperCase();
         final String json = settings_.getString(key, SETTINGS_NOT_FOUND);
 
         // use default settings if settings data not found in profile
@@ -97,12 +98,12 @@ public class UserSettings {
         }
 
         // load plugin settings or default plugin settings
-        final String jsonStr = settings_.getString(SETTINGS_KEY, SETTINGS_NOT_FOUND);
+        final String jsonStr = settings_.getString(SETTINGS_PLUGIN, SETTINGS_NOT_FOUND);
         if (jsonStr.equals(SETTINGS_NOT_FOUND)) {
             model_.studio().logs().logDebugMessage("settings not found, using default plugin settings.");
         } else {
             model_.pluginSettings(PluginSettings.fromJson(jsonStr));
-            model_.studio().logs().logDebugMessage("loaded PluginSettings from " + SETTINGS_KEY + ": "
+            model_.studio().logs().logDebugMessage("loaded PluginSettings from " + SETTINGS_PLUGIN + ": "
                     + model_.pluginSettings().toPrettyJson());
         }
     }
@@ -117,7 +118,7 @@ public class UserSettings {
         // settings key based on geometry type
         final GeometryType geometryType = model_.devices()
                 .getDeviceAdapter().getMicroscopeGeometry();
-        final String key = SETTINGS_PREFIX_KEY +
+        final String key = SETTINGS_PREFIX +
                 geometryType.toString().toUpperCase();
 
         // save acquisition settings
@@ -126,8 +127,8 @@ public class UserSettings {
                 + model_.acquisitions().settings().toPrettyJson());
 
         // save plugin settings
-        settings_.putString(SETTINGS_KEY, model_.pluginSettings().toJson());
-        model_.studio().logs().logDebugMessage("saved PluginSettings to " + SETTINGS_KEY + ": "
+        settings_.putString(SETTINGS_PLUGIN, model_.pluginSettings().toJson());
+        model_.studio().logs().logDebugMessage("saved PluginSettings to " + SETTINGS_PLUGIN + ": "
                 + model_.pluginSettings().toPrettyJson());
     }
 
