@@ -61,11 +61,12 @@ public class XYZGridFrame extends JFrame {
     private JLabel lblYCountValue_;
     private JLabel lblZCountValue_;
 
-    private LightSheetManager model_;
+    private final LightSheetManager model_;
 
     public XYZGridFrame(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
-        WindowPositioning.setUpBoundsMemory(this, this.getClass(), this.getClass().getSimpleName());
+        WindowPositioning.setUpBoundsMemory(this,
+                this.getClass(), this.getClass().getSimpleName());
         createUserInterface();
         createEventHandlers();
         loadFromSettings();
