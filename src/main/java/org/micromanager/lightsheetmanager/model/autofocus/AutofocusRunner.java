@@ -47,7 +47,7 @@ public class AutofocusRunner {
         }
 
         final String scoringAlgorithmName = acqSettings.autofocusSettings()
-                .scoringAlgorithm().toString();
+                .scoringMethod().toString();
 
         // set scoring algorithm
         try {
@@ -70,8 +70,8 @@ public class AutofocusRunner {
                 + scoringAlgorithmName + "\" algorithm, mode \"" + afMode + "\"");
 
         final int numImages = acqSettings.autofocusSettings().numImages();
-        final double stepSize = acqSettings.autofocusSettings().stepSize();
-        final double minimumRSquared = acqSettings.autofocusSettings().r2();
+        final double stepSize = acqSettings.autofocusSettings().stepSizeUm();
+        //final double minimumRSquared = acqSettings.autofocusSettings().toleranceUm();
 
         // TODO: view 1?
         final double imagingCenter = acqSettings.sheetCalibration(1).imagingCenter();

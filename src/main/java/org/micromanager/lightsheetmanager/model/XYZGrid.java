@@ -125,6 +125,15 @@ public class XYZGrid {
             return; // early exit => YZ unused
         }
 
+        // TODO: where to put prompt?
+//        PositionList positionList = model_.studio().positions().getPositionList();
+//        final boolean isPositionListEmpty = positionList.getNumberOfPositions() == 0;
+//        if (!isPositionListEmpty) {
+//            final boolean overwrite = false;
+//            if (!overwrite) {
+//                return; // early exit => nothing to do
+//            }
+//        }
         PositionList positionList = new PositionList();
         if (useY_ || useZ_) {
             for (int iz = 0; iz < numZ; ++iz) {
