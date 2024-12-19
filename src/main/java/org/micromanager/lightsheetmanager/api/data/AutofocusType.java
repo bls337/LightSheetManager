@@ -9,7 +9,6 @@ import java.util.stream.Stream;
  * The type of scoring algorithm for the general autofocus settings.
  */
 public enum AutofocusType {
-    NONE("None"),
     EDGES("Edges"),
     STD_DEV("StdDev"),
     MEAN("Mean"),
@@ -38,7 +37,7 @@ public enum AutofocusType {
     }
 
     public static AutofocusType fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, AutofocusType.NONE);
+        return stringToEnum.getOrDefault(symbol, AutofocusType.EDGES);
     }
 
     @Override

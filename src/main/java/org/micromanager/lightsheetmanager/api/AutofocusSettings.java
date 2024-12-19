@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.api;
 
 
-import org.micromanager.lightsheetmanager.api.data.AutofocusFitType;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 
@@ -21,18 +20,32 @@ public interface AutofocusSettings {
         Builder numImages(final int numImages);
 
         /**
-         * Set the channel to run the autofocus routine on.
-         *
-         * @param channel the channel to run autofocus on
-         */
-        Builder channel(final String channel);
-
-        /**
          * Sets the spacing between images in the autofocus routine.
          *
          * @param stepSize the step size in microns
          */
-        Builder stepSize(final double stepSize);
+        Builder stepSizeUm(final double stepSize);
+
+//        /**
+//         * Sets the tolerance in microns for the autofocus algorithm.
+//         *
+//         * @param value the tolerance in microns
+//         */
+//        Builder toleranceUm(final double value);
+
+        /**
+         * Set to {@code true} to show the images in the live view window.
+         *
+         * @param state {@code true} to show images
+         */
+        Builder showImages(final boolean state);
+
+        /**
+         * Set to {@code true} to show a graph of the data.
+         *
+         * @param state {@code true} to show the graph
+         */
+        Builder showGraph(final boolean state);
 
         /**
          * Selects whether to fix the piezo or the sheet for an autofocus routine.
@@ -46,50 +59,37 @@ public interface AutofocusSettings {
          *
          * @param type the scoring algorithm
          */
-        Builder scoringAlgorithm(final AutofocusType type);
+        Builder scoringMethod(final AutofocusType type);
 
         /**
-         * Sets the type of curve fitting algorithm to use with autofocus..
+         * Set the channel to run the autofocus routine on.
          *
-         * @param type the curve fitting algorithm
+         * @param channel the channel to run autofocus on
          */
-        Builder fit(final AutofocusFitType type);
+        Builder channel(final String channel);
 
         // TODO: maybe denote that these are related to acquisitions
 
-        /**
-         * Sets the amount of time to delay between acquiring time points.
-         */
-        Builder timePointInterval(final int timePointInterval);
+//        /**
+//         * Run autofocus every time we move to the next channel during an acquisition.
+//         *
+//         * @param state true to enable autofocus every stage pass
+//         */
+//        Builder useEveryStagePass(final boolean state);
+//
+//        /**
+//         * Run an autofocus routine before starting the acquisition.
+//         *
+//         * @param state true or false
+//         */
+//        Builder useBeforeAcquisition(final boolean state);
 
-        /**
-         * Run autofocus every time we move to the next channel during an acquisition.
-         *
-         * @param state true to enable autofocus every stage pass
-         */
-        Builder useEveryStagePass(final boolean state);
 
-        /**
-         * Run an autofocus routine before starting the acquisition.
-         *
-         * @param state true or false
-         */
-        Builder useBeforeAcquisition(final boolean state);
-
-        ///////////////////////////
-
-        /**
-         * Sets the coefficient of determination for the autofocus algorithm.
-         *
-         * @param value the coefficient of determination
-         */
-        Builder r2(final double value);
-
-        Builder maxOffset(final double maxOffset); // +/- um
-
-        Builder autoUpdateOffset(final boolean state);
-
-        Builder autoUpdateMaxOffset(final double um);
+//        Builder maxOffset(final double maxOffset); // +/- um
+//
+//        Builder autoUpdateOffset(final boolean state);
+//
+//        Builder autoUpdateMaxOffset(final double um);
 
         /**
          * Creates an immutable instance of AutofocusSettings
@@ -118,7 +118,14 @@ public interface AutofocusSettings {
      *
      * @return the step size in microns
      */
-    double stepSize();
+    double stepSizeUm();
+
+//    /**
+//     * Returns the coefficient of determination used in the autofocus routine.
+//     *
+//     * @return the coefficient of determination
+//     */
+//    double toleranceUm();
 
     /**
      * Returns the autofocus mode being used.
@@ -132,37 +139,7 @@ public interface AutofocusSettings {
      *
      * @return the type of scoring algorithm
      */
-    AutofocusType scoringAlgorithm();
-
-    AutofocusFitType fit();
-
-    /**
-     * Returns the coefficient of determination used in the autofocus routine.
-     *
-     * @return the coefficient of determination
-     */
-    double r2();
-
-    /**
-     * Returns the amount of time to delay between acquiring time points.
-     *
-     * @return the amount of time to delay between acquiring time points
-     */
-    int timePointInterval();
-
-    /**
-     * Returns true if autofocus is run every stage pass.
-     *
-     * @return true if autofocus is run every stage pass
-     */
-    boolean useEveryStagePass();
-
-    /**
-     * Returns true if we run an autofocus routine before starting an acquisition.
-     *
-     * @return true if enabled
-     */
-    boolean useBeforeAcquisition();
+    AutofocusType scoringMethod();
 
     /**
      * Returns the channel autofocus is being run on.
@@ -171,15 +148,29 @@ public interface AutofocusSettings {
      */
     String channel();
 
+//    /**
+//     * Returns true if autofocus is run every stage pass.
+//     *
+//     * @return true if autofocus is run every stage pass
+//     */
+//    boolean useEveryStagePass();
+//
+//    /**
+//     * Returns true if we run an autofocus routine before starting an acquisition.
+//     *
+//     * @return true if enabled
+//     */
+//    boolean useBeforeAcquisition();
+
    /**
     * What is this?
     *
     * @return
     */
-    double maxOffset(); // used during acquisitions
-
-    boolean autoUpdateOffset();
-
-    double autoUpdateMaxOffset();
+//    double maxOffset(); // used during acquisitions
+//
+//    boolean autoUpdateOffset();
+//
+//    double autoUpdateMaxOffset();
 
 }

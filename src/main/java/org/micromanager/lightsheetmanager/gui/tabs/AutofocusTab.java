@@ -1,16 +1,16 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
-import org.micromanager.lightsheetmanager.api.data.AutofocusFitType;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
-import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.awt.Font;
 import java.util.Objects;
@@ -22,13 +22,13 @@ public class AutofocusTab extends Panel implements ListeningPanel {
 
     // general autofocus options
     private CheckBox cbxShowImages_;
-    private CheckBox cbxShowPlot_;
+    private CheckBox cbxShowGraph_;
     private Spinner spnNumImages_;
     private Spinner spnStepSize_;
-    private Spinner spnMinimumR2_;
+    //private Spinner spnToleranceUm_;
     private ComboBox cmbAutofocusMode_;
-    private ComboBox cmbScoringAlgorithm_;
-    private ComboBox cmbFittingFunction_;
+    private ComboBox cmbScoringMethod_;
+    private Button btnRunAutofocus_;
 
     // autofocus options during setup
     private CheckBox cbxAutofocusEveryPass_;
@@ -43,7 +43,7 @@ public class AutofocusTab extends Panel implements ListeningPanel {
     private Spinner spnMaxOffsetSetup_;
     private CheckBox cbxAutoUpdateFocusFound_;
 
-    private LightSheetManager model_;
+    private final LightSheetManager model_;
 
     public AutofocusTab(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
@@ -58,9 +58,9 @@ public class AutofocusTab extends Panel implements ListeningPanel {
         final Label lblTitle = new Label("Autofocus Settings", Font.BOLD, 18);
 
         setMigLayout(
-            "",
-            "[]10[]",
-            "[]10[]"
+                "",
+                "[]10[]",
+                "[]10[]"
         );
 
         String[] labels = {"None"};
@@ -72,30 +72,31 @@ public class AutofocusTab extends Panel implements ListeningPanel {
 
         // general autofocus options
         final Label lblNumImages = new Label("Number of Images:");
-        final Label lblStepSize = new Label("Step Size [\u00B5m]:");
+        final Label lblStepSizeUm = new Label("Step Size [µm]:");
         final Label lblMode = new Label("Mode:");
         final Label lblScoringAlgorithm = new Label("Scoring algorithm:");
-        final Label lblFittingFunction = new Label("Fit using:");
-        final Label lblMinimumR2 = new Label("<html>Minimum R<sup>2</sup></html>");
+       // final Label lblToleranceUm = new Label("Tolerance [µm]");
 
-        cbxShowImages_ = new CheckBox("Show Images", 12, true, CheckBox.RIGHT);
-        cbxShowPlot_ = new CheckBox("Show Plot", 12, true, CheckBox.RIGHT);
+        cbxShowImages_ = new CheckBox("Show Images", 12,
+                acqSettings.autofocusSettings().showImages(), CheckBox.RIGHT);
+        cbxShowGraph_ = new CheckBox("Show Graph", 12,
+                acqSettings.autofocusSettings().showGraph(), CheckBox.RIGHT);
 
         spnNumImages_ = Spinner.createIntegerSpinner(
                 acqSettings.autofocusSettings().numImages(), 0, Integer.MAX_VALUE, 1);
         spnStepSize_ = Spinner.createDoubleSpinner(
-                acqSettings.autofocusSettings().stepSize(), 0.0, 100.0, 1.0);
-        spnMinimumR2_ = Spinner.createDoubleSpinner(
-                acqSettings.autofocusSettings().r2(), 0.0, 1.0, 0.01);
+                acqSettings.autofocusSettings().stepSizeUm(), 0.0, 100.0, 1.0);
+//        spnToleranceUm_ = Spinner.createDoubleSpinner(
+//                acqSettings.autofocusSettings().toleranceUm(), 0.0, 1.0, 0.01);
 
         ComboBox.setDefaultSize(120, 20);
-        cmbScoringAlgorithm_ = new ComboBox(AutofocusType.toArray(),
-                acqSettings.autofocusSettings().scoringAlgorithm().toString());
-        cmbFittingFunction_ = new ComboBox(AutofocusFitType.toArray(),
-                acqSettings.autofocusSettings().fit().toString());
+        cmbScoringMethod_ = new ComboBox(AutofocusType.toArray(),
+                acqSettings.autofocusSettings().scoringMethod().toString());
         ComboBox.setDefaultSize(140, 20);
         cmbAutofocusMode_ = new ComboBox(AutofocusMode.toArray(),
                 acqSettings.autofocusSettings().mode().toString());
+
+        btnRunAutofocus_ = new Button("Run Autofocus", 120, 30);
 
         // autofocus options during acquisition
         final Label lblTimePoints = new Label("time points");
@@ -112,7 +113,7 @@ public class AutofocusTab extends Panel implements ListeningPanel {
 
         // autofocus options during setup
         lblMaxOffsetSetup_ = new Label("Max offset change: ");
-        lblMaxOffsetSetupUm_ = new Label("\u00B5m (\u00B1)");
+        lblMaxOffsetSetupUm_ = new Label("µm (±)");
         cbxAutoUpdateFocusFound_ = new CheckBox("Automatically update offset if focus found", 12, false, CheckBox.RIGHT);
         spnMaxOffsetSetup_ = Spinner.createIntegerSpinner(3, 0, 10, 1);
         setSetupOptionsState(false);
@@ -133,19 +134,18 @@ public class AutofocusTab extends Panel implements ListeningPanel {
 
         // general autofocus options
         pnlGeneralOptions.add(cbxShowImages_, "");
-        pnlGeneralOptions.add(cbxShowPlot_, "wrap");
+        pnlGeneralOptions.add(cbxShowGraph_, "wrap");
         pnlGeneralOptions.add(lblNumImages, "");
         pnlGeneralOptions.add(spnNumImages_, "wrap");
-        pnlGeneralOptions.add(lblStepSize, "");
+        pnlGeneralOptions.add(lblStepSizeUm, "");
         pnlGeneralOptions.add(spnStepSize_, "wrap");
-        pnlGeneralOptions.add(lblMinimumR2, "");
-        pnlGeneralOptions.add(spnMinimumR2_, "wrap");
+     //   pnlGeneralOptions.add(lblToleranceUm, "");
+     //   pnlGeneralOptions.add(spnToleranceUm_, "wrap");
         pnlGeneralOptions.add(lblScoringAlgorithm, "");
-        pnlGeneralOptions.add(cmbScoringAlgorithm_, "wrap");
-        pnlGeneralOptions.add(lblFittingFunction, "");
-        pnlGeneralOptions.add(cmbFittingFunction_, "wrap");
+        pnlGeneralOptions.add(cmbScoringMethod_, "wrap");
         pnlGeneralOptions.add(lblMode, "");
-        pnlGeneralOptions.add(cmbAutofocusMode_, "");
+        pnlGeneralOptions.add(cmbAutofocusMode_, "wrap");
+        pnlGeneralOptions.add(btnRunAutofocus_, "");
 
         // autofocus options during acquisition
         pnlAcqActiveOptions.add(cbxAutofocusEveryPass_, "span 3, wrap");
@@ -157,7 +157,7 @@ public class AutofocusTab extends Panel implements ListeningPanel {
         pnlAcqActiveOptions.add(cmbAutofocusChannel_, "wrap");
         pnlAcqActiveOptions.add(lblMaxOffsetActive, "");
         pnlAcqActiveOptions.add(spnMaxOffset_, "");
-        pnlAcqActiveOptions.add(new Label("\u00B5m (\u00B1)"), "");
+        pnlAcqActiveOptions.add(new Label("µm (±)"), "");
 
         // autofocus options during setup
         pnlAcqSetupOptions.add(cbxAutoUpdateFocusFound_, "span 3, wrap");
@@ -173,10 +173,10 @@ public class AutofocusTab extends Panel implements ListeningPanel {
         pnlMoveCorrection.add(cmbChannel, "wrap");
         pnlMoveCorrection.add(lblMaxDistance, "");
         pnlMoveCorrection.add(spnMaxDistance, "");
-        pnlMoveCorrection.add(new Label("\u00B5m (\u00B1)"), "wrap");
+        pnlMoveCorrection.add(new Label("µm (±)"), "wrap");
         pnlMoveCorrection.add(lblMinMovement, "");
         pnlMoveCorrection.add(spnMinMovement, "");
-        pnlMoveCorrection.add(new Label("\u00B5m (\u00B1)"), "");
+        pnlMoveCorrection.add(new Label("µm (±)"), "");
 
         // add panels to tab
         add(pnlGeneralOptions, "");
@@ -189,47 +189,33 @@ public class AutofocusTab extends Panel implements ListeningPanel {
         lblMaxOffsetSetup_.setEnabled(state);
         spnMaxOffsetSetup_.setEnabled(state);
         lblMaxOffsetSetupUm_.setEnabled(state);
-
     }
 
     private void createEventHandlers() {
 
         // general autofocus settings
-        cbxShowImages_.registerListener(e -> {
-            //System.out.println("cbxShowImages_: " + cbxShowImages_.isSelected());
-        });
+        cbxShowImages_.registerListener(e -> model_.acquisitions().settingsBuilder()
+                .autofocusSettingsBuilder().showImages(cbxShowImages_.isSelected()));
 
-        cbxShowPlot_.registerListener(e -> {
-            //System.out.println("cbxShowPlot_: " + cbxShowPlot_.isSelected());
-        });
+        cbxShowGraph_.registerListener(e -> model_.acquisitions().settingsBuilder()
+                .autofocusSettingsBuilder().showGraph(cbxShowGraph_.isSelected()));
 
-        spnNumImages_.registerListener(e ->
-                model_.acquisitions().settingsBuilder()
-                        .autofocusSettingsBuilder().numImages(spnNumImages_.getInt()));
+        spnNumImages_.registerListener(e -> model_.acquisitions().settingsBuilder()
+                .autofocusSettingsBuilder().numImages(spnNumImages_.getInt()));
 
-        spnStepSize_.registerListener(e ->
-                model_.acquisitions().settingsBuilder()
-                        .autofocusSettingsBuilder().stepSize(spnStepSize_.getDouble()));
+        spnStepSize_.registerListener(e -> model_.acquisitions().settingsBuilder()
+                .autofocusSettingsBuilder().stepSizeUm(spnStepSize_.getDouble()));
 
-        spnMinimumR2_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder()
-                    .autofocusSettingsBuilder().r2(spnMinimumR2_.getDouble());
-        });
+     //   spnToleranceUm_.registerListener(e -> model_.acquisitions().settingsBuilder()
+     //          .autofocusSettingsBuilder().toleranceUm(spnToleranceUm_.getDouble()));
 
-        cmbAutofocusMode_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().autofocusSettingsBuilder()
-                    .mode(AutofocusMode.fromString(cmbAutofocusMode_.getSelected()));
-        });
+        cmbAutofocusMode_.registerListener(e -> model_.acquisitions().settingsBuilder()
+                .autofocusSettingsBuilder().mode(AutofocusMode.fromString(cmbAutofocusMode_.getSelected())));
 
-        cmbScoringAlgorithm_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().autofocusSettingsBuilder()
-                    .scoringAlgorithm(AutofocusType.fromString(cmbScoringAlgorithm_.getSelected()));
-        });
+        cmbScoringMethod_.registerListener(e -> model_.acquisitions().settingsBuilder()
+                .autofocusSettingsBuilder().scoringMethod(AutofocusType.fromString(cmbScoringMethod_.getSelected())));
 
-        cmbFittingFunction_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().autofocusSettingsBuilder()
-                    .fit(AutofocusFitType.fromString(cmbFittingFunction_.getSelected()));
-        });
+        btnRunAutofocus_.registerListener(e -> model_.acquisitions().autofocus().run());
 
         // autofocus options during acquisition
         cbxAutofocusEveryPass_.registerListener(e -> {
@@ -264,4 +250,5 @@ public class AutofocusTab extends Panel implements ListeningPanel {
     public void unselected() {
 
     }
+
 }

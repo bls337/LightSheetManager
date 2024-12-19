@@ -7,7 +7,6 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.model.PluginSettings;
 import org.micromanager.lightsheetmanager.model.UserSettings;
-import org.micromanager.lightsheetmanager.model.XYZGrid;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineDISPIM;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineSCAPE;
