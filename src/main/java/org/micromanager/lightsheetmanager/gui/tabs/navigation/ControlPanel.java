@@ -496,7 +496,7 @@ public class ControlPanel extends Panel implements Subscriber {
 
     @Override
     public void update(String topic, Object value) {
-       System.out.println("topic: " + topic + " obj:" + value);
+       //System.out.println("topic: " + topic + " obj:" + value);
        EventQueue.invokeLater(() -> {
           lblPosition_.setText(String.format("%.3f %s", updateMethod_.update(), units_));
        });

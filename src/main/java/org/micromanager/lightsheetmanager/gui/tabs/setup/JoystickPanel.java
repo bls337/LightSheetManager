@@ -24,7 +24,7 @@ public class JoystickPanel extends Panel {
     }
 
     private void createUserInterface() {
-        final JLabel lblJoystick = new JLabel("JoysticK:");
+        final JLabel lblJoystick = new JLabel("Joystick:");
         final JLabel lblLeftWheel = new JLabel("Left Wheel:");
         final JLabel lblRightWheel = new JLabel("Right Wheel:");
 
