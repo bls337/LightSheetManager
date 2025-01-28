@@ -85,9 +85,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     boolean run() {
-        final boolean isPolling = frame_.getNavigationPanel().isPolling();
+        final boolean isPolling = model_.positions().isPolling();
         if (isPolling) {
-            frame_.getNavigationPanel().stopPolling();
+            model_.positions().stopPolling();
             studio_.logs().logMessage("stopped position polling");
         }
 
@@ -144,10 +144,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
                 // if X speed is less than 0.2 mm/s then it probably wasn't restored to correct speed some other time
                 if (origSpeedX_ < 0.2) {
-                    final int result = DialogUtils.showYesNoDialog(frame_, "Change Speed",
+                    final boolean result = DialogUtils.showYesNoDialog(frame_, "Change Speed",
                             "Max speed of X axis is small, perhaps it was not correctly restored after " +
                                     "stage scanning previously. Do you want to set it to 1 mm/s now?");
-                    if (result == 0) {
+                    if (result) {
                         xyStage.setSpeedX(1.0);
                     }
                 }
@@ -715,7 +715,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // start polling for navigation panel
         if (isPolling) {
             studio_.logs().logMessage("started position polling after acquisition");
-            frame_.getNavigationPanel().startPolling();
+            model_.positions().startPolling();
         }
         return true;
     }

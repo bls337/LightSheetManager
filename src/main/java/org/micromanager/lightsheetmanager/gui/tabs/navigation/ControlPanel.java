@@ -1,11 +1,13 @@
 package org.micromanager.lightsheetmanager.gui.tabs.navigation;
 
+import mmcorej.CMMCore;
+import mmcorej.DeviceType;
+import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
-import mmcorej.CMMCore;
-import mmcorej.DeviceType;
-import org.micromanager.Studio;
+import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
+import org.micromanager.lightsheetmanager.model.positions.Subscriber;
 
 import javax.swing.JLabel;
 import java.awt.Dimension;
@@ -15,22 +17,37 @@ import java.util.Objects;
 
 // TODO: add tooltips for the buttons!
 
-public class ControlPanel extends Panel {
+public class ControlPanel extends Panel implements Subscriber {
 
-    enum Axis {
+    public enum Axis {
         NONE,
         X,
         Y
     }
 
-    private final Studio studio_;
+    public enum Units {
+        MICRONS("µm"),
+        DEGREES("°");
+
+        private final String text_;
+
+        Units(final String text) {
+           text_ = text;
+        }
+
+        @Override
+        public String toString() {
+           return text_;
+        }
+    }
+
     private final CMMCore core_;
 
-    private String propertyName_;
+    private String propertyName_; // name in device adapter
     private String deviceName_;
     private DeviceType deviceType_;
-    private Axis deviceAxis_;
-    private String units_;
+    private Axis axis_;
+    private Units units_;
 
     private JLabel lblPropertyName_;
     private JLabel lblPosition_;
@@ -43,15 +60,16 @@ public class ControlPanel extends Panel {
     private Button btnSetZero_;
 
     private UpdateMethod updateMethod_;
+    private final LightSheetManager model_;
 
-    public ControlPanel(final Studio studio, final String propertyName, final String deviceName, final DeviceType deviceType, final Axis axis) {
+    public ControlPanel(final LightSheetManager model, final String propertyName, final String deviceName, final DeviceType deviceType, final Axis axis, final Units units) {
+        model_ = Objects.requireNonNull(model);
+        core_ = model_.studio().core();
         propertyName_ = Objects.requireNonNull(propertyName);
         deviceName_ = Objects.requireNonNull(deviceName);
         deviceType_ = Objects.requireNonNull(deviceType);
-        deviceAxis_ = Objects.requireNonNull(axis);
-        studio_ = Objects.requireNonNull(studio);
-        core_ = studio.core();
-        units_ = "µm"; // microns
+        axis_ = axis;
+        units_ = units;
         setUpdateMethod();
         createUserInterface();
         createEventHandlers();
@@ -61,19 +79,21 @@ public class ControlPanel extends Panel {
         return propertyName_;
     }
 
-    public void setUnits(final String units) {
-        units_ = units;
-    }
-
     public DeviceType getDeviceType() {
         return deviceType_;
     }
 
     public void createUserInterface() {
 
+        // change start value if using degrees
+        double startValue = 100.0;
+        if (units_ == Units.DEGREES) {
+            startValue = 1.0;
+        }
+
         Button.setDefaultSize(120, 20);
-        spnRelativeMove_ = Spinner.createDoubleSpinner(100.0, 0.0, Double.MAX_VALUE, 1.0);
-        spnAbsoluteMove_ = Spinner.createDoubleSpinner(100.0, 0.0, Double.MAX_VALUE, 1.0);
+        spnRelativeMove_ = Spinner.createDoubleSpinner(startValue, 0.0, Double.MAX_VALUE, 1.0);
+        spnAbsoluteMove_ = Spinner.createDoubleSpinner(startValue, -Double.MAX_VALUE, Double.MAX_VALUE, 1.0);
         spnRelativeMove_.setColumnSize(8);
         spnAbsoluteMove_.setColumnSize(8);
 
@@ -84,13 +104,17 @@ public class ControlPanel extends Panel {
         btnRelMoveMinus_ = new Button("-");
 
         Button.setDefaultSize(100, 20);
-
-        btnMoveToZero_ = new Button("Zero", 60, 20);
+        btnMoveToZero_ = new Button("Go to 0", 80, 20);
         if (isStageDevice()) {
-            btnSetZero_ = new Button("Set Zero", 80, 20);
+            btnSetZero_ = new Button("Set 0", 80, 20);
+            btnSetZero_.setToolTipText("");
         }
 
-        lblPropertyName_ = new JLabel(propertyName_);
+        String propName = propertyName_;
+        if (axis_ != Axis.NONE) {
+            propName = propertyName_ + ": " + axis_ + " Axis";
+        }
+        lblPropertyName_ = new JLabel(propName);
         lblPropertyName_.setMinimumSize(new Dimension(95, 20));
 
         lblPosition_ = new JLabel();
@@ -100,6 +124,11 @@ public class ControlPanel extends Panel {
         } else {
             lblPosition_.setText("0.000");
         }
+
+        btnAbsoluteMove_.setToolTipText("Send an absolute move command to the device.");
+        btnRelMovePlus_.setToolTipText("Sends a relative move command to the device.");
+        btnRelMoveMinus_.setToolTipText("Sends a relative move command to the device.");
+        btnMoveToZero_.setToolTipText("");
 
         add(lblPosition_, "");
         add(lblPropertyName_, "");
@@ -118,8 +147,10 @@ public class ControlPanel extends Panel {
      * Attaches button functions to ui elements.
      */
     private void createEventHandlers() {
-        if (deviceType_ == DeviceType.XYStageDevice) { // TODO: isMultiAxisDevice method?
-            switch (deviceAxis_) {
+        model_.positions().register(this, propertyName_);
+
+        if (deviceType_ == DeviceType.XYStageDevice) {
+            switch (axis_) {
                 case X:
                     btnRelMovePlus_.registerListener(e ->
                             setRelativeXPosition(spnRelativeMove_.getDouble()));
@@ -128,7 +159,13 @@ public class ControlPanel extends Panel {
                     btnAbsoluteMove_.registerListener(e ->
                             setXPosition(spnAbsoluteMove_.getDouble()));
                     btnMoveToZero_.registerListener(e -> setXPosition(0.0));
-                    btnSetZero_.registerListener(e -> setOriginX());
+                    btnSetZero_.registerListener(e -> {
+                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
+                             "This will change the coordinate system. Are you sure you would like to proceed?");
+                       if (result) {
+                          setOriginX();
+                       }
+                    });
                     break;
                 case Y:
                     btnRelMovePlus_.registerListener(e ->
@@ -138,7 +175,14 @@ public class ControlPanel extends Panel {
                     btnAbsoluteMove_.registerListener(e ->
                             setYPosition(spnAbsoluteMove_.getDouble()));
                     btnMoveToZero_.registerListener(e -> setYPosition(0.0));
-                    btnSetZero_.registerListener(e -> setOriginY());
+                    btnSetZero_.registerListener(e -> {
+                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
+                             "This will change the coordinate system. Are you sure you would like to proceed?");
+                       if (result) {
+                          setOriginY();
+                       }
+                    });
+                    break;
                 default:
                     break;
             }
@@ -147,25 +191,28 @@ public class ControlPanel extends Panel {
             // single axis device
             btnRelMovePlus_.registerListener(e ->
                     setRelativePosition(spnRelativeMove_.getDouble()));
-
             btnRelMoveMinus_.registerListener(e ->
                     setRelativePosition(-spnRelativeMove_.getDouble()));
-
             btnAbsoluteMove_.registerListener(e ->
                     setPosition(spnAbsoluteMove_.getDouble()));
-
             btnMoveToZero_.registerListener(e -> setPosition(0.0));
 
             //if (isStageDevice()) {
-            btnSetZero_.registerListener(e -> setOrigin());
+            btnSetZero_.registerListener(e -> {
+               final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
+                     "This will change the coordinate system. Are you sure you would like to proceed?");
+               if (result) {
+                  setOrigin();
+               }
+            });
             //}
         } else if (deviceType_ == DeviceType.GalvoDevice) {
-            switch (deviceAxis_) {
+            switch (axis_) {
                 case X:
                     btnRelMovePlus_.registerListener(e ->
                             setRelativeGalvoPositionX(spnRelativeMove_.getDouble()));
                     btnRelMoveMinus_.registerListener(e ->
-                            setRelativeGalvoPositionY(-spnRelativeMove_.getDouble()));
+                            setRelativeGalvoPositionX(-spnRelativeMove_.getDouble()));
                     btnAbsoluteMove_.registerListener(e ->
                             setPositionGalvoX(spnAbsoluteMove_.getDouble()));
                     btnMoveToZero_.registerListener(e -> setPositionGalvoX(0.0));
@@ -178,14 +225,15 @@ public class ControlPanel extends Panel {
                             setRelativeGalvoPositionY(-spnRelativeMove_.getDouble()));
                     btnAbsoluteMove_.registerListener(e ->
                             setPositionGalvoY(spnAbsoluteMove_.getDouble()));
-                    btnMoveToZero_.registerListener(e -> setPositionGalvoX(0.0));
+                    btnMoveToZero_.registerListener(e -> setPositionGalvoY(0.0));
                     //btnSetZero_.registerListener(e -> setOriginY());
+                    break;
                 default:
                     break;
             }
         } else {
             // TODO: !!!
-            //studio_.logs().logError("error!");
+            //model_.studio().logs().logError("error!");
         }
     }
 
@@ -194,7 +242,7 @@ public class ControlPanel extends Panel {
      */
     private void setUpdateMethod() {
         if (deviceType_ == DeviceType.XYStageDevice) {
-            switch (deviceAxis_) {
+            switch (axis_) {
                 case X:
                     updateMethod_ = this::getXPosition;
                     break;
@@ -202,11 +250,11 @@ public class ControlPanel extends Panel {
                     updateMethod_ = this::getYPosition;
                     break;
                 default:
-                    //studio_.logs().showError("No update method set!");
+                    //model_.studio().logs().showError("No update method set!");
                     break;
             }
         } else if (deviceType_ == DeviceType.GalvoDevice) {
-            switch (deviceAxis_) {
+            switch (axis_) {
                 case X:
                     updateMethod_ = this::getGalvoPositionX;
                     break;
@@ -214,7 +262,7 @@ public class ControlPanel extends Panel {
                     updateMethod_ = this::getGalvoPositionY;
                     break;
                 default:
-                    //studio_.logs().showError("No update method set!");
+                    //model_.studio().logs().showError("No update method set!");
                     break;
             }
         } else {
@@ -230,7 +278,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setRelativeXYPosition(deviceName_, dx, dy);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
     }
 
@@ -238,7 +286,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setXYPosition(deviceName_, dx, dy);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
     }
 
@@ -248,7 +296,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setRelativeXYPosition(deviceName_, dx, 0.0);
         } catch (Exception e) {
-            studio_.logs().showError(propertyName_ + " " + deviceName_ + " failed!");
+            model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
         }
     }
 
@@ -256,7 +304,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setRelativeXYPosition(deviceName_, 0.0, dy);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
     }
 
@@ -264,7 +312,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setXYPosition(deviceName_, dx, getYPosition());
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
     }
 
@@ -272,7 +320,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setXYPosition(deviceName_, getXPosition(), dy);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
     }
 
@@ -280,7 +328,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setRelativePosition(deviceName_, d);
         } catch (Exception e) {
-            studio_.logs().showError("failed to set relative position!");
+            model_.studio().logs().showError("failed to set relative position!");
         }
     }
 
@@ -288,7 +336,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setPosition(deviceName_, d);
         } catch (Exception e) {
-            studio_.logs().showError("failed to set position!");
+            model_.studio().logs().showError("failed to set position!");
         }
     }
 
@@ -300,7 +348,7 @@ public class ControlPanel extends Panel {
         try {
             return core_.getXPosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
             return 0.0;
         }
     }
@@ -309,7 +357,7 @@ public class ControlPanel extends Panel {
         try {
             return core_.getYPosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
             return 0.0;
         }
     }
@@ -318,7 +366,7 @@ public class ControlPanel extends Panel {
         try {
             return core_.getPosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
             return 0.0;
         }
     }
@@ -330,7 +378,7 @@ public class ControlPanel extends Panel {
             //System.out.println("deviceName_: " + deviceName_);
             core_.setOriginY(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed to set y origin!");
+            model_.studio().logs().showError("failed to set y origin!");
         }
     }
 
@@ -339,7 +387,7 @@ public class ControlPanel extends Panel {
             //System.out.println("deviceName_: " + deviceName_);
             core_.setOriginX(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed to set x origin!");
+            model_.studio().logs().showError("failed to set x origin!");
         }
     }
 
@@ -347,7 +395,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setOrigin(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed to set origin!");
+            model_.studio().logs().showError("failed to set origin!");
         }
     }
 
@@ -357,7 +405,7 @@ public class ControlPanel extends Panel {
         try {
             core_.stop(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError(deviceName_  + " stop() failed!");
+            model_.studio().logs().showError(deviceName_  + " stop() failed!");
         }
     }
 
@@ -366,7 +414,7 @@ public class ControlPanel extends Panel {
         try {
             core_.home(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
     }
 
@@ -376,32 +424,35 @@ public class ControlPanel extends Panel {
         try {
             core_.setGalvoPosition(deviceName_, dx, dy);
         } catch (Exception e) {
-            studio_.logs().showError(propertyName_ + " " + deviceName_ + " failed!");
+            model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
         }
     }
 
     private void setRelativeGalvoPositionX(final double dx) {
+        final double x = getGalvoPositionX();
+        final double y = getGalvoPositionY();
         try {
-            core_.setGalvoPosition(deviceName_, dx, 0.0);
+            core_.setGalvoPosition(deviceName_, x + dx, y);
         } catch (Exception e) {
-            studio_.logs().showError(propertyName_ + " " + deviceName_ + " failed!");
+            model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
         }
     }
 
     private void setRelativeGalvoPositionY(final double dy) {
+       final double x = getGalvoPositionX();
+       final double y = getGalvoPositionY();
         try {
-            core_.setGalvoPosition(deviceName_, 0.0, dy);
+            core_.setGalvoPosition(deviceName_, x, y + dy);
         } catch (Exception e) {
-            studio_.logs().showError(propertyName_ + " " + deviceName_ + " failed!");
+            model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
         }
     }
-
 
     private void setPositionGalvoX(final double dx) {
         try {
             core_.setGalvoPosition(deviceName_, dx, getGalvoPositionY());
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+           model_.studio().logs().showError("failed!");
         }
     }
 
@@ -409,7 +460,7 @@ public class ControlPanel extends Panel {
         try {
             core_.setGalvoPosition(deviceName_, getGalvoPositionX(), dy);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
     }
 
@@ -418,7 +469,7 @@ public class ControlPanel extends Panel {
         try {
             result = core_.getGalvoPosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
         return result;
     }
@@ -428,7 +479,7 @@ public class ControlPanel extends Panel {
         try {
             result = core_.getGalvoPosition(deviceName_).x;
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
         return result;
     }
@@ -438,21 +489,17 @@ public class ControlPanel extends Panel {
         try {
             result = core_.getGalvoPosition(deviceName_).y;
         } catch (Exception e) {
-            studio_.logs().showError("failed!");
+            model_.studio().logs().showError("failed!");
         }
         return result;
     }
 
-    /////////////
-    // FIXME: support all types of devices!
-    // TODO: deal with "-0.0000", and check updateMethod_ for null??
-    public void updatePosition() {
-        //lblPosition_.setText(String.format("%.3f ", getXPosition()) + units_);
-        final String value = String.format("%.3f ", updateMethod_.update());
-        EventQueue.invokeLater(() -> {
-            //System.out.println("isEDT = " + SwingUtilities.isEventDispatchThread());
-            lblPosition_.setText(value + units_);
-        });
+    @Override
+    public void update(String topic, Object value) {
+       System.out.println("topic: " + topic + " obj:" + value);
+       EventQueue.invokeLater(() -> {
+          lblPosition_.setText(String.format("%.3f %s", updateMethod_.update(), units_));
+       });
     }
 
 }

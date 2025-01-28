@@ -45,7 +45,7 @@ public class DeviceManager {
     private final Studio studio_;
     private final CMMCore core_;
 
-    /* Maps the Device Adapter device name to a Device object */
+    /* Maps the Device Adapter device name to a DeviceBase object */
     private final Map<String, DeviceBase> deviceMap_;
 
     private static String deviceAdapterName_;
@@ -57,8 +57,7 @@ public class DeviceManager {
         model_ = Objects.requireNonNull(model);
         core_ = studio_.core();
 
-        deviceAdapterName_ = "";  // set by hasDeviceAdapter
-
+        deviceAdapterName_ = ""; // set by hasDeviceAdapter
         deviceMap_ = new ConcurrentHashMap<>();
     }
 
@@ -449,9 +448,9 @@ public class DeviceManager {
                 // Flash4, Fusion, etc
                 HamamatsuCamera camera = getDevice(cameraKey);
                 if (camera.getTriggerPolarity().equals(HamamatsuCamera.Values.NEGATIVE)) {
-                    final int result = DialogUtils.showYesNoDialog(frame, "Hamamatsu Camera",
+                    final boolean result = DialogUtils.showYesNoDialog(frame, "Hamamatsu Camera",
                             "The trigger polarity should be set to POSITIVE. Set it now?");
-                    if (result == 0) {
+                    if (result) {
                         camera.setTriggerPolarity(HamamatsuCamera.Values.POSITIVE);
                     }
                 }

@@ -84,12 +84,28 @@ public class LightSheetDeviceManager extends DeviceBase {
         return getProperty(propertyName).equals(UNDEFINED);
     }
 
+    private boolean isPropertyPositionDevice(final String propertyName) {
+        final DeviceType deviceType = getDeviceType(getProperty(propertyName));
+        return deviceType == DeviceType.StageDevice
+              || deviceType == DeviceType.XYStageDevice
+              || deviceType == DeviceType.GalvoDevice;
+    }
+
     public Map<String, String> getDeviceMap() {
         final String[] properties = getDevicePropertyNames();
         return Arrays.stream(properties)
                 .filter(PredicateUtils.not(this::isPropertyPreInit))
                 .filter(PredicateUtils.not(this::isPropertyReadOnly))
                 .collect(Collectors.toMap(p -> p, this::getProperty));
+    }
+
+    public String[] getPositionDevices() {
+        final String[] properties = getDevicePropertyNames();
+        return Arrays.stream(properties)
+              .filter(PredicateUtils.not(this::isPropertyPreInit))
+              .filter(PredicateUtils.not(this::isPropertyReadOnly))
+              .filter(this::isPropertyPositionDevice)
+              .toArray(String[]::new);
     }
 
     public Map<String, DeviceType> getDeviceTypeMap() {
