@@ -61,10 +61,10 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
     @Override
     boolean run() {
 
-        final boolean isPolling = frame_.getNavigationPanel().isPolling();
+        final boolean isPolling = model_.positions().isPolling();
         if (isPolling) {
             studio_.logs().logMessage("stopped position polling");
-            frame_.getNavigationPanel().stopPolling();
+            model_.positions().stopPolling();
         }
 
         // make settings current

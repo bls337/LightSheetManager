@@ -7,19 +7,20 @@ import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
+import org.micromanager.lightsheetmanager.model.positions.Subscriber;
 
 import javax.swing.JLabel;
 import java.awt.EventQueue;
+import java.awt.geom.Point2D;
 import java.util.Objects;
 
-public class PositionPanel extends Panel {
+public class PositionPanel extends Panel implements Subscriber {
 
     private JLabel lblImagingCenterValue_;
 
     private JLabel lblSlicePositionValue_;
     private JLabel lblImagingPositionValue_;
     private JLabel lblIllumPositionValue_;
-
 
     private Button btnImagingCenterGo_;
     private Button btnImagingCenterSet_;
@@ -36,11 +37,11 @@ public class PositionPanel extends Panel {
 
     private Button btnTestAcq_;
 
-    private int pathNum_;
+    private final int pathNum_;
 
     private boolean isUsingPLogic_;
 
-    private LightSheetManager model_;
+    private final LightSheetManager model_;
 
     public PositionPanel(final LightSheetManager model, final int pathNum) {
         super("Positions");
@@ -100,8 +101,8 @@ public class PositionPanel extends Panel {
             final double scannerPosition = scanner.getPosition().y;
             final String piezoPositionStr = String.format("%.3f ", piezoPosition);
             final String scannerPositionStr = String.format("%.3f ", scannerPosition);
-            lblImagingPositionValue_.setText(piezoPositionStr + " μm");
-            lblSlicePositionValue_.setText(scannerPositionStr + " °");
+            lblImagingPositionValue_.setText(piezoPositionStr + "μm");
+            lblSlicePositionValue_.setText(scannerPositionStr + "°");
         }
 
         txtSlicePosition_.setText("0");
@@ -160,6 +161,9 @@ public class PositionPanel extends Panel {
     // TODO: currently set up for SCAPE geometry, compare to original diSPIM plugin
     private void createEventHandlers() {
 
+        model_.positions().register(this, "ImagingFocus");
+        model_.positions().register(this, "IllumSlice");
+
         if (isUsingPLogic_) {
             final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
             final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
@@ -169,7 +173,7 @@ public class PositionPanel extends Panel {
                 final double piezoPosition = piezo.getPosition();
                 model_.acquisitions().settingsBuilder()
                         .sheetCalibrationBuilder(pathNum_).imagingCenter(piezoPosition);
-                lblImagingCenterValue_.setText(String.format("%.3f ", piezoPosition));
+                lblImagingCenterValue_.setText(String.format("%.3f μm", piezoPosition));
             });
 
             btnImagingCenterGo_.registerListener(e -> {
@@ -181,42 +185,37 @@ public class PositionPanel extends Panel {
 
             btnImagingZero_.registerListener(e -> {
                 piezo.setPosition(0.0);
-                lblSlicePositionValue_.setText(piezo.getPosition() + " μm");
+                lblImagingPositionValue_.setText(String.format("%.3f μm", piezo.getPosition()));
             });
 
             btnSliceZero_.registerListener(e -> {
                 final double xValue = scanner.getPosition().x;
                 scanner.setPosition(xValue, 0.0);
-                final String position = String.format("%.3f ", scanner.getPosition().y);
-                lblSlicePositionValue_.setText(position + " °");
+                lblSlicePositionValue_.setText(String.format("%.3f °", scanner.getPosition().y));
             });
 
             txtImagingPosition_.registerListener(e -> {
                 piezo.setPosition(Double.parseDouble(txtImagingPosition_.getText()));
-                final String position = String.format("%.3f ", piezo.getPosition());
-                lblImagingPositionValue_.setText(position + " μm");
+                lblImagingPositionValue_.setText(String.format("%.3f μm", piezo.getPosition()));
             });
 
             txtSlicePosition_.registerListener(e -> {
                 final double xValue = scanner.getPosition().x;
                 scanner.setPosition(xValue, Double.parseDouble(txtSlicePosition_.getText()));
-                final String position = String.format("%.3f ", scanner.getPosition().y);
-                lblSlicePositionValue_.setText(position + " °");
+                lblSlicePositionValue_.setText(String.format("%.3f °", scanner.getPosition().y));
             });
         }
     }
 
-    public void updatePositions() {
-        if (isUsingPLogic_) {
-            final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
-            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
-
-            final String piezoPosition = String.format("%.3f ", piezo.getPosition());
-            final String scannerPosition = String.format("%.3f ", scanner.getPosition().y);
-            EventQueue.invokeLater(() -> {
-                lblImagingPositionValue_.setText(piezoPosition + " μm");
-                lblSlicePositionValue_.setText(scannerPosition + " °");
-            });
-        }
+    @Override
+    public void update(String topic, Object value) {
+        EventQueue.invokeLater(() -> {
+            if (topic.equals("ImagingFocus")) {
+                lblImagingPositionValue_.setText(String.format("%.3f μm", (double)value));
+            } else if (topic.equals("IllumSlice")) {
+                final Point2D.Double point = (Point2D.Double)value;
+                lblSlicePositionValue_.setText(String.format("%.3f °", point.y));
+            }
+        });
     }
 }

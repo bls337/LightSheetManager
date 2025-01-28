@@ -247,9 +247,9 @@ public class XYZGridFrame extends JFrame {
         btnComputeGrid_.registerListener(e -> {
             final PositionList positionList = model_.studio().positions().getPositionList();
             if (positionList.getNumberOfPositions() != 0) {
-                final int result = DialogUtils.showYesNoDialog(this, "Warning",
+                final boolean result = DialogUtils.showYesNoDialog(this, "Warning",
                         "Do you want to overwrite the existing position list?");
-                if (result == 1) {
+                if (!result) {
                     return; // early exit => do not overwrite
                 }
             }

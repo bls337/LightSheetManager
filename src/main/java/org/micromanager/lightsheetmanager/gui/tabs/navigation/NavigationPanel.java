@@ -29,8 +29,6 @@ public class NavigationPanel extends Panel {
     private CheckBox cbxPollPositions_;
 
     private DeviceManager devices_;
-
-    private PositionUpdater positionUpdater_;
     private ArrayList<ControlPanel> controlPanels_;
 
     private final LightSheetManager model_;
@@ -41,7 +39,6 @@ public class NavigationPanel extends Panel {
         devices_ = model_.devices();
 
         controlPanels_ = new ArrayList<>();
-        positionUpdater_ = new PositionUpdater(this);
 
         createUserInterface();
         createEventHandlers();
@@ -122,7 +119,7 @@ public class NavigationPanel extends Panel {
                         axis = ControlPanel.Axis.Y;
                     }
                     ControlPanel controlPanel = new ControlPanel(
-                            studio_, propertyName, deviceName, deviceType, axis);
+                            model_, propertyName, deviceName, deviceType, axis, ControlPanel.Units.MICRONS);
                     illumProperties.get(pathNum - 1).add(controlPanel);
                     System.out.println(propertyName + " " + pathNum + " added to illum properties.");
                 } else {
@@ -130,12 +127,10 @@ public class NavigationPanel extends Panel {
                     final int pathNum = 1;
                     if (deviceType == DeviceType.GalvoDevice) {
                         ControlPanel controlPanelX = new ControlPanel(
-                                studio_, propertyName + ": X Axis", deviceName, deviceType, ControlPanel.Axis.X);
+                              model_, propertyName, deviceName, deviceType, ControlPanel.Axis.X, ControlPanel.Units.DEGREES);
                         ControlPanel controlPanelY = new ControlPanel(
-                                studio_, propertyName + ": Y Axis", deviceName, deviceType, ControlPanel.Axis.Y);
+                              model_, propertyName, deviceName, deviceType, ControlPanel.Axis.Y, ControlPanel.Units.DEGREES);
                         // TODO: check for ASI hardware when settings units
-                        controlPanelX.setUnits("°");
-                        controlPanelY.setUnits("°");
                         illumProperties.get(pathNum - 1).add(controlPanelX);
                         illumProperties.get(pathNum - 1).add(controlPanelY);
                     }
@@ -150,23 +145,23 @@ public class NavigationPanel extends Panel {
                     pathNum = 1;
                 }
                 ControlPanel controlPanel = new ControlPanel(
-                        studio_, propertyName, deviceName, deviceType, ControlPanel.Axis.NONE);
+                      model_, propertyName, deviceName, deviceType, ControlPanel.Axis.NONE, ControlPanel.Units.MICRONS);
                 imagingProperties.get(pathNum - 1).add(controlPanel);
                 System.out.println(propertyName + " " + pathNum + " added to imaging properties.");
             } else {
                 // propertyName doesn't start with "Illum" or "Imaging"
                 if (deviceType == DeviceType.XYStageDevice) {
                     ControlPanel controlPanelX = new ControlPanel(
-                            studio_, propertyName + ": X Axis", deviceName, deviceType, ControlPanel.Axis.X);
+                          model_, propertyName, deviceName, deviceType, ControlPanel.Axis.X, ControlPanel.Units.MICRONS);
                     ControlPanel controlPanelY = new ControlPanel(
-                            studio_, propertyName + ": Y Axis", deviceName, deviceType, ControlPanel.Axis.Y);
+                          model_, propertyName, deviceName, deviceType, ControlPanel.Axis.Y, ControlPanel.Units.MICRONS);
                     miscProperties.add(controlPanelX);
                     miscProperties.add(controlPanelY);
 
                     System.out.println(propertyName + " added to misc properties");
                 } else if (deviceType == DeviceType.StageDevice) {
                     ControlPanel controlPanel = new ControlPanel(
-                            studio_, propertyName, deviceName, deviceType, ControlPanel.Axis.NONE);
+                          model_, propertyName, deviceName, deviceType, ControlPanel.Axis.NONE, ControlPanel.Units.MICRONS);
                     miscProperties.add(controlPanel);
 
                     System.out.println(propertyName + " added to misc properties");
@@ -242,7 +237,7 @@ public class NavigationPanel extends Panel {
             revalidate();
             repaint();
             if (cbxPollPositions_.isSelected()) {
-                positionUpdater_.startPolling();
+               model_.positions().startPolling();
             }
         });
 
@@ -254,9 +249,9 @@ public class NavigationPanel extends Panel {
             final boolean isSelected = cbxPollPositions_.isSelected();
             model_.pluginSettings().setPollingPositions(isSelected);
             if (isSelected) {
-                positionUpdater_.startPolling();
+                model_.positions().startPolling();
             } else {
-                positionUpdater_.stopPolling();
+                model_.positions().stopPolling();
             }
             //System.out.println("poll positions isSelected: " + cbxPollPositions_.isSelected());
         });
@@ -277,32 +272,6 @@ public class NavigationPanel extends Panel {
             }
         }
         return containsDigit;
-    }
-
-    /**
-     * Used by the PositionUpdater to update the displayed positions.
-     */
-    public void updatePositions() {
-        //System.out.println("isEDT: " + SwingUtilities.isEventDispatchThread());
-        for (ControlPanel panel : controlPanels_) {
-            panel.updatePosition();
-        }
-    }
-
-    public void startPolling() {
-        positionUpdater_.startPolling();
-    }
-
-    public void stopPolling() {
-        positionUpdater_.stopPolling();
-    }
-
-    public boolean isPolling() {
-        return positionUpdater_.isPolling();
-    }
-
-    public PositionUpdater getPositionUpdater() {
-        return positionUpdater_;
     }
 
     /**

@@ -21,7 +21,6 @@ public class AutofocusRunner {
     public AutofocusRunner(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
-
     }
 
     public void runAutofocus() {

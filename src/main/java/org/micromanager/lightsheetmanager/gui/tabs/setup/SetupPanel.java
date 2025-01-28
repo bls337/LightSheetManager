@@ -30,7 +30,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
 
     private SingleAxisPanel singleAxisPanel_;
 
-    private LightSheetManager model_;
+    private final LightSheetManager model_;
 
     public SetupPanel(final LightSheetManager model, final int pathNum) {
         model_ = Objects.requireNonNull(model);

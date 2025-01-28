@@ -128,19 +128,14 @@ public class LightSheetManagerFrame extends JFrame {
         // register micro-manager events
         studio_.events().registerForEvents(this);
 
-        // TODO: better way to connect all of this together, maybe observer pattern for updater
-        PositionPanel positionPanel = tabPanel_.getSetupPathTab(1).getSetupPanel().getPositionPanel();
-        tabPanel_.getNavigationTab().getNavigationPanel()
-                .getPositionUpdater().setPositionPanel(positionPanel);
-
         if (model_.pluginSettings().isPollingPositions()) {
-            tabPanel_.getNavigationTab().getNavigationPanel().startPolling();
+            model_.positions().startPolling();
         }
 
         // window close event
         WindowUtils.registerWindowClosingEvent(this, event -> {
-            tabPanel_.getNavigationTab().getNavigationPanel().stopPolling();
             tabPanel_.getAcquisitionTab().getMultiPositionPanel().getXYZGridFrame().dispose();
+            model_.positions().stopPolling();
             model_.userSettings().save();
             studio_.logs().logMessage("user settings saved");
         });

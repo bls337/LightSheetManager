@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.api.LightSheetManagerAPI;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.model.PluginSettings;
+import org.micromanager.lightsheetmanager.model.positions.PositionUpdater;
 import org.micromanager.lightsheetmanager.model.UserSettings;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineDISPIM;
@@ -27,6 +28,8 @@ public class LightSheetManager implements LightSheetManagerAPI {
 
     private final UserSettings userSettings_;
     private final DeviceManager deviceManager_;
+    private final PositionUpdater positionUpdater_;
+
 
     private AcquisitionEngine acqEngine_;
     //private final AcquisitionTableData acqTableData_;
@@ -39,7 +42,7 @@ public class LightSheetManager implements LightSheetManagerAPI {
         userSettings_ = new UserSettings(this);
 
         deviceManager_ = new DeviceManager(studio_, this);
-        //acqTableData_ = new AcquisitionTableData();
+        positionUpdater_ = new PositionUpdater(this);
 
         // set during setup if there is an error
         errorText_ = "no errors";
@@ -59,6 +62,7 @@ public class LightSheetManager implements LightSheetManagerAPI {
 
         // setup devices
         deviceManager_.setup();
+        positionUpdater_.setup();
 
         // create different acq engine based on microscope geometry
         final GeometryType geometryType = deviceManager_
@@ -140,6 +144,10 @@ public class LightSheetManager implements LightSheetManagerAPI {
     @Override
     public DeviceManager devices() {
         return deviceManager_;
+    }
+
+    public PositionUpdater positions() {
+        return positionUpdater_;
     }
 
 }
