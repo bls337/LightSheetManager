@@ -97,6 +97,7 @@ public class AutofocusTab extends Panel implements ListeningPanel {
                 acqSettings.autofocusSettings().mode().toString());
 
         btnRunAutofocus_ = new Button("Run Autofocus", 120, 30);
+        btnRunAutofocus_.setEnabled(false); // FIXME: impl autofocus
 
         // autofocus options during acquisition
         final Label lblTimePoints = new Label("time points");

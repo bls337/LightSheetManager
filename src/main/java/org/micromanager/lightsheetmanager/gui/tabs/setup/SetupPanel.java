@@ -36,6 +36,12 @@ public class SetupPanel extends Panel implements ListeningPanel {
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;
 
+       setMigLayout(
+             "",
+             "[]0[]",
+             "[]5[]"
+       );
+
         // layout panels
         leftPanel_ = new Panel();
         rightPanel_ = new Panel();

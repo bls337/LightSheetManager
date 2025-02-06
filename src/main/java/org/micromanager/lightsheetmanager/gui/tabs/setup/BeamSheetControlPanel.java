@@ -49,7 +49,7 @@ public class BeamSheetControlPanel extends Panel {
     // TODO: this is temporary solution until, update this var so we don't have to rebuild the acqSettings
     private double currentOffset_;
 
-    private LightSheetManager model_;
+    private final LightSheetManager model_;
 
     public BeamSheetControlPanel(final LightSheetManager model, final int pathNum) {
         super("Light Sheet Synchronization");
@@ -130,16 +130,15 @@ public class BeamSheetControlPanel extends Panel {
                 pnlSecond_.add(sldSheetOffset_, "");
                 break;
             case SCAPE:
-                txtSheetOffset_ = new TextField(8);
+                txtSheetOffset_ = new TextField(6);
                 final double value = model_.acquisitions().settings()
                         .sheetCalibration(pathNum_).sheetOffset();
-                final String strValue = String.format("%.3f ", value);
+                final String strValue = String.format("%.3f", value);
                 txtSheetOffset_.setText(strValue);
-                lblSlopeOffset_ = new JLabel("0.0");
-                lblSlopeOffset_.setText(strValue);
-                pnlSecond_.add(lblSheetOffset, "");
+                lblSlopeOffset_ = new JLabel(strValue);
+                pnlSecond_.add(lblSheetOffset, "split 2");
                 pnlSecond_.add(lblSlopeOffset_, "");
-                pnlSecond_.add(txtSheetOffset_, "span 2, wrap");
+                pnlSecond_.add(txtSheetOffset_, "wrap");
                 pnlSecond_.add(btnCenterOffset_, "");
                 pnlSecond_.add(btnSheetOffsetMinus_, "split 2");
                 pnlSecond_.add(btnSheetOffsetPlus_, "");
@@ -159,11 +158,10 @@ public class BeamSheetControlPanel extends Panel {
     }
 
     private void createEventHandlers() {
-
         // first panel
-        btnPlotProfile_.registerListener(e -> {
+        //btnPlotProfile_.registerListener(e -> {
             //System.out.println("do something here...");
-        });
+        //});
 
         // second panel
         cbxAutoSheetWidth_.registerListener(e -> {
@@ -184,19 +182,24 @@ public class BeamSheetControlPanel extends Panel {
             final double value = sldSheetOffset_.getDouble();
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
-            final String strValue = String.format("%.3f ", value);
-            txtSheetOffset_.setText(strValue);
-            lblSlopeOffset_.setText(strValue);
+            final String strValue = String.format("%.3f", value);
+            currentOffset_ = value;
+            EventQueue.invokeLater(() -> {
+               txtSheetOffset_.setText(strValue);
+               lblSlopeOffset_.setText(strValue);
+            });
             //System.out.println("sheetOffset value: " + strValue);
         });
 
         txtSheetOffset_.registerListener(e -> {
             final double value = Double.parseDouble(txtSheetOffset_.getText());
+            final double total = Math.max(-1.0, Math.min(1.0, value));
             model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
-            lblSlopeOffset_.setText(String.format("%.3f ", value));
+                    .sheetCalibrationBuilder(pathNum_).sheetOffset(total);
+            currentOffset_ = total;
             EventQueue.invokeLater(() -> {
-                sldSheetOffset_.setDouble(value);
+                lblSlopeOffset_.setText(String.format("%.3f", total));
+                sldSheetOffset_.setDouble(total);
             });
         });
 
@@ -207,6 +210,7 @@ public class BeamSheetControlPanel extends Panel {
             txtSheetOffset_.setText("0");
             lblSlopeOffset_.setText("0");
             sldSheetOffset_.setDouble(0);
+            currentOffset_ = 0;
         });
 
         // TODO: buttons
@@ -234,13 +238,11 @@ public class BeamSheetControlPanel extends Panel {
             sldSheetOffset_.setDouble(value);
         });
 
-        btnSheetWidthMinus_.registerListener(e -> {
-
-        });
-
-        btnSheetWidthPlus_.registerListener(e -> {
-
-        });
+//        btnSheetWidthMinus_.registerListener(e -> {
+//        });
+//
+//        btnSheetWidthPlus_.registerListener(e -> {
+//        });
 
     }
 
