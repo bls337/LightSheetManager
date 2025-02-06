@@ -10,6 +10,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.positions.Subscriber;
 
 import javax.swing.JLabel;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.geom.Point2D;
 import java.util.Objects;
@@ -80,8 +81,8 @@ public class PositionPanel extends Panel implements Subscriber {
         txtImagingPosition_ = new TextField();
 
         Button.setDefaultSize(80, 26);
-        btnSliceZero_ = new Button("Go to 0");
-        btnImagingZero_ = new Button("Go to 0");
+        btnSliceZero_ = new Button("Go to 0", 70, 26);
+        btnImagingZero_ = new Button("Go to 0", 70, 26);
 
         final JLabel lblIllumPosition = new JLabel("Illumination Piezo:");
         txtIllumPosition_ = new TextField();
@@ -89,9 +90,20 @@ public class PositionPanel extends Panel implements Subscriber {
         btnIllumGoHome_ = new Button("Go Home");
         btnIllumSetHome_ = new Button("Set Home");
 
-        lblSlicePositionValue_ = new JLabel("0.0 °");
-        lblImagingPositionValue_ = new JLabel("0.0 μm");
-        lblIllumPositionValue_ = new JLabel("0.0 μm");
+        lblSlicePositionValue_ = new JLabel("0.000 °");
+        lblImagingPositionValue_ = new JLabel("0.000 μm");
+        lblIllumPositionValue_ = new JLabel("0.000 μm");
+
+        lblSlicePositionValue_.setMinimumSize(new Dimension(60, 20));
+        lblImagingPositionValue_ .setMinimumSize(new Dimension(60, 20));
+        lblSlicePositionValue_.setMinimumSize(new Dimension(60, 20));
+
+        // tooltips
+        btnImagingCenterGo_.setToolTipText("Move \"Imaging Piezo\" position to \"Imaging Center\" value.");
+        btnImagingCenterSet_.setToolTipText("Set \"Imaging Center\" value to \"Imaging Piezo\" position. ");
+        btnSliceZero_.setToolTipText("Move \"Slice Position\" position to 0 degrees.");
+        btnImagingZero_.setToolTipText("Move \"Imaging Piezo\" position to 0 μm.");
+        btnTestAcq_.setToolTipText("Run a test acquisition.");
 
         if (isUsingPLogic_) {
             final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
@@ -99,12 +111,13 @@ public class PositionPanel extends Panel implements Subscriber {
 
             final double piezoPosition = piezo.getPosition();
             final double scannerPosition = scanner.getPosition().y;
-            final String piezoPositionStr = String.format("%.3f ", piezoPosition);
-            final String scannerPositionStr = String.format("%.3f ", scannerPosition);
-            lblImagingPositionValue_.setText(piezoPositionStr + "μm");
-            lblSlicePositionValue_.setText(scannerPositionStr + "°");
+            final String piezoPositionStr = String.format("%.3f μm", piezoPosition);
+            final String scannerPositionStr = String.format("%.3f °", scannerPosition);
+            lblImagingPositionValue_.setText(piezoPositionStr);
+            lblSlicePositionValue_.setText(scannerPositionStr);
         }
 
+        // test fields
         txtSlicePosition_.setText("0");
         txtImagingPosition_.setText("0");
         txtIllumPosition_.setText("0");
@@ -151,7 +164,7 @@ public class PositionPanel extends Panel implements Subscriber {
 
                 // TODO: enable when feature exists
                 btnTestAcq_.setEnabled(false);
-                add(btnTestAcq_, "wrap");
+                add(btnTestAcq_, "span 2, wrap");
                 break;
             default:
                 break;
@@ -178,9 +191,10 @@ public class PositionPanel extends Panel implements Subscriber {
 
             btnImagingCenterGo_.registerListener(e -> {
                 // FIXME: make sure this is the same as original plugin, diSPIM also moves Scanner with computeGalvoFromPiezo
-                final double imagingCenter = model_.acquisitions().settings()
+                final double imagingCenter = model_.acquisitions().settingsBuilder().build()
                         .sheetCalibration(pathNum_).imagingCenter();
                 piezo.setPosition(imagingCenter);
+                lblImagingPositionValue_.setText(String.format("%.3f μm", piezo.getPosition()));
             });
 
             btnImagingZero_.registerListener(e -> {

@@ -91,22 +91,22 @@ public class ControlPanel extends Panel implements Subscriber {
             startValue = 1.0;
         }
 
-        Button.setDefaultSize(120, 20);
+        Button.setDefaultSize(120, 24);
         spnRelativeMove_ = Spinner.createDoubleSpinner(startValue, 0.0, Double.MAX_VALUE, 1.0);
         spnAbsoluteMove_ = Spinner.createDoubleSpinner(startValue, -Double.MAX_VALUE, Double.MAX_VALUE, 1.0);
         spnRelativeMove_.setColumnSize(8);
         spnAbsoluteMove_.setColumnSize(8);
 
-        btnAbsoluteMove_ = new Button("Absolute Move", 110, 20);
+        btnAbsoluteMove_ = new Button("Absolute Move", 110, 24);
 
-        Button.setDefaultSize(40, 20);
+        Button.setDefaultSize(40, 24);
         btnRelMovePlus_ = new Button("+");
         btnRelMoveMinus_ = new Button("-");
 
         Button.setDefaultSize(100, 20);
-        btnMoveToZero_ = new Button("Go to 0", 80, 20);
+        btnMoveToZero_ = new Button("Go to 0", 80, 24);
         if (isStageDevice()) {
-            btnSetZero_ = new Button("Set 0", 80, 20);
+            btnSetZero_ = new Button("Set 0", 80, 24);
             btnSetZero_.setToolTipText("");
         }
 

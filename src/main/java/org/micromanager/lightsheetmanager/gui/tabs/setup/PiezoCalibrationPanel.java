@@ -53,10 +53,10 @@ public class PiezoCalibrationPanel extends Panel {
         final JLabel lblSlope = new JLabel("Slope:");
         final JLabel lblOffset = new JLabel("Offset:");
         final JLabel lblStepSize = new JLabel("Step Size:");
-        final JLabel lblMicronsPerDeg = new JLabel("μm/°");
 
-        lblSlopeValue_ = new JLabel("0");
-        lblOffsetValue_ = new JLabel("0");
+        // default values
+        lblSlopeValue_ = new JLabel(String.format("%.3f μm/°", 0.0));
+        lblOffsetValue_ = new JLabel(String.format("%.3f μm", 0.0));
 
         setMigLayout(
                 "",
@@ -83,11 +83,14 @@ public class PiezoCalibrationPanel extends Panel {
         txtOffset_ = new TextField(7);
         txtStepSize_ = new TextField();
 
-        txtSlope_.setText(String.valueOf(acqSettings.sliceCalibration(pathNum_).sliceSlope()));
-        txtOffset_.setText(String.valueOf(acqSettings.sliceCalibration(pathNum_).sliceOffset()));
+        final double sliceSlope = acqSettings.sliceCalibration(pathNum_).sliceSlope();
+        final double sliceOffset = acqSettings.sliceCalibration(pathNum_).sliceOffset();
 
-        lblSlopeValue_.setText(String.valueOf(acqSettings.sliceCalibration(pathNum_).sliceSlope()));
-        lblOffsetValue_.setText(String.valueOf(acqSettings.sliceCalibration(pathNum_).sliceOffset()));
+        txtSlope_.setText("0");
+        txtOffset_.setText("0");
+
+        lblSlopeValue_.setText(String.format("%.3f μm/°", sliceSlope));
+        lblOffsetValue_.setText(String.format("%.3f μm", sliceOffset));
 
         Button.setDefaultSize(26, 26);
         btnStepUp_ = new Button(Icons.ARROW_UP);
@@ -95,25 +98,25 @@ public class PiezoCalibrationPanel extends Panel {
 
         btnRunAutofocus_.setEnabled(false);
 
+        lblSlopeValue_.setMinimumSize(new Dimension(74, 20));
+        lblOffsetValue_.setMinimumSize(new Dimension(74, 20));
+
         Panel pnlText = new Panel();
         pnlText.setMinimumSize(new Dimension(100, 30));
         pnlText.add(lblSlope, "");
         pnlText.add(lblSlopeValue_, "");
-        pnlText.add(lblMicronsPerDeg, "wrap");
+        pnlText.add(txtSlope_, "wrap");
         pnlText.add(lblOffset, "");
         pnlText.add(lblOffsetValue_, "");
-        pnlText.add(new JLabel("μm"), "");
 
-        Panel pnlFields = new Panel();
-        pnlFields.setMinimumSize(new Dimension(20, 30));
-        pnlFields.add(txtSlope_, "wrap");
-        pnlFields.add(txtOffset_, "");
+//        Panel pnlFields = new Panel();
+//        pnlFields.setMinimumSize(new Dimension(20, 30));
+       pnlText.add(txtOffset_, "");
 
         switch (geometryType) {
             case DISPIM:
                 add(lblSlope, "");
                 add(txtSlope_, "");
-                add(lblMicronsPerDeg, "");
                 add(btnTwoPoint_, "wrap");
                 add(lblOffset, "");
                 add(txtOffset_, "");
@@ -127,18 +130,8 @@ public class PiezoCalibrationPanel extends Panel {
                 add(btnRunAutofocus_, "span 3");
                 break;
             case SCAPE:
-//                add(lblSlope, "");
-//                add(lblSlopeValue_, "");
-//                add(lblMicronsPerDeg, "");
-//                add(txtSlope_, "wrap");
-//                add(lblOffset, "");
-//                add(lblOffsetValue_, "");
-//                add(new JLabel("μm"), "");
-//                add(txtOffset_, "wrap");
-                add(pnlText, "");
-                add(pnlFields, "wrap");
-                ///add(txtSlope_, "");
-                //add(txtOffset_, "wrap");
+                add(pnlText, "wrap");
+               // add(pnlFields, "wrap");
                 add(btnUpdate_, "wrap, span 2, align center");
                 add(btnRunAutofocus_, "span 2, align center");
                 break;
@@ -149,9 +142,9 @@ public class PiezoCalibrationPanel extends Panel {
 
     private void createEventHandlers() {
 
-        btnTwoPoint_.registerListener(e -> {
-
-        });
+//        btnTwoPoint_.registerListener(e -> {
+//
+//        });
 
         if (isUsingPLogic_) {
             final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
@@ -167,37 +160,32 @@ public class PiezoCalibrationPanel extends Panel {
                     // FIXME: update channelOffset
                     // was: channelOffset = ASIdiSPIM.getFrame().getAcquisitionPanel().getChannelOffset();
                     final double newOffset = piezoPosition - rate * scannerPosition - channelOffset;
-                    txtOffset_.setText(String.format("%.3f ", newOffset));
+                    txtOffset_.setText(String.format("%.3f μm", newOffset));
                     model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
                             newOffset + " (with channel offset of " + channelOffset + ")");
                 }
             });
         }
 
-        btnStepUp_.registerListener(e -> {
-
-        });
-
-        btnStepDown_.registerListener(e -> {
-
-        });
+//        btnStepUp_.registerListener(e -> {
+//        });
+//        btnStepDown_.registerListener(e -> {
+//        });
+//        txtStepSize_.registerListener(e -> {
+//        });
 
         txtSlope_.registerListener(e -> {
             final double slope = Double.parseDouble(txtSlope_.getText());
             model_.acquisitions().settingsBuilder()
                     .sliceCalibrationBuilder(pathNum_).sliceSlope(slope);
-            lblSlopeValue_.setText(String.format("%.3f ", slope));
+            lblSlopeValue_.setText(String.format("%.3f μm/°", slope));
         });
 
         txtOffset_.registerListener(e -> {
             final double offset = Double.parseDouble(txtOffset_.getText());
             model_.acquisitions().settingsBuilder()
                     .sliceCalibrationBuilder(pathNum_).sliceOffset(offset);
-            lblOffsetValue_.setText(String.format("%.3f ", offset));
-        });
-
-        txtStepSize_.registerListener(e -> {
-
+            lblOffsetValue_.setText(String.format("%.3f μm", offset));
         });
 
         btnRunAutofocus_.registerListener(e -> {
