@@ -36,7 +36,7 @@ public class PositionPanel extends Panel implements Subscriber {
     private Button btnIllumGoHome_;
     private Button btnIllumSetHome_;
 
-    private Button btnTestAcq_;
+    //private Button btnTestAcq_;
 
     private final int pathNum_;
 
@@ -73,7 +73,7 @@ public class PositionPanel extends Panel implements Subscriber {
         btnImagingCenterGo_ = new Button("Go");
         btnImagingCenterSet_ = new Button("Set");
 
-        btnTestAcq_ = new Button("Test Acquisition", 120, 26);
+        //btnTestAcq_ = new Button("Test Acquisition", 120, 26);
 
         final JLabel lblSlicePosition = new JLabel("Slice Position:");
         final JLabel lblImagingPosition = new JLabel("Imaging Piezo:");
@@ -100,10 +100,10 @@ public class PositionPanel extends Panel implements Subscriber {
 
         // tooltips
         btnImagingCenterGo_.setToolTipText("Move \"Imaging Piezo\" position to \"Imaging Center\" value.");
-        btnImagingCenterSet_.setToolTipText("Set \"Imaging Center\" value to \"Imaging Piezo\" position. ");
+        //btnImagingCenterSet_.setToolTipText("Set \"Imaging Center\" value to \"Imaging Piezo\" position. ");
         btnSliceZero_.setToolTipText("Move \"Slice Position\" position to 0 degrees.");
         btnImagingZero_.setToolTipText("Move \"Imaging Piezo\" position to 0 μm.");
-        btnTestAcq_.setToolTipText("Run a test acquisition.");
+        //btnTestAcq_.setToolTipText("Run a test acquisition.");
 
         if (isUsingPLogic_) {
             final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
@@ -127,8 +127,8 @@ public class PositionPanel extends Panel implements Subscriber {
                 add(lblImagingCenter, "");
                 add(lblImagingCenterValue_, "");
                 add(btnImagingCenterGo_, "");
-                add(btnImagingCenterSet_, "split 2");
-                add(btnTestAcq_, "wrap");
+                add(btnImagingCenterSet_, "wrap");
+                //add(btnTestAcq_, "wrap");
 
                 add(lblSlicePosition, "");
                 add(lblSlicePositionValue_, "");
@@ -149,8 +149,8 @@ public class PositionPanel extends Panel implements Subscriber {
             case SCAPE:
                 add(lblImagingCenter, "");
                 add(lblImagingCenterValue_, "");
-                add(btnImagingCenterGo_, "split 2");
-                add(btnImagingCenterSet_, "wrap");
+                add(btnImagingCenterGo_, "wrap");
+                //add(btnImagingCenterSet_, "wrap");
 
                 add(lblSlicePosition, "");
                 add(lblSlicePositionValue_, "");
@@ -162,9 +162,8 @@ public class PositionPanel extends Panel implements Subscriber {
                 add(txtImagingPosition_, "split 2");
                 add(btnImagingZero_, "wrap");
 
-                // TODO: enable when feature exists
-                btnTestAcq_.setEnabled(false);
-                add(btnTestAcq_, "span 2, wrap");
+                //btnTestAcq_.setEnabled(false);
+                //add(btnTestAcq_, "span 2, wrap");
                 break;
             default:
                 break;

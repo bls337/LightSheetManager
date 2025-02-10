@@ -11,7 +11,7 @@ import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import javax.swing.JLabel;
-import java.awt.EventQueue;
+import javax.swing.SwingConstants;
 import java.util.Objects;
 
 public class BeamSheetControlPanel extends Panel {
@@ -44,7 +44,7 @@ public class BeamSheetControlPanel extends Panel {
     private JLabel lblSlopeOffset_;
     private TextField txtSheetOffset_;
 
-    private int pathNum_;
+    private final int pathNum_;
 
     // TODO: this is temporary solution until, update this var so we don't have to rebuild the acqSettings
     private double currentOffset_;
@@ -69,6 +69,8 @@ public class BeamSheetControlPanel extends Panel {
         final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions()
                 .settings();
 
+        //setMigLayout("", "[]10[]", "");
+
         pnlFirst_ = new Panel();
         pnlSecond_ = new Panel();
 
@@ -84,7 +86,8 @@ public class BeamSheetControlPanel extends Panel {
 
         // second panel for other camera trigger modes
         final JLabel lblSheetWidth = new JLabel("Sheet width:");
-        final JLabel lblSheetOffset = new JLabel("Sheet offset:");
+        //final JLabel lblSheetOffset = new JLabel("Sheet offset:");
+        final JLabel lblSheetOffset = new JLabel("Galvo offset * 1000:");
         lblSlopeUnits2_ = new JLabel("μ°/px"); // TODO: reuse labels like this?
 
         cbxAutoSheetWidth_ = new CheckBox("Automatic", false);
@@ -133,16 +136,15 @@ public class BeamSheetControlPanel extends Panel {
                 txtSheetOffset_ = new TextField(6);
                 final double value = model_.acquisitions().settings()
                         .sheetCalibration(pathNum_).sheetOffset();
-                final String strValue = String.format("%.3f", value);
-                txtSheetOffset_.setText(strValue);
-                lblSlopeOffset_ = new JLabel(strValue);
-                pnlSecond_.add(lblSheetOffset, "split 2");
-                pnlSecond_.add(lblSlopeOffset_, "");
-                pnlSecond_.add(txtSheetOffset_, "wrap");
-                pnlSecond_.add(btnCenterOffset_, "");
-                pnlSecond_.add(btnSheetOffsetMinus_, "split 2");
-                pnlSecond_.add(btnSheetOffsetPlus_, "");
-                pnlSecond_.add(sldSheetOffset_, "");
+                txtSheetOffset_.setText(String.valueOf(value));
+                //lblSlopeOffset_ = new JLabel(strValue);
+                pnlSecond_.add(lblSheetOffset, "");
+                //pnlSecond_.add(lblSlopeOffset_, "");
+                pnlSecond_.add(txtSheetOffset_, "gapleft 20");
+//                pnlSecond_.add(btnCenterOffset_, "");
+//                pnlSecond_.add(btnSheetOffsetMinus_, "split 2");
+//                pnlSecond_.add(btnSheetOffsetPlus_, "");
+//                pnlSecond_.add(sldSheetOffset_, "");
                 break;
             default:
                 break;
@@ -164,79 +166,79 @@ public class BeamSheetControlPanel extends Panel {
         //});
 
         // second panel
-        cbxAutoSheetWidth_.registerListener(e -> {
-            final boolean state = cbxAutoSheetWidth_.isSelected();
-            model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).useAutoSheetWidth(state);
-            setEnabledSheetWidth(state);
-        });
-
-        sldSheetWidth_.registerListener(e -> {
-            final double value = sldSheetWidth_.getDouble();
-            model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).sheetWidth(value);
-            //System.out.println("sheetWidth value: " + value);
-        });
-
-        sldSheetOffset_.registerListener(e -> {
-            final double value = sldSheetOffset_.getDouble();
-            model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
-            final String strValue = String.format("%.3f", value);
-            currentOffset_ = value;
-            EventQueue.invokeLater(() -> {
-               txtSheetOffset_.setText(strValue);
-               lblSlopeOffset_.setText(strValue);
-            });
-            //System.out.println("sheetOffset value: " + strValue);
-        });
+//        cbxAutoSheetWidth_.registerListener(e -> {
+//            final boolean state = cbxAutoSheetWidth_.isSelected();
+//            model_.acquisitions().settingsBuilder()
+//                    .sheetCalibrationBuilder(pathNum_).useAutoSheetWidth(state);
+//            setEnabledSheetWidth(state);
+//        });
+//
+//        sldSheetWidth_.registerListener(e -> {
+//            final double value = sldSheetWidth_.getDouble();
+//            model_.acquisitions().settingsBuilder()
+//                    .sheetCalibrationBuilder(pathNum_).sheetWidth(value);
+//            //System.out.println("sheetWidth value: " + value);
+//        });
+//
+//        sldSheetOffset_.registerListener(e -> {
+//            final double value = sldSheetOffset_.getDouble();
+//            model_.acquisitions().settingsBuilder()
+//                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+//            final String strValue = String.format("%.3f", value);
+//            currentOffset_ = value;
+//            EventQueue.invokeLater(() -> {
+//               txtSheetOffset_.setText(strValue);
+//               lblSlopeOffset_.setText(strValue);
+//            });
+//            //System.out.println("sheetOffset value: " + strValue);
+//        });
 
         txtSheetOffset_.registerListener(e -> {
             final double value = Double.parseDouble(txtSheetOffset_.getText());
-            final double total = Math.max(-1.0, Math.min(1.0, value));
-            model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).sheetOffset(total);
-            currentOffset_ = total;
-            EventQueue.invokeLater(() -> {
-                lblSlopeOffset_.setText(String.format("%.3f", total));
-                sldSheetOffset_.setDouble(total);
-            });
-        });
-
-        btnCenterOffset_.registerListener(e -> {
-            //System.out.println("center offset pressed");
-            model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).sheetOffset(0.0);
-            txtSheetOffset_.setText("0");
-            lblSlopeOffset_.setText("0");
-            sldSheetOffset_.setDouble(0);
-            currentOffset_ = 0;
-        });
-
-        // TODO: buttons
-        btnSheetOffsetMinus_.registerListener(e -> {
-            //final double value = model_.acquisitions().getAcquisitionSettings()
-            //        .sheetCalibration(pathNum_).sheetOffset() - 0.01;
-            currentOffset_ -= 0.01;
-            final double value = currentOffset_;
-            //System.out.println("value: " + value);
+            //final double total = Math.max(-1.0, Math.min(1.0, value));
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
-            txtSheetOffset_.setText(String.format("%.3f ", value));
-            sldSheetOffset_.setDouble(value);
+           // currentOffset_ = total;
+//            EventQueue.invokeLater(() -> {
+//                lblSlopeOffset_.setText(String.format("%.3f", total));
+//                //sldSheetOffset_.setDouble(total);
+//            });
         });
 
-        btnSheetOffsetPlus_.registerListener(e -> {
-//            final double value = model_.acquisitions().getAcquisitionSettings()
-//                    .sheetCalibration(pathNum_).sheetOffset() + 0.01;
-            currentOffset_ += 0.01;
-            final double value = currentOffset_;
-            //System.out.println("value: " + value);
-            model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
-            txtSheetOffset_.setText(String.format("%.3f ", value));
-            sldSheetOffset_.setDouble(value);
-        });
+//        btnCenterOffset_.registerListener(e -> {
+//            //System.out.println("center offset pressed");
+//            model_.acquisitions().settingsBuilder()
+//                    .sheetCalibrationBuilder(pathNum_).sheetOffset(0.0);
+//            txtSheetOffset_.setText("0");
+//            lblSlopeOffset_.setText("0");
+//            sldSheetOffset_.setDouble(0);
+//            currentOffset_ = 0;
+//        });
+//
+//        // TODO: buttons
+//        btnSheetOffsetMinus_.registerListener(e -> {
+//            //final double value = model_.acquisitions().getAcquisitionSettings()
+//            //        .sheetCalibration(pathNum_).sheetOffset() - 0.01;
+//            currentOffset_ -= 0.01;
+//            final double value = currentOffset_;
+//            //System.out.println("value: " + value);
+//            model_.acquisitions().settingsBuilder()
+//                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+//            txtSheetOffset_.setText(String.format("%.3f ", value));
+//            sldSheetOffset_.setDouble(value);
+//        });
+//
+//        btnSheetOffsetPlus_.registerListener(e -> {
+////            final double value = model_.acquisitions().getAcquisitionSettings()
+////                    .sheetCalibration(pathNum_).sheetOffset() + 0.01;
+//            currentOffset_ += 0.01;
+//            final double value = currentOffset_;
+//            //System.out.println("value: " + value);
+//            model_.acquisitions().settingsBuilder()
+//                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+//            txtSheetOffset_.setText(String.format("%.3f ", value));
+//            sldSheetOffset_.setDouble(value);
+//        });
 
 //        btnSheetWidthMinus_.registerListener(e -> {
 //        });

@@ -98,15 +98,25 @@ public class XYZGridFrame extends JFrame {
         lblYCountValue_ = new JLabel("0");
         lblZCountValue_ = new JLabel("0");
 
-        Panel.setMigLayoutDefault(
-                "insets 10 10 10 10",
-                "[]10[]",
-                "[]10[]"
-        );
         final Panel pnlX = new Panel(cbxUseX_);
         final Panel pnlY = new Panel(cbxUseY_);
         final Panel pnlZ = new Panel(cbxUseZ_);
         final Panel pnlButtons = new Panel();
+        pnlX.setMigLayout(
+               "insets 10 10 10 10",
+               "[]10[]",
+               "[]10[]"
+        );
+        pnlX.setMigLayout(
+               "insets 10 10 10 10",
+               "[]10[]",
+               "[]10[]"
+        );
+        pnlX.setMigLayout(
+               "insets 10 10 10 10",
+               "[]10[]",
+               "[]10[]"
+        );
 
         // X
         lblXStart_ = new JLabel("X start [µm]:");
@@ -139,11 +149,16 @@ public class XYZGridFrame extends JFrame {
         spnZDelta_ = Spinner.createDoubleSpinner(0.0,-Double.MAX_VALUE, Double.MAX_VALUE, 100.0);
 
         final Panel pnlSettings = new Panel("Grid Settings");
+        pnlSettings.setMigLayout(
+               "insets 10 10 10 10",
+               "[]10[]",
+               "[]10[]"
+        );
+
         final JLabel lblOverlap = new JLabel("Overlap (Y and Z) [%]:");
         Spinner.setDefaultSize(4);
         spnOverlapYZ_ = Spinner.createIntegerSpinner(10, 0, 100, 1);
         cbxClearPositions_ = new CheckBox("Clear position list if YZ unused", false);
-
 
         pnlX.add(lblXStart_, "");
         pnlX.add(spnXStart_, "wrap");
