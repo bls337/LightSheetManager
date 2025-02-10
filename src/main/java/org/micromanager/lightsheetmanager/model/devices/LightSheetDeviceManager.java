@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
  */
 public class LightSheetDeviceManager extends DeviceBase {
 
-
     // used to indicate that the device is not set to any hardware
     public static final String UNDEFINED = "Undefined";
 

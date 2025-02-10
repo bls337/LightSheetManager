@@ -37,7 +37,7 @@ public class PiezoCalibrationPanel extends Panel {
     private final LightSheetManager model_;
 
     public PiezoCalibrationPanel(final LightSheetManager model, final int pathNum) {
-        super("Piezo/Slice Calibration");
+        super("Galvo Piezo Calibration");
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;
         createUserInterface();
@@ -50,8 +50,10 @@ public class PiezoCalibrationPanel extends Panel {
 
         isUsingPLogic_ = model_.devices().isUsingPLogic();
 
-        final JLabel lblSlope = new JLabel("Slope:");
-        final JLabel lblOffset = new JLabel("Offset:");
+        final JLabel lblSlope = new JLabel("Galvo constant:");
+        final JLabel lblOffset = new JLabel("Piezo offset:");
+//        final JLabel lblSlope = new JLabel("Slope:");
+//        final JLabel lblOffset = new JLabel("Offset:");
         final JLabel lblStepSize = new JLabel("Step Size:");
 
         // default values
@@ -104,6 +106,7 @@ public class PiezoCalibrationPanel extends Panel {
         Panel pnlText = new Panel();
         pnlText.setMinimumSize(new Dimension(100, 30));
         pnlText.add(lblSlope, "");
+        pnlText.add(lblSlopeValue_, "");
         pnlText.add(lblSlopeValue_, "");
         pnlText.add(txtSlope_, "wrap");
         pnlText.add(lblOffset, "");

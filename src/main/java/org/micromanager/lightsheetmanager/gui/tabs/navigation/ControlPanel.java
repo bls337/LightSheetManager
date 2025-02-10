@@ -5,7 +5,7 @@ import mmcorej.DeviceType;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
-import org.micromanager.lightsheetmanager.gui.components.Spinner;
+import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.positions.Subscriber;
 
@@ -43,19 +43,20 @@ public class ControlPanel extends Panel implements Subscriber {
 
     private final CMMCore core_;
 
-    private String propertyName_; // name in device adapter
+    // data
+    private String propertyName_; // property name in device adapter
     private String deviceName_;
     private DeviceType deviceType_;
     private Axis axis_;
     private Units units_;
 
+    // ui
     private JLabel lblPropertyName_;
     private JLabel lblPosition_;
-    private Spinner spnRelativeMove_;
-    private Spinner spnAbsoluteMove_;
+    private TextField txtAbsoluteMove_;
+    private TextField txtRelMoveStepSize_;
     private Button btnRelMovePlus_;
     private Button btnRelMoveMinus_;
-    private Button btnAbsoluteMove_;
     private Button btnMoveToZero_;
     private Button btnSetZero_;
 
@@ -84,62 +85,63 @@ public class ControlPanel extends Panel implements Subscriber {
     }
 
     public void createUserInterface() {
+        setMigLayout("", "[]5[]", "");
 
-        // change start value if using degrees
-        double startValue = 100.0;
+        // select step size start value
+        String startValue = "10";
         if (units_ == Units.DEGREES) {
-            startValue = 1.0;
+            startValue = "0.2";
         }
 
-        Button.setDefaultSize(120, 24);
-        spnRelativeMove_ = Spinner.createDoubleSpinner(startValue, 0.0, Double.MAX_VALUE, 1.0);
-        spnAbsoluteMove_ = Spinner.createDoubleSpinner(startValue, -Double.MAX_VALUE, Double.MAX_VALUE, 1.0);
-        spnRelativeMove_.setColumnSize(8);
-        spnAbsoluteMove_.setColumnSize(8);
+        txtAbsoluteMove_ = new TextField("0", 5);
+        txtRelMoveStepSize_ = new TextField(startValue, 3);
 
-        btnAbsoluteMove_ = new Button("Absolute Move", 110, 24);
+        btnRelMovePlus_ = new Button("+", 40, 26);
+        btnRelMoveMinus_ = new Button("-", 40, 26);
 
-        Button.setDefaultSize(40, 24);
-        btnRelMovePlus_ = new Button("+");
-        btnRelMoveMinus_ = new Button("-");
-
-        Button.setDefaultSize(100, 20);
-        btnMoveToZero_ = new Button("Go to 0", 80, 24);
+        btnMoveToZero_ = new Button("Go to 0", 68, 26);
         if (isStageDevice()) {
-            btnSetZero_ = new Button("Set 0", 80, 24);
+            btnSetZero_ = new Button("Set 0", 58, 26);
             btnSetZero_.setToolTipText("");
         }
 
+        // select axis names based on device
         String propName = propertyName_;
         if (axis_ != Axis.NONE) {
-            propName = propertyName_ + ": " + axis_ + " Axis";
+            if (deviceType_ == DeviceType.GalvoDevice) {
+                final String axisLetter = (axis_ == Axis.X) ? "A" : "B";
+                propName = propertyName_ + ", " + axisLetter;
+            } else {
+                propName = propertyName_ + ", " + axis_;
+            }
         }
-        lblPropertyName_ = new JLabel(propName);
-        lblPropertyName_.setMinimumSize(new Dimension(95, 20));
+
+        lblPropertyName_ = new JLabel(propName + ":");
+        lblPropertyName_.setMinimumSize(new Dimension(90, 20));
 
         lblPosition_ = new JLabel();
         lblPosition_.setMinimumSize(new Dimension(80, 20));
-        if (isStageDevice()) {
-            lblPosition_.setText("0.000 µm");
-        } else {
-            lblPosition_.setText("0.000");
-        }
+        lblPosition_.setText("0.000 " + units_);
 
-        btnAbsoluteMove_.setToolTipText("Send an absolute move command to the device.");
+        // tooltips
+        txtAbsoluteMove_.setToolTipText("Sends an absolute move command to the device.");
+        txtRelMoveStepSize_.setToolTipText("The relative move step size used by the +/- buttons.");
         btnRelMovePlus_.setToolTipText("Sends a relative move command to the device.");
         btnRelMoveMinus_.setToolTipText("Sends a relative move command to the device.");
-        btnMoveToZero_.setToolTipText("");
+        btnMoveToZero_.setToolTipText("Move to position 0.");
 
-        add(lblPosition_, "");
         add(lblPropertyName_, "");
-        add(spnRelativeMove_, "");
-        add(btnRelMoveMinus_, "");
+        add(lblPosition_, "");
+        add(txtAbsoluteMove_, "");
+        add(btnRelMoveMinus_, "gapleft 5");
+        add(txtRelMoveStepSize_, "");
         add(btnRelMovePlus_, "");
-        add(spnAbsoluteMove_, "gapleft 20");
-        add(btnAbsoluteMove_, "");
-        add(btnMoveToZero_, "gapleft 20");
+        add(btnMoveToZero_, "gapleft 5");
         if (isStageDevice()) {
-            add(btnSetZero_, "");
+            // check for imaging prefix to exclude piezo
+            if (!propertyName_.startsWith("Imaging")) {
+                add(btnSetZero_, "gapleft 40");
+            }
         }
     }
 
@@ -152,12 +154,12 @@ public class ControlPanel extends Panel implements Subscriber {
         if (deviceType_ == DeviceType.XYStageDevice) {
             switch (axis_) {
                 case X:
+                    txtAbsoluteMove_.registerListener(e ->
+                            setXPosition(Double.parseDouble(txtAbsoluteMove_.getText())));
                     btnRelMovePlus_.registerListener(e ->
-                            setRelativeXPosition(spnRelativeMove_.getDouble()));
+                            setRelativeXPosition(Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnRelMoveMinus_.registerListener(e ->
-                            setRelativeXPosition(-spnRelativeMove_.getDouble()));
-                    btnAbsoluteMove_.registerListener(e ->
-                            setXPosition(spnAbsoluteMove_.getDouble()));
+                            setRelativeXPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnMoveToZero_.registerListener(e -> setXPosition(0.0));
                     btnSetZero_.registerListener(e -> {
                        final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
@@ -168,12 +170,12 @@ public class ControlPanel extends Panel implements Subscriber {
                     });
                     break;
                 case Y:
+                    txtAbsoluteMove_.registerListener(e ->
+                            setYPosition(Double.parseDouble(txtAbsoluteMove_.getText())));
                     btnRelMovePlus_.registerListener(e ->
-                            setRelativeYPosition(spnRelativeMove_.getDouble()));
+                            setRelativeYPosition(Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnRelMoveMinus_.registerListener(e ->
-                            setRelativeYPosition(-spnRelativeMove_.getDouble()));
-                    btnAbsoluteMove_.registerListener(e ->
-                            setYPosition(spnAbsoluteMove_.getDouble()));
+                            setRelativeYPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnMoveToZero_.registerListener(e -> setYPosition(0.0));
                     btnSetZero_.registerListener(e -> {
                        final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
@@ -189,15 +191,13 @@ public class ControlPanel extends Panel implements Subscriber {
 
         } else if (deviceType_ == DeviceType.StageDevice) {
             // single axis device
+            txtAbsoluteMove_.registerListener(e ->
+                    setPosition(Double.parseDouble(txtAbsoluteMove_.getText())));
             btnRelMovePlus_.registerListener(e ->
-                    setRelativePosition(spnRelativeMove_.getDouble()));
+                    setRelativePosition(Double.parseDouble(txtRelMoveStepSize_.getText())));
             btnRelMoveMinus_.registerListener(e ->
-                    setRelativePosition(-spnRelativeMove_.getDouble()));
-            btnAbsoluteMove_.registerListener(e ->
-                    setPosition(spnAbsoluteMove_.getDouble()));
+                    setRelativePosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
             btnMoveToZero_.registerListener(e -> setPosition(0.0));
-
-            //if (isStageDevice()) {
             btnSetZero_.registerListener(e -> {
                final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
                      "This will change the coordinate system. Are you sure you would like to proceed?");
@@ -205,28 +205,26 @@ public class ControlPanel extends Panel implements Subscriber {
                   setOrigin();
                }
             });
-            //}
         } else if (deviceType_ == DeviceType.GalvoDevice) {
+            // do not add btnSetZero_ to GalvoDevices
             switch (axis_) {
                 case X:
+                    txtAbsoluteMove_.registerListener(e ->
+                            setPositionGalvoX(Double.parseDouble(txtAbsoluteMove_.getText())));
                     btnRelMovePlus_.registerListener(e ->
-                            setRelativeGalvoPositionX(spnRelativeMove_.getDouble()));
+                            setRelativeGalvoPositionX(Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnRelMoveMinus_.registerListener(e ->
-                            setRelativeGalvoPositionX(-spnRelativeMove_.getDouble()));
-                    btnAbsoluteMove_.registerListener(e ->
-                            setPositionGalvoX(spnAbsoluteMove_.getDouble()));
+                            setRelativeGalvoPositionX(-Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnMoveToZero_.registerListener(e -> setPositionGalvoX(0.0));
-                    //btnSetZero_.registerListener(e -> setOriginX());
                     break;
                 case Y:
+                    txtAbsoluteMove_.registerListener(e ->
+                            setPositionGalvoY(Double.parseDouble(txtAbsoluteMove_.getText())));
                     btnRelMovePlus_.registerListener(e ->
-                            setRelativeGalvoPositionY(spnRelativeMove_.getDouble()));
+                            setRelativeGalvoPositionY(Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnRelMoveMinus_.registerListener(e ->
-                            setRelativeGalvoPositionY(-spnRelativeMove_.getDouble()));
-                    btnAbsoluteMove_.registerListener(e ->
-                            setPositionGalvoY(spnAbsoluteMove_.getDouble()));
+                            setRelativeGalvoPositionY(-Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnMoveToZero_.registerListener(e -> setPositionGalvoY(0.0));
-                    //btnSetZero_.registerListener(e -> setOriginY());
                     break;
                 default:
                     break;

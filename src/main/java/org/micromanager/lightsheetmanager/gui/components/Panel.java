@@ -17,7 +17,7 @@ public class Panel extends JPanel {
     private static String defaultRows = "";
 
     public Panel() {
-        setMigLayout(defaultLayout, defaultCols, defaultRows);
+        setMigLayout("", "", "");
     }
 
     // TODO: do i need this?
@@ -53,10 +53,6 @@ public class Panel extends JPanel {
                 BorderFactory.createLineBorder(Color.gray));
         setBorder(border);
     }
-
-//    public Panel(final String layout, final String cols, final String rows) {
-//        setMigLayout(layout, cols, rows);
-//    }
 
     /**
      * Set the layout using MigLayout.

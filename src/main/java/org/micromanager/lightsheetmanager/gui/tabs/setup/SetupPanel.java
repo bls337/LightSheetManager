@@ -26,7 +26,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
     private Panel leftPanel_;
     private Panel rightPanel_;
 
-    private int pathNum_;
+    private final int pathNum_;
 
     private SingleAxisPanel singleAxisPanel_;
 
@@ -63,7 +63,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
         }
         leftPanel_.add(cameraPanel_, "growx, wrap");
 
-        rightPanel_.add(positionPanel_, "");
+        rightPanel_.add(positionPanel_, "growy");
         rightPanel_.add(piezoPanel_, "growy, wrap");
         rightPanel_.add(beamSheetPanel_, "span 2, growx, wrap");
 

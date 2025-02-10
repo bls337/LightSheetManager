@@ -5,8 +5,8 @@ import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import mmcorej.DeviceType;
-import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.model.devices.LightSheetDeviceManager;
 
 import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
@@ -22,20 +22,17 @@ import java.util.Objects;
 
 public class NavigationPanel extends Panel {
 
-    private final Studio studio_;
-
     private Button btnHaltDevices_;
     private Button btnRefreshPanel_;
     private CheckBox cbxPollPositions_;
 
-    private DeviceManager devices_;
-    private ArrayList<ControlPanel> controlPanels_;
+    private final DeviceManager devices_;
+    private final ArrayList<ControlPanel> controlPanels_;
 
     private final LightSheetManager model_;
 
     public NavigationPanel(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
-        studio_ = model_.studio();
         devices_ = model_.devices();
 
         controlPanels_ = new ArrayList<>();
@@ -49,45 +46,44 @@ public class NavigationPanel extends Panel {
      */
     private void createUserInterface() {
 
-        Panel.setMigLayoutDefault(
-                "", //""debug 1000",
+        setMigLayout(
+                "", // "debug 1000"
                 "[]5[]",
-                "[]0[]"
+                "[]5[]"
         );
 
         btnHaltDevices_ = new Button("HALT", 120, 30);
         btnRefreshPanel_ = new Button("Refresh", 120, 30);
-
         cbxPollPositions_ = new CheckBox("Poll Positions",
                 model_.pluginSettings().isPollingPositions());
 
-        final int numImagingPaths = devices_.getDeviceAdapter().getNumImagingPaths();
-        final int numIlluminationPaths = devices_.getDeviceAdapter().getNumIlluminationPaths();
-
-        final Map<String, String> deviceMap = devices_.getDeviceAdapter().getDeviceMap();
-        final Map<String, DeviceType> deviceTypeMap = devices_.getDeviceAdapter().getDeviceTypeMap();
-
+        // Property prefixes
         final String illum = "Illum";
         final String imaging = "Imaging";
 
-        //ControlPanel[][] panels = new ControlPanel[2][2];
+        // use pre-init property settings and Microscope Geometry data from Device Adapter
+        final LightSheetDeviceManager deviceAdapter = devices_.getDeviceAdapter();
+        final int numImagingPaths = deviceAdapter.getNumImagingPaths();
+        final int numIllumPaths = deviceAdapter.getNumIlluminationPaths();
+        final Map<String, String> deviceMap = deviceAdapter.getDeviceMap();
+        final Map<String, DeviceType> deviceTypeMap = deviceAdapter.getDeviceTypeMap();
 
-        ArrayList<ArrayList<ControlPanel>> imagingProperties = new ArrayList<>(numImagingPaths);
-        ArrayList<ArrayList<ControlPanel>> illumProperties = new ArrayList<>(numIlluminationPaths);
-        ArrayList<ControlPanel> miscProperties = new ArrayList<>();
+        // init ControlPanel arrays
+        final ArrayList<ControlPanel> stageProperties = new ArrayList<>();
+        final ArrayList<ArrayList<ControlPanel>> imagingProperties = new ArrayList<>(numImagingPaths);
+        final ArrayList<ArrayList<ControlPanel>> illumProperties = new ArrayList<>(numIllumPaths);
 
         for (int i = 0; i < numImagingPaths; i++) {
             imagingProperties.add(new ArrayList<>());
         }
-        for (int i = 0; i < numIlluminationPaths; i++) {
+        for (int i = 0; i < numIllumPaths; i++) {
             illumProperties.add(new ArrayList<>());
         }
 
-        //System.out.println("img props: " + imagingProperties.size());
-        //System.out.println("ill props: " + illumProperties.size());
-
+        // create a ControlPanel for each device
         int devicesFound = 0;
         for (String propertyName : deviceMap.keySet()) {
+
             final String deviceName = deviceMap.get(propertyName);
             if (deviceName.equals("Undefined")) {
                 continue; // skip this property => device not set
@@ -100,11 +96,9 @@ public class NavigationPanel extends Panel {
                 continue; // don't add cameras to axis list
             }
 
-            //ControlPanel controlPanel = new ControlPanel(studio_, propertyName, deviceName, deviceType, ControlPanel.Axis.X);
-
             //System.out.println(property);
             if (propertyName.startsWith(illum)) {
-                // check if String contains digit (TODO: or switch based on microscope geometry?)
+                // check if String contains digit TODO: or switch based on microscope geometry?
                 boolean containsDigit = containsDigit(propertyName);
                 if (containsDigit) {
                     // DISPIM
@@ -140,7 +134,7 @@ public class NavigationPanel extends Panel {
                 boolean containsDigit = containsDigit(propertyName);
                 final int pathNum;
                 if (containsDigit) {
-                    pathNum = Character.getNumericValue(propertyName.charAt(imaging.length()));
+                    pathNum = Character.getNumericValue(propertyName.charAt(imaging.length())); // TODO: make fn?
                 } else {
                     pathNum = 1;
                 }
@@ -155,14 +149,14 @@ public class NavigationPanel extends Panel {
                           model_, propertyName, deviceName, deviceType, ControlPanel.Axis.X, ControlPanel.Units.MICRONS);
                     ControlPanel controlPanelY = new ControlPanel(
                           model_, propertyName, deviceName, deviceType, ControlPanel.Axis.Y, ControlPanel.Units.MICRONS);
-                    miscProperties.add(controlPanelX);
-                    miscProperties.add(controlPanelY);
+                    stageProperties.add(controlPanelX);
+                    stageProperties.add(controlPanelY);
 
                     System.out.println(propertyName + " added to misc properties");
                 } else if (deviceType == DeviceType.StageDevice) {
                     ControlPanel controlPanel = new ControlPanel(
                           model_, propertyName, deviceName, deviceType, ControlPanel.Axis.NONE, ControlPanel.Units.MICRONS);
-                    miscProperties.add(controlPanel);
+                    stageProperties.add(controlPanel);
 
                     System.out.println(propertyName + " added to misc properties");
                 } else {
@@ -173,20 +167,28 @@ public class NavigationPanel extends Panel {
             devicesFound++;
         }
 
+        // no devices found
         if (devicesFound == 0) {
             add(new JLabel("No devices or device adapter properties are not set."), "wrap");
             add(btnHaltDevices_, "wrap");
-            //add(btnRefreshPanel_, "wrap");
+            //add(btnRefreshPanel_, "wrap"); // TODO: add refresh option
             add(cbxPollPositions_, "");
-            return;
+            return; // early exit => no devices to add
         }
 
-        miscProperties.sort(Comparator.comparing(ControlPanel::getPropertyName));
-
+        // sort all ControlPanel groups by property name
+        stageProperties.sort(Comparator.comparing(ControlPanel::getPropertyName));
         illumProperties.get(0).sort(Comparator.comparing(ControlPanel::getPropertyName));
         imagingProperties.get(0).sort(Comparator.comparing(ControlPanel::getPropertyName));
 
-        //ControlPanel control = new ControlPanel(studio_,"SampleXY", deviceMap.get("SampleXY"), DeviceType.XYStageDevice);
+        // add ControlPanels to ui
+        final Panel miscPanel = new Panel("Sample Axes", TitledBorder.LEFT);
+        for (ControlPanel controlPanel : stageProperties) {
+            miscPanel.add(controlPanel, "wrap");
+            controlPanels_.add(controlPanel);
+        }
+
+        add(miscPanel, "wrap");
 
         int i = 1;
         for (ArrayList<ControlPanel> list : imagingProperties) {
@@ -196,7 +198,7 @@ public class NavigationPanel extends Panel {
                     imagingPanel.add(controlPanel, "wrap");
                     controlPanels_.add(controlPanel);
                 }
-                add(imagingPanel, "wrap");
+                add(imagingPanel, "wrap, growx");
             }
             i++;
         }
@@ -214,14 +216,7 @@ public class NavigationPanel extends Panel {
             ii++;
         }
 
-        Panel miscPanel = new Panel("Additional Axes", TitledBorder.LEFT);
-        for (ControlPanel controlPanel : miscProperties) {
-            miscPanel.add(controlPanel, "wrap");
-            controlPanels_.add(controlPanel);
-        }
-
-        add(miscPanel, "wrap");
-        add(btnHaltDevices_, "split 3");
+        add(btnHaltDevices_, "wrap");
         //add(btnRefreshPanel_, "");
         add(cbxPollPositions_, "");
     }
@@ -230,14 +225,13 @@ public class NavigationPanel extends Panel {
 
         // refresh devices and ui
         btnRefreshPanel_.registerListener(e -> {
-            //System.out.println("refresh pressed");
             removeAll();
             createUserInterface();
             createEventHandlers();
             revalidate();
             repaint();
             if (cbxPollPositions_.isSelected()) {
-               model_.positions().startPolling();
+                model_.positions().startPolling();
             }
         });
 
@@ -274,12 +268,13 @@ public class NavigationPanel extends Panel {
         return containsDigit;
     }
 
+    // TODO: move to model and remove controlPanels_ var
     /**
      * Halt all 2D and 1D stage devices.
      */
     private void haltAllDevices() {
         for (ControlPanel controlPanel : controlPanels_) {
-            DeviceType deviceType = controlPanel.getDeviceType();
+            final DeviceType deviceType = controlPanel.getDeviceType();
             if (deviceType == DeviceType.XYStageDevice || deviceType == DeviceType.StageDevice) {
                 controlPanel.stop();
             }

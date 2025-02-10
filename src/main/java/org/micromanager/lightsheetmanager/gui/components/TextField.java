@@ -4,18 +4,17 @@ import javax.swing.JTextField;
 
 public class TextField extends JTextField {
 
-    private static int DEFAULT_SIZE = 5;
-
     public TextField() {
-        setColumns(DEFAULT_SIZE);
+        setColumns(5);
     }
 
     public TextField(final int size) {
         setColumns(size);
     }
 
-    public static void setDefaultSize(final int size) {
-        DEFAULT_SIZE = size;
+    public TextField(final String text, final int size) {
+        super(text);
+        setColumns(size);
     }
 
     public void registerListener(final Method method) {
