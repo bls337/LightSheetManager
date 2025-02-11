@@ -87,7 +87,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         final DefaultAcquisitionSettingsSCAPE acqSettings =
                 model_.acquisitions().settings();
 
-        Panel.setMigLayoutDefault(
+        setMigLayout(
                 "insets 10 10 10 10",
                 "[]5[]",
                 "[]5[]"
