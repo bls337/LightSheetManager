@@ -19,6 +19,7 @@ public class DeviceBase {
     public DeviceBase(final Studio studio) {
         studio_ = Objects.requireNonNull(studio);
         core_ = studio_.core();
+        deviceName_ = "";
     }
 
     public DeviceBase(final Studio studio, final String deviceName) {
@@ -121,9 +122,18 @@ public class DeviceBase {
         return result;
     }
 
+    // TODO: remove this
     public DeviceType getDeviceType(final String deviceName) {
         try {
             return core_.getDeviceType(deviceName);
+        } catch (Exception e) {
+            return DeviceType.UnknownType;
+        }
+    }
+
+    public DeviceType getDeviceType() {
+        try {
+            return core_.getDeviceType(deviceName_);
         } catch (Exception e) {
             return DeviceType.UnknownType;
         }
@@ -154,6 +164,14 @@ public class DeviceBase {
                 .toArray(String[]::new);
     }
 
+    public void halt() {
+       try {
+          core_.stop(deviceName_);
+       } catch (Exception e) {
+          studio_.logs().logError("Error halting device: " + deviceName_);
+       }
+    }
+
     public void waitForDevice() {
         try {
             core_.waitForDevice(deviceName_);
@@ -161,4 +179,5 @@ public class DeviceBase {
             studio_.logs().logError("Error waiting for device: " + deviceName_);
         }
     }
+
 }

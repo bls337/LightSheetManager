@@ -79,10 +79,6 @@ public class SetupPanel extends Panel implements ListeningPanel {
         return pathNum_;
     }
 
-    public PositionPanel getPositionPanel() {
-        return positionPanel_;
-    }
-
     @Override
     public void selected() {
         excitationPanel_.selected();

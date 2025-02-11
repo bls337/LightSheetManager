@@ -236,7 +236,7 @@ public class NavigationPanel extends Panel {
         });
 
         // halt stage devices
-        btnHaltDevices_.registerListener(e -> haltAllDevices());
+        btnHaltDevices_.registerListener(e -> model_.devices().haltDevices());
 
         // position polling
         cbxPollPositions_.registerListener(e -> {
@@ -266,19 +266,6 @@ public class NavigationPanel extends Panel {
             }
         }
         return containsDigit;
-    }
-
-    // TODO: move to model and remove controlPanels_ var
-    /**
-     * Halt all 2D and 1D stage devices.
-     */
-    private void haltAllDevices() {
-        for (ControlPanel controlPanel : controlPanels_) {
-            final DeviceType deviceType = controlPanel.getDeviceType();
-            if (deviceType == DeviceType.XYStageDevice || deviceType == DeviceType.StageDevice) {
-                controlPanel.stop();
-            }
-        }
     }
 
 }

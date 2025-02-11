@@ -12,17 +12,13 @@ import java.awt.Font;
 
 public class Panel extends JPanel {
 
-    private static String defaultLayout = "";
-    private static String defaultCols = "";
-    private static String defaultRows = "";
-
     public Panel() {
         setMigLayout("", "", "");
     }
 
     // TODO: do i need this?
     public Panel(final String text) {
-        setMigLayout(defaultLayout, defaultCols, defaultRows);
+        setMigLayout("", "", "");
         final TitledBorder titledBorder = BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(Color.gray), text);
         titledBorder.setTitleJustification(TitledBorder.CENTER);
@@ -32,7 +28,7 @@ public class Panel extends JPanel {
 
     // TODO: maybe parameterize font options and use static factory methods?
     public Panel(final String text, int side) { // side = TitledBorder.CENTER, etc
-        setMigLayout(defaultLayout, defaultCols, defaultRows);
+        setMigLayout("", "", "");
         final TitledBorder titledBorder = BorderFactory.createTitledBorder(
                 BorderFactory.createLineBorder(Color.gray), text);
         titledBorder.setTitleJustification(side);
@@ -41,14 +37,14 @@ public class Panel extends JPanel {
     }
 
     public Panel(final boolean border) {
-        setMigLayout(defaultLayout, defaultCols, defaultRows);
+        setMigLayout("", "", "");
         if (border) {
             setBorder(BorderFactory.createLineBorder(Color.gray));
         }
     }
 
     public Panel(final CheckBox checkBox) {
-        setMigLayout(defaultLayout, defaultCols, defaultRows);
+        setMigLayout("", "", "");
         final ComponentTitledBorder border = new ComponentTitledBorder(checkBox, this,
                 BorderFactory.createLineBorder(Color.gray));
         setBorder(border);
@@ -63,12 +59,6 @@ public class Panel extends JPanel {
      */
     public void setMigLayout(final String layout, final String cols, final String rows) {
         setLayout(new MigLayout(layout, cols, rows));
-    }
-
-    public static void setMigLayoutDefault(final String layout, final String cols, final String rows) {
-        Panel.defaultLayout = layout;
-        Panel.defaultCols = cols;
-        Panel.defaultRows = rows;
     }
 
 }

@@ -472,4 +472,14 @@ public class DeviceManager {
     public boolean hasDevice(final String deviceName) {
         return !deviceMap_.get(deviceName).getDeviceName().equals("Undefined");
     }
+
+    public void haltDevices() {
+        for (DeviceBase device : deviceMap_.values()) {
+            final DeviceType deviceType = device.getDeviceType();
+            if (deviceType == DeviceType.XYStageDevice || deviceType == DeviceType.StageDevice) {
+                device.halt();
+            }
+        }
+    }
+
 }

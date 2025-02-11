@@ -94,7 +94,7 @@ public class PositionUpdater implements Publisher {
    public void updatePositions() {
       for (String device : positions_.keySet()) {
          final String deviceName = model_.devices().getDevice(device).getDeviceName();
-         final DeviceType deviceType = model_.devices().getDevice(device).getDeviceType(deviceName);
+         final DeviceType deviceType = model_.devices().getDevice(device).getDeviceType();
          try {
             if (deviceType == DeviceType.XYStageDevice) {
                positions_.put(device, new Point2D.Double(

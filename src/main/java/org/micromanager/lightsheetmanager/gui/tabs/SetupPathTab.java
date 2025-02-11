@@ -12,10 +12,10 @@ import java.util.Objects;
 
 public class SetupPathTab extends Panel implements ListeningPanel {
 
-    private int pathNum_;
+    private final int pathNum_;
     private SetupPanel setupPanel_;
 
-    private LightSheetManager model_;
+    private final LightSheetManager model_;
 
     public SetupPathTab(final LightSheetManager model, final int pathNum) {
         model_ = Objects.requireNonNull(model);
