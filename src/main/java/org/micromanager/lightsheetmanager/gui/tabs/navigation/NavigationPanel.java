@@ -169,7 +169,7 @@ public class NavigationPanel extends Panel {
 
         // no devices found
         if (devicesFound == 0) {
-            add(new JLabel("No devices or device adapter properties are not set."), "wrap");
+            add(new JLabel("No devices found or the device adapter properties are not set."), "wrap");
             add(btnHaltDevices_, "wrap");
             //add(btnRefreshPanel_, "wrap"); // TODO: add refresh option
             add(cbxPollPositions_, "");
@@ -182,13 +182,15 @@ public class NavigationPanel extends Panel {
         imagingProperties.get(0).sort(Comparator.comparing(ControlPanel::getPropertyName));
 
         // add ControlPanels to ui
-        final Panel miscPanel = new Panel("Sample Axes", TitledBorder.LEFT);
+        final Panel sampleAxesPanel = new Panel("Sample Axes", TitledBorder.LEFT);
         for (ControlPanel controlPanel : stageProperties) {
-            miscPanel.add(controlPanel, "wrap");
+            sampleAxesPanel.add(controlPanel, "wrap");
             controlPanels_.add(controlPanel);
         }
 
-        add(miscPanel, "wrap");
+        if (!stageProperties.isEmpty()) {
+            add(sampleAxesPanel, "wrap");
+        }
 
         int i = 1;
         for (ArrayList<ControlPanel> list : imagingProperties) {

@@ -38,7 +38,6 @@ public class PositionUpdater implements Publisher {
       for (String device : devices) {
          positions_.put(device, 0.0); // TODO: how to init?
          topics_.put(device, new ArrayList<>());
-         System.out.println(device);
       }
    }
 
@@ -106,7 +105,7 @@ public class PositionUpdater implements Publisher {
                positions_.put(device, model_.core().getGalvoPosition(deviceName));
             }
          } catch (Exception e) {
-            // TODO:
+            model_.studio().logs().logError("Error in updatePositions()");
          }
       }
    }
