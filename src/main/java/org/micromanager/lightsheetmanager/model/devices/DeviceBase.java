@@ -19,7 +19,7 @@ public class DeviceBase {
     public DeviceBase(final Studio studio) {
         studio_ = Objects.requireNonNull(studio);
         core_ = studio_.core();
-        deviceName_ = "";
+        deviceName_ = "Unnamed";
     }
 
     public DeviceBase(final Studio studio, final String deviceName) {

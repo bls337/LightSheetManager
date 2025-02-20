@@ -112,4 +112,18 @@ public class LightSheetDeviceManager extends DeviceBase {
         return deviceMap.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> getDeviceType(e.getValue())));
     }
+
+   /**
+    * Return true if the device adapter has the deviceName property
+    * set to a value other than the default: "Undefined".
+    *
+    * <p>Example deviceName properties: "SampleXY"}, "ImagingFocus".
+    *
+    * @param deviceName the name of the device in the device adapter
+    * @return true if the device is not "Undefined".
+    */
+    public boolean hasDevice(final String deviceName) {
+        return !getProperty(deviceName).equals("Undefined");
+    }
+
 }

@@ -45,7 +45,7 @@ public class DeviceManager {
     private final Studio studio_;
     private final CMMCore core_;
 
-    /* Maps the Device Adapter device name to a DeviceBase object */
+    /** Maps the Device Adapter device name "SampleXY, ImagingFocus, etc" to a DeviceBase object. */
     private final Map<String, DeviceBase> deviceMap_;
 
     private static String deviceAdapterName_;
@@ -88,7 +88,7 @@ public class DeviceManager {
                 continue;
             }
 
-            // skip properties with no known DeviceType
+            // skip properties with unknown DeviceType
             final DeviceType deviceType = getDeviceType(deviceName);
             if (deviceType == DeviceType.UnknownType) {
                 continue;
@@ -142,7 +142,7 @@ public class DeviceManager {
                     devicesAdded.put(deviceName, scanner);
                 } else {
                     // use generic galvo device
-                    Galvo galvo = new Galvo(studio_);
+                    Galvo galvo = new Galvo(studio_, deviceName);
                     addDevice(propertyName, deviceName, galvo);
                     devicesAdded.put(deviceName, galvo);
                 }
@@ -464,15 +464,18 @@ public class DeviceManager {
     }
 
     /**
-     * Return true if the device is set to a value other than "Undefined".
+     * Return true if the device exists in the device map.
      *
-     * @param deviceName the device adapter name ("SampleXY", "SampleZ", etc.)
+     * @param deviceName the name of the device in the device adapter
      * @return true if the device is present
      */
     public boolean hasDevice(final String deviceName) {
         return !deviceMap_.get(deviceName).getDeviceName().equals("Undefined");
     }
 
+    /**
+     * Halt all XYStageDevice and StageDevice devices.
+     */
     public void haltDevices() {
         for (DeviceBase device : deviceMap_.values()) {
             final DeviceType deviceType = device.getDeviceType();

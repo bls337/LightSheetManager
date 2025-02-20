@@ -172,9 +172,13 @@ public class PositionPanel extends Panel implements Subscriber {
 
     // TODO: currently set up for SCAPE geometry, compare to original diSPIM plugin
     private void createEventHandlers() {
-
-        model_.positions().register(this, "ImagingFocus");
-        model_.positions().register(this, "IllumSlice");
+        // TODO: find a way to refresh these values
+        if (model_.devices().getDeviceAdapter().hasDevice("ImagingFocus")) {
+            model_.positions().register(this, "ImagingFocus");
+        }
+        if (model_.devices().getDeviceAdapter().hasDevice("IllumSlice")) {
+            model_.positions().register(this, "IllumSlice");
+        }
 
         if (isUsingPLogic_) {
             final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
