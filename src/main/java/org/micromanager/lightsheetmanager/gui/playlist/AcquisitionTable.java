@@ -71,7 +71,7 @@ public class AcquisitionTable extends JScrollPane {
         // enable drag and drop
         table_.setDragEnabled(true);
         table_.setDropMode(DropMode.INSERT_ROWS);
-        table_.setTransferHandler(new AcquisitionTableTransferHandler(table_));
+        //table_.setTransferHandler(new AcquisitionTableTransferHandler(table_));
 
         // used to set save directory root
         fileBrowser_ = new JFileChooser();
