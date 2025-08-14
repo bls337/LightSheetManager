@@ -940,6 +940,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
      * @return a builder for DefaultTimingSettings
      */
     public DefaultTimingSettings.Builder getTimingFromExposure() {
+
+        // temporary measure: use diSPIM-like settings unless we are doing stage scanning
+        if (!acqSettings_.isUsingStageScanning()) {
+           return getTimingFromPeriodAndLightExposure();
+        }
+
         // Note: sliceDuration is computed in recalculateSliceTiming
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
 
@@ -948,16 +954,26 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         final double cameraResetTime = camera.getResetTime(cameraMode);     // recalculate for safety, 0 for light sheet
         final double cameraReadoutTime = camera.getReadoutTime(cameraMode); // recalculate for safety, 0 for overlap
+
         final double cameraTotalTime = NumberUtils.ceilToQuarterMs(cameraResetTime + cameraReadoutTime);
         final double laserDuration = NumberUtils.roundToQuarterMs(
                 model_.acquisitions().settings().sliceSettings().sampleExposure());
+        final double slicePeriodMin = Math.max(laserDuration, cameraTotalTime);
+        // max of laser on time (for static light sheet) and total camera reset/readout time; will add excess later
+        final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriodMin - laserDuration);
+        // extra quarter millisecond to make sure interleaved slices works (otherwise laser signal never goes low)
+        final double sliceLaserInterleaved = (acqSettings_.channelMode() == MultiChannelMode.SLICE_HW ? 0.25f : 0.f);
 
-        final boolean isSlicePeriodMinimized = acqSettings_.sliceSettings().isSlicePeriodMinimized();
-        final double desiredSlicePeriod = acqSettings_.sliceSettings().slicePeriod();
+        // TODO: is this getting the correct value?
+        final double actualCameraResetTime =
+              camera.getDeviceName().equals(PVCamera.Models.PRIME_95B) ||
+              camera.getDeviceName().equals(PVCamera.Models.KINETIX)
+              ? camera.getPropertyFloat(PVCamera.Properties.READOUT_TIME) / 1e6 : cameraResetTime;
 
-        final double slicePeriod = Math.max(Math.max(laserDuration, cameraTotalTime),
-                isSlicePeriodMinimized ? 0 : desiredSlicePeriod);
-        final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriod - laserDuration);
+        //final boolean isSlicePeriodMinimized = acqSettings_.sliceSettings().isSlicePeriodMinimized();
+        //final double desiredSlicePeriod = acqSettings_.sliceSettings().slicePeriod();
+//        final double slicePeriod = Math.max(Math.max(laserDuration, cameraTotalTime),
+//                isSlicePeriodMinimized ? 0 : desiredSlicePeriod);
         switch (cameraMode) {
             case PSEUDO_OVERLAP: // e.g. Kinetix
                 tsb.scansPerSlice(1);
@@ -969,21 +985,72 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 tsb.delayBeforeLaser(sliceDeadTime);
                 tsb.delayBeforeScan(0.0);
                 break;
-            case OVERLAP: // e.g. Fusion
+            case OVERLAP: // e.g.
+                if (acqSettings_.isUsingChannels() && acqSettings_.numChannels() > 1
+                      && acqSettings_.channelMode() == MultiChannelMode.SLICE_HW) {
+                   // for interleaved slices we should illuminate during global exposure but not during readout/reset time after each trigger
+                   tsb.scansPerSlice(1);
+                   tsb.scanDuration(1.0);
+                   tsb.cameraExposure(0.25);
+                   tsb.laserTriggerDuration(laserDuration);
+                   tsb.cameraTriggerDuration(0.0);
+                   tsb.delayBeforeCamera(0.25);
+                   tsb.delayBeforeLaser(sliceDeadTime + NumberUtils.ceilToQuarterMs(cameraResetTime));
+                   tsb.delayBeforeScan(0.0);
+                } else {
+                   // the usual case
+                   tsb.scansPerSlice(1);
+                   tsb.scanDuration(1.0);
+                   tsb.cameraExposure(0.25);
+                   tsb.laserTriggerDuration(laserDuration);
+                   tsb.cameraTriggerDuration(1.0);
+                   tsb.delayBeforeCamera(0.0);
+                   tsb.delayBeforeLaser(sliceDeadTime + sliceLaserInterleaved);
+                   tsb.delayBeforeScan(0.0);
+                }
+                break;
             case EDGE:
+                // should illuminate during the entire exposure (or as much as needed) => will be exposing during camera reset and readout too
+                // Note: that this may be faster than overlap for interleaved channels
                 tsb.scansPerSlice(1);
-                tsb.scanDuration(0.0);
-                tsb.cameraExposure(laserDuration);
+                tsb.scanDuration(1.0);
+                tsb.cameraExposure(laserDuration - NumberUtils.ceilToQuarterMs(actualCameraResetTime + cameraReadoutTime));
                 tsb.laserTriggerDuration(laserDuration);
-                tsb.cameraTriggerDuration(1);
-                tsb.delayBeforeCamera(0);
-                tsb.delayBeforeLaser(sliceDeadTime);
-                tsb.delayBeforeScan(0.25);
+                tsb.cameraTriggerDuration(1.0);
+                tsb.delayBeforeCamera(sliceLaserInterleaved);
+                tsb.delayBeforeLaser(sliceDeadTime + sliceLaserInterleaved);
+                tsb.delayBeforeScan(0.0);
                 break;
             default:
                 studio_.logs().showError("Invalid camera mode");
                 break;
         }
+
+        // FIXME: needs delay
+        if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
+           double globalDelay = acqSettings_.sliceSettings().slicePeriod() - getSliceDuration(tsb);
+           if (cameraMode == CameraMode.VIRTUAL_SLIT) {
+              globalDelay = 0;
+           }
+           if (globalDelay < 0) {
+              globalDelay = 0;
+           }
+//           tsb.delayBeforeScan();
+//           tsb.delayBeforeCamera();
+//           tsb.delayBeforeLaser();
+        }
+
+        // FIXME: needs delay
+        final double cameraExposure = model_.acquisitions().settings().sliceSettings().sampleExposure();
+        double globalDelay = NumberUtils.ceilToQuarterMs(cameraExposure + cameraReadoutTime);
+        if (globalDelay > 0) {
+//           tsb.delayBeforeScan();
+//           tsb.delayBeforeCamera();
+//           tsb.delayBeforeLaser();
+        }
+
+        // update the slice duration based on our new values
+        tsb.sliceDuration(getSliceDuration(tsb));
         return tsb;
     }
 
