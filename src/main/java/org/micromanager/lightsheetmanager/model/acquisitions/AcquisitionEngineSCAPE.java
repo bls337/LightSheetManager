@@ -964,7 +964,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 tsb.scanDuration(0.25);
                 tsb.cameraExposure(laserDuration);
                 tsb.laserTriggerDuration(laserDuration);
-                tsb.cameraTriggerDuration(0.25);
+                tsb.cameraTriggerDuration(laserDuration);
                 tsb.delayBeforeCamera(0.25);
                 tsb.delayBeforeLaser(sliceDeadTime);
                 tsb.delayBeforeScan(0.0);
