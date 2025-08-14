@@ -1062,10 +1062,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // 4. start scan 0.25ms before camera global exposure and shifted up in time to account for delay introduced by Bessel filter
         // 5. turn on laser as soon as camera global exposure, leave laser on for desired light exposure time
         // 7. end camera exposure in final 0.25ms, post-filter scan waveform also ends now
-        ASIScanner scanner1 = model_.devices().getDevice("Illum1Beam");
-        ASIScanner scanner2 = model_.devices().getDevice("Illum2Beam");
+        ASIScanner scanner1 = model_.devices().getDevice("IllumBeam");
+        // ASIScanner scanner2 = model_.devices().getDevice("Illum2Beam");
 
-        CameraBase camera = model_.devices().getDevice("Imaging1Camera"); //.getImagingCamera(0);
+        //CameraBase camera = model_.devices().getDevice("Imaging1Camera"); //.getImagingCamera(0);
+        CameraBase camera = model_.devices().getDevice("ImagingCamera");
         if (camera == null) {
             // just a dummy to test demo mode
             return new DefaultTimingSettings.Builder();
@@ -1073,8 +1074,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // TODO: do this in ui?
         camera.setTriggerMode(acqSettings_.cameraMode());
 
+        // TODO: camera.getTriggerMode(); does not match up with actual selected trigger mode for PVCAM (pseudo overlap reads as edge trigger)
         //System.out.println(camera.getDeviceName());
-        CameraMode camMode = camera.getTriggerMode();
+        CameraMode camMode = acqSettings_.cameraMode(); // camera.getTriggerMode();
         //System.out.println(camMode);
 
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
@@ -1100,7 +1102,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // delay to start is (empirically) 0.07ms + 0.25/(freq in kHz)
         // delay to midpoint is empirically 0.38/(freq in kHz)
         // group delay for 5th-order bessel filter ~0.39/freq from theory and ~0.4/freq from IC datasheet
-        final double scanFilterFreq = Math.max(scanner1.getFilterFreqX(), scanner2.getFilterFreqX());
+        //final double scanFilterFreq = Math.max(scanner1.getFilterFreqX(), scanner2.getFilterFreqX());
+        final double scanFilterFreq = scanner1.getFilterFreqX();
 
         double scanDelayFilter = 0;
         if (scanFilterFreq != 0) {
