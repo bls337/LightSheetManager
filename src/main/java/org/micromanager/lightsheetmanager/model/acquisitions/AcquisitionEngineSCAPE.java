@@ -706,7 +706,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             final String savePath = FileUtils.createUniquePath(saveDir, saveName);
             //System.out.println("savePath: " + savePath);
             try {
-                curStore_.save(Datastore.SaveMode.MULTIPAGE_TIFF, savePath);
+                curStore_.save(Datastore.SaveMode.ND_TIFF, savePath);
             } catch (IOException e) {
                 model_.studio().logs().showError("could not save the acquisition data to: \n" + savePath);
             }
