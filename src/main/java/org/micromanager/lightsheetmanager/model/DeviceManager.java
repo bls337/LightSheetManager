@@ -240,6 +240,17 @@ public class DeviceManager {
         return (T) deviceMap_.get(deviceName);
     }
 
+    public DeviceBase getFirstImagingCamera() {
+         final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
+         if (adapter.getNumSimultaneousCameras() > 1) {
+            return deviceMap_.get("Imaging1Camera1");
+         } else if (adapter.getNumImagingPaths() > 1) {
+            return deviceMap_.get("Imaging1Camera");
+         } else {
+            return deviceMap_.get("ImagingCamera");
+         }
+    }
+
     public DeviceBase getImagingCamera() {
         return deviceMap_.get("ImagingCamera");
     }
