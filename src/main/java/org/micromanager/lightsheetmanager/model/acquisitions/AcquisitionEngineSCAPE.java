@@ -532,15 +532,24 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
-            if (acqSettings_.volumeSettings().numViews() > 1) {
-                cameraNames = new String[]{
+            if (model_.devices().getDeviceAdapter().getNumSimultaneousCameras() > 1) {
+               // multiple simultaneous cameras
+               cameraNames = new String[]{
+                     model_.devices().getDevice("Imaging1Camera1").getDeviceName(),
+                     model_.devices().getDevice("Imaging2Camera2").getDeviceName()
+               };
+            } else {
+               // standard camera setup
+               if (acqSettings_.volumeSettings().numViews() > 1) {
+                  cameraNames = new String[]{
                         model_.devices().getDevice("Imaging1Camera").getDeviceName(),
                         model_.devices().getDevice("Imaging2Camera").getDeviceName()
-                };
-            } else {
-                cameraNames = new String[]{
+                  };
+               } else {
+                  cameraNames = new String[]{
                         model_.devices().getDevice("ImagingCamera").getDeviceName()
-                };
+                  };
+               }
             }
         }
 
