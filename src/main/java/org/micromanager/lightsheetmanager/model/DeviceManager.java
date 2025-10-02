@@ -240,28 +240,43 @@ public class DeviceManager {
         return (T) deviceMap_.get(deviceName);
     }
 
-    public DeviceBase getFirstImagingCamera() {
-         final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
-         if (adapter.getNumSimultaneousCameras() > 1) {
-            return deviceMap_.get("Imaging1Camera1");
-         } else if (adapter.getNumImagingPaths() > 1) {
-            return deviceMap_.get("Imaging1Camera");
-         } else {
-            return deviceMap_.get("ImagingCamera");
-         }
+    public CameraBase getFirstImagingCamera() {
+        final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
+        if (adapter.getNumSimultaneousCameras() > 1 && adapter.getNumImagingPaths() == 1) {
+           return (CameraBase)deviceMap_.get("ImagingCamera1");
+        } else if (adapter.getNumSimultaneousCameras() > 1) {
+           return (CameraBase)deviceMap_.get("Imaging1Camera1");
+        } else if (adapter.getNumImagingPaths() > 1) {
+           return (CameraBase)deviceMap_.get("Imaging1Camera");
+        } else {
+           return (CameraBase)deviceMap_.get("ImagingCamera");
+        }
     }
 
-    public DeviceBase getImagingCamera() {
-        return deviceMap_.get("ImagingCamera");
+    public CameraBase getImagingCamera(final int view, final int num) {
+        final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
+        String cameraName = "Imaging";
+        if (adapter.getNumImagingPaths() > 1) {
+            cameraName += String.valueOf(view);
+        }
+        cameraName += "Camera";
+        if (adapter.getNumSimultaneousCameras() > 1) {
+            cameraName += String.valueOf(num);
+        }
+       return (CameraBase)deviceMap_.get(cameraName);
     }
 
-    public DeviceBase getImagingCamera(final int side) {
-        return deviceMap_.get("Imaging" + side + "Camera");
-    }
-
-    public DeviceBase getImagingCamera(final int side, final int num) {
-        return deviceMap_.get("Imaging" + side + "Camera" + num);
-    }
+//    public DeviceBase getImagingCamera() {
+//        return deviceMap_.get("ImagingCamera");
+//    }
+//
+//    public DeviceBase getImagingCamera(final int view) {
+//        return deviceMap_.get("Imaging" + view + "Camera");
+//    }
+//
+//    public DeviceBase getImagingCamera(final int view, final int num) {
+//        return deviceMap_.get("Imaging" + view + "Camera" + num);
+//    }
 
     public LightSheetDeviceManager getDeviceAdapter() {
         return (LightSheetDeviceManager)deviceMap_.get("LightSheetDeviceManager");

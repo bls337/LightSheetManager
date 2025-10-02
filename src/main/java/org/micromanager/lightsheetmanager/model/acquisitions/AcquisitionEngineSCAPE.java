@@ -25,6 +25,7 @@ import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.PLogicSCAPE;
+import org.micromanager.lightsheetmanager.model.devices.LightSheetDeviceManager;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
@@ -110,8 +111,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // save current exposure to restore later
-        CameraBase cam = model_.devices()
-                .getDevice("ImagingCamera");
+        CameraBase cam = model_.devices().getFirstImagingCamera(); //.getDevice("ImagingCamera");
         final double origExposure = cam.getExposure();
 
         // used to detect if the plugin is using ASI hardware
@@ -532,11 +532,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
-            if (model_.devices().getDeviceAdapter().getNumSimultaneousCameras() > 1) {
+            final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
+            if (adapter.getNumSimultaneousCameras() > 1 && adapter.getNumImagingPaths() == 1) {
                // multiple simultaneous cameras
                cameraNames = new String[]{
-                     model_.devices().getDevice("Imaging1Camera1").getDeviceName(),
-                     model_.devices().getDevice("Imaging2Camera2").getDeviceName()
+                     model_.devices().getDevice("ImagingCamera1").getDeviceName(),
+                     model_.devices().getDevice("ImagingCamera2").getDeviceName()
                };
             } else {
                // standard camera setup
@@ -705,7 +706,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // TODO: execute any end-acquisition runnables
 
         // set the camera trigger mode back to internal for live mode
-        CameraBase camera = model_.devices().getDevice("ImagingCamera");
+        CameraBase camera = model_.devices().getFirstImagingCamera(); //.getDevice("ImagingCamera");
         camera.setTriggerMode(CameraMode.INTERNAL);
         camera.setExposure(origExposure);
 
@@ -737,7 +738,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     private boolean doHardwareCalculations(PLogicSCAPE plc) {
 
         // TODO: find a better place to set the camera trigger mode for SCAPE
-        CameraBase camera1 = model_.devices().getDevice("ImagingCamera");
+        CameraBase camera1 = model_.devices().getFirstImagingCamera(); // .getDevice("ImagingCamera");
         camera1.setTriggerMode(acqSettings_.cameraMode());
         studio_.logs().logMessage("camera \"" + camera1.getDeviceName()
                 + "\" set to mode: " + camera1.getTriggerMode());
@@ -794,38 +795,46 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
         // TODO: code that doubles nrSlicesSoftware if (twoSided && acqBothCameras) missing
 
+        // TODO: make this more robust
+        String cameraName;
+        if (model_.devices().getDeviceAdapter().getNumSimultaneousCameras() > 1) {
+           cameraName = "ImagingCamera1";
+        } else {
+           cameraName = "ImagingCamera";
+        }
+
         // TODO: maybe wrap this up into a method for clarity
         double cameraReadoutTime;
         final CameraLibrary cameraLibrary = CameraLibrary.fromString(
-                model_.devices().getDevice("ImagingCamera").getDeviceLibrary());
+                model_.devices().getDevice(cameraName).getDeviceLibrary());
         switch (cameraLibrary) {
             case HAMAMATSU: {
-                HamamatsuCamera camera = model_.devices().getDevice("ImagingCamera");
+                HamamatsuCamera camera = model_.devices().getDevice(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case PVCAM: {
-                PVCamera camera = model_.devices().getDevice("ImagingCamera");
+                PVCamera camera = model_.devices().getDevice(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case PCOCAMERA: {
-                PCOCamera camera = model_.devices().getDevice("ImagingCamera");
+                PCOCamera camera = model_.devices().getDevice(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case ANDORSDK3: {
-                AndorCamera camera = model_.devices().getDevice("ImagingCamera");
+                AndorCamera camera = model_.devices().getDevice(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case DEMOCAMERA: {
-                DemoCamera camera = model_.devices().getDevice("ImagingCamera");
+                DemoCamera camera = model_.devices().getDevice(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             default:
-                CameraBase camera = model_.devices().getDevice("ImagingCamera");
+                CameraBase camera = model_.devices().getDevice(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
         }
@@ -917,8 +926,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // set imaging camera exposure
-        final CameraBase cam = model_.devices()
-                .getDevice("ImagingCamera");
+        final CameraBase cam = model_.devices().getFirstImagingCamera(); //.getDevice("ImagingCamera");
         cam.setExposure(exposureTime);
 
         double extraChannelOffset = 0.0;
@@ -958,7 +966,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // Note: sliceDuration is computed in recalculateSliceTiming
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
 
-        final CameraBase camera = model_.devices().getDevice("ImagingCamera");
+        final CameraBase camera = model_.devices().getFirstImagingCamera(); //getDevice("ImagingCamera");
         final CameraMode cameraMode = acqSettings_.cameraMode();
 
         final double cameraResetTime = camera.getResetTime(cameraMode);     // recalculate for safety, 0 for light sheet
@@ -1074,8 +1082,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         ASIScanner scanner1 = model_.devices().getDevice("IllumBeam");
         // ASIScanner scanner2 = model_.devices().getDevice("Illum2Beam");
 
-        //CameraBase camera = model_.devices().getDevice("Imaging1Camera"); //.getImagingCamera(0);
-        CameraBase camera = model_.devices().getDevice("ImagingCamera");
+        CameraBase camera = model_.devices().getFirstImagingCamera(); //.getDevice("ImagingCamera");
         if (camera == null) {
             // just a dummy to test demo mode
             return new DefaultTimingSettings.Builder();
