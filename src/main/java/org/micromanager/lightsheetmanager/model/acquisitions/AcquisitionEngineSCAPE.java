@@ -793,7 +793,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     return false; // early exit
             }
         }
-        // TODO: code that doubles nrSlicesSoftware if (twoSided && acqBothCameras) missing
+//        // TODO: add code to check if cameras are active
+//        if (model_.devices().getDeviceAdapter().getNumSimultaneousCameras() > 1) {
+//            nrSlicesSoftware *= 2;
+//        }
 
         // TODO: make this more robust
         String cameraName;
@@ -1079,7 +1082,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // 4. start scan 0.25ms before camera global exposure and shifted up in time to account for delay introduced by Bessel filter
         // 5. turn on laser as soon as camera global exposure, leave laser on for desired light exposure time
         // 7. end camera exposure in final 0.25ms, post-filter scan waveform also ends now
-        ASIScanner scanner1 = model_.devices().getDevice("IllumBeam");
+        ASIScanner scanner1 = model_.devices().getDevice("IllumSlice"); //.getDevice("IllumBeam");
         // ASIScanner scanner2 = model_.devices().getDevice("Illum2Beam");
 
         CameraBase camera = model_.devices().getFirstImagingCamera(); //.getDevice("ImagingCamera");
