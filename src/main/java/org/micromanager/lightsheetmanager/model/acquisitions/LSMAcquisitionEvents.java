@@ -21,7 +21,7 @@ public class LSMAcquisitionEvents {
 
    public static final String TIME_AXIS = "time";
    public static final String POSITION_AXIS = "position";
-   public static final String CAMERA_AXIS = "view";
+   public static final String CAMERA_AXIS = "channel";
 
 
    public static Iterator<AcquisitionEvent> createTimelapseMultiChannelVolumeAcqEvents(

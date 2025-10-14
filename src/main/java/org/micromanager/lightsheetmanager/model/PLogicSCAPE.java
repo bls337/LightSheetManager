@@ -475,6 +475,11 @@ public class PLogicSCAPE {
             numSlicesHW += 1;
         }
 
+        // increase number of trigger pulses for multiple simultaneous
+
+        // cameras
+        numSlicesHW *= model_.devices().getDeviceAdapter().getNumSimultaneousCameras();
+
         // FIXME: more light sheet setup
         //final double slope1 = settings.sliceCalibration(1).sliceSlope();
         //final double slope2 = settings.sliceCalibration(2).sliceSlope();
@@ -905,6 +910,9 @@ public class PLogicSCAPE {
         String deviceName = "ImagingCamera" + view; // diSPIM
         if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
             deviceName = "ImagingCamera";
+            if (model_.devices().getDeviceAdapter().getNumSimultaneousCameras() > 1 ) {
+                deviceName += String.valueOf(view);
+            }
         }
         CameraBase camera = devices_.getDevice(deviceName); // TODO: find a way of adapting to different cameras
         String cameraName = camera.getDeviceName(); // TODO: put this on LSM camera?
