@@ -18,7 +18,7 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
         private String saveNamePrefix_ = "";
         private boolean saveDuringAcq_ = false;
         private boolean demoMode_ = false;
-        private DataStorage.SaveMode saveMode_ = DataStorage.SaveMode.NDTIFF;
+        private DataStorage.SaveMode saveMode_ = DataStorage.SaveMode.ND_TIFF;
 
         private DefaultAutofocusSettings.Builder afsb_ = new DefaultAutofocusSettings.Builder();
 
