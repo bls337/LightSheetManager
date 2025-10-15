@@ -10,7 +10,7 @@ public class PluginSettings {
 
     private boolean isPollingPositions_ = true;
 
-    private XYZGrid xyzGrid_ = new XYZGrid();
+    private final XYZGrid xyzGrid_ = new XYZGrid();
 
     public XYZGrid xyzGrid() {
         return xyzGrid_;

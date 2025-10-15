@@ -217,7 +217,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // This sets the preferred save mode for DefaultDatastore, this value
         // is used in the MMAcquisition constructor to set the Storage object.
-        if (acqSettings_.saveMode() == DataStorage.SaveMode.NDTIFF) {
+        if (acqSettings_.saveMode() == DataStorage.SaveMode.ND_TIFF) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
         } else if (acqSettings_.saveMode() == DataStorage.SaveMode.MULTIPAGE_TIFF) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);

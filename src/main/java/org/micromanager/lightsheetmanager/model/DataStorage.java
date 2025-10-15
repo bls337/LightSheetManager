@@ -23,8 +23,7 @@ public class DataStorage implements DataSink {
     public enum SaveMode {
         SINGLEPLANE_TIFF_SERIES("Single Plane TIFF"),
         MULTIPAGE_TIFF("Multi Page TIFF"),
-
-        NDTIFF("NDTiff");
+        ND_TIFF("NDTiff");
 
         private String text_;
 
@@ -42,7 +41,7 @@ public class DataStorage implements DataSink {
         }
 
         public static SaveMode fromString(final String symbol) {
-            return stringToEnum.getOrDefault(symbol, SaveMode.NDTIFF);
+            return stringToEnum.getOrDefault(symbol, SaveMode.ND_TIFF);
         }
 
         @Override

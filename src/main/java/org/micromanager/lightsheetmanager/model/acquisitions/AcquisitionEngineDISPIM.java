@@ -181,7 +181,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         DefaultDatastore result = new DefaultDatastore(studio_);
         try {
-            if (acqSettings_.saveMode() == DataStorage.SaveMode.NDTIFF) {
+            if (acqSettings_.saveMode() == DataStorage.SaveMode.ND_TIFF) {
                 DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
             } else if (acqSettings_.saveMode() == DataStorage.SaveMode.MULTIPAGE_TIFF) {
                 DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);
