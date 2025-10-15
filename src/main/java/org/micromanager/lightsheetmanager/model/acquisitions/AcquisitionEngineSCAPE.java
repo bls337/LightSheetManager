@@ -111,8 +111,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // save current exposure to restore later
-        CameraBase cam = model_.devices().getFirstImagingCamera(); //.getDevice("ImagingCamera");
-        final double origExposure = cam.getExposure();
+        CameraBase[] cameras = model_.devices().getImagingCameras();
+        ArrayList<Double> savedExposures = new ArrayList<>();
+        for (CameraBase camera : cameras) {
+            savedExposures.add(camera.getExposure());
+        }
 
         // used to detect if the plugin is using ASI hardware
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
@@ -705,10 +708,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // TODO: execute any end-acquisition runnables
 
-        // set the camera trigger mode back to internal for live mode
-        CameraBase camera = model_.devices().getFirstImagingCamera(); //.getDevice("ImagingCamera");
-        camera.setTriggerMode(CameraMode.INTERNAL);
-        camera.setExposure(origExposure);
+        // set the camera trigger modes back to internal for live mode
+        for (int i = 0; i < cameras.length; i++) {
+            CameraBase camera = cameras[i];
+            camera.setTriggerMode(CameraMode.INTERNAL);
+            camera.setExposure(savedExposures.get(i));
+        }
 
         currentAcquisition_ = null;
 
@@ -716,7 +721,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             final String savePath = FileUtils.createUniquePath(saveDir, saveName);
             //System.out.println("savePath: " + savePath);
             try {
-                curStore_.save(Datastore.SaveMode.ND_TIFF, savePath);
+                // convert from DataStorage.SaveMode to Datastore.SaveMode
+                final Datastore.SaveMode saveMode =
+                      DataStorage.SaveMode.convert(acqSettings_.saveMode());
+                curStore_.save(saveMode, savePath);
             } catch (IOException e) {
                 model_.studio().logs().showError("could not save the acquisition data to: \n" + savePath);
             }
@@ -738,10 +746,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     private boolean doHardwareCalculations(PLogicSCAPE plc) {
 
         // TODO: find a better place to set the camera trigger mode for SCAPE
-        CameraBase camera1 = model_.devices().getFirstImagingCamera(); // .getDevice("ImagingCamera");
-        camera1.setTriggerMode(acqSettings_.cameraMode());
-        studio_.logs().logMessage("camera \"" + camera1.getDeviceName()
-                + "\" set to mode: " + camera1.getTriggerMode());
+        CameraBase[] cameras = model_.devices().getImagingCameras();
+        for (CameraBase camera : cameras) {
+            camera.setTriggerMode(acqSettings_.cameraMode());
+            studio_.logs().logMessage("camera \"" + camera.getDeviceName()
+                 + "\" set to mode: " + camera.getTriggerMode());
+        }
 
         // make sure slice timings are up-to-date
         recalculateSliceTiming();
@@ -928,9 +938,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
         }
 
-        // set imaging camera exposure
-        final CameraBase cam = model_.devices().getFirstImagingCamera(); //.getDevice("ImagingCamera");
-        cam.setExposure(exposureTime);
+        // set exposure for imaging camera
+        for (CameraBase camera : cameras) {
+           camera.setExposure(exposureTime);
+        }
 
         double extraChannelOffset = 0.0;
         plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
