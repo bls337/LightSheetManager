@@ -1101,8 +1101,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             // just a dummy to test demo mode
             return new DefaultTimingSettings.Builder();
         }
-        // TODO: do this in ui?
-        camera.setTriggerMode(acqSettings_.cameraMode());
+
+        // TODO: is this necessary? setTriggerMode is called in doHardwareCalculations too
+        CameraBase[] cameras = model_.devices().getImagingCameras();
+        for (CameraBase cam : cameras) {
+            cam.setTriggerMode(acqSettings_.cameraMode());
+        }
 
         // TODO: camera.getTriggerMode(); does not match up with actual selected trigger mode for PVCAM (pseudo overlap reads as edge trigger)
         //System.out.println(camera.getDeviceName());

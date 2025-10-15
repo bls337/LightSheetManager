@@ -275,11 +275,11 @@ public class DeviceManager {
             for (int j = 0; j < numCameras; j++) {
                 String cameraName = "Imaging";
                 if (numImagingPaths > 1) {
-                    cameraName += String.valueOf(i);
+                    cameraName += String.valueOf(i + 1);
                 }
                 cameraName += "Camera";
                 if (numCameras > 1) {
-                    cameraName += String.valueOf(j);
+                    cameraName += String.valueOf(j + 1);
                 }
                 cameraNames.add((CameraBase)deviceMap_.get(cameraName));
             }
