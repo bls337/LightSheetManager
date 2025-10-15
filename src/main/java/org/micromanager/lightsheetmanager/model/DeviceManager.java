@@ -263,7 +263,28 @@ public class DeviceManager {
         if (adapter.getNumSimultaneousCameras() > 1) {
             cameraName += String.valueOf(num);
         }
-       return (CameraBase)deviceMap_.get(cameraName);
+        return (CameraBase)deviceMap_.get(cameraName);
+    }
+
+    public CameraBase[] getImagingCameras() {
+        ArrayList<CameraBase> cameraNames = new ArrayList<>();
+        final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
+        final int numImagingPaths = adapter.getNumImagingPaths();
+        final int numCameras  = adapter.getNumSimultaneousCameras();
+        for (int i = 0; i < numImagingPaths; i++) {
+            for (int j = 0; j < numCameras; j++) {
+                String cameraName = "Imaging";
+                if (numImagingPaths > 1) {
+                    cameraName += String.valueOf(i);
+                }
+                cameraName += "Camera";
+                if (numCameras > 1) {
+                    cameraName += String.valueOf(j);
+                }
+                cameraNames.add((CameraBase)deviceMap_.get(cameraName));
+            }
+        }
+        return cameraNames.toArray(new CameraBase[0]);
     }
 
 //    public DeviceBase getImagingCamera() {

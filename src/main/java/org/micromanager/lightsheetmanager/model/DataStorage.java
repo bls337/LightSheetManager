@@ -34,6 +34,18 @@ public class DataStorage implements DataSink {
             text_ = text;
         }
 
+        public static Datastore.SaveMode convert(final DataStorage.SaveMode mode) {
+            switch (mode) {
+               case ND_TIFF:
+                  return Datastore.SaveMode.ND_TIFF;
+               case MULTIPAGE_TIFF:
+                  return Datastore.SaveMode.MULTIPAGE_TIFF;
+               case SINGLEPLANE_TIFF_SERIES:
+               default:
+                  return Datastore.SaveMode.SINGLEPLANE_TIFF_SERIES;
+            }
+        }
+
         public static String[] toArray() {
             return Arrays.stream(values())
                     .map(SaveMode::toString)
