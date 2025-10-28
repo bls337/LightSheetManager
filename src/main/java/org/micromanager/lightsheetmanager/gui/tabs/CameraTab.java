@@ -53,21 +53,9 @@ public class CameraTab extends Panel implements ListeningPanel {
         btnCustomROI_ = new Button("Custom", 120, 30);
         btnGetCurrentROI_ = new Button("Get Current ROI", 120, 30);
 
-        // get the imaging camera library based on number of imaging paths
-        CameraLibrary camLib = CameraLibrary.UNKNOWN;
-        if (model_.devices().getDeviceAdapter().getNumImagingPaths() >= 2) {
-            final CameraBase camera = model_.devices()
-                    .getDevice("Imaging1Camera");
-            if (camera != null) {
-                camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
-            }
-        } else {
-            final CameraBase camera = model_.devices()
-                    .getDevice("ImagingCamera");
-            if (camera != null) {
-                camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
-            }
-        }
+        // get the imaging camera library
+        final CameraBase camera = model_.devices().getFirstImagingCamera();
+        final CameraLibrary camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
 
         cmbCameraTriggerMode_ = new ComboBox(CameraMode.getAvailableModes(camLib),
               model_.acquisitions().settings().cameraMode().toString());

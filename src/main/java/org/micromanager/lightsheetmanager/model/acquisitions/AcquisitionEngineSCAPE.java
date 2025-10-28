@@ -1387,7 +1387,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             s += String.format("%.3f hr", Math.floor(duration/(60*60)));
             s += String.format("%.3f min", (double)Math.round((duration % (60*60))/60));
         }
-       label.setText(s);
+        label.setText(s);
     }
 
     private double computeTotalTimeDuration() {
