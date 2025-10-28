@@ -94,7 +94,7 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
          *
          * @param timePointInterval the time point interval in seconds.
          */
-        T timePointInterval(final int timePointInterval);
+        T timePointInterval(final double timePointInterval);
 
         /**
          * Sets the delay after a move when using multiple positions.
@@ -278,7 +278,7 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      *
      * @return the time point interval in seconds.
      */
-    int timePointInterval();
+    double timePointInterval();
 
     /**
      * Returns the post move delay in milliseconds.

@@ -40,8 +40,8 @@ public class TimePointsPanel extends Panel {
         lblTimePointInterval_ = new Label("Interval [s]:");
         spnNumTimePoints_ = Spinner.createIntegerSpinner(
                 acqSettings.numTimePoints(), 1, Integer.MAX_VALUE,1);
-        spnTimePointInterval_ = Spinner.createIntegerSpinner(
-                acqSettings.timePointInterval(), 0, Integer.MAX_VALUE, 1);
+        spnTimePointInterval_ = Spinner.createDoubleSpinner(
+                acqSettings.timePointInterval(), 0.1, Double.MAX_VALUE, 0.1);
 
         add(lblNumTimePoints_, "");
         add(spnNumTimePoints_, "wrap");
@@ -54,13 +54,13 @@ public class TimePointsPanel extends Panel {
 
         spnNumTimePoints_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().numTimePoints(spnNumTimePoints_.getInt());
-            //updateDurationLabels();
+            model_.acquisitions().updateDurationLabels();
             //System.out.println("getNumTimePoints: " + model_.acquisitions().getAcquisitionSettings().getNumTimePoints());
         });
 
         spnTimePointInterval_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().timePointInterval(spnTimePointInterval_.getInt());
-            //updateDurationLabels();
+            model_.acquisitions().settingsBuilder().timePointInterval(spnTimePointInterval_.getDouble());
+            model_.acquisitions().updateDurationLabels();
             //System.out.println("getTimePointInterval: " + model_.acquisitions().getAcquisitionSettings().getTimePointInterval());
         });
     }
