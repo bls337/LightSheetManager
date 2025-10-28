@@ -20,7 +20,7 @@ public class VolumeSettingsPanel extends Panel {
     private Spinner spnSliceStepSize_;
     private Spinner spnNumSlices_;
 
-    private LightSheetManager model_;
+    private final LightSheetManager model_;
 
     public VolumeSettingsPanel(final LightSheetManager model) {
         super("Volume Settings");
@@ -50,7 +50,7 @@ public class VolumeSettingsPanel extends Panel {
         final Label lblFirstView = new Label("First view:");
         final Label lblViewDelay = new Label("Delay before view [ms]:");
         final Label lblSlicesPerView = new Label("Slices per view:");
-        final Label lblSliceStepSize = new Label("Slice step size [\u00B5m]:");
+        final Label lblSliceStepSize = new Label("Slice step size [µm]:");
 
         // if the number of sides has changed and the firstView or numViews is larger
         // than the number of sides, default to 1.
@@ -71,7 +71,7 @@ public class VolumeSettingsPanel extends Panel {
         spnSliceStepSize_ = Spinner.createDoubleSpinner(
                 volumeSettings.sliceStepSize(), 0.0, Double.MAX_VALUE, 0.1);
         spnNumSlices_ = Spinner.createIntegerSpinner(
-                volumeSettings.slicesPerView(), 0, Integer.MAX_VALUE, 1);
+                volumeSettings.slicesPerView(), 1, Integer.MAX_VALUE, 1);
 
         switch (geometryType) {
             case DISPIM:
@@ -114,11 +114,13 @@ public class VolumeSettingsPanel extends Panel {
         spnViewDelay_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
                     .delayBeforeView(spnViewDelay_.getDouble());
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnNumSlices_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
                     .slicesPerView(spnNumSlices_.getInt());
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnSliceStepSize_.registerListener(e -> {

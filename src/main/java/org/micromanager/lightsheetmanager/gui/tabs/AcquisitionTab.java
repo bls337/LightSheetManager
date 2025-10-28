@@ -98,14 +98,15 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         final Panel pnlCenter = new Panel();
         pnlRight_ = new Panel();
 
+        // durations
+        pnlDurations_ = new VolumeDurationPanel(model_);
+
         pnlVolumeSettings_ = new VolumeSettingsPanel(model_);
 
         // switch between these two panels
         pnlSliceSettings_ = new SliceSettingsPanel(model_);
         pnlAdvancedTiming_ = new AdvancedTimingPanel(model_);
 
-        // durations
-        pnlDurations_ = new VolumeDurationPanel(model_);
 
         // multiple positions
         cbxUseMultiplePositions_ = new CheckBox(

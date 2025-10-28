@@ -698,7 +698,12 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // TODO: update gui (but not in the model)
     }
 
-    public DefaultTimingSettings.Builder getTimingFromPeriodAndLightExposure() {
+   @Override
+   public void updateDurationLabels() {
+
+   }
+
+   public DefaultTimingSettings.Builder getTimingFromPeriodAndLightExposure() {
         // uses algorithm Jon worked out in Octave code; each slice period goes like this:
         // 1. camera readout time (none if in overlap mode, 0.25ms in pseudo-overlap)
         // 2. any extra delay time

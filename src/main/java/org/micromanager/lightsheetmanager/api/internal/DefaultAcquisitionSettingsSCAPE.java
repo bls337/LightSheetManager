@@ -32,7 +32,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private boolean useAdvancedTiming_ = false;
 
         private int numTimePoints_ = 1;
-        private int timePointInterval_ = 0;
+        private double timePointInterval_ = 0.0;
         private int postMoveDelay_ = 0;
 
         private int numChannels_ = 0;
@@ -199,7 +199,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
          * @param timePointInterval the time point interval in seconds.
          */
         @Override
-        public Builder timePointInterval(final int timePointInterval) {
+        public Builder timePointInterval(final double timePointInterval) {
             timePointInterval_ = timePointInterval;
             return this;
         }
@@ -342,7 +342,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final boolean useAdvancedTiming_;
 
     private final int numTimePoints_;
-    private final int timePointInterval_;
+    private final double timePointInterval_;
     private final int postMoveDelay_;
 
     private final int numChannels_;
@@ -606,7 +606,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return the time point interval in seconds.
      */
     @Override
-    public int timePointInterval() {
+    public double timePointInterval() {
         return timePointInterval_;
     }
 
