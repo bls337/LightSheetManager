@@ -475,10 +475,9 @@ public class PLogicSCAPE {
             numSlicesHW += 1;
         }
 
-        // increase number of trigger pulses for multiple simultaneous
-
-        // cameras
-        numSlicesHW *= model_.devices().getDeviceAdapter().getNumSimultaneousCameras();
+        // HACK(Brandon): used this to get a single camera to work with 2 simultaneous cameras
+        // increase number of trigger pulses for multiple simultaneous cameras
+        // numSlicesHW *= model_.devices().getDeviceAdapter().getNumSimultaneousCameras();
 
         // FIXME: more light sheet setup
         //final double slope1 = settings.sliceCalibration(1).sliceSlope();
