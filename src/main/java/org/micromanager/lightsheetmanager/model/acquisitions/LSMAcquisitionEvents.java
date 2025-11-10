@@ -34,7 +34,7 @@ public class LSMAcquisitionEvents {
       }
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> timelapse =
               timelapse(acquisitionSettings.numTimePoints(),
-                      (double) acquisitionSettings.timePointInterval());
+                    acquisitionSettings.timePointInterval());
 
       if (acquisitionSettings.numChannels() == 1) {
          throw new RuntimeException("Expected multiple channels but only one found");
@@ -167,10 +167,10 @@ public class LSMAcquisitionEvents {
    }
 
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(String[] cameraDeviceNames) {
-      return (AcquisitionEvent event) -> new Iterator<AcquisitionEvent>() {
+      return (AcquisitionEvent event) -> new Iterator<>() {
 
          private int cameraIndex_ = 0;
-         private String[] cameraDeviceNames_ = cameraDeviceNames;
+         private final String[] cameraDeviceNames_ = cameraDeviceNames;
 
          @Override
          public boolean hasNext() {
@@ -190,7 +190,7 @@ public class LSMAcquisitionEvents {
 
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack(
            int startSliceIndex, int stopSliceIndex) {
-      return (AcquisitionEvent event) -> new Iterator<AcquisitionEvent>() {
+      return (AcquisitionEvent event) -> new Iterator<>() {
 
          private int zIndex_ = startSliceIndex;
 
@@ -212,7 +212,7 @@ public class LSMAcquisitionEvents {
 
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> timelapse(
            int numTimePoints, Double intervalMs) {
-      return (AcquisitionEvent event) -> new Iterator<AcquisitionEvent>() {
+      return (AcquisitionEvent event) -> new Iterator<>() {
 
          int frameIndex_ = 0;
 
@@ -243,7 +243,7 @@ public class LSMAcquisitionEvents {
     */
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels(
            ChannelSpec[] channelList) {
-      return (AcquisitionEvent event) -> new Iterator<AcquisitionEvent>() {
+      return (AcquisitionEvent event) -> new Iterator<>() {
          int index = 0;
 
          @Override
@@ -289,7 +289,7 @@ public class LSMAcquisitionEvents {
     */
    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> positions(
            PositionList positionList) {
-      return (AcquisitionEvent event) -> new Iterator<AcquisitionEvent>() {
+      return (AcquisitionEvent event) -> new Iterator<>() {
          int index = 0;
 
          @Override
