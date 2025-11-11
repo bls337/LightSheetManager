@@ -245,27 +245,21 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
 
 
-
-        if (projectionMode) {
-            // DiSPIM always uses 45 degrees
-            double theta = Math.PI / 4;
-            double zStep = acqSettings_.volumeSettings().sliceStepSize();
-            int numZSlices = acqSettings_.volumeSettings().slicesPerView();
-            int cameraWidth = (int) core_.getImageWidth();
-            int cameraHeight = (int) core_.getImageHeight();
-            double pixelSizeXYUm = core_.getPixelSizeUm();
-
-            int numUniqueProcessorsNeeded = 2; // Always keep enough around for 2 views
-            if (acqSettings_.isUsingChannels()) {
-                numUniqueProcessorsNeeded *= acqSettings_.channels().length;
-            }
-
-            AcqEngJStackProcessors proc =
-                    new AcqEngJStackProcessors(ObliqueStackProcessor.YX_PROJECTION, theta,
-                            pixelSizeXYUm,
-                            zStep, numZSlices, cameraWidth, cameraHeight, numUniqueProcessorsNeeded);
-            currentAcquisition_.addImageProcessor(proc);
-        }
+       // TODO: how much of this do we need? use the projector plugin...
+//        if (projectionMode) {
+//            // DiSPIM always uses 45 degrees
+//            double theta = Math.PI / 4;
+//            double zStep = acqSettings_.volumeSettings().sliceStepSize();
+//            int numZSlices = acqSettings_.volumeSettings().slicesPerView();
+//            int cameraWidth = (int) core_.getImageWidth();
+//            int cameraHeight = (int) core_.getImageHeight();
+//            double pixelSizeXYUm = core_.getPixelSizeUm();
+//
+//            int numUniqueProcessorsNeeded = 2; // Always keep enough around for 2 views
+//            if (acqSettings_.isUsingChannels()) {
+//                numUniqueProcessorsNeeded *= acqSettings_.channels().length;
+//            }
+//        }
 
         long acqButtonStart = System.currentTimeMillis();
 

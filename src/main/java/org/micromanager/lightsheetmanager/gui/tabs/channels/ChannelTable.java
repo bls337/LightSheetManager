@@ -108,10 +108,10 @@ public class ChannelTable extends JScrollPane {
         ArrayList<String> strGroups = new ArrayList<>();
         // strGroups.add("None");
         for (String group : groups) {
-//            System.out.println("grp: " + group);
 //            StrVector st = model_.studio().core().getAvailableConfigGroups();
 //            for (String s : st)
 //                System.out.println(s);
+            // a channel group must have multiple presets to be detected
             if (model_.studio().core().getAvailableConfigs(group).size() > 1) {
                 strGroups.add(group);
             }
