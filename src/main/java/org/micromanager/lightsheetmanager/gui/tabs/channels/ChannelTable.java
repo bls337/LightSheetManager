@@ -18,7 +18,8 @@ import java.util.Objects;
 public class ChannelTable extends JScrollPane {
 
     private JTable table_;
-    private JComboBox<String> cmbPresets_;
+    private final JComboBox<String> cmbPresets_;
+
     private ChannelTableData tableData_;
     private ChannelTableModel tableModel_;
 
@@ -30,7 +31,7 @@ public class ChannelTable extends JScrollPane {
         final String channelGroup = model_.acquisitions().settings().channelGroup();
         final ChannelSpec[] channels = model_.acquisitions().settings().channels();
 
-        tableData_ = new ChannelTableData(channels, channelGroup);
+        tableData_ = new ChannelTableData(channelGroup, channels);
         tableModel_ = new ChannelTableModel(tableData_);
         table_ = new JTable(tableModel_);
 
@@ -42,7 +43,6 @@ public class ChannelTable extends JScrollPane {
         for (String preset : presets) {
             cmbPresets_.addItem(preset);
         }
-        //cmbPresets.addItem("None");
         //cmbPresets_.setSelectedItem(presets[0]);
         column.setCellEditor(new DefaultCellEditor(cmbPresets_));
 
@@ -65,7 +65,7 @@ public class ChannelTable extends JScrollPane {
      * @param data the channel data
      */
     public void setTableData(final ChannelTableData data) {
-        this.tableData_ = data;
+        tableData_ = data;
         tableModel_ = new ChannelTableModel(tableData_);
         table_ = new JTable(tableModel_);
     }
@@ -82,7 +82,13 @@ public class ChannelTable extends JScrollPane {
         return table_;
     }
 
-    public void updatePresetCombos(final String channelGroup) {
+   /**
+    * Update the preset combo box with the available configurations
+    * for this channel group.
+    *
+    * @param channelGroup the channel group
+    */
+    public void updatePresetComboBox(final String channelGroup) {
         final String[] presets = getAllPresets(channelGroup);
         cmbPresets_.removeAllItems();
         for (String preset : presets) {
@@ -91,6 +97,10 @@ public class ChannelTable extends JScrollPane {
         cmbPresets_.setSelectedItem(channelGroup);
     }
 
+//    public void updateAvailableChannelConfigs(final String channelGroup) {
+//
+//    }
+
     // TODO: probably should be in the model
     private String[] getAllPresets(final String configGroup) {
         return model_.studio().core().getAvailableConfigs(configGroup).toArray();
@@ -98,25 +108,27 @@ public class ChannelTable extends JScrollPane {
 
     // TODO: probably should be in the model
     public String[] getAvailableGroups() {
-        StrVector groups;
+        // get all channel groups
+        StrVector channelGroups;
         try {
-            groups = model_.studio().core().getAllowedPropertyValues("Core", "ChannelGroup");
+            channelGroups = model_.studio().core()
+                  .getAllowedPropertyValues("Core", "ChannelGroup");
         } catch (Exception e) {
             model_.studio().logs().logError(e);
             return new String[0];
         }
-        ArrayList<String> strGroups = new ArrayList<>();
-        // strGroups.add("None");
-        for (String group : groups) {
+        // filter channel groups
+        ArrayList<String> groups = new ArrayList<>();
+        for (String group : channelGroups) {
 //            StrVector st = model_.studio().core().getAvailableConfigGroups();
 //            for (String s : st)
 //                System.out.println(s);
             // a channel group must have multiple presets to be detected
             if (model_.studio().core().getAvailableConfigs(group).size() > 1) {
-                strGroups.add(group);
+                groups.add(group);
             }
         }
-        return strGroups.toArray(new String[0]);
+        return groups.toArray(String[]::new);
     }
 
     public void setHeaderRowColor(final boolean state) {

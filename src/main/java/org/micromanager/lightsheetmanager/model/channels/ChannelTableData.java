@@ -8,22 +8,34 @@ import java.util.Collections;
  */
 public class ChannelTableData {
 
-    private final ArrayList<ChannelSpec> channels_;
     private String channelGroup_;
+    private final ArrayList<ChannelSpec> channels_;
 
     public ChannelTableData() {
         channels_ = new ArrayList<>();
         channelGroup_ = "";
     }
 
-    public ChannelTableData(final ChannelSpec[] channels, final String channelGroup) {
+    public ChannelTableData(final String channelGroup, final ChannelSpec[] allChannels) {
         channels_ = new ArrayList<>();
-        channelGroup_ = channelGroup;
-        Collections.addAll(channels_, channels);
+        setChannels(channelGroup, allChannels);
+        //channelGroup_ = channelGroup;
+        //Collections.addAll(channels_, allChannels);
     }
 
     public ChannelSpec getChannelByIndex(final int index) {
         return channels_.get(index);
+    }
+
+    public void setChannels(final String channelGroup, final ChannelSpec[] allChannels) {
+       channels_.clear();
+       channelGroup_ = channelGroup;
+       // only add channel data in the channel group
+       for (ChannelSpec channel : allChannels) {
+          if (channel.getGroup().equals(channelGroup)) {
+             channels_.add(channel);
+          }
+       }
     }
 
     public ChannelSpec[] getChannels() {
