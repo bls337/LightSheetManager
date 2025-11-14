@@ -39,12 +39,11 @@ public class ChannelTable extends JScrollPane {
         table_ = new JTable(tableModel_);
 
         // init presets combo box
-        TableColumn column = table_.getColumnModel().getColumn(1);
         cmbPresets_ = new JComboBox<>();
-
-        // update presets
         updatePresetComboBoxes(channelGroup);
 
+        // set the editor
+        TableColumn column = table_.getColumnModel().getColumn(1);
         column.setCellEditor(new DefaultCellEditor(cmbPresets_));
 
         // cancel JTable edits when focus is lost to prevent errors

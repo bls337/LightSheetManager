@@ -151,15 +151,13 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         Button.setDefaultSize(140, 30);
         btnRunOverviewAcq_ = new Button("Overview Acquisition");
 
-        cbxUseChannels_ = new CheckBox(
-                "Channels", acqSettings.isUsingChannels());
+        final boolean isUsingChannels = acqSettings.isUsingChannels();
+        cbxUseChannels_ = new CheckBox("Channels", isUsingChannels);
         pnlChannelTable_ = new ChannelTablePanel(model_, cbxUseChannels_);
         pnlChannelTable_.setMaximumSize(new Dimension(270, 400));
 
         // disable elements based on acqSettings
-        if (!acqSettings.isUsingChannels()) {
-            pnlChannelTable_.setItemsEnabled(false);
-        }
+        pnlChannelTable_.setItemsEnabled(isUsingChannels);
 
         // acquisition mode combo box
         final boolean isUsingScanSettings = model_.devices().isUsingStageScanning();
