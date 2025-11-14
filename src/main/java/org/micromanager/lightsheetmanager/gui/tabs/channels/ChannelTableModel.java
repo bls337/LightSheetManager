@@ -8,6 +8,11 @@ import java.util.Objects;
 
 public class ChannelTableModel extends AbstractTableModel {
 
+    // column constants
+    private static final int COLUMN_USE = 0;
+    private static final int COLUMN_PRESET = 1;
+    private static final int COLUMN_OFFSET = 2;
+
     /**Column names for the channels table. */
     private final String[] columnNames_ = {
             "Use",
@@ -27,13 +32,23 @@ public class ChannelTableModel extends AbstractTableModel {
     }
 
     @Override
-    public Class<?> getColumnClass(int c) {
-        return getValueAt(0, c).getClass();
+    public int getColumnCount() {
+        return columnNames_.length;
     }
 
     @Override
-    public int getColumnCount() {
-        return columnNames_.length;
+    public Class<?> getColumnClass(int c) {
+        switch (c) {
+            case COLUMN_USE:
+                return Boolean.class;
+            case COLUMN_PRESET:
+                return String.class;
+            case COLUMN_OFFSET:
+                return Double.class;
+            default:
+                // Note: This will never happen if getColumnCount is correct.
+                throw new IllegalArgumentException("Invalid column index: " + c);
+        }
     }
 
     @Override
@@ -48,13 +63,13 @@ public class ChannelTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        ChannelSpec channelSpec = tableData_.getChannelByIndex(row);
+       final ChannelSpec channelSpec = tableData_.getChannelByIndex(row);
         switch (col) {
-            case 0:
+            case COLUMN_USE:
                 return channelSpec.isUsed();
-            case 1:
+            case COLUMN_PRESET:
                 return channelSpec.getName();
-            case 2:
+            case COLUMN_OFFSET:
                 return channelSpec.getOffset();
             default:
                 throw new IllegalArgumentException("Invalid column index: " + col);
@@ -63,26 +78,34 @@ public class ChannelTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        ChannelSpec channelSpec = tableData_.getChannelByIndex(row);
+        final ChannelSpec channelSpec = tableData_.getChannelByIndex(row);
         switch (col) {
-            case 0:
+            case COLUMN_USE:
                 if (value instanceof Boolean) {
                     channelSpec.setUsed((boolean) value);
+                } else {
+                   return; // early exit => wrong type
                 }
                 break;
-            case 1:
+            case COLUMN_PRESET:
                 if (value instanceof String) {
                     channelSpec.setName((String) value);
+                } else {
+                   return; // early exit => wrong type
                 }
                 break;
-            case 2:
+            case COLUMN_OFFSET:
                 if (value instanceof Double) {
                     channelSpec.setOffset((double) value);
+                } else {
+                   return; // early exit => wrong type
                 }
                 break;
             default:
                 throw new IllegalArgumentException("Invalid column index: " + col);
         }
+
+        // update the table ui
         fireTableCellUpdated(row, col);
     }
 
