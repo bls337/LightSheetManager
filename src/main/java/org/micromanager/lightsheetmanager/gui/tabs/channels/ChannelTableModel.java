@@ -57,11 +57,9 @@ public class ChannelTableModel extends AbstractTableModel {
             case 2:
                 return channelSpec.getOffset();
             default:
-                return null; // FIXME: is this okay? raise exception?
+                throw new IllegalArgumentException("Invalid column index: " + col);
         }
     }
-
-    // TODO: is if (value instanceof Boolean) { needed?
 
     @Override
     public void setValueAt(Object value, int row, int col) {
@@ -83,8 +81,7 @@ public class ChannelTableModel extends AbstractTableModel {
                 }
                 break;
             default:
-                // FIXME: is this okay? raise exception?
-                break;
+                throw new IllegalArgumentException("Invalid column index: " + col);
         }
         fireTableCellUpdated(row, col);
     }

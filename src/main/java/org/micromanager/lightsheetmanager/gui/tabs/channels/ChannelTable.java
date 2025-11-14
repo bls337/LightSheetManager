@@ -15,6 +15,9 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * This is the JTable ui element for channel settings.
+ */
 public class ChannelTable extends JScrollPane {
 
     private JTable table_;
@@ -39,11 +42,9 @@ public class ChannelTable extends JScrollPane {
         TableColumn column = table_.getColumnModel().getColumn(1);
         cmbPresets_ = new JComboBox<>();
 
-        final String[] presets = getAllPresets(channelGroup);
-        for (String preset : presets) {
-            cmbPresets_.addItem(preset);
-        }
-        //cmbPresets_.setSelectedItem(presets[0]);
+        // update presets
+        updatePresetComboBoxes(channelGroup);
+
         column.setCellEditor(new DefaultCellEditor(cmbPresets_));
 
         // cancel JTable edits when focus is lost to prevent errors
@@ -88,8 +89,8 @@ public class ChannelTable extends JScrollPane {
     *
     * @param channelGroup the channel group
     */
-    public void updatePresetComboBox(final String channelGroup) {
-        final String[] presets = getAllPresets(channelGroup);
+    public void updatePresetComboBoxes(final String channelGroup) {
+        final String[] presets = getChannelGroupPresets(channelGroup);
         cmbPresets_.removeAllItems();
         for (String preset : presets) {
             cmbPresets_.addItem(preset);
@@ -97,17 +98,13 @@ public class ChannelTable extends JScrollPane {
         cmbPresets_.setSelectedItem(channelGroup);
     }
 
-//    public void updateAvailableChannelConfigs(final String channelGroup) {
-//
-//    }
-
     // TODO: probably should be in the model
-    private String[] getAllPresets(final String configGroup) {
+    private String[] getChannelGroupPresets(final String configGroup) {
         return model_.studio().core().getAvailableConfigs(configGroup).toArray();
     }
 
     // TODO: probably should be in the model
-    public String[] getAvailableGroups() {
+    public String[] getChannelGroups() {
         // get all channel groups
         StrVector channelGroups;
         try {
@@ -120,13 +117,13 @@ public class ChannelTable extends JScrollPane {
         // filter channel groups
         ArrayList<String> groups = new ArrayList<>();
         for (String group : channelGroups) {
-//            StrVector st = model_.studio().core().getAvailableConfigGroups();
-//            for (String s : st)
-//                System.out.println(s);
             // a channel group must have multiple presets to be detected
             if (model_.studio().core().getAvailableConfigs(group).size() > 1) {
                 groups.add(group);
             }
+//            StrVector st = model_.studio().core().getAvailableConfigGroups();
+//            for (String s : st)
+//                System.out.println(s);
         }
         return groups.toArray(String[]::new);
     }

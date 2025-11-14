@@ -11,6 +11,9 @@ import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import javax.swing.JLabel;
 import java.util.Objects;
 
+/**
+ * This panel contains the ChannelTable and controls.
+ */
 public class ChannelTablePanel extends Panel {
 
     private JLabel lblChannelGroup_;
@@ -47,7 +50,7 @@ public class ChannelTablePanel extends Panel {
         btnRemoveChannel_.setToolTipText("Remove the currently selected channel from the table.");
         btnRefresh_.setToolTipText("Refresh the channel panel with the latest configuration groups settings.");
 
-        final String[] groupLabels = table_.getAvailableGroups();
+        final String[] groupLabels = table_.getChannelGroups();
         cmbChannelGroup_ = new ComboBox(groupLabels,
                 model_.acquisitions().settings().channelGroup(),
                 120, 22);
@@ -71,7 +74,7 @@ public class ChannelTablePanel extends Panel {
         // select channel group
         cmbChannelGroup_.registerListener(e -> {
             final String channelGroup = cmbChannelGroup_.getSelected();
-            table_.updatePresetComboBox(channelGroup);
+            table_.updatePresetComboBoxes(channelGroup);
             table_.getData().setChannels(channelGroup, model_.acquisitions().settings().channels());
             table_.getData().setChannelGroup(channelGroup);
             model_.acquisitions().settingsBuilder().channelGroup(channelGroup);
@@ -108,7 +111,7 @@ public class ChannelTablePanel extends Panel {
         // refresh channel table
         btnRefresh_.registerListener(e -> {
             final String channelGroup = model_.acquisitions().settings().channelGroup();
-            final String[] groups = table_.getAvailableGroups();
+            final String[] groups = table_.getChannelGroups();
             cmbChannelGroup_.removeAllItems();
             for (String group : groups) {
                 cmbChannelGroup_.addItem(group);
@@ -117,7 +120,7 @@ public class ChannelTablePanel extends Panel {
                     cmbChannelGroup_.setSelectedItem(channelGroup);
                 }
             }
-            table_.updatePresetComboBox(channelGroup);
+            table_.updatePresetComboBoxes(channelGroup);
             cmbChannelGroup_.updateUI();
         });
 
