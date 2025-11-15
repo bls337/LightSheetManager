@@ -20,15 +20,28 @@ public class ChannelTableModel extends AbstractTableModel {
             "Offset"
     };
 
-    private final ChannelTableData tableData_;
+    private final ChannelTableData data_;
 
     public ChannelTableModel(final ChannelTableData tableData) {
-        tableData_ = Objects.requireNonNull(tableData);
+        data_ = Objects.requireNonNull(tableData);
+    }
+
+    public void addEmptyChannel() {
+        final int rowIndex = data_.getNumChannels();
+        data_.addEmptyChannel();
+        fireTableRowsInserted(rowIndex, rowIndex);
+    }
+
+    public void removeChannel(int rowIndex) {
+        if (rowIndex != -1) {
+           data_.removeChannel(rowIndex);
+           fireTableRowsDeleted(rowIndex, rowIndex);
+        }
     }
 
     @Override
     public int getRowCount() {
-        return tableData_.getNumChannels();
+        return data_.getNumChannels();
     }
 
     @Override
@@ -63,7 +76,7 @@ public class ChannelTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-       final ChannelSpec channelSpec = tableData_.getChannelByIndex(row);
+       final ChannelSpec channelSpec = data_.getChannelByIndex(row);
         switch (col) {
             case COLUMN_USE:
                 return channelSpec.isUsed();
@@ -78,7 +91,7 @@ public class ChannelTableModel extends AbstractTableModel {
 
     @Override
     public void setValueAt(Object value, int row, int col) {
-        final ChannelSpec channelSpec = tableData_.getChannelByIndex(row);
+        final ChannelSpec channelSpec = data_.getChannelByIndex(row);
         switch (col) {
             case COLUMN_USE:
                 if (value instanceof Boolean) {

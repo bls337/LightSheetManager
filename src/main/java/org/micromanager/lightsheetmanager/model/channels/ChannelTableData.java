@@ -58,7 +58,9 @@ public class ChannelTableData {
     }
 
     public void removeChannel(final int index) {
-        channels_.remove(index);
+        if (index >= 0 && index < channels_.size()) {
+            channels_.remove(index);
+        }
     }
 
     public void removeAllChannels() {

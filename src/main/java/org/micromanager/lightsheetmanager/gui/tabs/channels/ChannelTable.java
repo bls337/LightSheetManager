@@ -78,6 +78,10 @@ public class ChannelTable extends JScrollPane {
         return tableData_;
     }
 
+    public ChannelTableModel getTableModel() {
+        return tableModel_;
+    }
+
     public JTable getTable() {
         return table_;
     }

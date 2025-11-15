@@ -83,27 +83,22 @@ public class ChannelTablePanel extends Panel {
 
         // add channel
         btnAddChannel_.registerListener(e -> {
-            table_.getData().addEmptyChannel();
-//            revalidate(); // updates JScrollBar when adding elements
-            table_.refreshData();
-//            table_.repaint();
-//            repaint();
-            //System.out.println("add channel");
-            //table_.getData().printChannelData();
+            table_.getTableModel().addEmptyChannel();
             final ChannelSpec[] channels = table_.getData().getChannels();
             model_.acquisitions().settingsBuilder().channels(channels);
             model_.acquisitions().settingsBuilder().numChannels(channels.length);
+            //System.out.println("add channel");
+            //table_.getData().printChannelData();
         });
 
         // remove channel
         btnRemoveChannel_.registerListener(e -> {
             final int row = table_.getTable().getSelectedRow();
             if (row != -1) { // is any row selected?
-                table_.getData().removeChannel(row);
+                table_.getTableModel().removeChannel(row);
                 final ChannelSpec[] channels = table_.getData().getChannels();
                 model_.acquisitions().settingsBuilder().channels(channels);
                 model_.acquisitions().settingsBuilder().numChannels(channels.length);
-                table_.refreshData();
                 //System.out.println("remove row index: " + row);
             }
         });
