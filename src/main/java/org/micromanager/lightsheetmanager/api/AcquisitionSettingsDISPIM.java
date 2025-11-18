@@ -111,13 +111,6 @@ public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
         T postMoveDelay(final int postMoveDelay);
 
         /**
-         * Sets the number of channels.
-         *
-         * @param numChannels the number of channels.
-         */
-        T numChannels(final int numChannels);
-
-        /**
          * Sets the channel group.
          *
          * @param channelGroup the channel group.
