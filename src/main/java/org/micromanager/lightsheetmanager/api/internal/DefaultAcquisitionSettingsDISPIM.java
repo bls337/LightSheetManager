@@ -219,17 +219,6 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         }
 
         /**
-         * Sets the number of channels.
-         *
-         * @param numChannels the number of channels.
-         */
-        @Override
-        public Builder numChannels(final int numChannels) {
-            numChannels_ = numChannels;
-            return this;
-        }
-
-        /**
          * Sets the channel group.
          *
          * @param channelGroup the channel group.
