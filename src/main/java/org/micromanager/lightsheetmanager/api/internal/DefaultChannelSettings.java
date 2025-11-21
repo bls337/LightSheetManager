@@ -66,14 +66,16 @@ public class DefaultChannelSettings implements ChannelSettings {
     }
 
    /**
-    * Returns the number of channels for the selected channel group,
+    * Returns the number of used channels for the selected channel group,
     * and returns 0 if the channel group does not exist.
     *
     * @return the number of channels in the channel group
     */
     @Override
     public int numChannels() {
-        return groups_.getOrDefault(channelGroup_, EMPTY_CHANNELS).length;
+        return Arrays.stream(groups_.getOrDefault(channelGroup_, EMPTY_CHANNELS))
+              .filter(ChannelSpec::useChannel)
+              .toArray(ChannelSpec[]::new).length;
     }
 
    /**
