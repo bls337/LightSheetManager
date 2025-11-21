@@ -28,6 +28,6 @@ public interface ChannelSettings {
 
     ChannelSpec[] channels();
 
-    ChannelSpec[] usedChannels();
+    ChannelSpec[] allChannels();
 
 }

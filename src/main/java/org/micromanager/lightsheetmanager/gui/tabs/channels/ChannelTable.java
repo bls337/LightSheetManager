@@ -31,6 +31,7 @@ public class ChannelTable extends JScrollPane {
     public ChannelTable(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
 
+        // set the channel group first to get the correct channel array
         final String channelGroup = model_.acquisitions().settings().channelSettings().channelGroup();
         final ChannelSpec[] channels = model_.acquisitions().settings().channelSettings().channels();
 

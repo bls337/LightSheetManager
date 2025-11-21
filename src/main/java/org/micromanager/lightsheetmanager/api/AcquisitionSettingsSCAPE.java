@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.api;
 
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
+import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultScanSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
@@ -115,6 +116,13 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      * @return AcquisitionSettingsDISPIM.Builder pre-populated with settings of this instance.
      */
     //Builder copyBuilder();
+
+    /**
+     * Returns the immutable DefaultChannelSettings instance.
+     *
+     * @return immutable DefaultChannelSettings instance.
+     */
+    DefaultChannelSettings channelSettings();
 
     /**
      * Returns the immutable DefaultTimingSettings instance.

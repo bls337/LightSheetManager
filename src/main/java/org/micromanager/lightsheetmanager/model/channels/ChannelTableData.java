@@ -41,7 +41,7 @@ public class ChannelTableData {
 
     public ChannelSpec[] getUsedChannels() {
         return channels_.stream()
-                        .filter(ChannelSpec::isUsed)
+                        .filter(ChannelSpec::useChannel)
                         .toArray(ChannelSpec[]::new);
     }
 

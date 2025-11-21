@@ -351,17 +351,12 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
 //        );
 //    }
 
-//    @Override
-//    public AcquisitionSettingsDISPIM.Builder copyBuilder() {
-//        return null;
-//    }
-
     /**
      * Returns the immutable DefaultChannelSettings instance.
      *
      * @return immutable DefaultChannelSettings instance.
      */
-    //@Override
+    @Override
     public DefaultChannelSettings channelSettings() {
         return channelSettings_;
     }

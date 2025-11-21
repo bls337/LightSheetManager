@@ -79,7 +79,7 @@ public class ChannelTableModel extends AbstractTableModel {
        final ChannelSpec channelSpec = data_.getChannelByIndex(row);
         switch (col) {
             case COLUMN_USE:
-                return channelSpec.isUsed();
+                return channelSpec.useChannel();
             case COLUMN_PRESET:
                 return channelSpec.getName();
             case COLUMN_OFFSET:

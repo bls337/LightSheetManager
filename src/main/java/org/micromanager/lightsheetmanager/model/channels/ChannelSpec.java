@@ -32,10 +32,10 @@ public class ChannelSpec {
     }
 
     public ChannelSpec(final ChannelSpec channel) {
-        this.useChannel_ = channel.useChannel_;
-        this.group_ = channel.group_;
-        this.name_ = channel.name_;
-        this.offset_ = channel.offset_;
+        useChannel_ = channel.useChannel_;
+        group_ = channel.group_;
+        name_ = channel.name_;
+        offset_ = channel.offset_;
     }
 
     public String getName() {
@@ -54,7 +54,7 @@ public class ChannelSpec {
         offset_ = offset;
     }
 
-    public boolean isUsed() {
+    public boolean useChannel() {
         return useChannel_;
     }
 

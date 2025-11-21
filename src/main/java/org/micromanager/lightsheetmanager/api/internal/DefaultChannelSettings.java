@@ -117,19 +117,25 @@ public class DefaultChannelSettings implements ChannelSettings {
     }
 
    /**
-    * Returns the channels for the selected channel group.
+    * Returns the used channels for the selected channel group.
     *
-    * @return the channels for the channel group.
+    * @return the channels for the channel group
     */
     @Override
     public ChannelSpec[] channels() {
+        return Arrays.stream(groups_.getOrDefault(channelGroup_, EMPTY_CHANNELS))
+              .filter(ChannelSpec::useChannel)
+              .toArray(ChannelSpec[]::new);
+    }
+
+   /**
+    * Returns all channels for the selected channel group.
+    *
+    * @return all channels for the selected channel group
+    */
+    @Override
+    public ChannelSpec[] allChannels() {
         return groups_.getOrDefault(channelGroup_, EMPTY_CHANNELS);
     }
 
-    @Override
-    public ChannelSpec[] usedChannels() {
-        return Arrays.stream(groups_.get(channelGroup_))
-                .filter(ChannelSpec::isUsed)
-                .toArray(ChannelSpec[]::new);
-    }
 }
