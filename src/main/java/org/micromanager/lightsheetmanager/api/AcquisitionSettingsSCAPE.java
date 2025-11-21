@@ -2,7 +2,6 @@ package org.micromanager.lightsheetmanager.api;
 
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultScanSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
@@ -10,7 +9,6 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
-import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 /**
  * Acquisition settings for SCAPE microscope geometries.
@@ -25,13 +23,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
          * @param acqMode the acquisition mode
          */
         T acquisitionMode(final AcquisitionMode acqMode);
-
-        /**
-         * Sets the channel mode.
-         *
-         * @param channelMode the channel mode.
-         */
-        T channelMode(final MultiChannelMode channelMode);
 
         /**
          * Sets the camera mode.
@@ -104,20 +95,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
         T postMoveDelay(final int postMoveDelay);
 
         /**
-         * Sets the channel group.
-         *
-         * @param channelGroup the channel group.
-         */
-        T channelGroup(final String channelGroup);
-
-        /**
-         * Sets the channels array.
-         *
-         * @param channels the channel array
-         */
-        T channels(final ChannelSpec[] channels);
-
-        /**
          * Sets the live scan period.
          *
          * @param liveScanPeriod the channel array
@@ -187,7 +164,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      * @return immutable DefaultSliceCalibration instance.
      */
     DefaultSliceCalibration sliceCalibration(final int view);
-    //DefaultSliceCalibration sliceCalibration();
 
     /**
      * Returns the acquisition mode.
@@ -195,13 +171,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      * @return the acquisition mode.
      */
     AcquisitionMode acquisitionMode();
-
-    /**
-     * Returns the channel mode.
-     *
-     * @return the channel mode.
-     */
-    MultiChannelMode channelMode();
 
     /**
      * Returns the camera mode.
@@ -279,27 +248,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      * @return the post move delay in milliseconds.
      */
     int postMoveDelay();
-
-    /**
-     * Returns the number of channels.
-     *
-     * @return the number of channels.
-     */
-    int numChannels();
-
-    /**
-     * Returns the channel group.
-     *
-     * @return the channel group.
-     */
-    String channelGroup();
-
-    /**
-     * Returns the channels as an array.
-     *
-     * @return the channels as an array.
-     */
-    ChannelSpec[] channels();
 
     double liveScanPeriod();
 }

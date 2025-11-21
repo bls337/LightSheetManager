@@ -3,15 +3,12 @@ package org.micromanager.lightsheetmanager.api.internal;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
-import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
-
-import java.util.Arrays;
 
 public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings implements AcquisitionSettingsSCAPE {
 
     public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsSCAPE.Builder<Builder> {
 
+        private DefaultChannelSettings.Builder csb_ = new DefaultChannelSettings.Builder();
         private DefaultTimingSettings.Builder tsb_ = new DefaultTimingSettings.Builder();
         private DefaultVolumeSettings.Builder vsb_ = new DefaultVolumeSettings.Builder();
         private DefaultSliceSettings.Builder ssb_ = new DefaultSliceSettings.Builder();
@@ -20,7 +17,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[1];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[1];
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NONE;
-        private MultiChannelMode channelMode_ = MultiChannelMode.NONE;
         private CameraMode cameraMode_ = CameraMode.EDGE;
 
         private boolean useChannels_ = false;
@@ -34,10 +30,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private int numTimePoints_ = 1;
         private double timePointInterval_ = 0.0;
         private int postMoveDelay_ = 0;
-
-        private int numChannels_ = 0;
-        private String channelGroup_ = "";
-        private ChannelSpec[] channels_ = new ChannelSpec[]{};
         private double liveScanPeriod_ = 20.0;
 
         public Builder() {
@@ -49,6 +41,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
 
         public Builder(final DefaultAcquisitionSettingsSCAPE acqSettings) {
             super(acqSettings);
+            csb_ = acqSettings.channelSettings_.copyBuilder();
             tsb_ = acqSettings.timingSettings_.copyBuilder();
             vsb_ = acqSettings.volumeSettings_.copyBuilder();
             ssb_ = acqSettings.sliceSettings_.copyBuilder();
@@ -59,7 +52,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
                 shcb_[i] = acqSettings.sheetCalibrations_[i].copyBuilder();
             }
             acquisitionMode_ = acqSettings.acquisitionMode_;
-            channelMode_ = acqSettings.channelMode_;
             cameraMode_ = acqSettings.cameraMode_;
             useChannels_ = acqSettings.useChannels_;
             useTimePoints_ = acqSettings.useTimePoints_;
@@ -71,9 +63,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             numTimePoints_ = acqSettings.numTimePoints_;
             timePointInterval_ = acqSettings.timePointInterval_;
             postMoveDelay_ = acqSettings.postMoveDelay_;
-            numChannels_ = acqSettings.numChannels_;
-            channelGroup_ = acqSettings.channelGroup_;
-            channels_ = acqSettings.channels_;
             liveScanPeriod_ = acqSettings.liveScanPeriod_;
         }
 
@@ -91,17 +80,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             useStageScanning_ = acqMode == AcquisitionMode.STAGE_SCAN
                     || acqMode == AcquisitionMode.STAGE_SCAN_INTERLEAVED
                     || acqMode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL;
-            return this;
-        }
-
-        /**
-         * Sets the channel mode.
-         *
-         * @param channelMode the channel mode.
-         */
-        @Override
-        public Builder channelMode(final MultiChannelMode channelMode) {
-            channelMode_ = channelMode;
             return this;
         }
 
@@ -215,29 +193,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             return this;
         }
 
-        /**
-         * Sets the channel group.
-         *
-         * @param channelGroup the channel group.
-         */
-        @Override
-        public Builder channelGroup(final String channelGroup) {
-            channelGroup_ = channelGroup;
-            return this;
-        }
-
-        /**
-         * Sets the channels array.
-         *
-         * @param channels the channel array
-         */
-        @Override
-        public Builder channels(final ChannelSpec[] channels) {
-            channels_ = channels;
-            numChannels_ = channels_.length;
-            return this;
-        }
-
         @Override
         public Builder liveScanPeriod(double liveScanPeriod) {
             liveScanPeriod_ = liveScanPeriod;
@@ -245,6 +200,10 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         }
 
         // getters for sub-builders
+        public DefaultChannelSettings.Builder channelSettingsBuilder() {
+            return csb_;
+        }
+
         public DefaultTimingSettings.Builder timingSettingsBuilder() {
             return tsb_;
         }
@@ -311,6 +270,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
 
     }
 
+    private final DefaultChannelSettings channelSettings_;
     private final DefaultTimingSettings timingSettings_;
     private final DefaultVolumeSettings volumeSettings_;
     private final DefaultSliceSettingsLS sliceSettingsLS_;
@@ -320,7 +280,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
     private final AcquisitionMode acquisitionMode_;
-    private final MultiChannelMode channelMode_;
     private final CameraMode cameraMode_;
 
     private final boolean useChannels_;
@@ -334,15 +293,11 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final int numTimePoints_;
     private final double timePointInterval_;
     private final int postMoveDelay_;
-
-    private final int numChannels_;
-    private final String channelGroup_;
-    private final ChannelSpec[] channels_;
-
     private final double liveScanPeriod_;
 
     private DefaultAcquisitionSettingsSCAPE(Builder builder) {
         super(builder);
+        channelSettings_ = builder.csb_.build();
         timingSettings_ = builder.tsb_.build();
         volumeSettings_ = builder.vsb_.build();
         sliceSettings_ = builder.ssb_.build();
@@ -355,7 +310,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             sliceCalibrations_[i] = builder.slcb_[i].build();
         }
         acquisitionMode_ = builder.acquisitionMode_;
-        channelMode_ = builder.channelMode_;
         cameraMode_ = builder.cameraMode_;
         useChannels_ = builder.useChannels_;
         useTimePoints_ = builder.useTimePoints_;
@@ -367,9 +321,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         numTimePoints_ = builder.numTimePoints_;
         timePointInterval_ = builder.timePointInterval_;
         postMoveDelay_ = builder.postMoveDelay_;
-        numChannels_ = builder.numChannels_;
-        channelGroup_ = builder.channelGroup_;
-        channels_ = builder.channels_;
         liveScanPeriod_= builder.liveScanPeriod_;
     }
     //    /**
@@ -396,10 +347,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
 //                useAdvancedTiming_,
 //                numTimePoints_,
 //                timePointInterval_,
-//                postMoveDelay_,
-//                numChannels_,
-//                channelGroup_,
-//                channels_
+//                postMoveDelay_
 //        );
 //    }
 
@@ -407,6 +355,16 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
 //    public AcquisitionSettingsDISPIM.Builder copyBuilder() {
 //        return null;
 //    }
+
+    /**
+     * Returns the immutable DefaultChannelSettings instance.
+     *
+     * @return immutable DefaultChannelSettings instance.
+     */
+    //@Override
+    public DefaultChannelSettings channelSettings() {
+        return channelSettings_;
+    }
 
     /**
      * Returns the immutable DefaultTimingSettings instance.
@@ -488,16 +446,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     @Override
     public AcquisitionMode acquisitionMode() {
         return acquisitionMode_;
-    }
-
-    /**
-     * Returns the channel mode.
-     *
-     * @return the channel mode.
-     */
-    @Override
-    public MultiChannelMode channelMode() {
-        return channelMode_;
     }
 
     /**
@@ -608,42 +556,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     @Override
     public int postMoveDelay() {
         return postMoveDelay_;
-    }
-
-    /**
-     * Returns the number of channels.
-     *
-     * @return the number of channels.
-     */
-    @Override
-    public int numChannels() {
-        return numChannels_;
-    }
-
-    /**
-     * Returns the channel group.
-     *
-     * @return the channel group.
-     */
-    @Override
-    public String channelGroup() {
-        return channelGroup_;
-    }
-
-    /**
-     * Returns the channels as an array.
-     *
-     * @return the channels as an array.
-     */
-    @Override
-    public ChannelSpec[] channels() {
-        return channels_;
-    }
-
-    public ChannelSpec[] usedChannels() {
-        return Arrays.stream(channels_)
-                .filter(ChannelSpec::isUsed)
-                .toArray(ChannelSpec[]::new);
     }
 
     @Override

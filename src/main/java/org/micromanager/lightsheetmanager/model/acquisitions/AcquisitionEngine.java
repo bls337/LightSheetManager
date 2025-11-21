@@ -192,11 +192,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             // These are the ones from the clojure engine that may yet need to be translated
             //        "Channels" -> {Long@25854} 2
 
-            summaryMetadata.put(PropertyKey.CHANNEL_GROUP.key(), acqSettings_.channelGroup());
+            summaryMetadata.put(PropertyKey.CHANNEL_GROUP.key(), acqSettings_.channelSettings().channelGroup());
             JSONArray chNames = new JSONArray();
             JSONArray chColors = new JSONArray();
-            if (acqSettings_.isUsingChannels() && acqSettings_.channels().length > 0) {
-                for (ChannelSpec c : acqSettings_.channels()) {
+            if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().numChannels() > 0) {
+                for (ChannelSpec c : acqSettings_.channelSettings().channels()) {
                     chNames.put(c.getName());
 //                chColors.put(c.getRGB());
                 }
@@ -215,7 +215,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                   .put(PropertyKey.SLICES.key(), doProjections ? 1 : acqSettings_.volumeSettings().slicesPerView());
 
             summaryMetadata.put(PropertyKey.CHANNELS.key(), acqSettings_.isUsingChannels() ?
-                  acqSettings_.channels().length : 1);
+                  acqSettings_.channelSettings().numChannels() : 1);
             summaryMetadata
                   .put(PropertyKey.POSITIONS.key(), acqSettings_.isUsingMultiplePositions() ?
                         studio_.positions().getPositionList().getNumberOfPositions() : 1);
