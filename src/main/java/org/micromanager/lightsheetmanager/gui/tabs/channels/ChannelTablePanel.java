@@ -74,9 +74,12 @@ public class ChannelTablePanel extends Panel {
         cmbChannelGroup_.registerListener(e -> {
             final String channelGroup = cmbChannelGroup_.getSelected();
             table_.updatePresetComboBoxes(channelGroup);
+            // set the channel group to use when we get the channels
+            model_.acquisitions().settingsBuilder().channelSettingsBuilder().channelGroup(channelGroup);
+            model_.acquisitions().updateAcquisitionSettings();
+            // update the table data model and refresh ui
             table_.getData().setChannels(channelGroup, model_.acquisitions().settings().channelSettings().channels());
             table_.getData().setChannelGroup(channelGroup);
-            model_.acquisitions().settingsBuilder().channelSettingsBuilder().channelGroup(channelGroup);
             table_.refreshData();
         });
 
