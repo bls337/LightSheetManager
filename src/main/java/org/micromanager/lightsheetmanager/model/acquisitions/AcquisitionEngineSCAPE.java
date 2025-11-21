@@ -760,25 +760,25 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //        }
 
         // setup channels
-        int nrChannelsSoftware = acqSettings_.numChannels();  // how many times we trigger the controller per stack
+        int nrChannelsSoftware = acqSettings_.channelSettings().numChannels();  // how many times we trigger the controller per stack
         int nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView();
         //acqSettings_.volumeSettings().slicesPerView();
         // TODO: channels need to modify panels and need extraChannelOffset_
         boolean changeChannelPerVolumeSoftware = false;
         boolean changeChannelPerVolumeDoneFirst = false;
         if (acqSettings_.isUsingChannels()) {
-            if (acqSettings_.numChannels() == 0) {
+            if (acqSettings_.channelSettings().numChannels() == 0) {
                 studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
                 return false; // early exit
             }
-            switch (acqSettings_.channelMode()) {
+            switch (acqSettings_.channelSettings().channelMode()) {
                 case VOLUME:
                     changeChannelPerVolumeSoftware = true;
                     changeChannelPerVolumeDoneFirst = true;
                     break;
                 case VOLUME_HW:
                 case SLICE_HW:
-                    if (acqSettings_.numChannels() == 1) {
+                    if (acqSettings_.channelSettings().numChannels() == 1) {
                         // only 1 channel selected so don't have to really use hardware switching
                         //multiChannelPanel_.initializeChannelCycle();
                         //extraChannelOffset_ = multiChannelPanel_.selectNextChannelAndGetOffset();
@@ -792,12 +792,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                             return false; // early exit
                         }
                         nrChannelsSoftware = 1;
-                        nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView() * acqSettings_.numChannels();
+                        nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView() * acqSettings_.channelSettings().numChannels();
                     }
                     break;
                 default:
                     studio_.logs().showError(
-                            "Unsupported multichannel mode \"" + acqSettings_.channelMode().toString() + "\"");
+                            "Unsupported multichannel mode \"" + acqSettings_.channelSettings().channelMode().toString() + "\"");
                     return false; // early exit
             }
         }
@@ -923,7 +923,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // must use PLogic for channels when using hardware time points
         if (isUsingHardwareTimePoints) {
-            if (acqSettings_.isUsingChannels() && acqSettings_.channelMode() == MultiChannelMode.VOLUME) {
+            if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().channelMode() == MultiChannelMode.VOLUME) {
                 studio_.logs().showError("Cannot use hardware time points (small time point interval) " +
                         "with software channels (need to use PLogic channel switching).");
                 return false;
@@ -991,7 +991,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // max of laser on time (for static light sheet) and total camera reset/readout time; will add excess later
         final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriodMin - laserDuration);
         // extra quarter millisecond to make sure interleaved slices works (otherwise laser signal never goes low)
-        final double sliceLaserInterleaved = (acqSettings_.channelMode() == MultiChannelMode.SLICE_HW ? 0.25f : 0.f);
+        final double sliceLaserInterleaved = (acqSettings_.channelSettings().channelMode() == MultiChannelMode.SLICE_HW ? 0.25f : 0.f);
 
         // TODO: is this getting the correct value?
         final double actualCameraResetTime =
@@ -1015,8 +1015,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 tsb.delayBeforeScan(0.0);
                 break;
             case OVERLAP: // e.g.
-                if (acqSettings_.isUsingChannels() && acqSettings_.numChannels() > 1
-                      && acqSettings_.channelMode() == MultiChannelMode.SLICE_HW) {
+                if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().numChannels() > 1
+                      && acqSettings_.channelSettings().channelMode() == MultiChannelMode.SLICE_HW) {
                    // for interleaved slices we should illuminate during global exposure but not during readout/reset time after each trigger
                    tsb.scansPerSlice(1);
                    tsb.scanDuration(1.0);
@@ -1311,8 +1311,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     private double computeActualVolumeDuration(final DefaultAcquisitionSettingsSCAPE acqSettings) {
-        final MultiChannelMode channelMode = acqSettings.channelMode();
-        final int numChannels = acqSettings.numChannels();
+        final MultiChannelMode channelMode = acqSettings.channelSettings().channelMode();
+        final int numChannels = acqSettings.channelSettings().numChannels();
         final int numViews = acqSettings.volumeSettings().numViews();
         final double delayBeforeSide = acqSettings.volumeSettings().delayBeforeView();
         int numCameraTriggers = acqSettings.volumeSettings().slicesPerView();
@@ -1418,8 +1418,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     public double computeVolumeDuration(final DefaultAcquisitionSettingsSCAPE acqSettings) {
-        final MultiChannelMode channelMode = acqSettings.channelMode();
-        final int numChannels = acqSettings.numChannels();
+        final MultiChannelMode channelMode = acqSettings.channelSettings().channelMode();
+        final int numChannels = acqSettings.channelSettings().numChannels();
         final int numViews = acqSettings.volumeSettings().numViews();
         final double delayBeforeView = acqSettings.volumeSettings().delayBeforeView();
         int numCameraTriggers = acqSettings.volumeSettings().slicesPerView();

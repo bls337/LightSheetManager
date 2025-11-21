@@ -47,7 +47,7 @@ public enum CameraMode {
      * Does camera support overlap/synchronous mode?
      *
      * @param camLib the camera device adapter
-     * @return
+     * @return {@code true} if the camera supports the mode
      */
     public static boolean hasOverlapTrigger(final CameraLibrary camLib) {
         return camLib == CameraLibrary.HAMAMATSU ||
@@ -60,7 +60,7 @@ public enum CameraMode {
      * Both PCO and Photometrics 95B do (PCO panda seems to be exception but can't easily account for that)
      *
      * @param camLib the camera device adapter
-     * @return
+     * @return {@code true} if the camera supports the mode
      */
     private static boolean hasPseudoOverlapTrigger(CameraLibrary camLib) {
         return camLib == CameraLibrary.PCOCAMERA || camLib == CameraLibrary.PVCAM;
@@ -76,7 +76,7 @@ public enum CameraMode {
      * Does camera support light sheet mode?
      *
      * @param camLib the camera device adapter
-     * @return
+     * @return {@code true} if the camera supports the mode
      */
     private static boolean hasLightSheetTrigger(CameraLibrary camLib) {
         return camLib == CameraLibrary.HAMAMATSU ||
