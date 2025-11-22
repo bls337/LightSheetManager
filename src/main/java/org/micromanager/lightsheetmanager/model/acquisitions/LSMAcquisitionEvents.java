@@ -23,6 +23,8 @@ public class LSMAcquisitionEvents {
    public static final String POSITION_AXIS = "position";
    public static final String CAMERA_AXIS = "channel";
 
+   public static int currentChannelIndex_ = 0;
+   public static boolean isUsingMultipleCameras = false;
 
    public static Iterator<AcquisitionEvent> createTimelapseMultiChannelVolumeAcqEvents(
            AcquisitionEvent baseEvent, DefaultAcquisitionSettingsSCAPE acquisitionSettings,
@@ -181,7 +183,11 @@ public class LSMAcquisitionEvents {
          public AcquisitionEvent next() {
             AcquisitionEvent cameraEvent = event.copy();
             cameraEvent.setCameraDeviceName(cameraDeviceNames_[cameraIndex_]);
-            cameraEvent.setAxisPosition(CAMERA_AXIS, cameraIndex_);
+            if (isUsingMultipleCameras) {
+               cameraEvent.setAxisPosition(CAMERA_AXIS, cameraIndex_ + (currentChannelIndex_ * cameraDeviceNames_.length));
+            } else {
+               cameraEvent.setAxisPosition(CAMERA_AXIS, cameraIndex_);
+            }
             cameraIndex_++;
             return cameraEvent;
          }
@@ -257,7 +263,7 @@ public class LSMAcquisitionEvents {
             channelEvent.setConfigGroup(channelList[index].getGroup());
             channelEvent.setConfigPreset(channelList[index].getName());
             channelEvent.setChannelName(Integer.toString(index));
-            //channelEvent.setChannelName(channelList[index].getName());
+            currentChannelIndex_ = index;
 
             double zPos;
             if (channelEvent.getZPosition() == null) {

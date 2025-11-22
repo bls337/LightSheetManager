@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.api.LightSheetManagerAPI;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.model.PluginSettings;
+import org.micromanager.lightsheetmanager.model.acquisitions.LSMAcquisitionEvents;
 import org.micromanager.lightsheetmanager.model.positions.PositionUpdater;
 import org.micromanager.lightsheetmanager.model.UserSettings;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
@@ -29,7 +30,6 @@ public class LightSheetManager implements LightSheetManagerAPI {
     private final UserSettings userSettings_;
     private final DeviceManager deviceManager_;
     private final PositionUpdater positionUpdater_;
-
 
     private AcquisitionEngine acqEngine_;
     //private final AcquisitionTableData acqTableData_;
@@ -82,6 +82,10 @@ public class LightSheetManager implements LightSheetManagerAPI {
 
         // load settings
         userSettings_.load();
+
+        // TODO: put this somewhere better, need to put this value into LSMAcquisitionEvents for now
+        LSMAcquisitionEvents.isUsingMultipleCameras =
+              deviceManager_.getDeviceAdapter().getNumSimultaneousCameras() > 1;
 
         // if we made it here then everything loaded correctly
         return true;
