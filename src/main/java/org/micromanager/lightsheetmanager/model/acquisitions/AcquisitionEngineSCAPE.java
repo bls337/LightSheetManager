@@ -1003,6 +1003,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         //final double desiredSlicePeriod = acqSettings_.sliceSettings().slicePeriod();
 //        final double slicePeriod = Math.max(Math.max(laserDuration, cameraTotalTime),
 //                isSlicePeriodMinimized ? 0 : desiredSlicePeriod);
+
+        // the delays may need to be increased by the global delay
+        double delayBeforeCamera = 0.0;
+        double delayBeforeLaser = 0.0;
+        double delayBeforeScan = 0.0;
         switch (cameraMode) {
             case PSEUDO_OVERLAP: // e.g. Kinetix
                 tsb.scansPerSlice(1);
@@ -1010,9 +1015,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 tsb.cameraExposure(laserDuration);
                 tsb.laserTriggerDuration(laserDuration);
                 tsb.cameraTriggerDuration(laserDuration);
-                tsb.delayBeforeCamera(0.25);
-                tsb.delayBeforeLaser(sliceDeadTime);
-                tsb.delayBeforeScan(0.0);
+                delayBeforeCamera = 0.25;
+                delayBeforeLaser = sliceDeadTime;
+                delayBeforeScan = 0.0;
                 break;
             case OVERLAP: // e.g.
                 if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().numChannels() > 1
@@ -1023,9 +1028,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                    tsb.cameraExposure(0.25);
                    tsb.laserTriggerDuration(laserDuration);
                    tsb.cameraTriggerDuration(0.0);
-                   tsb.delayBeforeCamera(0.25);
-                   tsb.delayBeforeLaser(sliceDeadTime + NumberUtils.ceilToQuarterMs(cameraResetTime));
-                   tsb.delayBeforeScan(0.0);
+                   delayBeforeCamera = 0.25;
+                   delayBeforeLaser = sliceDeadTime + NumberUtils.ceilToQuarterMs(cameraResetTime);
+                   delayBeforeScan = 0.0;
                 } else {
                    // the usual case
                    tsb.scansPerSlice(1);
@@ -1033,9 +1038,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                    tsb.cameraExposure(0.25);
                    tsb.laserTriggerDuration(laserDuration);
                    tsb.cameraTriggerDuration(1.0);
-                   tsb.delayBeforeCamera(0.0);
-                   tsb.delayBeforeLaser(sliceDeadTime + sliceLaserInterleaved);
-                   tsb.delayBeforeScan(0.0);
+                   delayBeforeCamera = 0.0;
+                   delayBeforeLaser = sliceDeadTime + sliceLaserInterleaved;
+                   delayBeforeScan = 0.0;
                 }
                 break;
             case EDGE:
@@ -1046,16 +1051,15 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 tsb.cameraExposure(laserDuration - NumberUtils.ceilToQuarterMs(actualCameraResetTime + cameraReadoutTime));
                 tsb.laserTriggerDuration(laserDuration);
                 tsb.cameraTriggerDuration(1.0);
-                tsb.delayBeforeCamera(sliceLaserInterleaved);
-                tsb.delayBeforeLaser(sliceDeadTime + sliceLaserInterleaved);
-                tsb.delayBeforeScan(0.0);
+                delayBeforeCamera = sliceLaserInterleaved;
+                delayBeforeLaser = sliceDeadTime + sliceLaserInterleaved;
+                delayBeforeScan = 0.0;
                 break;
             default:
                 studio_.logs().showError("Invalid camera mode");
                 break;
         }
 
-        // FIXME: needs delay
         if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
            double globalDelay = acqSettings_.sliceSettings().slicePeriod() - getSliceDuration(tsb);
            if (cameraMode == CameraMode.VIRTUAL_SLIT) {
@@ -1063,20 +1067,26 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
            }
            if (globalDelay < 0) {
               globalDelay = 0;
+              studio_.logs().showError(
+                    "Increasing slice period to meet laser exposure constraint\n"
+                          + "(time required for camera readout; readout time depends on ROI).");
            }
-//           tsb.delayBeforeScan();
-//           tsb.delayBeforeCamera();
-//           tsb.delayBeforeLaser();
+           delayBeforeCamera += globalDelay;
+           delayBeforeLaser += globalDelay;
+           delayBeforeScan += globalDelay;
         }
 
-        // FIXME: needs delay
         final double cameraExposure = model_.acquisitions().settings().sliceSettings().sampleExposure();
         double globalDelay = NumberUtils.ceilToQuarterMs(cameraExposure + cameraReadoutTime);
         if (globalDelay > 0) {
-//           tsb.delayBeforeScan();
-//           tsb.delayBeforeCamera();
-//           tsb.delayBeforeLaser();
+           delayBeforeCamera += globalDelay;
+           delayBeforeLaser += globalDelay;
+           delayBeforeScan += globalDelay;
         }
+
+        tsb.delayBeforeCamera(delayBeforeCamera);
+        tsb.delayBeforeLaser(delayBeforeLaser);
+        tsb.delayBeforeScan(delayBeforeScan);
 
         // update the slice duration based on our new values
         tsb.sliceDuration(getSliceDuration(tsb));
