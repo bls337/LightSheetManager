@@ -76,7 +76,7 @@ public class PiezoCalibrationPanel extends Panel {
             btnUpdate_ = new Button("Update");
         } else {
             // SCAPE
-            btnUpdate_ = new Button("Update", 120, 26);
+            btnUpdate_ = new Button("Update Offset", 120, 26);
         }
         btnRunAutofocus_ = new Button("Run Autofocus", 120, 26);
 
@@ -197,6 +197,10 @@ public class PiezoCalibrationPanel extends Panel {
             model_.acquisitions().settingsBuilder()
                     .sliceCalibrationBuilder(pathNum_).sliceOffset(offset);
             lblOffsetValue_.setText(String.format("%.3f μm", offset));
+            // also update the imaging center on the position panel
+            panel_.setImagingCenterValue(offset);
+            model_.acquisitions().settingsBuilder()
+                  .sheetCalibrationBuilder(pathNum_).imagingCenter(offset);
         });
 
         btnRunAutofocus_.registerListener(e -> {
