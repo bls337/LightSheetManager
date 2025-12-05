@@ -224,6 +224,10 @@ public class PositionPanel extends Panel implements Subscriber {
         }
     }
 
+    public void setImagingCenterValue(final double value) {
+        lblImagingCenterValue_.setText(String.format("%.3f μm", value));
+    }
+
     @Override
     public void update(String topic, Object value) {
         EventQueue.invokeLater(() -> {

@@ -34,11 +34,13 @@ public class PiezoCalibrationPanel extends Panel {
 
     private boolean isUsingPLogic_;
 
+    private final PositionPanel panel_;
     private final LightSheetManager model_;
 
-    public PiezoCalibrationPanel(final LightSheetManager model, final int pathNum) {
+    public PiezoCalibrationPanel(final LightSheetManager model, final PositionPanel panel, final int pathNum) {
         super("Galvo Piezo Calibration");
         model_ = Objects.requireNonNull(model);
+        panel_ = Objects.requireNonNull(panel);
         pathNum_ = pathNum;
         createUserInterface();
         createEventHandlers();
@@ -165,6 +167,9 @@ public class PiezoCalibrationPanel extends Panel {
                     final double newOffset = piezoPosition - rate * scannerPosition - channelOffset;
                     //txtOffset_.setText(String.format("%.3f μm", newOffset));
                     lblOffsetValue_.setText(String.format("%.3f μm", newOffset));
+                    panel_.setImagingCenterValue(newOffset);
+                    model_.acquisitions().settingsBuilder()
+                          .sheetCalibrationBuilder(pathNum_).imagingCenter(newOffset);
                     model_.acquisitions().settingsBuilder()
                           .sliceCalibrationBuilder(pathNum_).sliceOffset(newOffset);
                     model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
