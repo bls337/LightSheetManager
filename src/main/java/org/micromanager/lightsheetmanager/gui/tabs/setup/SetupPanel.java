@@ -46,9 +46,9 @@ public class SetupPanel extends Panel implements ListeningPanel {
         leftPanel_ = new Panel();
         rightPanel_ = new Panel();
 
-        piezoPanel_ = new PiezoCalibrationPanel(model_, pathNum);
         beamSheetPanel_ = new BeamSheetControlPanel(model_, pathNum);
         positionPanel_ = new PositionPanel(model_, pathNum);
+        piezoPanel_ = new PiezoCalibrationPanel(model_, positionPanel_, pathNum);
 
         joystickPanel_ = new JoystickPanel(model_);
         excitationPanel_ = new ExcitationPanel(model_);
