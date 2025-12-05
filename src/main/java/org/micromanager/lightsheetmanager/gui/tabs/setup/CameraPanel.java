@@ -135,7 +135,7 @@ public class CameraPanel extends Panel {
                 // live mode
                 btnLiveMode_.registerListener(e -> {
                     closeLiveModeWindow();
-                    final CameraBase camera = model_.devices().getDevice("ImagingCamera");
+                    final CameraBase camera = model_.devices().getFirstImagingCamera();
                     if (camera != null) {
                         try {
                             model_.studio().core().setCameraDevice(camera.getDeviceName());
@@ -147,6 +147,7 @@ public class CameraPanel extends Panel {
                         isLivePressed = true;
                         model_.studio().live().setLiveModeOn(true);
                     } else {
+                        // TODO: use correct name for camera, ImagingCamera1, etc
                         model_.studio().logs().showError(
                                 "No device for \"ImagingCamera\" set in the device adapter.");
                     }

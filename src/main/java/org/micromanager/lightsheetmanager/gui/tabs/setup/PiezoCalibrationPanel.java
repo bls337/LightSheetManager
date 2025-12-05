@@ -163,7 +163,10 @@ public class PiezoCalibrationPanel extends Panel {
                     // FIXME: update channelOffset
                     // was: channelOffset = ASIdiSPIM.getFrame().getAcquisitionPanel().getChannelOffset();
                     final double newOffset = piezoPosition - rate * scannerPosition - channelOffset;
-                    txtOffset_.setText(String.format("%.3f μm", newOffset));
+                    //txtOffset_.setText(String.format("%.3f μm", newOffset));
+                    lblOffsetValue_.setText(String.format("%.3f μm", newOffset));
+                    model_.acquisitions().settingsBuilder()
+                          .sliceCalibrationBuilder(pathNum_).sliceOffset(newOffset);
                     model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
                             newOffset + " (with channel offset of " + channelOffset + ")");
                 }
