@@ -42,7 +42,7 @@ public class PositionUpdater implements Publisher {
    }
 
    private void createPollingTask() {
-      worker_ = new SwingWorker<Void, Void>() {
+      worker_ = new SwingWorker<>() {
          @Override
          protected Void doInBackground() {
             while (isPolling_.get()) {
