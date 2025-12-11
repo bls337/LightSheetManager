@@ -441,7 +441,7 @@ public class PLogicSCAPE {
             // for stage scanning we define the piezo position to be the home position (normally 0)
             // this is basically required for interleaved mode (otherwise piezo would be moving every slice)
             //    and by convention we'll do it for all stage scanning
-            piezoCenter = piezo_.getHomePosition();
+            piezoCenter = piezo_.getHomePosition() * 1000.0; // convert to mm
         } else {
             // TODO: add centerAtCurrentZ to acqSettings
             final boolean centerAtCurrentZ = false;
@@ -465,13 +465,17 @@ public class PLogicSCAPE {
         // we modify it if we are taking "extra slice" for synchronous/overlap
         int numSlicesHW = settings.volumeSettings().slicesPerView();
 
-        // tweak the parameters if we are using synchronous/overlap mode
-        // object is to get exact same piezo/scanner positions in first
-        // N frames (piezo/scanner will move to N+1st position but no image taken)
+        // tweak the piezo parameters if we are using synchronous/overlap mode
+        // object is to get exact same piezo/scanner positions in first N frames (piezo/scanner will move to N+1st position but no image taken)
+        // amplitude is (N-1)*stepSize and artificially make N*stepSize instead => multiply amplitude by (N)/(N-1)
+        // offset shifts by half a step
         final CameraMode cameraMode = settings.cameraMode();
         if (cameraMode == CameraMode.OVERLAP) {
-            piezoAmplitude *= numSlicesHW / (numSlicesHW - 1.0);
-            piezoCenter += piezoAmplitude / (2 * numSlicesHW);
+            if (settings.volumeSettings().slicesPerView() > 1) {
+                piezoAmplitude *= numSlicesHW / (numSlicesHW - 1.0);
+            }
+            // was piezoCenter += piezoAmplitude/(2*numSlicesHW) which isn't quite the same but close enough that nobody probably noticed
+            piezoCenter += settings.volumeSettings().sliceStepSize() / 2;
             numSlicesHW += 1;
         }
 
