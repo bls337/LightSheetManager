@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.model.acquisitions;
 
 import mmcorej.StrVector;
+import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
 import org.micromanager.MultiStagePosition;
 import org.micromanager.PositionList;
@@ -251,6 +252,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         currentAcquisition_ = new Acquisition(sink);
 
         JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
+        try {
+            summaryMetadata.put("z-um_step", acqSettings_.volumeSettings().sliceStepSize());
+        } catch (JSONException e) {
+            studio_.logs().logError("Failed to add z-um_step metadata: " + e.getMessage());
+        }
         DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata, projectionMode);
 
         // TODO(Brandon): where should i get this from?

@@ -237,7 +237,10 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             }
             summaryMetadata.put(PropertyKey.AXIS_ORDER.key(), axes);
 
-            DefaultSummaryMetadata dsmd = (DefaultSummaryMetadata) dsmb.build();
+            // add "z-step_um" metadata to the image viewer (used in the deskew plugin)
+            DefaultSummaryMetadata dsmd = (DefaultSummaryMetadata) dsmb
+                  .zStepUm(acqSettings_.volumeSettings().sliceStepSize())
+                  .build();
 
             summaryMetadata.put(PropertyKey.MICRO_MANAGER_VERSION.key(),
                   dsmd.getMicroManagerVersion());
