@@ -516,7 +516,8 @@ public class PLogicSCAPE {
             final boolean oppositeDirections = false;
 
             scanner_.setSPIMAlternateDirections(oppositeDirections);
-            scanner_.setSPIMScanDuration(settings.timingSettings().scanDuration());
+            scanner_.setSPIMScanDuration(
+                  settings.timingSettings().sliceDuration() - settings.timingSettings().delayBeforeScan());
             scanner_.sa().setAmplitudeY(sliceAmplitude);
             scanner_.sa().setOffsetY(sliceCenter);
             scanner_.setSPIMNumSlices(numSlicesHW);
@@ -537,7 +538,7 @@ public class PLogicSCAPE {
                 // if we artificially shifted centers due to extra trigger and only moving piezo
                 // then move galvo center back to where it would have been
                 if (settings.cameraMode() == CameraMode.OVERLAP) {
-                    piezoCenter -= piezoAmplitude / (2 * (numSlicesHW - 1));
+                    piezoCenter -= settings.volumeSettings().sliceStepSize() / 2;
                 }
                 piezoAmplitude = 0.0;
             }
@@ -597,8 +598,9 @@ public class PLogicSCAPE {
 //                    // width should be increased by ratio (1 + settle_fraction)
 //                    sheetWidth += (sheetWidth * settleTime/readoutTime);
             }
-            scanner_.sa().setAmplitudeX(sheetWidth);
-            scanner_.sa().setOffsetX(sheetOffset);
+            // SCOPE should not modify the x-axis of the galvo
+            // scanner_.sa().setAmplitudeX(sheetWidth);
+            // scanner_.sa().setOffsetX(sheetOffset);
         }
         return true;
     }

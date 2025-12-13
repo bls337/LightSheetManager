@@ -62,7 +62,7 @@ public class SingleAxis extends DeviceBase {
     }
 
     public void setAmplitudeY(final double degrees) {
-        setPropertyFloat(Properties.AMPLITUDE_X, degrees);
+        setPropertyFloat(Properties.AMPLITUDE_Y, degrees);
     }
 
     public double getAmplitudeY() {
