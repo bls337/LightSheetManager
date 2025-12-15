@@ -59,7 +59,6 @@ public enum AcquisitionMode {
             keys.add(STAGE_SCAN);
         }
         keys.add(SLICE_SCAN_ONLY);
-        keys.add(PIEZO_SCAN_ONLY);
         return keys.stream()
                 .map(AcquisitionMode::toString)
                 .toArray(String[]::new);
