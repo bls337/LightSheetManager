@@ -497,13 +497,6 @@ public class PLogicSCAPE {
         double sliceAmplitude = piezoAmplitude / sliceRate;
         double sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
 
-        if (settings.acquisitionMode() == AcquisitionMode.PIEZO_SCAN_ONLY) {
-            if (cameraMode == CameraMode.OVERLAP) {
-                double actualPiezoCenter = piezoCenter - piezoAmplitude / (2 * (numSlicesHW - 1));
-                sliceCenter = (actualPiezoCenter - sliceOffset) / sliceRate;
-            }
-            sliceAmplitude = 0.0;
-        }
         // round to nearest 0.0001 degrees, which is approximately the DAC resolution
         sliceAmplitude = NumberUtils.roundToPlace(sliceAmplitude, 4);
         sliceCenter = NumberUtils.roundToPlace(sliceCenter, 4);
@@ -532,9 +525,9 @@ public class PLogicSCAPE {
             // get the piezo card ready
             // need to do this for stage scanning too, which makes sure the piezo amplitude is 0
 
-            // if mode SLICE_SCAN_ONLY we have computed slice movement as if we
+            // if mode GALVO_SCAN we have computed slice movement as if we
             //   were moving the piezo but now make piezo stay still
-            if (settings.acquisitionMode() == AcquisitionMode.SLICE_SCAN_ONLY) {
+            if (settings.acquisitionMode() == AcquisitionMode.GALVO_SCAN) {
                 // if we artificially shifted centers due to extra trigger and only moving piezo
                 // then move galvo center back to where it would have been
                 if (settings.cameraMode() == CameraMode.OVERLAP) {
@@ -846,9 +839,7 @@ public class PLogicSCAPE {
                 scanner_.setSPIMState(ASIScanner.SPIMState.ARMED);
                 xyStage_.setScanState(ASIXYStage.ScanState.RUNNING);
                 break;
-            case PIEZO_SLICE_SCAN:
-            case SLICE_SCAN_ONLY:
-            case PIEZO_SCAN_ONLY:
+            case GALVO_SCAN:
             case NO_SCAN:
                 // in actuality only matters which device we trigger if there are
                 // two micro-mirror cards, which hasn't ever been done in practice yet
