@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.api.data;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 // TODO: account for different naming on each geometry type (SLICE_SCAN_ONLY)
 
 /**
- * Acquisition modes for diSPIM and SCAPE.
+ * Acquisition modes for all microscope geometry types.
  */
 public enum AcquisitionMode {
     NONE("None"),
@@ -21,6 +21,16 @@ public enum AcquisitionMode {
     //SLICE_SCAN_ONLY("Slice scan only"), // for diSPIM
     SLICE_SCAN_ONLY("Galvo scan"), // for SCAPE
     PIEZO_SCAN_ONLY("Piezo scan only");
+
+    // Maps GeometryType to a set of valid AcquisitionModes
+    private static final Map<GeometryType, List<AcquisitionMode>> MODES_BY_GEOMETRY_TYPE = Map.of(
+          GeometryType.SCAPE, List.of(NO_SCAN, STAGE_SCAN, SLICE_SCAN_ONLY),
+          GeometryType.DISPIM, List.of(NO_SCAN, STAGE_SCAN, SLICE_SCAN_ONLY) // TODO: add all valid modes
+    );
+
+    private static final List<AcquisitionMode> STAGE_SCAN_MODES = List.of(
+          STAGE_SCAN, STAGE_SCAN_INTERLEAVED, STAGE_SCAN_UNIDIRECTIONAL
+    );
 
     private final String text_;
 
@@ -52,16 +62,11 @@ public enum AcquisitionMode {
      * @param isStageScanning {@code true} if stage scanning
      * @return an array of strings
      */
-    public static String[] getValidKeys(final boolean isStageScanning) {
-        final ArrayList<AcquisitionMode> keys = new ArrayList<>();
-        keys.add(NO_SCAN);
-        if (isStageScanning) {
-            keys.add(STAGE_SCAN);
-        }
-        keys.add(SLICE_SCAN_ONLY);
-        return keys.stream()
+    public static String[] getValidKeys(final GeometryType geometry, final boolean isStageScanning) {
+        final List<AcquisitionMode> baseModes = MODES_BY_GEOMETRY_TYPE.getOrDefault(geometry, List.of());
+        return baseModes.stream()
+                .filter(mode -> isStageScanning || !STAGE_SCAN_MODES.contains(mode))
                 .map(AcquisitionMode::toString)
                 .toArray(String[]::new);
-
     }
 }

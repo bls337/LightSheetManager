@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.Studio;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
@@ -161,7 +162,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
         // acquisition mode combo box
         final boolean isUsingScanSettings = model_.devices().isUsingStageScanning();
-        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.getValidKeys(isUsingScanSettings),
+        final GeometryType geometryType = model_.devices().getDeviceAdapter().getMicroscopeGeometry();
+        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.getValidKeys(geometryType, isUsingScanSettings),
                 acqSettings.acquisitionMode().toString(),
                 180, 24);
 
