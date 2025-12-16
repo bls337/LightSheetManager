@@ -16,7 +16,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private DefaultScanSettings.Builder scsb_ = new DefaultScanSettings.Builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[1];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[1];
-        private AcquisitionMode acquisitionMode_ = AcquisitionMode.NONE;
+        private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
         private CameraMode cameraMode_ = CameraMode.EDGE;
 
         private boolean useChannels_ = false;

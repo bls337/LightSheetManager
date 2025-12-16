@@ -163,7 +163,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         // acquisition mode combo box
         final boolean isUsingScanSettings = model_.devices().isUsingStageScanning();
         final GeometryType geometryType = model_.devices().getDeviceAdapter().getMicroscopeGeometry();
-        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.getValidKeys(geometryType, isUsingScanSettings),
+        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.getLabels(geometryType, isUsingScanSettings),
                 acqSettings.acquisitionMode().toString(),
                 180, 24);
 
@@ -266,8 +266,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         // select the acquisition mode
         cmbAcquisitionModes_.registerListener(e -> {
             final String selected = cmbAcquisitionModes_.getSelected();
-            model_.acquisitions().settingsBuilder()
-                    .acquisitionMode(AcquisitionMode.fromString(selected));
+            AcquisitionMode.fromString(selected).ifPresent(mode -> {
+                model_.acquisitions().settingsBuilder().acquisitionMode(mode);
+            });
         });
 
         // TODO: should timing recalc be part of setting use advanced timing value in model?

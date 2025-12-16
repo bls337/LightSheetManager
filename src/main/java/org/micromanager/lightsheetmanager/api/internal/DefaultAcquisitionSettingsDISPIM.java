@@ -16,7 +16,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultScanSettings.Builder scsb_ = new DefaultScanSettings.Builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
-        private AcquisitionMode acquisitionMode_ = AcquisitionMode.NONE;
+        private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
         private MultiChannelMode channelMode_ = MultiChannelMode.NONE;
         private CameraMode cameraMode_ = CameraMode.EDGE;
 
