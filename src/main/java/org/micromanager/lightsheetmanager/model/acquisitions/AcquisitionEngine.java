@@ -120,8 +120,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             }
 
             try {
-                // make sure AcquisitionSettings are up-to-date
-                acqSettings_ = asb_.build();
+                updateAcquisitionSettings(); // make sure settings are current
 
                 if (speedTest) {
                     try {
@@ -133,16 +132,17 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                     }
                 } else {
                     studio_.logs().logMessage("Preparing Acquisition: plugin version " + LightSheetManagerPlugin.version);
-                    // run abstract methods implemented by acquisition engine geometry types
+                    // run methods implemented by acquisition engine geometry types
                     if (!setup()) {
                         studio_.logs().logError("error during setup!");
                         return; // early exit => stop acquisition
                     }
                     run(); // run the acquisition and block until complete
-                    finish(); // cleanup any resources
                 }
             } catch (Exception e) {
                 studio_.logs().showError(e);
+            } finally {
+                finish(); // cleanup any resources
             }
         });
         return acqFinished;

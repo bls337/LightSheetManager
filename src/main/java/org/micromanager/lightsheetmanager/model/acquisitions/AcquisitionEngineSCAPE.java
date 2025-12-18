@@ -22,9 +22,6 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
-
-
-
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
@@ -50,10 +47,16 @@ import java.util.ArrayList;
 
 public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
+    PLogicSCAPE controller_;
+    ArrayList<Double> savedExposures_;
+    Point2D.Double xyPosUm_;
     private double origSpeedX_;
     private double origAccelX_;
     private double scanSpeedX_;
     private double scanAccelX_;
+    private boolean isShutterOpen_;
+    private boolean autoShutter_;
+    private boolean isPolling_; // true if polling was enabled at the start of an acquisition
 
     public AcquisitionEngineSCAPE(final LightSheetManager model) {
         super(model);
@@ -91,8 +94,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     boolean run() {
-        final boolean isPolling = model_.positions().isPolling();
-        if (isPolling) {
+        isPolling_ = model_.positions().isPolling();
+        if (isPolling_) {
             model_.positions().stopPolling();
             studio_.logs().logMessage("stopped position polling");
         }
@@ -117,16 +120,16 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // save current exposure to restore later
         CameraBase[] cameras = model_.devices().getImagingCameras();
-        ArrayList<Double> savedExposures = new ArrayList<>();
+        savedExposures_ = new ArrayList<>();
         for (CameraBase camera : cameras) {
-            savedExposures.add(camera.getExposure());
+            savedExposures_.add(camera.getExposure());
         }
 
         // used to detect if the plugin is using ASI hardware
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
 
         // initialize stage scanning so we can restore state
-        Point2D.Double xyPosUm = new Point2D.Double();
+        xyPosUm_ = new Point2D.Double();
         origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
         origAccelX_ = 1.0; // don't want 0 in case something goes wrong
 
@@ -146,7 +149,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 }
 
                 // second part: initialize stage scanning, so we can restore state later
-                xyPosUm = xyStage.getXYPosition();
+                xyPosUm_ = xyStage.getXYPosition();
                 origSpeedX_ = xyStage.getSpeedX();
                 origAccelX_ = xyStage.getAccelerationX();
 
@@ -163,8 +166,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
         }
 
-        PLogicSCAPE controller = null;
-
         // Assume demo mode if default camera is DemoCamera
         boolean demoMode = false;
         try {
@@ -176,9 +177,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         if (!demoMode) {
 
             if (isUsingPLC) {
-                controller = new PLogicSCAPE(model_);
+                controller_ = new PLogicSCAPE(model_);
 
-                final boolean success = doHardwareCalculations(controller);
+                final boolean success = doHardwareCalculations(controller_);
                 if (!success) {
                     return false; // early exit => could not set up hardware
                 }
@@ -443,7 +444,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 //        }, Acquisition.AFTER_HARDWARE_HOOK);
 
-        final PLogicSCAPE controllerInstance = controller;
+        final PLogicSCAPE controllerInstance = controller_;
         // TODO This after camera hook is called after the camera has been readied to acquire a
         //  sequence. I assume we want to tell the Tiger to start sending TTLs etc here
         currentAcquisition_.addHook(new AcquisitionHook() {
@@ -489,19 +490,18 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }, Acquisition.AFTER_CAMERA_HOOK);
 
         ///////////// Turn off autoshutter /////////////////
-        final boolean isShutterOpen;
         try {
-            isShutterOpen = core_.getShutterOpen();
+            isShutterOpen_ = core_.getShutterOpen();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         // TODO: should the shutter be left open for the full duration of acquisition?
         //  because that's what this code currently does
-        boolean autoShutter = core_.getAutoShutter();
-        if (autoShutter) {
+        autoShutter_ = core_.getAutoShutter();
+        if (autoShutter_) {
             core_.setAutoShutter(false);
-            if (!isShutterOpen) {
+            if (!isShutterOpen_) {
                 try {
                     core_.setShutterOpen(true);
                 } catch (Exception e) {
@@ -668,14 +668,18 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final long elapsedTimeMs = System.currentTimeMillis() - acqButtonStart;
         studio_.logs().logMessage("SCAPE plugin acquisition took: " + elapsedTimeMs + " milliseconds");
 
+        return true;
+    }
 
+    @Override
+    boolean finish() {
         // clean up controller settings after acquisition
         // want to do this, even with demo cameras, so we can test everything else
         // TODO: figure out if we really want to return piezos to 0 position (maybe center position,
         //   maybe not at all since we move when we switch to setup tab, something else??)
-        if (isUsingPLC) {
-            controller.cleanUpControllerAfterAcquisition(acqSettings_, true);
-            controller.stopSPIMStateMachines();
+        if (model_.devices().isUsingPLogic()) {
+            controller_.cleanUpControllerAfterAcquisition(acqSettings_, true);
+            controller_.stopSPIMStateMachines();
         }
 
         // if we did stage scanning restore the original position and speed
@@ -691,14 +695,14 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             xyStage.setAccelerationX(origAccelX_);
 
             if (returnToOriginalPosition) {
-                xyStage.setXYPosition(xyPosUm.x, xyPosUm.y);
+                xyStage.setXYPosition(xyPosUm_.x, xyPosUm_.y);
             }
         }
 
         // Restore shutter/autoshutter to original state
         try {
-            core_.setShutterOpen(isShutterOpen);
-            core_.setAutoShutter(autoShutter);
+            core_.setShutterOpen(isShutterOpen_);
+            core_.setAutoShutter(autoShutter_);
         } catch (Exception e) {
             throw new RuntimeException("Couldn't restore shutter to original state");
         }
@@ -713,21 +717,22 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // TODO: execute any end-acquisition runnables
 
         // set the camera trigger modes back to internal for live mode
+        CameraBase[] cameras = model_.devices().getImagingCameras();
         for (int i = 0; i < cameras.length; i++) {
             CameraBase camera = cameras[i];
             camera.setTriggerMode(CameraMode.INTERNAL);
-            camera.setExposure(savedExposures.get(i));
+            camera.setExposure(savedExposures_.get(i));
         }
 
         currentAcquisition_ = null;
 
         if (acqSettings_.isSavingImagesDuringAcquisition()) {
-            final String savePath = FileUtils.createUniquePath(saveDir, saveName);
-            //System.out.println("savePath: " + savePath);
+            final String savePath = FileUtils.createUniquePath(
+                    acqSettings_.saveDirectory(), acqSettings_.saveNamePrefix());
             try {
                 // convert from DataStorage.SaveMode to Datastore.SaveMode
                 final Datastore.SaveMode saveMode =
-                      DataStorage.SaveMode.convert(acqSettings_.saveMode());
+                        DataStorage.SaveMode.convert(acqSettings_.saveMode());
                 curStore_.save(saveMode, savePath);
             } catch (IOException e) {
                 model_.studio().logs().showError("could not save the acquisition data to: \n" + savePath);
@@ -735,15 +740,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // start polling for navigation panel
-        if (isPolling) {
+        if (isPolling_) {
             studio_.logs().logMessage("started position polling after acquisition");
             model_.positions().startPolling();
         }
-        return true;
-    }
-
-    @Override
-    boolean finish() {
         return true;
     }
 
