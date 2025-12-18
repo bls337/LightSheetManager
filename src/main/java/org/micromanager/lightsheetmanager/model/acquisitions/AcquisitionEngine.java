@@ -143,6 +143,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                 studio_.logs().showError(e);
             } finally {
                 finish(); // cleanup any resources
+                currentAcquisition_ = null;
             }
         });
         return acqFinished;

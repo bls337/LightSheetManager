@@ -673,6 +673,20 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     boolean finish() {
+
+        final CameraBase[] cameras = model_.devices().getImagingCameras();
+
+        // Stop all cameras sequences
+        try {
+            for (CameraBase camera : model_.devices().getImagingCameras()) {
+                if (core_.isSequenceRunning(camera.getDeviceName())) {
+                    core_.stopSequenceAcquisition(camera.getDeviceName());
+                }
+            }
+        } catch (Exception e) {
+            studio_.logs().logError("Could not stop camera sequences: " + e.getMessage());
+        }
+
         // clean up controller settings after acquisition
         // want to do this, even with demo cameras, so we can test everything else
         // TODO: figure out if we really want to return piezos to 0 position (maybe center position,
@@ -704,27 +718,24 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             core_.setShutterOpen(isShutterOpen_);
             core_.setAutoShutter(autoShutter_);
         } catch (Exception e) {
-            throw new RuntimeException("Couldn't restore shutter to original state");
+            studio_.logs().logError("Couldn't restore shutter to original state");
         }
 
         // Check if acquisition ended due to an exception and show error to user if it did
         try {
             currentAcquisition_.checkForExceptions();
         } catch (Exception e) {
-            studio_.logs().showError(e);
+            studio_.logs().logError(e);
         }
 
         // TODO: execute any end-acquisition runnables
 
         // set the camera trigger modes back to internal for live mode
-        CameraBase[] cameras = model_.devices().getImagingCameras();
         for (int i = 0; i < cameras.length; i++) {
             CameraBase camera = cameras[i];
             camera.setTriggerMode(CameraMode.INTERNAL);
             camera.setExposure(savedExposures_.get(i));
         }
-
-        currentAcquisition_ = null;
 
         if (acqSettings_.isSavingImagesDuringAcquisition()) {
             final String savePath = FileUtils.createUniquePath(
