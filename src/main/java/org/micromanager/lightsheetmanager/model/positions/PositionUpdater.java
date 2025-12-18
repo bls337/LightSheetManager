@@ -33,8 +33,7 @@ public class PositionUpdater implements Publisher {
 
    // call this after the devices are found
    public void setup() {
-      final String[] devices = model_.devices()
-            .getDeviceAdapter().getPositionDevices();
+      final String[] devices = model_.devices().adapter().positionDevices();
       for (String device : devices) {
          positions_.put(device, 0.0); // TODO: how to init?
          topics_.put(device, new ArrayList<>());

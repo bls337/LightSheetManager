@@ -11,7 +11,6 @@ import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 import java.util.Objects;
 
 public class BeamSheetControlPanel extends Panel {
@@ -63,11 +62,9 @@ public class BeamSheetControlPanel extends Panel {
     }
 
     private void createUserInterface() {
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final GeometryType geometryType = model_.devices().adapter().geometry();
 
-        final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions()
-                .settings();
+        final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
 
         //setMigLayout("", "[]10[]", "");
 

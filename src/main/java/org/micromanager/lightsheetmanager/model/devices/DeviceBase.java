@@ -4,7 +4,6 @@ import mmcorej.CMMCore;
 import mmcorej.DeviceType;
 import mmcorej.StrVector;
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.model.utils.jplus.PredicateUtils;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -159,8 +158,8 @@ public class DeviceBase {
 
     public String[] getEditableProperties(final String[] properties) {
         return Arrays.stream(properties)
-                .filter(PredicateUtils.not(this::isPropertyPreInit))
-                .filter(PredicateUtils.not(this::isPropertyReadOnly))
+                .filter(p -> !isPropertyPreInit(p))
+                .filter(p -> !isPropertyReadOnly(p))
                 .toArray(String[]::new);
     }
 

@@ -73,8 +73,7 @@ public class UserSettings {
      */
     public void load() {
         // get json from settings based on microscope geometry type
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final GeometryType geometryType = model_.devices().adapter().geometry();
 
         final String key = SETTINGS_PREFIX + geometryType.toString().toUpperCase();
         final String json = settings_.getString(key, SETTINGS_NOT_FOUND);
@@ -116,10 +115,8 @@ public class UserSettings {
         model_.acquisitions().updateAcquisitionSettings();
 
         // settings key based on geometry type
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
-        final String key = SETTINGS_PREFIX +
-                geometryType.toString().toUpperCase();
+        final GeometryType geometryType = model_.devices().adapter().geometry();
+        final String key = SETTINGS_PREFIX + geometryType.toString().toUpperCase();
 
         // save acquisition settings
         settings_.putString(key, model_.acquisitions().settings().toJson());

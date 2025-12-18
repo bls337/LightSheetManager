@@ -89,8 +89,7 @@ public class PLogicDISPIM {
         lastDistanceStr_ = "";
         lastPosStr_ = "";
 
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final GeometryType geometryType = model_.devices().adapter().geometry();
 
         // populate devices
         switch (geometryType) {
@@ -506,7 +505,7 @@ public class PLogicDISPIM {
         }
 
         // TODO: make a separate method for scape? two classes instead? no need for switch
-        if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+        if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
             scanner = scanner_;
             piezo = piezo_;
         }
@@ -1012,7 +1011,7 @@ public class PLogicDISPIM {
         double sheetWidth;
         //final String cameraName = devices_.getMMDevice(cameraDevice);
         String deviceName = "ImagingCamera" + view; // diSPIM
-        if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+        if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
             deviceName = "ImagingCamera";
         }
         CameraBase camera = devices_.getDevice(deviceName); // TODO: find a way of adapting to different cameras
@@ -1131,7 +1130,7 @@ public class PLogicDISPIM {
     }
 
     public void stopSPIMStateMachines() {
-        if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+        if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
             scanner_.setSPIMState(ASIScanner.SPIMState.IDLE);
         } else {
             scanner1_.setSPIMState(ASIScanner.SPIMState.IDLE);

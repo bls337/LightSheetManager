@@ -906,9 +906,9 @@ public class PLogicSCAPE {
         double sheetWidth;
         //final String cameraName = devices_.getMMDevice(cameraDevice);
         String deviceName = "ImagingCamera" + view; // diSPIM
-        if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+        if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
             deviceName = "ImagingCamera";
-            if (model_.devices().getDeviceAdapter().getNumSimultaneousCameras() > 1 ) {
+            if (model_.devices().adapter().numSimultaneousCameras() > 1 ) {
                 deviceName += String.valueOf(view);
             }
         }

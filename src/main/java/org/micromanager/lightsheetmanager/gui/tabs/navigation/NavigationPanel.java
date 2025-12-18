@@ -62,11 +62,11 @@ public class NavigationPanel extends Panel {
         final String imaging = "Imaging";
 
         // use pre-init property settings and Microscope Geometry data from Device Adapter
-        final LightSheetDeviceManager deviceAdapter = devices_.getDeviceAdapter();
-        final int numImagingPaths = deviceAdapter.getNumImagingPaths();
-        final int numIllumPaths = deviceAdapter.getNumIlluminationPaths();
-        final Map<String, String> deviceMap = deviceAdapter.getDeviceMap();
-        final Map<String, DeviceType> deviceTypeMap = deviceAdapter.getDeviceTypeMap();
+        final LightSheetDeviceManager deviceAdapter = devices_.adapter();
+        final int numImagingPaths = deviceAdapter.numImagingPaths();
+        final int numIllumPaths = deviceAdapter.numIlluminationPaths();
+        final Map<String, String> deviceMap = deviceAdapter.deviceMap();
+        final Map<String, DeviceType> deviceTypeMap = deviceAdapter.deviceTypeMap();
 
         // init ControlPanel arrays
         final ArrayList<ControlPanel> stageProperties = new ArrayList<>();
@@ -83,11 +83,7 @@ public class NavigationPanel extends Panel {
         // create a ControlPanel for each device
         int devicesFound = 0;
         for (String propertyName : deviceMap.keySet()) {
-
             final String deviceName = deviceMap.get(propertyName);
-            if (deviceName.equals("Undefined")) {
-                continue; // skip this property => device not set
-            }
 
             // TODO: only add certain kinds of devices
             //System.out.println(propertyName);

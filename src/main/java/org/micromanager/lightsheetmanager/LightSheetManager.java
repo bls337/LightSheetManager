@@ -65,8 +65,7 @@ public class LightSheetManager implements LightSheetManagerAPI {
         positionUpdater_.setup();
 
         // create different acq engine based on microscope geometry
-        final GeometryType geometryType = deviceManager_
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final GeometryType geometryType = deviceManager_.adapter().geometry();
         switch (geometryType) {
             case SCAPE:
                 acqEngine_ = new AcquisitionEngineSCAPE(this);
@@ -85,7 +84,7 @@ public class LightSheetManager implements LightSheetManagerAPI {
 
         // TODO: put this somewhere better, need to put this value into LSMAcquisitionEvents for now
         LSMAcquisitionEvents.isUsingMultipleCameras =
-              deviceManager_.getDeviceAdapter().getNumSimultaneousCameras() > 1;
+              deviceManager_.adapter().numSimultaneousCameras() > 1;
 
         // if we made it here then everything loaded correctly
         return true;

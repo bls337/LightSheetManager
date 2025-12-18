@@ -71,7 +71,6 @@ public class DeviceManager {
 
         // always add an entry for the device adapter
         final LightSheetDeviceManager lsm = new LightSheetDeviceManager(studio_, deviceAdapterName_);
-        lsm.getPreInitProperties();
         deviceMap_.put("LightSheetDeviceManager", lsm);
 
         // keep track of devices we have already added to the map
@@ -241,12 +240,12 @@ public class DeviceManager {
     }
 
     public CameraBase getFirstImagingCamera() {
-        final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
-        if (adapter.getNumSimultaneousCameras() > 1 && adapter.getNumImagingPaths() == 1) {
+        final LightSheetDeviceManager adapter = model_.devices().adapter();
+        if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
            return (CameraBase)deviceMap_.get("ImagingCamera1");
-        } else if (adapter.getNumSimultaneousCameras() > 1) {
+        } else if (adapter.numSimultaneousCameras() > 1) {
            return (CameraBase)deviceMap_.get("Imaging1Camera1");
-        } else if (adapter.getNumImagingPaths() > 1) {
+        } else if (adapter.numImagingPaths() > 1) {
            return (CameraBase)deviceMap_.get("Imaging1Camera");
         } else {
            return (CameraBase)deviceMap_.get("ImagingCamera");
@@ -254,13 +253,13 @@ public class DeviceManager {
     }
 
     public CameraBase getImagingCamera(final int view, final int num) {
-        final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
+        final LightSheetDeviceManager adapter = model_.devices().adapter();
         String cameraName = "Imaging";
-        if (adapter.getNumImagingPaths() > 1) {
+        if (adapter.numImagingPaths() > 1) {
             cameraName += String.valueOf(view);
         }
         cameraName += "Camera";
-        if (adapter.getNumSimultaneousCameras() > 1) {
+        if (adapter.numSimultaneousCameras() > 1) {
             cameraName += String.valueOf(num);
         }
         return (CameraBase)deviceMap_.get(cameraName);
@@ -268,9 +267,9 @@ public class DeviceManager {
 
     public CameraBase[] getImagingCameras() {
         ArrayList<CameraBase> cameraNames = new ArrayList<>();
-        final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
-        final int numImagingPaths = adapter.getNumImagingPaths();
-        final int numCameras  = adapter.getNumSimultaneousCameras();
+        final LightSheetDeviceManager adapter = model_.devices().adapter();
+        final int numImagingPaths = adapter.numImagingPaths();
+        final int numCameras  = adapter.numSimultaneousCameras();
         for (int i = 0; i < numImagingPaths; i++) {
             for (int j = 0; j < numCameras; j++) {
                 String cameraName = "Imaging";
@@ -299,7 +298,7 @@ public class DeviceManager {
 //        return deviceMap_.get("Imaging" + view + "Camera" + num);
 //    }
 
-    public LightSheetDeviceManager getDeviceAdapter() {
+    public LightSheetDeviceManager adapter() {
         return (LightSheetDeviceManager)deviceMap_.get("LightSheetDeviceManager");
     }
 
@@ -446,8 +445,8 @@ public class DeviceManager {
      */
     private ArrayList<String> updateConfig(final String groupName, final String configName) {
         ArrayList<String> newProperties = new ArrayList<>();
-        final String[] props = getDeviceAdapter().getDevicePropertyNames();
-        final String[] properties = getDeviceAdapter().getEditableProperties(props);
+        final String[] props = adapter().getDevicePropertyNames();
+        final String[] properties = adapter().getEditableProperties(props);
 
         Configuration config;
         try {

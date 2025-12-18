@@ -53,8 +53,7 @@ public class PositionPanel extends Panel implements Subscriber {
     }
 
     private void createUserInterface() {
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final GeometryType geometryType = model_.devices().adapter().geometry();
 
         isUsingPLogic_ = model_.devices().isUsingPLogic();
 
@@ -173,10 +172,10 @@ public class PositionPanel extends Panel implements Subscriber {
     // TODO: currently set up for SCAPE geometry, compare to original diSPIM plugin
     private void createEventHandlers() {
         // TODO: find a way to refresh these values
-        if (model_.devices().getDeviceAdapter().hasDevice("ImagingFocus")) {
+        if (model_.devices().adapter().hasDevice("ImagingFocus")) {
             model_.positions().register(this, "ImagingFocus");
         }
-        if (model_.devices().getDeviceAdapter().hasDevice("IllumSlice")) {
+        if (model_.devices().adapter().hasDevice("IllumSlice")) {
             model_.positions().register(this, "IllumSlice");
         }
 

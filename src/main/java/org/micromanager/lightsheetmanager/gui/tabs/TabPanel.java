@@ -65,7 +65,7 @@ public class TabPanel extends Panel {
         tabbedPane_.addTab(createTabTitle("Navigation"), navigationTab_);
 
         // create a setup path tab for each imaging path
-        final int numImagingPaths = devices_.getDeviceAdapter().getNumImagingPaths();
+        final int numImagingPaths = devices_.adapter().numImagingPaths();
         for (int i = 0; i < numImagingPaths; i++) {
             SetupPathTab setupPathTab = new SetupPathTab(model_, i + 1);
             tabbedPane_.add(createTabTitle("Setup Path " + (i + 1)), setupPathTab);
