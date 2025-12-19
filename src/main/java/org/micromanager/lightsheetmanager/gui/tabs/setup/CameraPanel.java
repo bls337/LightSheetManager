@@ -39,8 +39,7 @@ public class CameraPanel extends Panel {
     }
 
     private void createUserInterface() {
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final GeometryType geometryType = model_.devices().adapter().geometry();
 
         setMigLayout(
                 "",
@@ -85,8 +84,7 @@ public class CameraPanel extends Panel {
     }
 
     private void createEventHandlers() {
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final GeometryType geometryType = model_.devices().adapter().geometry();
 
         switch (geometryType) {
             case DISPIM:

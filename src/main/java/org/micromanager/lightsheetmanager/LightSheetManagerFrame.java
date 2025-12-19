@@ -13,7 +13,6 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.tabs.TabPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.navigation.NavigationPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.setup.PositionPanel;
 import org.micromanager.lightsheetmanager.gui.utils.WindowUtils;
 import org.micromanager.internal.utils.WindowPositioning;
 
@@ -46,8 +45,7 @@ public class LightSheetManagerFrame extends JFrame {
         // create the user interface
         if (isLoaded) {
             initDialogs();
-            final GeometryType geometryType = model_.devices()
-                    .getDeviceAdapter().getMicroscopeGeometry();
+            final GeometryType geometryType = model_.devices().adapter().geometry();
             switch (geometryType) {
                 case DISPIM:
                 case SCAPE:

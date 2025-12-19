@@ -57,7 +57,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
         // TODO: add joystick panel back in
         leftPanel_.add(excitationPanel_, "growx, wrap");
         //leftPanel_.add(joystickPanel_, "growx, wrap");
-        if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+        if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
             singleAxisPanel_ = new SingleAxisPanel(model_);
             leftPanel_.add(singleAxisPanel_, "growx, wrap");
         }

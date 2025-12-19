@@ -4,7 +4,6 @@ import mmcorej.DeviceType;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.LightSheetType;
-import org.micromanager.lightsheetmanager.model.utils.jplus.PredicateUtils;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -12,17 +11,18 @@ import java.util.stream.Collectors;
 
 
 /**
- * This class is for interacting with the LightSheetDeviceManager device adapter.
+ * The device adapter "LightSheetDeviceManager".
  *
- * <p>This class is contained in the DeviceManager object as "LightSheetDeviceManager".
+ * <p>Contained in the DeviceManager object as "LightSheetDeviceManager".
  */
 public class LightSheetDeviceManager extends DeviceBase {
 
     // used to indicate that the device is not set to any hardware
     public static final String UNDEFINED = "Undefined";
 
-    // TODO: put this here?
-    // private String deviceAdapterVersion_;
+    // TODO: use this for validation
+    // TODO: parse this to a more useful object for version comparisons?
+    private String version_;
 
     // pre-init properties
     private GeometryType geometryType_;
@@ -33,97 +33,129 @@ public class LightSheetDeviceManager extends DeviceBase {
 
     public LightSheetDeviceManager(final Studio studio, final String deviceName) {
         super(studio, deviceName);
+        loadPreInitProperties();
     }
 
-    // TODO: safely use Integer.parseInt
     /**
-     * Gets the pre-init properties from LightSheetDeviceManager and caches them. Call this method before
-     * using the getters for pre-init properties.
+     * Queries the pre-init properties from the device adapter and caches them.
      */
-    public void getPreInitProperties() {
-        // convert pre-init property strings to ints
-        numImagingPaths_ = Integer.parseInt(getProperty("ImagingPaths"));
-        numIlluminationPaths_ = Integer.parseInt(getProperty("IlluminationPaths"));
-        numSimultaneousCameras_ = Integer.parseInt(getProperty("SimultaneousCameras"));
-        // convert pre-init property strings to enum constants
+    private void loadPreInitProperties() {
+        version_ = getProperty("Version");
         geometryType_ = GeometryType.fromString(getProperty("MicroscopeGeometry"));
         lightSheetType_ = LightSheetType.fromString(getProperty("LightSheetType"));
+        // change defaults based on microscope geometry
+        int defaultImaging = 1;
+        int defaultIllumination = 1;
+        if (geometryType_ == GeometryType.DISPIM) {
+            defaultImaging = 2;
+            defaultIllumination = 2;
+        }
+        numImagingPaths_ = parsePropertyInt("ImagingPaths", defaultImaging);
+        numIlluminationPaths_ = parsePropertyInt("IlluminationPaths", defaultIllumination);
+        numSimultaneousCameras_ = parsePropertyInt("SimultaneousCameras", 1);
     }
 
-    // TODO: is this needed?
-    private int tryIntParse(final String text) {
+    /**
+     * Safely parses a device property to an integer, returns the default value on failure.
+     */
+    private int parsePropertyInt(final String propertyName, final int defaultValue) {
         try {
-            return Integer.parseInt(text);
+            return Integer.parseInt(getProperty(propertyName));
         } catch (NumberFormatException e) {
-            return -1;
+            studio_.logs().logError("Error parsing " + propertyName
+                    + " from the device adapter, use default value " + defaultValue);
+            return defaultValue;
         }
     }
 
-    public GeometryType getMicroscopeGeometry() {
+    private boolean isPositionDevice(final String deviceName) {
+        final DeviceType deviceType = getDeviceType(deviceName);
+        return deviceType == DeviceType.StageDevice
+                || deviceType == DeviceType.XYStageDevice
+                || deviceType == DeviceType.GalvoDevice;
+    }
+
+    private DeviceType getDeviceType(final String deviceName) {
+        try {
+            return core_.getDeviceType(deviceName);
+        } catch (Exception e) {
+            return DeviceType.UnknownType;
+        }
+    }
+
+    public String version() {
+        return version_;
+    }
+
+    public GeometryType geometry() {
         return geometryType_;
     }
 
-    public LightSheetType getLightSheetType() {
+    public LightSheetType lightSheetType() {
         return lightSheetType_;
     }
 
-    public int getNumImagingPaths() {
+    public int numImagingPaths() {
         return numImagingPaths_;
     }
 
-    public int getNumIlluminationPaths() {
+    public int numIlluminationPaths() {
         return numIlluminationPaths_;
     }
 
-    public int getNumSimultaneousCameras() {
+    public int numSimultaneousCameras() {
         return numSimultaneousCameras_;
     }
 
-    private boolean isPropertyUndefined(final String propertyName) {
-        return getProperty(propertyName).equals(UNDEFINED);
-    }
-
-    private boolean isPropertyPositionDevice(final String propertyName) {
-        final DeviceType deviceType = getDeviceType(getProperty(propertyName));
-        return deviceType == DeviceType.StageDevice
-              || deviceType == DeviceType.XYStageDevice
-              || deviceType == DeviceType.GalvoDevice;
-    }
-
-    public Map<String, String> getDeviceMap() {
+    /**
+     * Returns a map of internal device names to hardware device names.
+     *
+     * @return a map of internal device names to hardware device names
+     */
+    public Map<String, String> deviceMap() {
         final String[] properties = getDevicePropertyNames();
         return Arrays.stream(properties)
-                .filter(PredicateUtils.not(this::isPropertyPreInit))
-                .filter(PredicateUtils.not(this::isPropertyReadOnly))
-                .collect(Collectors.toMap(p -> p, this::getProperty));
+                .filter(p -> !isPropertyPreInit(p) && !isPropertyReadOnly(p))
+                .map(p -> Map.entry(p, getProperty(p)))
+                .filter(e -> !e.getValue().equals(UNDEFINED))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public String[] getPositionDevices() {
-        final String[] properties = getDevicePropertyNames();
-        return Arrays.stream(properties)
-              .filter(PredicateUtils.not(this::isPropertyPreInit))
-              .filter(PredicateUtils.not(this::isPropertyReadOnly))
-              .filter(this::isPropertyPositionDevice)
-              .toArray(String[]::new);
-    }
-
-    public Map<String, DeviceType> getDeviceTypeMap() {
-        final Map<String, String> deviceMap = getDeviceMap();
-        return deviceMap.entrySet().stream()
+    /**
+     * Returns a map of internal device names to device types.
+     *
+     * @return a map of internal device names to device types
+     */
+    public Map<String, DeviceType> deviceTypeMap() {
+        return deviceMap().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> getDeviceType(e.getValue())));
     }
 
-   /**
-    * Return true if the device adapter has the deviceName property
-    * set to a value other than the default: "Undefined".
-    *
-    * <p>Example deviceName properties: "SampleXY"}, "ImagingFocus".
-    *
-    * @param deviceName the name of the device in the device adapter
-    * @return true if the device is not "Undefined".
-    */
+    /**
+     * Returns an array of internal device names for all position devices.
+     * <p>
+     * A "Position Device" is a StageDevice, XYStageDevice, or GalvoDevice.
+     *
+     * @return an array of internal devices names for all position devices
+     */
+    public String[] positionDevices() {
+        return deviceMap().entrySet().stream()
+                .filter(entry -> isPositionDevice(entry.getValue()))
+                .map(Map.Entry::getKey)
+                .toArray(String[]::new);
+    }
+
+    /**
+     * Return {@code true} if the device adapter has the deviceName property
+     * set to a value other than the default: "Undefined".
+     * <p>
+     * Example deviceName properties: "SampleXY", "ImagingFocus".
+     *
+     * @param deviceName the name of the device in the device adapter
+     * @return {@code true} if the device is not "Undefined".
+     */
     public boolean hasDevice(final String deviceName) {
-        return !getProperty(deviceName).equals("Undefined");
+        return !getProperty(deviceName).equals(UNDEFINED);
     }
 
 }

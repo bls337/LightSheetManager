@@ -30,11 +30,9 @@ public class VolumeSettingsPanel extends Panel {
     }
 
     private void createUserInterface() {
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final GeometryType geometryType = model_.devices().adapter().geometry();
 
-        final int numImagingPaths = model_.devices()
-                .getDeviceAdapter().getNumImagingPaths();
+        final int numImagingPaths = model_.devices().adapter().numImagingPaths();
 
         final DefaultVolumeSettings volumeSettings = model_.acquisitions()
                 .settings().volumeSettings();

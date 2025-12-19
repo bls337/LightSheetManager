@@ -37,15 +37,15 @@ public class DeviceTab extends Panel implements ListeningPanel {
         btnCreateConfigGroup_ = new Button("Create Devices Configuration Group", 220, 30);
 
         final JLabel lblGeometryType = new JLabel("Microscope Geometry: "
-                + devices_.getDeviceAdapter().getMicroscopeGeometry());
+                + devices_.adapter().geometry());
         final JLabel lblLightSheetType = new JLabel("Light Sheet Type: "
-                + devices_.getDeviceAdapter().getLightSheetType());
+                + devices_.adapter().lightSheetType());
         final JLabel lblNumImagingPaths = new JLabel("Imaging Paths: "
-                + devices_.getDeviceAdapter().getNumImagingPaths());
+                + devices_.adapter().numImagingPaths());
         final JLabel lblNumIlluminationPaths = new JLabel("Illumination Paths: "
-                + devices_.getDeviceAdapter().getNumIlluminationPaths());
+                + devices_.adapter().numIlluminationPaths());
         final JLabel lblNumSimultaneousCameras = new JLabel("Simultaneous Cameras: "
-                + devices_.getDeviceAdapter().getNumSimultaneousCameras());
+                + devices_.adapter().numSimultaneousCameras());
 
         btnCreateConfigGroup_.setToolTipText("Creates or updates the \"LightSheetManager::Devices\" " +
                 "configuration group with all editable properties from the Light Sheet Manager device adapter.");

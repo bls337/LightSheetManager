@@ -679,7 +679,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // don't change timing settings if user is using advanced timing
         if (acqSettings_.isUsingAdvancedTiming()) {
             // TODO: find a better place to set the camera trigger mode for SCAPE
-            if (model_.devices().getDeviceAdapter().getMicroscopeGeometry() == GeometryType.SCAPE) {
+            if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
                 CameraBase camera = model_.devices().getDevice("ImagingCamera");
                 camera.setTriggerMode(acqSettings_.cameraMode());
                 studio_.logs().logDebugMessage(

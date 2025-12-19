@@ -539,8 +539,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
-            final LightSheetDeviceManager adapter = model_.devices().getDeviceAdapter();
-            if (adapter.getNumSimultaneousCameras() > 1 && adapter.getNumImagingPaths() == 1) {
+            final LightSheetDeviceManager adapter = model_.devices().adapter();
+            if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
                // multiple simultaneous cameras
                cameraNames = new String[]{
                      model_.devices().getDevice("ImagingCamera1").getDeviceName(),
@@ -825,7 +825,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // TODO: make this more robust
         String cameraName;
-        if (model_.devices().getDeviceAdapter().getNumSimultaneousCameras() > 1) {
+        if (model_.devices().adapter().numSimultaneousCameras() > 1) {
            cameraName = "ImagingCamera1";
         } else {
            cameraName = "ImagingCamera";

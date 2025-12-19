@@ -32,8 +32,7 @@ public class ExcitationPanel extends Panel implements ListeningPanel {
     }
 
     private void createUserInterface() {
-        final GeometryType geometryType = model_.devices()
-                .getDeviceAdapter().getMicroscopeGeometry();
+        final GeometryType geometryType = model_.devices().adapter().geometry();
 
         isUsingPLogic_ = model_.devices().isUsingPLogic();
 
