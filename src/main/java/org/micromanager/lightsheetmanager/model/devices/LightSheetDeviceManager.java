@@ -62,7 +62,24 @@ public class LightSheetDeviceManager extends DeviceBase {
         try {
             return Integer.parseInt(getProperty(propertyName));
         } catch (NumberFormatException e) {
+            studio_.logs().logError("Error parsing " + propertyName
+                    + " from the device adapter, use default value " + defaultValue);
             return defaultValue;
+        }
+    }
+
+    private boolean isPositionDevice(final String deviceName) {
+        final DeviceType deviceType = getDeviceType(deviceName);
+        return deviceType == DeviceType.StageDevice
+                || deviceType == DeviceType.XYStageDevice
+                || deviceType == DeviceType.GalvoDevice;
+    }
+
+    private DeviceType getDeviceType(final String deviceName) {
+        try {
+            return core_.getDeviceType(deviceName);
+        } catch (Exception e) {
+            return DeviceType.UnknownType;
         }
     }
 
@@ -90,46 +107,41 @@ public class LightSheetDeviceManager extends DeviceBase {
         return numSimultaneousCameras_;
     }
 
-    private boolean isPropertyUndefined(final String propertyName) {
-        return getProperty(propertyName).equals(UNDEFINED);
-    }
-
-    private boolean isPropertyPositionDevice(final String propertyName) {
-        final DeviceType deviceType = getDeviceType(getProperty(propertyName));
-        return deviceType == DeviceType.StageDevice
-                || deviceType == DeviceType.XYStageDevice
-                || deviceType == DeviceType.GalvoDevice;
-    }
-
+    /**
+     * Returns a map of internal device names to hardware device names.
+     *
+     * @return a map of internal device names to hardware device names
+     */
     public Map<String, String> deviceMap() {
         final String[] properties = getDevicePropertyNames();
         return Arrays.stream(properties)
-                .filter(p -> !isPropertyPreInit(p))
-                .filter(p -> !isPropertyReadOnly(p))
-                .filter(p -> !isPropertyUndefined(p))
-                .collect(Collectors.toMap(p -> p, this::getProperty));
+                .filter(p -> !isPropertyPreInit(p) && !isPropertyReadOnly(p))
+                .map(p -> Map.entry(p, getProperty(p)))
+                .filter(e -> !e.getValue().equals(UNDEFINED))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    /**
+     * Returns a map of internal device names to device types.
+     *
+     * @return a map of internal device names to device types
+     */
     public Map<String, DeviceType> deviceTypeMap() {
-        final Map<String, String> deviceMap = deviceMap();
-        return deviceMap.entrySet().stream()
+        return deviceMap().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> getDeviceType(e.getValue())));
     }
 
     /**
-     * Returns an array of device names for all position devices.
+     * Returns an array of internal device names for all position devices.
      * <p>
      * A "Position Device" is a StageDevice, XYStageDevice, or GalvoDevice.
      *
-     * @return an array of devices names for all position devices
+     * @return an array of internal devices names for all position devices
      */
     public String[] positionDevices() {
-        final String[] properties = getDevicePropertyNames();
-        return Arrays.stream(properties)
-                .filter(p -> !isPropertyPreInit(p))
-                .filter(p -> !isPropertyReadOnly(p))
-                .filter(p -> !isPropertyUndefined(p))
-                .filter(this::isPropertyPositionDevice)
+        return deviceMap().entrySet().stream()
+                .filter(entry -> isPositionDevice(entry.getValue()))
+                .map(Map.Entry::getKey)
                 .toArray(String[]::new);
     }
 

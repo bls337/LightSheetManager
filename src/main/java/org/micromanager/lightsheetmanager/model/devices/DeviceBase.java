@@ -121,15 +121,6 @@ public class DeviceBase {
         return result;
     }
 
-    // TODO: remove this
-    public DeviceType getDeviceType(final String deviceName) {
-        try {
-            return core_.getDeviceType(deviceName);
-        } catch (Exception e) {
-            return DeviceType.UnknownType;
-        }
-    }
-
     public DeviceType getDeviceType() {
         try {
             return core_.getDeviceType(deviceName_);
