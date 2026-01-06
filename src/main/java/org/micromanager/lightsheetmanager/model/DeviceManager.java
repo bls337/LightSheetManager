@@ -28,7 +28,9 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIZStage;
 
 import javax.swing.JFrame;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -265,8 +267,8 @@ public class DeviceManager {
         return (CameraBase)deviceMap_.get(cameraName);
     }
 
-    public CameraBase[] getImagingCameras() {
-        ArrayList<CameraBase> cameraNames = new ArrayList<>();
+    public String[] getImagingCameraNames() {
+        List<String> names = new ArrayList<>();
         final LightSheetDeviceManager adapter = model_.devices().adapter();
         final int numImagingPaths = adapter.numImagingPaths();
         final int numCameras  = adapter.numSimultaneousCameras();
@@ -280,10 +282,17 @@ public class DeviceManager {
                 if (numCameras > 1) {
                     cameraName += String.valueOf(j + 1);
                 }
-                cameraNames.add((CameraBase)deviceMap_.get(cameraName));
+                names.add(cameraName);
             }
         }
-        return cameraNames.toArray(new CameraBase[0]);
+        return names.toArray(String[]::new);
+    }
+
+    public CameraBase[] getImagingCameras() {
+        return Arrays.stream(getImagingCameraNames())
+                .map(name -> (CameraBase)deviceMap_.get(name))
+                .filter(Objects::nonNull)
+                .toArray(CameraBase[]::new);
     }
 
 //    public DeviceBase getImagingCamera() {

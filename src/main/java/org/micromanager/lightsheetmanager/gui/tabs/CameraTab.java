@@ -23,9 +23,10 @@ public class CameraTab extends Panel implements ListeningPanel {
     private Button btnCustomROI_;
     private Button btnGetCurrentROI_;
     private ComboBox cmbCameraTriggerMode_;
+    private ComboBox cmbFirstCamera_;
 
-    private TabPanel tabPanel_;
-    private LightSheetManager model_;
+    private final TabPanel tabPanel_;
+    private final LightSheetManager model_;
 
     public CameraTab(final LightSheetManager model, final TabPanel tabPanel) {
         tabPanel_ = Objects.requireNonNull(tabPanel);
@@ -39,6 +40,7 @@ public class CameraTab extends Panel implements ListeningPanel {
 
         final Panel pnlROI = new Panel("Imaging ROI");
         final Panel pnlCameraTrigger = new Panel("Camera Trigger Mode");
+        final Panel pnlFirstCamera = new Panel("First Camera");
 
         final Label lblXOffset = new Label("X Offset:");
         final Label lblYOffset = new Label("Y Offset:");
@@ -59,7 +61,10 @@ public class CameraTab extends Panel implements ListeningPanel {
         final CameraLibrary camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
 
         cmbCameraTriggerMode_ = new ComboBox(CameraMode.getAvailableModes(camLib),
-              model_.acquisitions().settings().cameraMode().toString());
+                model_.acquisitions().settings().cameraMode().toString());
+
+        cmbFirstCamera_ = new ComboBox(model_.devices().getImagingCameraNames(),
+                model_.devices().getFirstImagingCamera().toString());
 
         pnlROI.add(btnUnchangedROI_, "span 2, wrap");
         pnlROI.add(btnFullROI_, "");
@@ -74,10 +79,12 @@ public class CameraTab extends Panel implements ListeningPanel {
         pnlROI.add(btnGetCurrentROI_, "span 2");
 
         pnlCameraTrigger.add(cmbCameraTriggerMode_, "");
+        pnlFirstCamera.add(cmbFirstCamera_, "");
 
         add(lblTitle, "wrap");
         add(pnlROI, "wrap");
-        add(pnlCameraTrigger, "growx");
+        add(pnlCameraTrigger, "wrap, growx");
+        add(pnlFirstCamera, "growx");
     }
 
     private void createEventHandlers() {
@@ -91,8 +98,12 @@ public class CameraTab extends Panel implements ListeningPanel {
             //System.out.println("getCameraMode: " + model_.acquisitions().getAcquisitionSettings().getCameraMode());
         });
 
-        //model_.studio().core().setROI();
+        // select primary camera
+        cmbFirstCamera_.registerListener(e -> {
 
+        });
+
+        //model_.studio().core().setROI();
     }
 
     @Override
