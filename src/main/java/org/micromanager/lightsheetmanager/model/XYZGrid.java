@@ -82,8 +82,8 @@ public class XYZGrid {
      */
     public void computeGrid(final LightSheetManager model) {
 
-        XYStage xyStage = model.devices().getDevice("SampleXY");
-        Stage zStage = model.devices().getDevice("SampleZ");
+        XYStage xyStage = model.devices().device("SampleXY");
+        Stage zStage = model.devices().device("SampleZ");
 
         final int numX = useX_ ? updateGridXCount() : 1;
         final int numY = useY_ ? updateGridYCount() : 1;

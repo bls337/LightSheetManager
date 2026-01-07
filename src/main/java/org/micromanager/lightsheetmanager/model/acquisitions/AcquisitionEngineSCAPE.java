@@ -119,7 +119,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // save current exposure to restore later
-        CameraBase[] cameras = model_.devices().getImagingCameras();
+        CameraBase[] cameras = model_.devices().imagingCameras();
         savedExposures_ = new ArrayList<>();
         for (CameraBase camera : cameras) {
             savedExposures_.add(camera.getExposure());
@@ -135,7 +135,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // make sure stage scan is supported if selected
         if (acqSettings_.isUsingStageScanning()) {
-            final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+            final ASIXYStage xyStage = model_.devices().device("SampleXY");
             if (xyStage != null) {
                 if (!xyStage.hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES)) {
                     studio_.logs().showError("Must have stage with scan-enabled firmware for stage scanning.");
@@ -401,7 +401,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     scanSpeedX_ = 1.0;
                     scanAccelX_ = 1.0;
                     if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
-                        final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+                        final ASIXYStage xyStage = model_.devices().device("SampleXY");
                         scanSpeedX_ = xyStage.getSpeedX();
                         scanAccelX_ = xyStage.getAccelerationX();
                         xyStage.setSpeedX(origSpeedX_);
@@ -454,7 +454,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 //  to the tiger to tell it to start outputting TTLs
                 if (isUsingPLC) {
                     if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
-                        final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+                        final ASIXYStage xyStage = model_.devices().device("SampleXY");
                         final Point2D.Double pos = xyStage.getXYPosition();
                         xyStage.setSpeedX(scanSpeedX_);
                         xyStage.setAccelerationX(scanAccelX_);
@@ -465,7 +465,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     }
 
                     // TODO: is this the best place to set state to idle?
-                    ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+                    ASIScanner scanner = model_.devices().device("IllumSlice");
                     // need to set to IDLE to re-arm for each z-stack
                     if (!acqSettings_.isUsingHardwareTimePoints()) {
                         if (scanner.getSPIMState().equals(ASIScanner.SPIMState.RUNNING)) {
@@ -543,19 +543,19 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
                // multiple simultaneous cameras
                cameraNames = new String[]{
-                     model_.devices().getDevice("ImagingCamera1").getDeviceName(),
-                     model_.devices().getDevice("ImagingCamera2").getDeviceName()
+                     model_.devices().device("ImagingCamera1").getDeviceName(),
+                     model_.devices().device("ImagingCamera2").getDeviceName()
                };
             } else {
                // standard camera setup
                if (acqSettings_.volumeSettings().numViews() > 1) {
                   cameraNames = new String[]{
-                        model_.devices().getDevice("Imaging1Camera").getDeviceName(),
-                        model_.devices().getDevice("Imaging2Camera").getDeviceName()
+                        model_.devices().device("Imaging1Camera").getDeviceName(),
+                        model_.devices().device("Imaging2Camera").getDeviceName()
                   };
                } else {
                   cameraNames = new String[]{
-                        model_.devices().getDevice("ImagingCamera").getDeviceName()
+                        model_.devices().device("ImagingCamera").getDeviceName()
                   };
                }
             }
@@ -674,11 +674,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     @Override
     boolean finish() {
 
-        final CameraBase[] cameras = model_.devices().getImagingCameras();
+        final CameraBase[] cameras = model_.devices().imagingCameras();
 
         // Stop all cameras sequences
         try {
-            for (CameraBase camera : model_.devices().getImagingCameras()) {
+            for (CameraBase camera : model_.devices().imagingCameras()) {
                 if (core_.isSequenceRunning(camera.getDeviceName())) {
                     core_.stopSequenceAcquisition(camera.getDeviceName());
                 }
@@ -698,7 +698,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // if we did stage scanning restore the original position and speed
         if (acqSettings_.isUsingStageScanning()) {
-            final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
+            final ASIXYStage xyStage = model_.devices().device("SampleXY");
             final boolean returnToOriginalPosition =
                     acqSettings_.scanSettings().scanReturnToOriginalPosition();
 
@@ -761,7 +761,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     private boolean doHardwareCalculations(PLogicSCAPE plc) {
 
         // TODO: find a better place to set the camera trigger mode for SCAPE
-        CameraBase[] cameras = model_.devices().getImagingCameras();
+        CameraBase[] cameras = model_.devices().imagingCameras();
         for (CameraBase camera : cameras) {
             camera.setTriggerMode(acqSettings_.cameraMode());
             studio_.logs().logMessage("camera \"" + camera.getDeviceName()
@@ -834,35 +834,35 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // TODO: maybe wrap this up into a method for clarity
         double cameraReadoutTime;
         final CameraLibrary cameraLibrary = CameraLibrary.fromString(
-                model_.devices().getDevice(cameraName).getDeviceLibrary());
+                model_.devices().device(cameraName).getDeviceLibrary());
         switch (cameraLibrary) {
             case HAMAMATSU: {
-                HamamatsuCamera camera = model_.devices().getDevice(cameraName);
+                HamamatsuCamera camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case PVCAM: {
-                PVCamera camera = model_.devices().getDevice(cameraName);
+                PVCamera camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case PCOCAMERA: {
-                PCOCamera camera = model_.devices().getDevice(cameraName);
+                PCOCamera camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case ANDORSDK3: {
-                AndorCamera camera = model_.devices().getDevice(cameraName);
+                AndorCamera camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case DEMOCAMERA: {
-                DemoCamera camera = model_.devices().getDevice(cameraName);
+                DemoCamera camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             default:
-                CameraBase camera = model_.devices().getDevice(cameraName);
+                CameraBase camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
         }
@@ -964,7 +964,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     private void doHardwareCalculationsNIDAQ() {
-        NIDAQ daq = model_.devices().getDevice("TriggerCamera");
+        NIDAQ daq = model_.devices().device("TriggerCamera");
         //daq.setProperty("PropertyName", "1");
     }
 
@@ -995,7 +995,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // Note: sliceDuration is computed in recalculateSliceTiming
         DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
 
-        final CameraBase camera = model_.devices().getFirstImagingCamera(); //getDevice("ImagingCamera");
+        final CameraBase camera = model_.devices().firstImagingCamera(); //getDevice("ImagingCamera");
         final CameraMode cameraMode = acqSettings_.cameraMode();
 
         final double cameraResetTime = camera.getResetTime(cameraMode);     // recalculate for safety, 0 for light sheet
@@ -1118,17 +1118,17 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // 4. start scan 0.25ms before camera global exposure and shifted up in time to account for delay introduced by Bessel filter
         // 5. turn on laser as soon as camera global exposure, leave laser on for desired light exposure time
         // 7. end camera exposure in final 0.25ms, post-filter scan waveform also ends now
-        ASIScanner scanner1 = model_.devices().getDevice("IllumSlice"); //.getDevice("IllumBeam");
+        ASIScanner scanner1 = model_.devices().device("IllumSlice"); //.getDevice("IllumBeam");
         // ASIScanner scanner2 = model_.devices().getDevice("Illum2Beam");
 
-        CameraBase camera = model_.devices().getFirstImagingCamera(); //.getDevice("ImagingCamera");
+        CameraBase camera = model_.devices().firstImagingCamera(); //.getDevice("ImagingCamera");
         if (camera == null) {
             // just a dummy to test demo mode
             return new DefaultTimingSettings.Builder();
         }
 
         // TODO: is this necessary? setTriggerMode is called in doHardwareCalculations too
-        CameraBase[] cameras = model_.devices().getImagingCameras();
+        CameraBase[] cameras = model_.devices().imagingCameras();
         for (CameraBase cam : cameras) {
             cam.setTriggerMode(acqSettings_.cameraMode());
         }

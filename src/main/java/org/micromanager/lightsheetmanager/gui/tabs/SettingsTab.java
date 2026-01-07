@@ -161,7 +161,7 @@ public class SettingsTab extends Panel implements ListeningPanel {
         // ASIScanner Filter Freq
         if (isUsingPLogic_) {
             final ASIScanner scanner = model_.devices()
-                    .getDevice("IllumSlice");
+                    .device("IllumSlice");
 
             spnSheetAxisFilterFreq_.registerListener(
                     e -> scanner.setFilterFreqX(spnSheetAxisFilterFreq_.getDouble()));

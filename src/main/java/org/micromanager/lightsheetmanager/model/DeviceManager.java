@@ -237,11 +237,11 @@ public class DeviceManager {
      * @param <T> the generic type to cast the result to
      */
     @SuppressWarnings("unchecked")
-    public <T extends DeviceBase> T getDevice(final String deviceName) {
+    public <T extends DeviceBase> T device(final String deviceName) {
         return (T) deviceMap_.get(deviceName);
     }
 
-    public CameraBase getFirstImagingCamera() {
+    public CameraBase firstImagingCamera() {
         final LightSheetDeviceManager adapter = model_.devices().adapter();
         if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
            return (CameraBase)deviceMap_.get("ImagingCamera1");
@@ -254,7 +254,7 @@ public class DeviceManager {
         }
     }
 
-    public CameraBase getImagingCamera(final int view, final int num) {
+    public CameraBase imagingCamera(final int view, final int num) {
         final LightSheetDeviceManager adapter = model_.devices().adapter();
         String cameraName = "Imaging";
         if (adapter.numImagingPaths() > 1) {
@@ -267,7 +267,7 @@ public class DeviceManager {
         return (CameraBase)deviceMap_.get(cameraName);
     }
 
-    public String[] getImagingCameraNames() {
+    public String[] imagingCameraNames() {
         List<String> names = new ArrayList<>();
         final LightSheetDeviceManager adapter = model_.devices().adapter();
         final int numImagingPaths = adapter.numImagingPaths();
@@ -288,24 +288,12 @@ public class DeviceManager {
         return names.toArray(String[]::new);
     }
 
-    public CameraBase[] getImagingCameras() {
-        return Arrays.stream(getImagingCameraNames())
+    public CameraBase[] imagingCameras() {
+        return Arrays.stream(imagingCameraNames())
                 .map(name -> (CameraBase)deviceMap_.get(name))
                 .filter(Objects::nonNull)
                 .toArray(CameraBase[]::new);
     }
-
-//    public DeviceBase getImagingCamera() {
-//        return deviceMap_.get("ImagingCamera");
-//    }
-//
-//    public DeviceBase getImagingCamera(final int view) {
-//        return deviceMap_.get("Imaging" + view + "Camera");
-//    }
-//
-//    public DeviceBase getImagingCamera(final int view, final int num) {
-//        return deviceMap_.get("Imaging" + view + "Camera" + num);
-//    }
 
     public LightSheetDeviceManager adapter() {
         return (LightSheetDeviceManager)deviceMap_.get("LightSheetDeviceManager");
@@ -492,7 +480,7 @@ public class DeviceManager {
     public void checkDevices(final JFrame frame) {
 
         final String cameraKey = "ImagingCamera";
-        CameraBase cameraDevice = getDevice(cameraKey);
+        CameraBase cameraDevice = device(cameraKey);
         CameraLibrary cameraLib = CameraLibrary.UNKNOWN;
         if (cameraDevice != null) {
             cameraLib = CameraLibrary.fromString(cameraDevice.getDeviceLibrary());
@@ -501,7 +489,7 @@ public class DeviceManager {
         switch (cameraLib) {
             case HAMAMATSU:
                 // Flash4, Fusion, etc
-                HamamatsuCamera camera = getDevice(cameraKey);
+                HamamatsuCamera camera = device(cameraKey);
                 if (camera.getTriggerPolarity().equals(HamamatsuCamera.Values.NEGATIVE)) {
                     final boolean result = DialogUtils.showYesNoDialog(frame, "Hamamatsu Camera",
                             "The trigger polarity should be set to POSITIVE. Set it now?");

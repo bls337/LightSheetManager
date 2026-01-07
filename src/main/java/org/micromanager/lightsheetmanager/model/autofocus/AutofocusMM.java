@@ -42,13 +42,13 @@ public class AutofocusMM {
 
         // TODO: switch based on AutofocusMode?
         final String deviceName = model_.devices()
-                .getDevice("SampleZ").getDeviceName();
+                .device("SampleZ").getDeviceName();
 
         final String deviceName2 = model_.devices()
-                .getDevice("IllumSlice").getDeviceName();
+                .device("IllumSlice").getDeviceName();
 
         final String deviceName3 = model_.devices()
-                .getDevice("IllumFocus").getDeviceName();
+                .device("IllumFocus").getDeviceName();
 
         // TODO: is this correct?
         final double exposure = model_.acquisitions()

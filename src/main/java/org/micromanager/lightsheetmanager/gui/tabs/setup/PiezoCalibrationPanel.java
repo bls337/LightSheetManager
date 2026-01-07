@@ -151,8 +151,8 @@ public class PiezoCalibrationPanel extends Panel {
 //        });
 
         if (isUsingPLogic_) {
-            final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
-            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+            final ASIPiezo piezo = model_.devices().device("ImagingFocus");
+            final ASIScanner scanner = model_.devices().device("IllumSlice");
 
             btnUpdate_.registerListener(e -> {
                 if (scanner.isBeamOn()) {

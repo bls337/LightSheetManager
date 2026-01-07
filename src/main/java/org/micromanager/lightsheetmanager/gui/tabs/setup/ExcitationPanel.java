@@ -45,7 +45,7 @@ public class ExcitationPanel extends Panel implements ListeningPanel {
         cbxSheetEpi_ = new CheckBox("Sheet", false);
 
         if (isUsingPLogic_) {
-            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+            final ASIScanner scanner = model_.devices().device("IllumSlice");
             cbxBeamExc_.setSelected(scanner.isBeamOn());
         }
 
@@ -70,7 +70,7 @@ public class ExcitationPanel extends Panel implements ListeningPanel {
     private void createEventHandlers() {
 
         if (isUsingPLogic_) {
-            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+            final ASIScanner scanner = model_.devices().device("IllumSlice");
 
             cbxBeamExc_.registerListener(e -> {
                 scanner.setBeamOn(cbxBeamExc_.isSelected());
@@ -98,7 +98,7 @@ public class ExcitationPanel extends Panel implements ListeningPanel {
 
         if (isUsingPLogic_) {
             final ASIScanner scanner =
-                    model_.devices().getDevice("IllumSlice");
+                    model_.devices().device("IllumSlice");
 
             if (scanner != null && isBeamOn && !scanner.isBeamOn()) {
                 scanner.setBeamOn(true);

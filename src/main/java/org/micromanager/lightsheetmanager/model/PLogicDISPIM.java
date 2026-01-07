@@ -94,22 +94,22 @@ public class PLogicDISPIM {
         // populate devices
         switch (geometryType) {
             case DISPIM:
-                scanner1_ = devices_.getDevice(DISPIMDevice.getIllumBeam(1));
-                scanner2_ = devices_.getDevice(DISPIMDevice.getIllumBeam(2));
-                piezo1_ = devices_.getDevice(DISPIMDevice.getImagingFocus(1));
-                piezo2_ = devices_.getDevice(DISPIMDevice.getImagingFocus(2));
-                plcCamera_ = devices_.getDevice(DISPIMDevice.TRIGGER_CAMERA);
-                plcLaser_ = devices_.getDevice(DISPIMDevice.TRIGGER_LASER);
-                xyStage_ = devices_.getDevice(DISPIMDevice.SAMPLE_XY);
-                zStage_ = devices_.getDevice(DISPIMDevice.SAMPLE_Z);
+                scanner1_ = devices_.device(DISPIMDevice.getIllumBeam(1));
+                scanner2_ = devices_.device(DISPIMDevice.getIllumBeam(2));
+                piezo1_ = devices_.device(DISPIMDevice.getImagingFocus(1));
+                piezo2_ = devices_.device(DISPIMDevice.getImagingFocus(2));
+                plcCamera_ = devices_.device(DISPIMDevice.TRIGGER_CAMERA);
+                plcLaser_ = devices_.device(DISPIMDevice.TRIGGER_LASER);
+                xyStage_ = devices_.device(DISPIMDevice.SAMPLE_XY);
+                zStage_ = devices_.device(DISPIMDevice.SAMPLE_Z);
                 break;
             case SCAPE:
-                scanner_ = devices_.getDevice("IllumSlice");
-                piezo_ = devices_.getDevice("ImagingFocus");
-                plcCamera_ = devices_.getDevice("TriggerCamera");
-                plcLaser_ = devices_.getDevice("TriggerLaser");
-                xyStage_ = devices_.getDevice("SampleXY");
-                zStage_ = devices_.getDevice("SampleZ");
+                scanner_ = devices_.device("IllumSlice");
+                piezo_ = devices_.device("ImagingFocus");
+                plcCamera_ = devices_.device("TriggerCamera");
+                plcLaser_ = devices_.device("TriggerLaser");
+                xyStage_ = devices_.device("SampleXY");
+                zStage_ = devices_.device("SampleZ");
                 break;
             default:
                 break;
@@ -1014,7 +1014,7 @@ public class PLogicDISPIM {
         if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
             deviceName = "ImagingCamera";
         }
-        CameraBase camera = devices_.getDevice(deviceName); // TODO: find a way of adapting to different cameras
+        CameraBase camera = devices_.device(deviceName); // TODO: find a way of adapting to different cameras
         String cameraName = camera.getDeviceName(); // TODO: put this on LSM camera?
 
 //        // start by assuming the base value, then modify below if needed

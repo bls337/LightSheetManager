@@ -49,7 +49,7 @@ public class SingleAxisPanel extends Panel {
         int periodY = 0;
         if (isUsingPLogic_) {
             final ASIScanner scanner = model_.devices()
-                    .getDevice("IllumSlice");
+                    .device("IllumSlice");
             pattern = scanner.sa().getPatternY().toString();
             amplitudeY = scanner.sa().getAmplitudeY();
             periodY = scanner.sa().getPeriodY();
@@ -71,7 +71,7 @@ public class SingleAxisPanel extends Panel {
 
         if (isUsingPLogic_) {
             final ASIScanner galvo = model_.devices()
-                    .getDevice("IllumSlice");
+                    .device("IllumSlice");
 
             cbxPattern_.registerListener(e -> {
                 galvo.sa().setPatternY(SingleAxis.Pattern.fromString(cbxPattern_.getSelected()));

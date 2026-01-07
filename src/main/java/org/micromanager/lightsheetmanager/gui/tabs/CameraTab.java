@@ -56,15 +56,15 @@ public class CameraTab extends Panel implements ListeningPanel {
         btnGetCurrentROI_ = new Button("Get Current ROI", 120, 30);
 
         // get the imaging camera library
-        final CameraBase camera = model_.devices().getFirstImagingCamera();
+        final CameraBase camera = model_.devices().firstImagingCamera();
 
         final CameraLibrary camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
 
         cmbCameraTriggerMode_ = new ComboBox(CameraMode.getAvailableModes(camLib),
                 model_.acquisitions().settings().cameraMode().toString());
 
-        cmbFirstCamera_ = new ComboBox(model_.devices().getImagingCameraNames(),
-                model_.devices().getFirstImagingCamera().toString());
+        cmbFirstCamera_ = new ComboBox(model_.devices().imagingCameraNames(),
+                model_.devices().firstImagingCamera().toString());
 
         pnlROI.add(btnUnchangedROI_, "span 2, wrap");
         pnlROI.add(btnFullROI_, "");
