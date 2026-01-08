@@ -38,14 +38,27 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A utility for extracting information from LightSheetDeviceManager.
- *
- * <p>This class maps device strings to device objects.
+ * <p>
+ * This class maps device strings to device objects.
  */
 public class DeviceManager {
 
-    static class DeviceNotFoundException extends RuntimeException {
-        public DeviceNotFoundException(String deviceName) {
-            super("Required device not found: " + deviceName);
+    public static class DeviceException extends RuntimeException {
+        public DeviceException(String message) {
+            super(message);
+        }
+    }
+
+    public static class DeviceNotFoundException extends DeviceException {
+        public DeviceNotFoundException(String name) {
+            super("Device '" + name + "' not found.");
+        }
+    }
+
+    public static class DeviceTypeMismatchException extends DeviceException {
+        public DeviceTypeMismatchException(String name, String actual, String expected) {
+            super(String.format("Device '%s' is a %s, but you requested a %s.",
+                    name, actual, expected));
         }
     }
 
@@ -254,10 +267,8 @@ public class DeviceManager {
             return Optional.empty();
         }
         if (!type.isInstance(device)) {
-            throw new IllegalArgumentException(String.format(
-                    "Device '%s' is a %s, but you requested a %s.",
-                    deviceName, device.getClass().getSimpleName(), type.getSimpleName()
-            ));
+            throw new DeviceTypeMismatchException(
+                    deviceName, device.getClass().getSimpleName(), type.getSimpleName());
         }
         return Optional.of(type.cast(device));
     }
