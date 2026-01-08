@@ -534,7 +534,6 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         // TODO: execute any end-acquisition runnables
 
-        currentAcquisition_ = null;
         return true;
     }
 

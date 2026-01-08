@@ -19,7 +19,6 @@ public class TabPanel extends Panel {
     private NavigationTab navigationTab_;
     private AcquisitionTab acquisitionTab_;
     private AutofocusTab autofocusTab_;
-    private DataTab dataTab_;
     private DeviceTab deviceTab_;
     private CameraTab cameraTab_;
     private SettingsTab settingsTab_;
@@ -53,10 +52,9 @@ public class TabPanel extends Panel {
     private void createUserInterface() {
         // create tabs
         navigationTab_ = new NavigationTab(model_);
-        acquisitionTab_ = new AcquisitionTab(model_);
+        acquisitionTab_ = new AcquisitionTab(model_, frame_);
         autofocusTab_ = new AutofocusTab(model_);
         cameraTab_ = new CameraTab(model_,this);
-        dataTab_ = new DataTab(model_, frame_);
         deviceTab_ = new DeviceTab(model_);
         settingsTab_ = new SettingsTab(model_);
         helpTab_ = new HelpTab();
@@ -75,7 +73,6 @@ public class TabPanel extends Panel {
         tabbedPane_.addTab(createTabTitle("Acquisition"), acquisitionTab_);
         tabbedPane_.addTab(createTabTitle("Autofocus"), autofocusTab_);
         tabbedPane_.addTab(createTabTitle("Cameras"), cameraTab_);
-        tabbedPane_.addTab(createTabTitle("Data"), dataTab_);
         tabbedPane_.addTab(createTabTitle("Devices"), deviceTab_);
         tabbedPane_.addTab(createTabTitle("Settings"), settingsTab_);
         tabbedPane_.addTab(createTabTitle("Help"), helpTab_);
@@ -115,10 +112,6 @@ public class TabPanel extends Panel {
 
     public AcquisitionTab getAcquisitionTab() {
         return acquisitionTab_;
-    }
-
-    public DataTab getDataTab() {
-        return dataTab_;
     }
 
     public DeviceTab getDeviceTab() {
