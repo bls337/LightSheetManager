@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -41,7 +42,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>This class maps device strings to device objects.
  */
 public class DeviceManager {
-    
+
+    static class DeviceNotFoundException extends RuntimeException {
+        public DeviceNotFoundException(String deviceName) {
+            super("Required device not found: " + deviceName);
+        }
+    }
+
     public static final String LSM_DEVICE_LIBRARY = "LightSheetManager";
 
     private final Studio studio_;
@@ -241,17 +248,38 @@ public class DeviceManager {
         return (T) deviceMap_.get(deviceName);
     }
 
+    public <T extends DeviceBase> Optional<T> device2(final String deviceName, final Class<T> type) {
+        final DeviceBase device = deviceMap_.get(deviceName);
+        if (device == null) {
+            return Optional.empty();
+        }
+        if (!type.isInstance(device)) {
+            throw new IllegalArgumentException(String.format(
+                    "Device '%s' is a %s, but you requested a %s.",
+                    deviceName, device.getClass().getSimpleName(), type.getSimpleName()
+            ));
+        }
+        return Optional.of(type.cast(device));
+    }
+
+    public <T extends DeviceBase> T requiredDevice(final String name, final Class<T> type) {
+        return device2(name, type)
+                .orElseThrow(() -> new DeviceNotFoundException(name));
+    }
+
     public CameraBase firstImagingCamera() {
         final LightSheetDeviceManager adapter = model_.devices().adapter();
+        String deviceKey;
         if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
-           return (CameraBase)deviceMap_.get("ImagingCamera1");
+            deviceKey = "ImagingCamera1";
         } else if (adapter.numSimultaneousCameras() > 1) {
-           return (CameraBase)deviceMap_.get("Imaging1Camera1");
+            deviceKey = "Imaging1Camera1";
         } else if (adapter.numImagingPaths() > 1) {
-           return (CameraBase)deviceMap_.get("Imaging1Camera");
+            deviceKey = "Imaging1Camera";
         } else {
-           return (CameraBase)deviceMap_.get("ImagingCamera");
+            deviceKey = "ImagingCamera";
         }
+        return (CameraBase)deviceMap_.get(deviceKey);
     }
 
     public CameraBase imagingCamera(final int view, final int num) {
