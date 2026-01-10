@@ -539,22 +539,37 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
+            // TODO(Brandon): account for > 2 simultaneous cameras
             final LightSheetDeviceManager adapter = model_.devices().adapter();
             if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
                // multiple simultaneous cameras
-               cameraNames = new String[]{
-                     model_.devices().device("ImagingCamera1").getDeviceName(),
-                     model_.devices().device("ImagingCamera2").getDeviceName()
-               };
+                if (model_.acquisitions().settings().isAcqFromBothSides()) {
+                    // use 2 cameras
+                    String secondCamera = "ImagingCamera2";
+                    final String primaryCamera = model_.acquisitions().settings().primaryCamera();
+                    if (primaryCamera.equals(secondCamera)) {
+                        secondCamera = "ImagingCamera1";
+                    }
+                    cameraNames = new String[] {
+                            model_.devices().device(primaryCamera).getDeviceName(),
+                            model_.devices().device(secondCamera).getDeviceName()
+                    };
+                } else {
+                    // use 1 camera
+                    final String camera = model_.acquisitions().settings().primaryCamera();
+                    cameraNames = new String[] {
+                            model_.devices().device(camera).getDeviceName(),
+                    };
+                }
             } else {
                // standard camera setup
                if (acqSettings_.volumeSettings().numViews() > 1) {
-                  cameraNames = new String[]{
+                  cameraNames = new String[] {
                         model_.devices().device("Imaging1Camera").getDeviceName(),
                         model_.devices().device("Imaging2Camera").getDeviceName()
                   };
                } else {
-                  cameraNames = new String[]{
+                  cameraNames = new String[] {
                         model_.devices().device("ImagingCamera").getDeviceName()
                   };
                }

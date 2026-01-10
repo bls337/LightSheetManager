@@ -33,6 +33,20 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
         T cameraMode(final CameraMode cameraMode);
 
         /**
+         * Sets the first camera used in an acquisition.
+         *
+         * @param primaryCamera the primary camera
+         */
+        T primaryCamera(final String primaryCamera);
+
+        /**
+         * Sets the acquisition to acquire from multiple simultaneous cameras.
+         *
+         * @param state true if acquiring from both sides
+         */
+        T isAcqFromBothSides(final boolean state);
+
+        /**
          * Sets the acquisition to use channels.
          *
          * @param state true to use channels.
@@ -186,6 +200,20 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      * @return the camera mode.
      */
     CameraMode cameraMode();
+
+    /**
+     * Returns the name of the primary camera.
+     *
+     * @return the name of the primary camera
+     */
+    String primaryCamera();
+
+    /**
+     * Returns true if acquiring from both imaging cameras.
+     *
+     * @return true if acquiring from both imaging cameras
+     */
+    boolean isAcqFromBothSides();
 
     /**
      * Returns true if using channels.

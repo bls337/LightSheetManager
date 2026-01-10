@@ -17,7 +17,10 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[1];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[1];
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
+
         private CameraMode cameraMode_ = CameraMode.EDGE;
+        private String primaryCamera_ = "";
+        private boolean isAcqFromBothSides_ = false;
 
         private boolean useChannels_ = false;
         private boolean useTimePoints_ = false;
@@ -53,6 +56,8 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             }
             acquisitionMode_ = acqSettings.acquisitionMode_;
             cameraMode_ = acqSettings.cameraMode_;
+            primaryCamera_ = acqSettings.primaryCamera_;
+            isAcqFromBothSides_ = acqSettings.isAcqFromBothSides_;
             useChannels_ = acqSettings.useChannels_;
             useTimePoints_ = acqSettings.useTimePoints_;
             useAutofocus_ = acqSettings.useAutofocus_;
@@ -91,6 +96,28 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         @Override
         public Builder cameraMode(final CameraMode cameraMode) {
             cameraMode_ = cameraMode;
+            return this;
+        }
+
+        /**
+         * Sets the first camera used in an acquisition.
+         *
+         * @param primaryCamera the primary camera
+         */
+        @Override
+        public Builder primaryCamera(final String primaryCamera) {
+            primaryCamera_ = primaryCamera;
+            return this;
+        }
+
+        /**
+         * Sets the acquisition to acquire from multiple simultaneous cameras.
+         *
+         * @param state true if acquiring from both sides
+         */
+        @Override
+        public Builder isAcqFromBothSides(final boolean state) {
+            isAcqFromBothSides_ = state;
             return this;
         }
 
@@ -280,7 +307,10 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
     private final AcquisitionMode acquisitionMode_;
+
     private final CameraMode cameraMode_;
+    private final String primaryCamera_;
+    private final boolean isAcqFromBothSides_;
 
     private final boolean useChannels_;
     private final boolean useTimePoints_;
@@ -311,6 +341,8 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         }
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
+        primaryCamera_ = builder.primaryCamera_;
+        isAcqFromBothSides_ = builder.isAcqFromBothSides_;
         useChannels_ = builder.useChannels_;
         useTimePoints_ = builder.useTimePoints_;
         useAutofocus_ = builder.useAutofocus_;
@@ -451,6 +483,26 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     @Override
     public CameraMode cameraMode() {
         return cameraMode_;
+    }
+
+    /**
+     * Returns the name of the primary camera.
+     *
+     * @return the name of the primary camera
+     */
+    @Override
+    public String primaryCamera() {
+        return primaryCamera_;
+    }
+
+    /**
+     * Returns true if acquiring from both imaging cameras.
+     *
+     * @return true if acquiring from both imaging cameras
+     */
+    @Override
+    public boolean isAcqFromBothSides() {
+        return isAcqFromBothSides_;
     }
 
     /**

@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.components.Button;
+import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
@@ -11,6 +12,7 @@ import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
 import java.awt.Font;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class CameraTab extends Panel implements ListeningPanel {
@@ -23,7 +25,8 @@ public class CameraTab extends Panel implements ListeningPanel {
     private Button btnCustomROI_;
     private Button btnGetCurrentROI_;
     private ComboBox cmbCameraTriggerMode_;
-    private ComboBox cmbFirstCamera_;
+    private ComboBox cmbPrimaryCamera_;
+    private CheckBox cbxAcquireFromBothSides_;
 
     private final TabPanel tabPanel_;
     private final LightSheetManager model_;
@@ -40,7 +43,7 @@ public class CameraTab extends Panel implements ListeningPanel {
 
         final Panel pnlROI = new Panel("Imaging ROI");
         final Panel pnlCameraTrigger = new Panel("Camera Trigger Mode");
-        final Panel pnlFirstCamera = new Panel("First Camera");
+        final Panel pnlPrimaryCamera = new Panel("First Camera");
 
         final Label lblXOffset = new Label("X Offset:");
         final Label lblYOffset = new Label("Y Offset:");
@@ -57,14 +60,25 @@ public class CameraTab extends Panel implements ListeningPanel {
 
         // get the imaging camera library
         final CameraBase camera = model_.devices().firstImagingCamera();
-
         final CameraLibrary camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
 
         cmbCameraTriggerMode_ = new ComboBox(CameraMode.getAvailableModes(camLib),
                 model_.acquisitions().settings().cameraMode().toString());
 
-        cmbFirstCamera_ = new ComboBox(model_.devices().imagingCameraNames(),
-                model_.devices().firstImagingCamera().toString());
+        // validate that the logical device name exists
+        final String[] cameraNames = model_.devices().imagingCameraNames();
+        String primaryCamera =  model_.acquisitions().settings().primaryCamera();
+        if (!Arrays.asList(cameraNames).contains(primaryCamera)) {
+            model_.acquisitions().settingsBuilder().primaryCamera(cameraNames[0]);
+            primaryCamera = cameraNames[0]; // use first device as default
+            model_.studio().logs().logMessage(
+                    "Logical device name " + primaryCamera + " not found, use " + cameraNames[0] + " instead.");
+        }
+
+        // simultaneous camera settings
+        cmbPrimaryCamera_ = new ComboBox(cameraNames, primaryCamera);
+        cbxAcquireFromBothSides_ = new CheckBox("Acquire from both sides simultaneously",
+                model_.acquisitions().settings().isAcqFromBothSides());
 
         pnlROI.add(btnUnchangedROI_, "span 2, wrap");
         pnlROI.add(btnFullROI_, "");
@@ -79,12 +93,16 @@ public class CameraTab extends Panel implements ListeningPanel {
         pnlROI.add(btnGetCurrentROI_, "span 2");
 
         pnlCameraTrigger.add(cmbCameraTriggerMode_, "");
-        pnlFirstCamera.add(cmbFirstCamera_, "");
-
+        if (model_.devices().adapter().numSimultaneousCameras() > 1) {
+            pnlPrimaryCamera.add(cmbPrimaryCamera_, "wrap");
+        }
         add(lblTitle, "wrap");
         add(pnlROI, "wrap");
-        add(pnlCameraTrigger, "wrap, growx");
-        add(pnlFirstCamera, "growx");
+        add(pnlCameraTrigger, "wrap");
+        add(pnlPrimaryCamera, "wrap");
+        if (model_.devices().adapter().numSimultaneousCameras() > 1) {
+            add(cbxAcquireFromBothSides_, "");
+        }
     }
 
     private void createEventHandlers() {
@@ -95,13 +113,17 @@ public class CameraTab extends Panel implements ListeningPanel {
             model_.acquisitions().settingsBuilder().cameraMode(cameraMode);
             tabPanel_.getAcquisitionTab().getSliceSettingsPanel().switchUI(cameraMode);
             tabPanel_.swapSetupPathPanels(cameraMode);
-            //System.out.println("getCameraMode: " + model_.acquisitions().getAcquisitionSettings().getCameraMode());
         });
 
         // select primary camera
-        cmbFirstCamera_.registerListener(e -> {
+        cmbPrimaryCamera_.registerListener(e ->
+                model_.acquisitions().settingsBuilder().primaryCamera(
+                        cmbPrimaryCamera_.getSelected()));
 
-        });
+        // use both cameras
+        cbxAcquireFromBothSides_.registerListener(e ->
+                model_.acquisitions().settingsBuilder().isAcqFromBothSides(
+                        cbxAcquireFromBothSides_.isSelected()));
 
         //model_.studio().core().setROI();
     }
