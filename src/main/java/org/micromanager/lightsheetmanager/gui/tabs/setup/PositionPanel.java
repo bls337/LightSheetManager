@@ -105,8 +105,8 @@ public class PositionPanel extends Panel implements Subscriber {
         //btnTestAcq_.setToolTipText("Run a test acquisition.");
 
         if (isUsingPLogic_) {
-            final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
-            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+            final ASIPiezo piezo = model_.devices().device("ImagingFocus");
+            final ASIScanner scanner = model_.devices().device("IllumSlice");
 
             final double piezoPosition = piezo.getPosition();
             final double scannerPosition = scanner.getPosition().y;
@@ -180,8 +180,8 @@ public class PositionPanel extends Panel implements Subscriber {
         }
 
         if (isUsingPLogic_) {
-            final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
-            final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+            final ASIPiezo piezo = model_.devices().device("ImagingFocus");
+            final ASIScanner scanner = model_.devices().device("IllumSlice");
 
             btnImagingCenterSet_.registerListener(e -> {
                 // FIXME: check for piezo limits!

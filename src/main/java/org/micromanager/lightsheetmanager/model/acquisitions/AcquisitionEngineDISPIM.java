@@ -440,12 +440,12 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         } else {
             if (acqSettings_.volumeSettings().numViews() > 1) {
                 cameraNames = new String[]{
-                        model_.devices().getDevice("Imaging1Camera").getDeviceName(),
-                        model_.devices().getDevice("Imaging2Camera").getDeviceName()
+                        model_.devices().device("Imaging1Camera").getDeviceName(),
+                        model_.devices().device("Imaging2Camera").getDeviceName()
                 };
             } else {
                 cameraNames = new String[]{
-                        model_.devices().getDevice("Imaging1Camera").getDeviceName()
+                        model_.devices().device("Imaging1Camera").getDeviceName()
                 };
             }
         }
@@ -534,7 +534,6 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         // TODO: execute any end-acquisition runnables
 
-        currentAcquisition_ = null;
         return true;
     }
 
@@ -597,7 +596,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         }
         // TODO: code that doubles nrSlicesSoftware if (twoSided && acqBothCameras) missing
 
-        CameraBase camera = model_.devices().getDevice("Imaging1Camera");
+        CameraBase camera = model_.devices().device("Imaging1Camera");
         CameraMode camMode = camera.getTriggerMode();
         final double cameraReadoutTime = camera.getReadoutTime(camMode);
         final double exposureTime = acqSettings_.timingSettings().cameraExposure();
@@ -669,7 +668,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
     }
 
     private void doHardwareCalculationsNIDAQ() {
-        NIDAQ daq = model_.devices().getDevice("TriggerCamera");
+        NIDAQ daq = model_.devices().device("TriggerCamera");
 
         //daq.setProperty("PropertyName", "1");
     }
@@ -680,7 +679,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         if (acqSettings_.isUsingAdvancedTiming()) {
             // TODO: find a better place to set the camera trigger mode for SCAPE
             if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
-                CameraBase camera = model_.devices().getDevice("ImagingCamera");
+                CameraBase camera = model_.devices().device("ImagingCamera");
                 camera.setTriggerMode(acqSettings_.cameraMode());
                 studio_.logs().logDebugMessage(
                         "camera \"" + camera.getDeviceName() + "\" set to mode: " + camera.getTriggerMode());
@@ -705,10 +704,10 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // 4. start scan 0.25ms before camera global exposure and shifted up in time to account for delay introduced by Bessel filter
         // 5. turn on laser as soon as camera global exposure, leave laser on for desired light exposure time
         // 7. end camera exposure in final 0.25ms, post-filter scan waveform also ends now
-        ASIScanner scanner1 = model_.devices().getDevice("Illum1Beam");
-        ASIScanner scanner2 = model_.devices().getDevice("Illum2Beam");
+        ASIScanner scanner1 = model_.devices().device("Illum1Beam");
+        ASIScanner scanner2 = model_.devices().device("Illum2Beam");
 
-        CameraBase camera = model_.devices().getDevice("Imaging1Camera"); //.getImagingCamera(0);
+        CameraBase camera = model_.devices().device("Imaging1Camera"); //.getImagingCamera(0);
         if (camera == null) {
             // just a dummy to test demo mode
             return new DefaultTimingSettings.Builder();

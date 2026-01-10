@@ -27,8 +27,8 @@ public class AutofocusRunner {
         DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
 
         // TODO: make this work for generic devices
-        final ASIPiezo piezo = model_.devices().getDevice("ImagingFocus");
-        final ASIScanner scanner = model_.devices().getDevice("IllumSlice");
+        final ASIPiezo piezo = model_.devices().device("ImagingFocus");
+        final ASIScanner scanner = model_.devices().device("IllumSlice");
 
         AutofocusManager afManager = studio_.getAutofocusManager();
         afManager.setAutofocusMethodByName("OughtaFocus");

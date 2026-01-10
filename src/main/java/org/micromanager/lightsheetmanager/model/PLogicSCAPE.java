@@ -79,12 +79,12 @@ public class PLogicSCAPE {
         lastPosStr_ = "";
 
         // populate devices
-        scanner_ = devices_.getDevice("IllumSlice");
-        piezo_ = devices_.getDevice("ImagingFocus");
-        plcCamera_ = devices_.getDevice("TriggerCamera");
-        plcLaser_ = devices_.getDevice("TriggerLaser");
-        xyStage_ = devices_.getDevice("SampleXY");
-        zStage_ = devices_.getDevice("SampleZ");
+        scanner_ = devices_.device("IllumSlice");
+        piezo_ = devices_.device("ImagingFocus");
+        plcCamera_ = devices_.device("TriggerCamera");
+        plcLaser_ = devices_.device("TriggerLaser");
+        xyStage_ = devices_.device("SampleXY");
+        zStage_ = devices_.device("SampleZ");
     }
 
     // TODO: numViews > 2
@@ -912,7 +912,7 @@ public class PLogicSCAPE {
                 deviceName += String.valueOf(view);
             }
         }
-        CameraBase camera = devices_.getDevice(deviceName); // TODO: find a way of adapting to different cameras
+        CameraBase camera = devices_.device(deviceName); // TODO: find a way of adapting to different cameras
         String cameraName = camera.getDeviceName(); // TODO: put this on LSM camera?
 
 //        // start by assuming the base value, then modify below if needed

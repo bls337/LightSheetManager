@@ -112,7 +112,7 @@ public class CameraPanel extends Panel {
                 //btnInvertedPath_.setText("Preview");
                 btnInvertedPath_.registerListener(e -> {
                     closeLiveModeWindow();
-                    final CameraBase camera = model_.devices().getDevice("PreviewCamera");
+                    final CameraBase camera = model_.devices().device("PreviewCamera");
                     if (camera != null) {
                         try {
                             model_.studio().core().setCameraDevice(camera.getDeviceName());
@@ -133,7 +133,7 @@ public class CameraPanel extends Panel {
                 // live mode
                 btnLiveMode_.registerListener(e -> {
                     closeLiveModeWindow();
-                    final CameraBase camera = model_.devices().getFirstImagingCamera();
+                    final CameraBase camera = model_.devices().firstImagingCamera();
                     if (camera != null) {
                         try {
                             model_.studio().core().setCameraDevice(camera.getDeviceName());
