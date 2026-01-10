@@ -93,14 +93,13 @@ public class CameraTab extends Panel implements ListeningPanel {
         pnlROI.add(btnGetCurrentROI_, "span 2");
 
         pnlCameraTrigger.add(cmbCameraTriggerMode_, "");
-        if (model_.devices().adapter().numSimultaneousCameras() > 1) {
-            pnlPrimaryCamera.add(cmbPrimaryCamera_, "wrap");
-        }
+
         add(lblTitle, "wrap");
         add(pnlROI, "wrap");
         add(pnlCameraTrigger, "wrap");
-        add(pnlPrimaryCamera, "wrap");
         if (model_.devices().adapter().numSimultaneousCameras() > 1) {
+            pnlPrimaryCamera.add(cmbPrimaryCamera_, "wrap");
+            add(pnlPrimaryCamera, "wrap");
             add(cbxAcquireFromBothSides_, "");
         }
     }
