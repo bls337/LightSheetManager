@@ -31,11 +31,11 @@ public class RadioButton extends JPanel {
         setSelected(selected, true);
     }
 
-    public RadioButton(final String[] names, final String selected, final int type, final int alignment) {
+    public RadioButton(final String[] names, final String selected, final int alignment) {
         setMigLayout("", "", "");
         buttonGroup = new ButtonGroup();
         buttons = new ArrayList<>();
-        setLayoutStyle(alignment, type);
+        setLayoutStyle(alignment, LEFT);
         addButtons(names);
         setSelected(selected, true);
     }

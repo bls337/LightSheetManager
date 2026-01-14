@@ -82,7 +82,7 @@ public class CameraTab extends Panel implements ListeningPanel {
         }
 
         // simultaneous camera settings
-        radPrimaryCamera_ = new RadioButton(cameraNames, primaryCamera, RadioButton.LEFT, RadioButton.VERTICAL);
+        radPrimaryCamera_ = new RadioButton(cameraNames, primaryCamera, RadioButton.VERTICAL);
         cbxUseSimultaneousCameras_ = new CheckBox("Acquire from all active cameras simultaneously",
                 model_.acquisitions().settings().isUsingSimultaneousCameras());
 
