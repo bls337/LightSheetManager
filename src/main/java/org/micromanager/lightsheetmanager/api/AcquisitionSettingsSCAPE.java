@@ -33,18 +33,25 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
         T cameraMode(final CameraMode cameraMode);
 
         /**
-         * Sets the first camera used in an acquisition.
+         * Sets the imaging camera order.
          *
-         * @param primaryCamera the primary camera
+         * @param cameraOrder the imaging camera order
          */
-        T primaryCamera(final String primaryCamera);
+        T imagingCameraOrder(final String[] cameraOrder);
+
+        /**
+         * Sets the active imaging cameras.
+         *
+         * @param camerasActive the active imaging cameras
+         */
+        T imagingCamerasActive(final boolean[] camerasActive);
 
         /**
          * Sets the acquisition to acquire from multiple simultaneous cameras.
          *
          * @param state true if acquiring from both sides
          */
-        T isAcqFromBothSides(final boolean state);
+        T useSimultaneousCameras(final boolean state);
 
         /**
          * Sets the acquisition to use channels.
@@ -202,18 +209,25 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
     CameraMode cameraMode();
 
     /**
-     * Returns the name of the primary camera.
+     * Returns the imaging camera order.
      *
-     * @return the name of the primary camera
+     * @return the imaging camera order
      */
-    String primaryCamera();
+    String[] imagingCameraOrder();
+
+    /**
+     * Returns an array of active imaging cameras.
+     *
+     * @return an array of active imaging cameras
+     */
+    boolean[] imagingCamerasActive();
 
     /**
      * Returns true if acquiring from both imaging cameras.
      *
      * @return true if acquiring from both imaging cameras
      */
-    boolean isAcqFromBothSides();
+    boolean isUsingSimultaneousCameras();
 
     /**
      * Returns true if using channels.

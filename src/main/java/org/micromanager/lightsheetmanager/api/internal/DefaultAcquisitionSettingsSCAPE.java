@@ -19,8 +19,9 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
 
         private CameraMode cameraMode_ = CameraMode.EDGE;
-        private String primaryCamera_ = "";
-        private boolean isAcqFromBothSides_ = false;
+        private String[] imagingCameraOrder_ = {};
+        private boolean[] imagingCamerasActive_ = {};
+        private boolean useSimultaneousCameras_ = true;
 
         private boolean useChannels_ = false;
         private boolean useTimePoints_ = false;
@@ -56,8 +57,9 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             }
             acquisitionMode_ = acqSettings.acquisitionMode_;
             cameraMode_ = acqSettings.cameraMode_;
-            primaryCamera_ = acqSettings.primaryCamera_;
-            isAcqFromBothSides_ = acqSettings.isAcqFromBothSides_;
+            imagingCameraOrder_ = acqSettings.imagingCameraOrder_;
+            imagingCamerasActive_ = acqSettings.imagingCamerasActive_;
+            useSimultaneousCameras_ = acqSettings.useSimultaneousCameras_;
             useChannels_ = acqSettings.useChannels_;
             useTimePoints_ = acqSettings.useTimePoints_;
             useAutofocus_ = acqSettings.useAutofocus_;
@@ -100,13 +102,24 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         }
 
         /**
-         * Sets the first camera used in an acquisition.
+         * Sets the imaging camera order.
          *
-         * @param primaryCamera the primary camera
+         * @param cameraOrder the imaging camera order
          */
         @Override
-        public Builder primaryCamera(final String primaryCamera) {
-            primaryCamera_ = primaryCamera;
+        public Builder imagingCameraOrder(final String[] cameraOrder) {
+            imagingCameraOrder_ = cameraOrder;
+            return this;
+        }
+
+        /**
+         * Sets the active imaging cameras.
+         *
+         * @param camerasActive the active imaging cameras
+         */
+        @Override
+        public Builder imagingCamerasActive(final boolean[] camerasActive) {
+            imagingCamerasActive_ = camerasActive;
             return this;
         }
 
@@ -116,8 +129,8 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
          * @param state true if acquiring from both sides
          */
         @Override
-        public Builder isAcqFromBothSides(final boolean state) {
-            isAcqFromBothSides_ = state;
+        public Builder useSimultaneousCameras(final boolean state) {
+            useSimultaneousCameras_ = state;
             return this;
         }
 
@@ -309,8 +322,9 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final AcquisitionMode acquisitionMode_;
 
     private final CameraMode cameraMode_;
-    private final String primaryCamera_;
-    private final boolean isAcqFromBothSides_;
+    private final String[] imagingCameraOrder_;
+    private final boolean[] imagingCamerasActive_;
+    private final boolean useSimultaneousCameras_;
 
     private final boolean useChannels_;
     private final boolean useTimePoints_;
@@ -341,8 +355,9 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         }
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
-        primaryCamera_ = builder.primaryCamera_;
-        isAcqFromBothSides_ = builder.isAcqFromBothSides_;
+        imagingCameraOrder_ = builder.imagingCameraOrder_;
+        imagingCamerasActive_ = builder.imagingCamerasActive_;
+        useSimultaneousCameras_ = builder.useSimultaneousCameras_;
         useChannels_ = builder.useChannels_;
         useTimePoints_ = builder.useTimePoints_;
         useAutofocus_ = builder.useAutofocus_;
@@ -486,23 +501,33 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     }
 
     /**
-     * Returns the name of the primary camera.
+     * Returns the imaging camera order.
      *
-     * @return the name of the primary camera
+     * @return the imaging camera order
      */
     @Override
-    public String primaryCamera() {
-        return primaryCamera_;
+    public String[] imagingCameraOrder() {
+        return imagingCameraOrder_;
     }
 
     /**
-     * Returns true if acquiring from both imaging cameras.
+     * Returns an array of active imaging cameras.
      *
-     * @return true if acquiring from both imaging cameras
+     * @return an array of active imaging cameras
      */
     @Override
-    public boolean isAcqFromBothSides() {
-        return isAcqFromBothSides_;
+    public boolean[] imagingCamerasActive() {
+        return imagingCamerasActive_;
+    }
+
+    /**
+     * Returns true if acquiring from all active imaging cameras on a single view.
+     *
+     * @return true if acquiring from all active imaging cameras on a single view
+     */
+    @Override
+    public boolean isUsingSimultaneousCameras() {
+        return useSimultaneousCameras_;
     }
 
     /**

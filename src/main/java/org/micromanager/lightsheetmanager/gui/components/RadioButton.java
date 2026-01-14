@@ -35,7 +35,7 @@ public class RadioButton extends JPanel {
         setMigLayout("", "", "");
         buttonGroup = new ButtonGroup();
         buttons = new ArrayList<>();
-        setLayoutStyle(type, alignment);
+        setLayoutStyle(alignment, type);
         addButtons(names);
         setSelected(selected, true);
     }

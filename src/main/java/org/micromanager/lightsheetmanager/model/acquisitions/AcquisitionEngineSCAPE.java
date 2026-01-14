@@ -543,10 +543,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             final LightSheetDeviceManager adapter = model_.devices().adapter();
             if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
                // multiple simultaneous cameras
-                if (model_.acquisitions().settings().isAcqFromBothSides()) {
+                if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
                     // use 2 cameras
                     String secondCamera = "ImagingCamera2";
-                    final String primaryCamera = model_.acquisitions().settings().primaryCamera();
+                    final String primaryCamera = "ImagingCamera1";//model_.acquisitions().settings().primaryCamera();
                     if (primaryCamera.equals(secondCamera)) {
                         secondCamera = "ImagingCamera1";
                     }
@@ -556,7 +556,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     };
                 } else {
                     // use 1 camera
-                    final String camera = model_.acquisitions().settings().primaryCamera();
+                    final String camera = "ImagingCamera1"; // model_.acquisitions().settings().primaryCamera();
                     cameraNames = new String[] {
                             model_.devices().device(camera).getDeviceName(),
                     };
