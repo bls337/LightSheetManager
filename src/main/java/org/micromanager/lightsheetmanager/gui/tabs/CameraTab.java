@@ -9,10 +9,13 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.gui.components.RadioButton;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
+import javax.swing.JLabel;
 import java.awt.Font;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class CameraTab extends Panel implements ListeningPanel {
@@ -24,9 +27,11 @@ public class CameraTab extends Panel implements ListeningPanel {
     private Button btnEigthROI_;
     private Button btnCustomROI_;
     private Button btnGetCurrentROI_;
+
     private ComboBox cmbCameraTriggerMode_;
-    private ComboBox cmbPrimaryCamera_;
-    private CheckBox cbxAcquireFromBothSides_;
+    private RadioButton radPrimaryCamera_;
+    private CheckBox cbxUseSimultaneousCameras_;
+    private List<CheckBox> cbxActiveCameras_;
 
     private final TabPanel tabPanel_;
     private final LightSheetManager model_;
@@ -43,20 +48,20 @@ public class CameraTab extends Panel implements ListeningPanel {
 
         final Panel pnlROI = new Panel("Imaging ROI");
         final Panel pnlCameraTrigger = new Panel("Camera Trigger Mode");
-        final Panel pnlPrimaryCamera = new Panel("First Camera");
+        final Panel pnlPrimaryCamera = new Panel("Simultaneous Cameras");
 
         final Label lblXOffset = new Label("X Offset:");
         final Label lblYOffset = new Label("Y Offset:");
         final Label lblWidth = new Label("Width:");
         final Label lblHeight = new Label("Height:");
 
-        btnUnchangedROI_ = new Button("Unchanged", 120, 30);
-        btnFullROI_ = new Button("Full", 60, 30);
-        btnHalfROI_ = new Button("1/2", 60, 30);
-        btnQuarterROI_ = new Button("1/4", 60, 30);
-        btnEigthROI_ = new Button("1/8", 60, 30);
-        btnCustomROI_ = new Button("Custom", 120, 30);
-        btnGetCurrentROI_ = new Button("Get Current ROI", 120, 30);
+        btnUnchangedROI_ = new Button("Unchanged", 140, 30);
+        btnFullROI_ = new Button("Full", 70, 30);
+        btnHalfROI_ = new Button("1/2", 70, 30);
+        btnQuarterROI_ = new Button("1/4", 70, 30);
+        btnEigthROI_ = new Button("1/8", 70, 30);
+        btnCustomROI_ = new Button("Custom", 140, 30);
+        btnGetCurrentROI_ = new Button("Get Current ROI", 140, 30);
 
         // get the imaging camera library
         final CameraBase camera = model_.devices().firstImagingCamera();
@@ -67,18 +72,39 @@ public class CameraTab extends Panel implements ListeningPanel {
 
         // validate that the logical device name exists
         final String[] cameraNames = model_.devices().imagingCameraNames();
-        String primaryCamera =  model_.acquisitions().settings().primaryCamera();
-        if (!Arrays.asList(cameraNames).contains(primaryCamera)) {
-            model_.acquisitions().settingsBuilder().primaryCamera(cameraNames[0]);
-            primaryCamera = cameraNames[0]; // use first device as default
-            model_.studio().logs().logMessage(
-                    "Logical device name " + primaryCamera + " not found, use " + cameraNames[0] + " instead.");
+        cbxActiveCameras_ = new ArrayList<>(cameraNames.length);
+
+        // the first element of the list is the primary camera
+        String primaryCamera = "";
+        final String[] cameraOrder =  model_.acquisitions().settings().imagingCameraOrder();
+        if (cameraOrder.length > 0) {
+            primaryCamera = cameraOrder[0];
         }
 
         // simultaneous camera settings
-        cmbPrimaryCamera_ = new ComboBox(cameraNames, primaryCamera);
-        cbxAcquireFromBothSides_ = new CheckBox("Acquire from both sides simultaneously",
-                model_.acquisitions().settings().isAcqFromBothSides());
+        radPrimaryCamera_ = new RadioButton(cameraNames, primaryCamera, RadioButton.VERTICAL);
+        cbxUseSimultaneousCameras_ = new CheckBox("Acquire from all active cameras simultaneously",
+                model_.acquisitions().settings().isUsingSimultaneousCameras());
+
+        // active check boxes
+        final Panel pnlCheckboxes = new Panel();
+        pnlCheckboxes.setMigLayout(
+                "",
+                "",
+                "[]6[]"
+        );
+
+        final boolean[] activeCameras = model_.acquisitions().settings().imagingCamerasActive();
+        for (int i = 0; i < cameraNames.length; i++) {
+            final CheckBox checkBox = new CheckBox("Active", activeCameras[i]);
+            pnlCheckboxes.add(checkBox, "wrap");
+            cbxActiveCameras_.add(checkBox);
+        }
+
+        final Panel pnlCameraSelectionRow = new Panel();
+        pnlCameraSelectionRow.add(new JLabel("Select Primary Camera"), "wrap");
+        pnlCameraSelectionRow.add(radPrimaryCamera_, "");
+        pnlCameraSelectionRow.add(pnlCheckboxes, "gaptop 2px");
 
         pnlROI.add(btnUnchangedROI_, "span 2, wrap");
         pnlROI.add(btnFullROI_, "");
@@ -95,13 +121,15 @@ public class CameraTab extends Panel implements ListeningPanel {
         pnlCameraTrigger.add(cmbCameraTriggerMode_, "");
 
         add(lblTitle, "wrap");
-        add(pnlROI, "wrap");
-        add(pnlCameraTrigger, "wrap");
         if (model_.devices().adapter().numSimultaneousCameras() > 1) {
-            pnlPrimaryCamera.add(cmbPrimaryCamera_, "wrap");
+            pnlPrimaryCamera.add(pnlCameraSelectionRow, "wrap");
+            pnlPrimaryCamera.add(cbxUseSimultaneousCameras_, "wrap");
+            add(pnlROI, "growx");
             add(pnlPrimaryCamera, "wrap");
-            add(cbxAcquireFromBothSides_, "");
+        } else {
+            add(pnlROI, "wrap");
         }
+        add(pnlCameraTrigger, "growx");
     }
 
     private void createEventHandlers() {
@@ -114,17 +142,46 @@ public class CameraTab extends Panel implements ListeningPanel {
             tabPanel_.swapSetupPathPanels(cameraMode);
         });
 
-        // select primary camera
-        cmbPrimaryCamera_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().primaryCamera(
-                        cmbPrimaryCamera_.getSelected()));
+        // TODO(Brandon): uses simple ordering that works for 2 cameras,
+        //   but needs additional work to support 4. Use a reorderable JTable?
 
-        // use both cameras
-        cbxAcquireFromBothSides_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().isAcqFromBothSides(
-                        cbxAcquireFromBothSides_.isSelected()));
+        // select primary camera
+        radPrimaryCamera_.registerListener(e -> {
+            final String selected = radPrimaryCamera_.getSelectedButtonText();
+            final String[] cameraNames = model_.devices().imagingCameraNames();
+            final List<String> cameraOrder = new ArrayList<>();
+            // the first array index is the primary camera
+            cameraOrder.add(selected);
+            for (String cameraName : cameraNames) {
+                if (!selected.equals(cameraName)) {
+                    cameraOrder.add(cameraName);
+                }
+            }
+            model_.acquisitions().settingsBuilder()
+                    .imagingCameraOrder(cameraOrder.toArray(String[]::new));
+        });
+
+        // active camera check boxes
+        for (CheckBox cbx : cbxActiveCameras_) {
+            cbx.registerListener(e ->
+                    model_.acquisitions().settingsBuilder()
+                            .imagingCamerasActive(activeCameras()));
+        }
+
+        // use all active cameras
+        cbxUseSimultaneousCameras_.registerListener(e ->
+                model_.acquisitions().settingsBuilder()
+                        .useSimultaneousCameras(cbxUseSimultaneousCameras_.isSelected()));
 
         //model_.studio().core().setROI();
+    }
+
+    private boolean[] activeCameras() {
+        boolean[] active = new boolean[cbxActiveCameras_.size()];
+        for (int i = 0; i < cbxActiveCameras_.size(); i++) {
+            active[i] = cbxActiveCameras_.get(i).isSelected();
+        }
+        return active;
     }
 
     @Override

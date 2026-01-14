@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager;
 
 import com.google.common.eventbus.Subscribe;
-import mmcorej.CMMCore;
 import net.miginfocom.swing.MigLayout;
 
 import org.micromanager.Studio;
@@ -12,7 +11,6 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.tabs.TabPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.navigation.NavigationPanel;
 import org.micromanager.lightsheetmanager.gui.utils.WindowUtils;
 import org.micromanager.internal.utils.WindowPositioning;
 
@@ -22,13 +20,10 @@ import java.util.Objects;
 
 /**
  * Main GUI frame.
- *
  */
 public class LightSheetManagerFrame extends JFrame {
 
     private final Studio studio_;
-    private final CMMCore core_;
-
     private TabPanel tabPanel_;
 
     private final LightSheetManager model_;
@@ -36,7 +31,6 @@ public class LightSheetManagerFrame extends JFrame {
     public LightSheetManagerFrame(final LightSheetManager model, final boolean isLoaded) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
-        core_ = studio_.core();
 
         // save window position
         WindowPositioning.setUpBoundsMemory(
@@ -138,15 +132,6 @@ public class LightSheetManagerFrame extends JFrame {
             studio_.logs().logMessage("user settings saved");
         });
 
-    }
-
-    // TODO: remove when there is a better method to stop polling from acq engine
-    public NavigationPanel getNavigationPanel() {
-        return tabPanel_.getNavigationTab().getNavigationPanel();
-    }
-
-    public Studio getStudio_() {
-        return studio_;
     }
 
     /**
