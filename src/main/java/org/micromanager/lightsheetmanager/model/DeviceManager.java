@@ -279,18 +279,35 @@ public class DeviceManager {
     }
 
     public CameraBase firstImagingCamera() {
-        final LightSheetDeviceManager adapter = model_.devices().adapter();
         String deviceKey;
-        if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
-            deviceKey = "ImagingCamera1";
-        } else if (adapter.numSimultaneousCameras() > 1) {
-            deviceKey = "Imaging1Camera1";
-        } else if (adapter.numImagingPaths() > 1) {
-            deviceKey = "Imaging1Camera";
+        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+            deviceKey =  firstActiveCameraName();
         } else {
-            deviceKey = "ImagingCamera";
+            final LightSheetDeviceManager adapter = model_.devices().adapter();
+            if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
+                deviceKey = "ImagingCamera1";
+            } else if (adapter.numSimultaneousCameras() > 1) {
+                deviceKey = "Imaging1Camera1";
+            } else if (adapter.numImagingPaths() > 1) {
+                deviceKey = "Imaging1Camera";
+            } else {
+                deviceKey = "ImagingCamera";
+            }
         }
-        return (CameraBase)deviceMap_.get(deviceKey);
+        return (CameraBase) deviceMap_.get(deviceKey);
+    }
+
+    // TODO: active needs to be synchronized with the order, since order changes but active does not
+    // For simultaneous cameras
+    public String firstActiveCameraName() {
+        final String[] cameras = model_.acquisitions().settings().imagingCameraOrder();
+        final boolean[] active = model_.acquisitions().settings().imagingCamerasActive();
+        for (int i = 0; i < cameras.length; i++) {
+            if (active[i]) {
+                return cameras[i];
+            }
+        }
+        return "";
     }
 
     public CameraBase imagingCamera(final int view, final int num) {
@@ -328,7 +345,21 @@ public class DeviceManager {
     }
 
     public CameraBase[] imagingCameras() {
-        return Arrays.stream(imagingCameraNames())
+        String[] cameraNames;
+        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+            ArrayList<String> names = new ArrayList<>();
+            final String[] cameras = model_.acquisitions().settings().imagingCameraOrder();
+            final boolean[] active = model_.acquisitions().settings().imagingCamerasActive();
+            for (int i = 0; i < cameras.length; i++) {
+                if (active[i]) {
+                    names.add(cameras[i]);
+                }
+            }
+            cameraNames = names.toArray(String[]::new);
+        } else {
+            cameraNames = imagingCameraNames();
+        }
+        return Arrays.stream(cameraNames)
                 .map(name -> (CameraBase)deviceMap_.get(name))
                 .filter(Objects::nonNull)
                 .toArray(CameraBase[]::new);

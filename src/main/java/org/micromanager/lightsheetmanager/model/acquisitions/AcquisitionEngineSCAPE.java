@@ -92,6 +92,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 studio_.logs().showError("Using simultaneous cameras and no cameras are active!");
                 return false;
             }
+            // TODO: primary camera must be active
         }
 
         // this is needed for LSMAcquisitionEvents to work with multiple positions
@@ -556,15 +557,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                // multiple simultaneous cameras
                 if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
                     // use 2 cameras
-                    String secondCamera = "ImagingCamera2";
-                    final String primaryCamera = "ImagingCamera1";//model_.acquisitions().settings().primaryCamera();
-                    if (primaryCamera.equals(secondCamera)) {
-                        secondCamera = "ImagingCamera1";
+                    final ArrayList<String> names = new ArrayList<>();
+                    final CameraBase[] cameraList = model_.devices().imagingCameras();
+                    for (CameraBase camera: cameraList) {
+                        names.add(camera.getDeviceName());
                     }
-                    cameraNames = new String[] {
-                            model_.devices().device(primaryCamera).getDeviceName(),
-                            model_.devices().device(secondCamera).getDeviceName()
-                    };
+                    cameraNames = names.toArray(String[]::new);
                 } else {
                     // use 1 camera
                     final String camera = "ImagingCamera1"; // model_.acquisitions().settings().primaryCamera();
