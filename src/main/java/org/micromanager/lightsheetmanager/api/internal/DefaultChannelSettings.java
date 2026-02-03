@@ -12,7 +12,7 @@ public class DefaultChannelSettings implements ChannelSettings {
     public static class Builder implements ChannelSettings.Builder {
 
         private String channelGroup_ = "";
-        private MultiChannelMode channelMode_ = MultiChannelMode.NONE;
+        private MultiChannelMode channelMode_ = MultiChannelMode.VOLUME;
         private HashMap<String, ChannelSpec[]> groups_ = new HashMap<>();
 
         public Builder() {

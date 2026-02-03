@@ -43,6 +43,7 @@ import javax.swing.JLabel;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 
 public class AcquisitionEngineSCAPE extends AcquisitionEngine {
@@ -65,12 +66,33 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     @Override
     boolean setup() {
 
+        isPolling_ = model_.positions().isPolling();
+        if (isPolling_) {
+            model_.positions().stopPolling();
+            studio_.logs().logMessage("stopped position polling");
+        }
+
+        asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
+        asb_.sheetCalibrationBuilder(1).autoSheetWidthPerPixel(0.0);
+
+        // make settings current
+        updateAcquisitionSettings();
+
 //        // check pixel size
 //        if (core_.getPixelSizeUm() < 1e-6) {
 //            studio_.logs().showError(
 //                    "Pixel size not set, navigate to \"Devices > Pixel Size Calibration...\" to set the value.");
 //            return false;
 //        }
+
+        // we must have an active camera if we are using simultaneous cameras
+        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+            final boolean[] active = model_.acquisitions().settings().imagingCamerasActive();
+            if (IntStream.range(0, active.length).noneMatch(i -> active[i])) {
+                studio_.logs().showError("Using simultaneous cameras and no cameras are active!");
+                return false;
+            }
+        }
 
         // this is needed for LSMAcquisitionEvents to work with multiple positions
         if (core_.getFocusDevice().isEmpty()
@@ -94,17 +116,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     boolean run() {
-        isPolling_ = model_.positions().isPolling();
-        if (isPolling_) {
-            model_.positions().stopPolling();
-            studio_.logs().logMessage("stopped position polling");
-        }
-
-        asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
-        asb_.sheetCalibrationBuilder(1).autoSheetWidthPerPixel(0.0);
-
-        // make settings current
-        updateAcquisitionSettings();
 
         // TODO: delete later, this is the settings before everything is set up in doHardwareCalculations (used to debug)
         //studio_.logs().logMessage("debug info:\n" + acqSettings_.toPrettyJson());
@@ -693,7 +704,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // Stop all cameras sequences
         try {
-            for (CameraBase camera : model_.devices().imagingCameras()) {
+            for (CameraBase camera : cameras) {
                 if (core_.isSequenceRunning(camera.getDeviceName())) {
                     core_.stopSequenceAcquisition(camera.getDeviceName());
                 }
