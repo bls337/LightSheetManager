@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
+import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings implements AcquisitionSettingsSCAPE {
@@ -19,8 +20,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
 
         private CameraMode cameraMode_ = CameraMode.EDGE;
-        private String[] imagingCameraOrder_ = {};
-        private boolean[] imagingCamerasActive_ = {};
+        private CameraData[] imagingCameraOrder_ = {};
         private boolean useSimultaneousCameras_ = true;
 
         private boolean useChannels_ = false;
@@ -58,7 +58,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             acquisitionMode_ = acqSettings.acquisitionMode_;
             cameraMode_ = acqSettings.cameraMode_;
             imagingCameraOrder_ = acqSettings.imagingCameraOrder_;
-            imagingCamerasActive_ = acqSettings.imagingCamerasActive_;
             useSimultaneousCameras_ = acqSettings.useSimultaneousCameras_;
             useChannels_ = acqSettings.useChannels_;
             useTimePoints_ = acqSettings.useTimePoints_;
@@ -107,19 +106,8 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
          * @param cameraOrder the imaging camera order
          */
         @Override
-        public Builder imagingCameraOrder(final String[] cameraOrder) {
+        public Builder imagingCameraOrder(final CameraData[] cameraOrder) {
             imagingCameraOrder_ = cameraOrder;
-            return this;
-        }
-
-        /**
-         * Sets the active imaging cameras.
-         *
-         * @param camerasActive the active imaging cameras
-         */
-        @Override
-        public Builder imagingCamerasActive(final boolean[] camerasActive) {
-            imagingCamerasActive_ = camerasActive;
             return this;
         }
 
@@ -322,8 +310,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final AcquisitionMode acquisitionMode_;
 
     private final CameraMode cameraMode_;
-    private final String[] imagingCameraOrder_;
-    private final boolean[] imagingCamerasActive_;
+    private final CameraData[] imagingCameraOrder_;
     private final boolean useSimultaneousCameras_;
 
     private final boolean useChannels_;
@@ -356,7 +343,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
         imagingCameraOrder_ = builder.imagingCameraOrder_;
-        imagingCamerasActive_ = builder.imagingCamerasActive_;
         useSimultaneousCameras_ = builder.useSimultaneousCameras_;
         useChannels_ = builder.useChannels_;
         useTimePoints_ = builder.useTimePoints_;
@@ -506,18 +492,8 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return the imaging camera order
      */
     @Override
-    public String[] imagingCameraOrder() {
+    public CameraData[] imagingCameraOrder() {
         return imagingCameraOrder_;
-    }
-
-    /**
-     * Returns an array of active imaging cameras.
-     *
-     * @return an array of active imaging cameras
-     */
-    @Override
-    public boolean[] imagingCamerasActive() {
-        return imagingCamerasActive_;
     }
 
     /**
