@@ -86,14 +86,14 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //        }
 
         // we must have an active camera if we are using simultaneous cameras
-        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
-            final boolean[] active = model_.acquisitions().settings().imagingCamerasActive();
-            if (IntStream.range(0, active.length).noneMatch(i -> active[i])) {
-                studio_.logs().showError("Using simultaneous cameras and no cameras are active!");
-                return false;
-            }
-            // TODO: primary camera must be active
-        }
+//        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+//            final boolean[] active = model_.acquisitions().settings().imagingCamerasActive();
+//            if (IntStream.range(0, active.length).noneMatch(i -> active[i])) {
+//                studio_.logs().showError("Using simultaneous cameras and no cameras are active!");
+//                return false;
+//            }
+//            // TODO: primary camera must be active
+//        }
 
         // this is needed for LSMAcquisitionEvents to work with multiple positions
         if (core_.getFocusDevice().isEmpty()

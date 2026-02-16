@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.api;
 
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
+import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultScanSettings;
@@ -37,14 +38,7 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
          *
          * @param cameraOrder the imaging camera order
          */
-        T imagingCameraOrder(final String[] cameraOrder);
-
-        /**
-         * Sets the active imaging cameras.
-         *
-         * @param camerasActive the active imaging cameras
-         */
-        T imagingCamerasActive(final boolean[] camerasActive);
+        T imagingCameraOrder(final CameraData[] cameraOrder);
 
         /**
          * Sets the acquisition to acquire from multiple simultaneous cameras.
@@ -213,14 +207,7 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      *
      * @return the imaging camera order
      */
-    String[] imagingCameraOrder();
-
-    /**
-     * Returns an array of active imaging cameras.
-     *
-     * @return an array of active imaging cameras
-     */
-    boolean[] imagingCamerasActive();
+    CameraData[] imagingCameraOrder();
 
     /**
      * Returns true if acquiring from both imaging cameras.

@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
+import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.gui.components.Button;
@@ -31,7 +32,7 @@ public class CameraTab extends Panel implements ListeningPanel {
     private ComboBox cmbCameraTriggerMode_;
     private RadioButton radPrimaryCamera_;
     private CheckBox cbxUseSimultaneousCameras_;
-    private List<CheckBox> cbxActiveCameras_;
+    private List<CheckBox> cbxCameras_;
 
     private final TabPanel tabPanel_;
     private final LightSheetManager model_;
@@ -63,22 +64,30 @@ public class CameraTab extends Panel implements ListeningPanel {
         btnCustomROI_ = new Button("Custom", 140, 30);
         btnGetCurrentROI_ = new Button("Get Current ROI", 140, 30);
 
-        // get the imaging camera library
-        final CameraBase camera = model_.devices().firstImagingCamera();
-        final CameraLibrary camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
+        // TODO: use optional here for camera?
 
-        cmbCameraTriggerMode_ = new ComboBox(CameraMode.getAvailableModes(camLib),
+        // get the imaging camera library
+        String[] modes = {""};
+        final CameraBase camera = model_.devices().firstImagingCamera();
+        if (camera != null) {
+            final CameraLibrary camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
+            modes = CameraMode.getAvailableModes(camLib);
+        }
+
+        cmbCameraTriggerMode_ = new ComboBox(modes,
                 model_.acquisitions().settings().cameraMode().toString());
 
         // validate that the logical device name exists
         final String[] cameraNames = model_.devices().imagingCameraNames();
-        cbxActiveCameras_ = new ArrayList<>(cameraNames.length);
+        cbxCameras_ = new ArrayList<>(cameraNames.length);
 
         // the first element of the list is the primary camera
         String primaryCamera = "";
-        final String[] cameraOrder =  model_.acquisitions().settings().imagingCameraOrder();
+        final CameraData[] cameraOrder =  model_.acquisitions().settings().imagingCameraOrder();
         if (cameraOrder.length > 0) {
-            primaryCamera = cameraOrder[0];
+            primaryCamera = cameraOrder[0].name();
+        } else {
+            primaryCamera = cameraNames[0]; // default to first camera name
         }
 
         // simultaneous camera settings
@@ -94,11 +103,12 @@ public class CameraTab extends Panel implements ListeningPanel {
                 "[]6[]"
         );
 
-        final boolean[] activeCameras = model_.acquisitions().settings().imagingCamerasActive();
-        for (int i = 0; i < cameraNames.length; i++) {
-            final CheckBox checkBox = new CheckBox("Active", activeCameras[i]);
+        // we already have the camera order array
+        for (String cameraName : cameraNames) {
+            final boolean isActive = CameraData.isCameraActive(cameraOrder, cameraName);
+            final CheckBox checkBox = new CheckBox("Active", isActive);
             pnlCheckboxes.add(checkBox, "wrap");
-            cbxActiveCameras_.add(checkBox);
+            cbxCameras_.add(checkBox);
         }
 
         final Panel pnlCameraSelectionRow = new Panel();
@@ -142,30 +152,12 @@ public class CameraTab extends Panel implements ListeningPanel {
             tabPanel_.swapSetupPathPanels(cameraMode);
         });
 
-        // TODO(Brandon): uses simple ordering that works for 2 cameras,
-        //   but needs additional work to support 4. Use a reorderable JTable?
-
         // select primary camera
-        radPrimaryCamera_.registerListener(e -> {
-            final String selected = radPrimaryCamera_.getSelectedButtonText();
-            final String[] cameraNames = model_.devices().imagingCameraNames();
-            final List<String> cameraOrder = new ArrayList<>();
-            // the first array index is the primary camera
-            cameraOrder.add(selected);
-            for (String cameraName : cameraNames) {
-                if (!selected.equals(cameraName)) {
-                    cameraOrder.add(cameraName);
-                }
-            }
-            model_.acquisitions().settingsBuilder()
-                    .imagingCameraOrder(cameraOrder.toArray(String[]::new));
-        });
+        radPrimaryCamera_.registerListener(e -> computeCameraOrder());
 
         // active camera check boxes
-        for (CheckBox cbx : cbxActiveCameras_) {
-            cbx.registerListener(e ->
-                    model_.acquisitions().settingsBuilder()
-                            .imagingCamerasActive(activeCameras()));
+        for (CheckBox cbx : cbxCameras_) {
+            cbx.registerListener(e -> computeCameraOrder());
         }
 
         // use all active cameras
@@ -177,11 +169,41 @@ public class CameraTab extends Panel implements ListeningPanel {
     }
 
     private boolean[] activeCameras() {
-        boolean[] active = new boolean[cbxActiveCameras_.size()];
-        for (int i = 0; i < cbxActiveCameras_.size(); i++) {
-            active[i] = cbxActiveCameras_.get(i).isSelected();
+        boolean[] active = new boolean[cbxCameras_.size()];
+        for (int i = 0; i < cbxCameras_.size(); i++) {
+            active[i] = cbxCameras_.get(i).isSelected();
         }
         return active;
+    }
+
+    private void computeCameraOrder() {
+        // change the order of the imaging camera array
+        final String selected = radPrimaryCamera_.getSelectedButtonText();
+        final String[] cameraNames = model_.devices().imagingCameraNames();
+        final ArrayList<CameraData> cameraData = new ArrayList<>(cameraNames.length);
+
+        // check if the selected primary camera is active before changing the array order
+        boolean isSelectedActive = true;
+        final boolean[] active = activeCameras();
+        for (int i = 0; i < cameraNames.length; i++) {
+            if (cameraNames[i].equals(selected)) {
+                isSelectedActive = active[i];
+                break;
+            }
+        }
+
+        // the first array index is the primary camera
+        cameraData.add(new CameraData(selected, isSelectedActive));
+        // TODO(Brandon): uses simple ordering that works for 2 cameras,
+        //   but needs additional work to support 4. Use a reorderable JTable?
+        for (int i = 0; i < cameraNames.length; i++) {
+            if (!selected.equals(cameraNames[i])) {
+                System.out.println("cameraNames[i] " + cameraNames[i] + "active[i] " + active[i]);
+                cameraData.add(new CameraData(cameraNames[i], active[i]));
+            }
+        }
+        model_.acquisitions().settingsBuilder()
+                .imagingCameraOrder(cameraData.toArray(CameraData[]::new));
     }
 
     @Override

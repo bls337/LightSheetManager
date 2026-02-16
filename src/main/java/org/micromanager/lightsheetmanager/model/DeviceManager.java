@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.model;
 import mmcorej.Configuration;
 import mmcorej.StrVector;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import mmcorej.CMMCore;
 import mmcorej.DeviceType;
@@ -297,14 +298,12 @@ public class DeviceManager {
         return (CameraBase) deviceMap_.get(deviceKey);
     }
 
-    // TODO: active needs to be synchronized with the order, since order changes but active does not
     // For simultaneous cameras
     public String firstActiveCameraName() {
-        final String[] cameras = model_.acquisitions().settings().imagingCameraOrder();
-        final boolean[] active = model_.acquisitions().settings().imagingCamerasActive();
-        for (int i = 0; i < cameras.length; i++) {
-            if (active[i]) {
-                return cameras[i];
+        final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
+        for (CameraData camera : cameras) {
+            if (camera.isActive()) {
+                return camera.name();
             }
         }
         return "";
@@ -348,11 +347,10 @@ public class DeviceManager {
         String[] cameraNames;
         if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
             ArrayList<String> names = new ArrayList<>();
-            final String[] cameras = model_.acquisitions().settings().imagingCameraOrder();
-            final boolean[] active = model_.acquisitions().settings().imagingCamerasActive();
-            for (int i = 0; i < cameras.length; i++) {
-                if (active[i]) {
-                    names.add(cameras[i]);
+            final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
+            for (CameraData camera : cameras) {
+                if (camera.isActive()) {
+                    names.add(camera.name());
                 }
             }
             cameraNames = names.toArray(String[]::new);
