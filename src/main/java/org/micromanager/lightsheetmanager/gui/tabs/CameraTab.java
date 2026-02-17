@@ -198,7 +198,6 @@ public class CameraTab extends Panel implements ListeningPanel {
         //   but needs additional work to support 4. Use a reorderable JTable?
         for (int i = 0; i < cameraNames.length; i++) {
             if (!selected.equals(cameraNames[i])) {
-                System.out.println("cameraNames[i] " + cameraNames[i] + "active[i] " + active[i]);
                 cameraData.add(new CameraData(cameraNames[i], active[i]));
             }
         }

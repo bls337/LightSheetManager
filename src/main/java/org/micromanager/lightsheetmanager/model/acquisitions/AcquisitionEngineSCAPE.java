@@ -17,6 +17,7 @@ import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
+import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
@@ -43,7 +44,6 @@ import javax.swing.JLabel;
 import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.stream.IntStream;
 
 
 public class AcquisitionEngineSCAPE extends AcquisitionEngine {
@@ -86,14 +86,22 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //        }
 
         // we must have an active camera if we are using simultaneous cameras
-//        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
-//            final boolean[] active = model_.acquisitions().settings().imagingCamerasActive();
-//            if (IntStream.range(0, active.length).noneMatch(i -> active[i])) {
-//                studio_.logs().showError("Using simultaneous cameras and no cameras are active!");
-//                return false;
-//            }
-//            // TODO: primary camera must be active
-//        }
+        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+            final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
+            if (cameras.length > 0 && !cameras[0].isActive()) {
+                studio_.logs().showError("The primary camera MUST be active in simultaneous cameras mode!");
+                return false;
+            }
+            // set the core camera device to the primary camera
+            if (cameras.length > 1) {
+                try {
+                    core_.setCameraDevice(cameras[0].name());
+                } catch (Exception e) {
+                    studio_.logs().showError("Could not set \"Core-Camera\" for simultaneous cameras.");
+                    return false;
+                }
+            }
+        }
 
         // this is needed for LSMAcquisitionEvents to work with multiple positions
         if (core_.getFocusDevice().isEmpty()
