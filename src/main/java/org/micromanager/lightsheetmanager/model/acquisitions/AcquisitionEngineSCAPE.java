@@ -92,15 +92,15 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 studio_.logs().showError("The primary camera MUST be active in simultaneous cameras mode!");
                 return false;
             }
-            // set the core camera device to the primary camera
-            if (cameras.length > 1) {
-                try {
-                    core_.setCameraDevice(cameras[0].name());
-                } catch (Exception e) {
-                    studio_.logs().showError("Could not set \"Core-Camera\" for simultaneous cameras.");
-                    return false;
-                }
-            }
+        }
+
+        // set the "Core-Camera" property to the first logical camera device
+        final String cameraName = model_.devices().firstImagingCamera().getDeviceName();
+        try {
+            core_.setCameraDevice(cameraName);
+        } catch (Exception e) {
+            studio_.logs().showError("Could not set \"Core-Camera\" to the first logical camera device.");
+            return false;
         }
 
         // this is needed for LSMAcquisitionEvents to work with multiple positions
