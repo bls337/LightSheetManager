@@ -5,8 +5,6 @@ import com.google.gson.GsonBuilder;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 
-// TODO: make public instead of abstract? use this in demo mode?
-
 /**
  * Base acquisition settings for all microscopes.
  */
@@ -14,8 +12,8 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
 
     public abstract static class Builder<T extends Builder<T>> implements AcquisitionSettings.Builder<T> {
 
-        private String saveDirectory_ = "";
-        private String saveNamePrefix_ = "";
+        private String saveDirectory_ = System.getProperty("user.home");
+        private String saveNamePrefix_ = "Experiment";
         private boolean saveDuringAcq_ = false;
         private boolean demoMode_ = false;
         private DataStorage.SaveMode saveMode_ = DataStorage.SaveMode.ND_TIFF;
