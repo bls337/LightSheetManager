@@ -3,10 +3,11 @@ package org.micromanager.lightsheetmanager.model.utils;
 /**
  * Math utilities.
  */
-public class MathUtils {
+public final class MathUtils {
 
+    /** This class should not be instantiated. */
     private MathUtils() {
-        // prevent instantiation
+        throw new AssertionError("Utility class; do not instantiate.");
     }
 
     /**

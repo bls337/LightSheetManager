@@ -97,9 +97,7 @@ public enum CameraMode {
                 modes.add(CameraMode.VIRTUAL_SLIT);
             }
         }
-        return modes.stream()
-                .map(CameraMode::toString)
-                .toArray(CameraMode[]::new);
+        return modes.toArray(CameraMode[]::new);
     }
 
     @Override

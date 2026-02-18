@@ -15,7 +15,9 @@ import java.util.Optional;
 // Note: Each text string must be unique to support reliable lookup in fromString().
 
 /**
- * Acquisition modes for all microscope geometry types.
+ * Acquisition modes for all microscope geometries.
+ * <p>
+ * Use the {@code modesByType} method to get valid modes based on {@link GeometryType}.
  */
 public enum AcquisitionMode {
     NO_SCAN("No scan (fixed sheet)"),
@@ -85,13 +87,13 @@ public enum AcquisitionMode {
      * This list is filtered based on hardware capabilities: if {@code hasStageScanning}
      * is {@code false}, all stage-scan related modes are excluded.
      *
-     * @param geometry the {@link GeometryType} to query; if {@code null}, an empty list is returned
+     * @param geometryType the {@link GeometryType} to query; if {@code null}, an empty list is returned
      * @param hasStageScanning {@code true} if stage scan hardware is available
-     * @return a {@code List} of {@link AcquisitionMode} constants
+     * @return an array of {@link AcquisitionMode} constants
      */
-    public static AcquisitionMode[] getValidModes(final GeometryType geometry, final boolean hasStageScanning) {
-        return Optional.ofNullable(geometry)
-                .map(MODES_BY_GEOMETRY::get) // returns null if geometry is not in map
+    public static AcquisitionMode[] modesByType(final GeometryType geometryType, final boolean hasStageScanning) {
+        return Optional.ofNullable(geometryType)
+                .map(MODES_BY_GEOMETRY::get) // returns null if geometryType is not in map
                 .orElse(Collections.emptyList())
                 .stream()
                 .filter(mode -> hasStageScanning || !mode.isStageScanMode())

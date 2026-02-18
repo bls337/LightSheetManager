@@ -5,7 +5,12 @@ import mmcorej.org.json.JSONObject;
 
 import java.util.Objects;
 
-public class JsonUtils {
+public final class JsonUtils {
+
+    /** This class should not be instantiated. */
+    private JsonUtils() {
+        throw new AssertionError("Utility class; do not instantiate.");
+    }
 
     public static void putJson(JSONObject json, final String property, final Object value) {
         Objects.requireNonNull(json);

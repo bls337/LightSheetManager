@@ -7,7 +7,12 @@ import java.math.BigDecimal;
 /**
  * Utilities for dealing with double precision floating point numbers.
  */
-public class NumberUtils {
+public final class NumberUtils {
+
+    /** This class should not be instantiated. */
+    private NumberUtils() {
+        throw new AssertionError("Utility class; do not instantiate.");
+    }
 
     /**
      * Return true if the two doubles are equal according to Apache commons-math3 library.

@@ -1,16 +1,19 @@
 package org.micromanager.lightsheetmanager.model.utils;
 
+import org.micromanager.internal.MMStudio;
+
 import java.io.File;
 import java.io.IOException;
 
-// TODO: show errors!
-// TODO: better name
-
-
 /**
- * Read and write to text files using Apache Commons.
+ * Utilities to read and write to files.
  */
-public class FileUtils {
+public final class FileUtils {
+
+    /** This class should not be instantiated. */
+    private FileUtils() {
+        throw new AssertionError("Utility class; do not instantiate.");
+    }
 
     /**
      * Reads a text file with UTF-8 encoding into a String.
@@ -23,7 +26,7 @@ public class FileUtils {
         try {
             result = org.apache.commons.io.FileUtils.readFileToString(new File(filePath), "UTF-8");
         } catch (IOException e) {
-            //ReportingUtils.showError("IOException: " + e.getMessage());
+            MMStudio.getInstance().logs().logError("FileUtils: readFileToString error");
         }
         return result;
     }
@@ -38,7 +41,7 @@ public class FileUtils {
         try {
             org.apache.commons.io.FileUtils.writeStringToFile(new File(filePath), contents, "UTF-8");
         } catch (IOException e) {
-            //ReportingUtils.showError("IOException: " + e.getMessage());
+            MMStudio.getInstance().logs().logError("FileUtils: writeStringToFile error");
         }
     }
 

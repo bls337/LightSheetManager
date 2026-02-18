@@ -166,7 +166,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         // acquisition mode combo box
         final boolean isUsingScanSettings = model_.devices().isUsingStageScanning();
         final GeometryType geometryType = model_.devices().adapter().geometry();
-        cmbAcquisitionModes_ = new ComboBox<>(AcquisitionMode.getValidModes(geometryType, isUsingScanSettings),
+        cmbAcquisitionModes_ = new ComboBox<>(
+                AcquisitionMode.modesByType(geometryType, isUsingScanSettings),
                 acqSettings.acquisitionMode(),
                 180, 24);
 
