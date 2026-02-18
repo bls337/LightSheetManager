@@ -1,16 +1,10 @@
 package org.micromanager.lightsheetmanager.api.data;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Arrays;
 
 public enum LightSheetType {
-    UNKNOWN("Unknown"),
     STATIC("Static"),
     SCANNED("Scanned");
-
-    private static final Map<String, LightSheetType> stringToEnum =
-            Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
     private final String label_;
 
@@ -23,7 +17,14 @@ public enum LightSheetType {
         return label_;
     }
 
-    public static LightSheetType fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, LightSheetType.UNKNOWN);
+    public static LightSheetType fromString(final String propertyValue) {
+        if (propertyValue == null || propertyValue.isEmpty()) {
+            return STATIC;
+        }
+        return Arrays.stream(values())
+                .filter(g -> g.label_.equalsIgnoreCase(propertyValue))
+                .findFirst()
+                .orElse(STATIC);
     }
+
 }

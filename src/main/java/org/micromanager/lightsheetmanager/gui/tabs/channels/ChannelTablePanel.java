@@ -23,8 +23,8 @@ public class ChannelTablePanel extends Panel {
     private Button btnRemoveChannel_;
     private Button btnRefresh_;
 
-    private ComboBox cmbChannelGroup_;
-    private ComboBox cmbChannelMode_;
+    private ComboBox<String> cmbChannelGroup_;
+    private ComboBox<MultiChannelMode> cmbChannelMode_;
 
     private final ChannelTable table_;
     private final LightSheetManager model_;
@@ -50,12 +50,12 @@ public class ChannelTablePanel extends Panel {
         btnRefresh_.setToolTipText("Refresh the channel panel with the latest configuration groups settings.");
 
         final String[] groupLabels = table_.getChannelGroups();
-        cmbChannelGroup_ = new ComboBox(groupLabels,
+        cmbChannelGroup_ = new ComboBox<>(groupLabels,
                 model_.acquisitions().settings().channelSettings().channelGroup(),
                 120, 22);
 
-        cmbChannelMode_ = new ComboBox(MultiChannelMode.toArray(),
-                model_.acquisitions().settings().channelSettings().channelMode().toString(),
+        cmbChannelMode_ = new ComboBox<>(MultiChannelMode.values(),
+                model_.acquisitions().settings().channelSettings().channelMode(),
                 120, 22);
 
         add(lblChannelGroup_, "split 2");
@@ -122,7 +122,7 @@ public class ChannelTablePanel extends Panel {
         // select channel mode
         cmbChannelMode_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().channelSettingsBuilder()
-                  .channelMode(MultiChannelMode.getByIndex(cmbChannelMode_.getSelectedIndex()));
+                  .channelMode(cmbChannelMode_.getSelected());
         });
 
     }

@@ -10,9 +10,9 @@ import java.util.Objects;
 // TODO: find a better way to organize vendor specific panels/ui elements
 public class JoystickPanel extends Panel {
 
-    private ComboBox cmbJoystick_;
-    private ComboBox cmbLeftWheel_;
-    private ComboBox cmbRightWheel_;
+    private ComboBox<String> cmbJoystick_;
+    private ComboBox<String> cmbLeftWheel_;
+    private ComboBox<String> cmbRightWheel_;
 
     private LightSheetManager model_;
 
@@ -37,10 +37,9 @@ public class JoystickPanel extends Panel {
         // TODO: enum for combo values
         String[] labels = {"Imaging Piezo", "XYStage", "Imaging Slice"};
 
-        ComboBox.setDefaultSize(100, 20);
-        cmbJoystick_ = new ComboBox(labels, "XYStage");
-        cmbLeftWheel_ = new ComboBox(labels, "Imaging Piezo");
-        cmbRightWheel_ = new ComboBox(labels, "Imaging Slice");
+        cmbJoystick_ = new ComboBox<>(labels, "XYStage", 100, 20);
+        cmbLeftWheel_ = new ComboBox<>(labels, "Imaging Piezo", 100, 20);
+        cmbRightWheel_ = new ComboBox<>(labels, "Imaging Slice", 100, 20);
 
         add(lblJoystick, "");
         add(cmbJoystick_, "wrap");

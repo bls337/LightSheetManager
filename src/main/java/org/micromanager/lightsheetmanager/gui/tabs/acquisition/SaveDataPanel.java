@@ -28,7 +28,7 @@ public class SaveDataPanel extends Panel {
     private Button btnBrowse_;
     private Button btnOpen_;
 
-    private ComboBox cbxSaveMode_;
+    private ComboBox<DataStorage.SaveMode> cbxSaveMode_;
     private CheckBox cbxSaveWhileAcquiring_;
 
     private final FileDialogs.FileType directorySelect_;
@@ -76,8 +76,8 @@ public class SaveDataPanel extends Panel {
         btnBrowse_ = new Button("...", 26, 20);
         btnOpen_ = new Button(Icons.FOLDER, 26, 20);
 
-        cbxSaveMode_ = new ComboBox(DataStorage.SaveMode.toArray(),
-                acqSettings.saveMode().toString(), 110, 20);
+        cbxSaveMode_ = new ComboBox<>(DataStorage.SaveMode.values(),
+                acqSettings.saveMode(), 110, 20);
 
         cbxSaveWhileAcquiring_ = new CheckBox("Save images during acquisition",
                 acqSettings.isSavingImagesDuringAcquisition());
@@ -107,7 +107,7 @@ public class SaveDataPanel extends Panel {
 
         // use the text field so we don't need to update settings
         btnOpen_.registerListener(e ->
-                openDirectory(txtSaveDirectory_.getText().trim()));
+                openDirectory(txtSaveDirectory_.getText()));
 
         cbxSaveWhileAcquiring_.registerListener(e ->
                 model_.acquisitions().settingsBuilder().saveImagesDuringAcquisition(
@@ -117,8 +117,7 @@ public class SaveDataPanel extends Panel {
                 model_.acquisitions().settingsBuilder().saveNamePrefix(txtSaveFileName_.getText()));
 
         cbxSaveMode_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().saveMode(
-                        DataStorage.SaveMode.fromString(cbxSaveMode_.getSelected())));
+                model_.acquisitions().settingsBuilder().saveMode(cbxSaveMode_.getSelected()));
 
     }
 

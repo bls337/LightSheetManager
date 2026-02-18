@@ -29,7 +29,7 @@ public class CameraTab extends Panel implements ListeningPanel {
     private Button btnCustomROI_;
     private Button btnGetCurrentROI_;
 
-    private ComboBox cmbCameraTriggerMode_;
+    private ComboBox<CameraMode> cmbCameraTriggerMode_;
     private RadioButton radPrimaryCamera_;
     private CheckBox cbxUseSimultaneousCameras_;
     private List<CheckBox> cbxCameras_;
@@ -67,15 +67,15 @@ public class CameraTab extends Panel implements ListeningPanel {
         // TODO: use optional here for camera?
 
         // get the imaging camera library
-        String[] modes = {""};
+        CameraMode[] modes = {};
         final CameraBase camera = model_.devices().firstImagingCamera();
         if (camera != null) {
             final CameraLibrary camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
             modes = CameraMode.getAvailableModes(camLib);
         }
 
-        cmbCameraTriggerMode_ = new ComboBox(modes,
-                model_.acquisitions().settings().cameraMode().toString());
+        cmbCameraTriggerMode_ = new ComboBox<>(modes,
+                model_.acquisitions().settings().cameraMode(), 140, 20);
 
         // validate that the logical device name exists
         final String[] cameraNames = model_.devices().imagingCameraNames();
@@ -87,7 +87,8 @@ public class CameraTab extends Panel implements ListeningPanel {
         if (cameraOrder.length > 0) {
             primaryCamera = cameraOrder[0].name();
         } else {
-            primaryCamera = cameraNames[0]; // default to first camera name
+            // TODO: what is a sensible default here? make sure cameraNames is always populated?
+            // primaryCamera = cameraNames[0]; // default to first camera name
         }
 
         // simultaneous camera settings
@@ -146,7 +147,7 @@ public class CameraTab extends Panel implements ListeningPanel {
 
         // camera trigger mode
         cmbCameraTriggerMode_.registerListener(e -> {
-            final CameraMode cameraMode = CameraMode.fromString(cmbCameraTriggerMode_.getSelected());
+            final CameraMode cameraMode = cmbCameraTriggerMode_.getSelected();
             model_.acquisitions().settingsBuilder().cameraMode(cameraMode);
             tabPanel_.getAcquisitionTab().getSliceSettingsPanel().switchUI(cameraMode);
             tabPanel_.swapSetupPathPanels(cameraMode);

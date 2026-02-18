@@ -1,8 +1,6 @@
 package org.micromanager.lightsheetmanager.api.data;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.Arrays;
 
 public enum GeometryType {
     UNKNOWN("Unknown"),
@@ -10,11 +8,7 @@ public enum GeometryType {
     ISPIM("iSPIM"),
     OSPIM("oSPIM"),
     MESOSPIM("mesoSPIM"),
-    OPENSPIML("OpenSPIM-L"),
     SCAPE("SCAPE");
-
-    private static final Map<String, GeometryType> stringToEnum =
-            Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
 
     private final String label_;
 
@@ -27,7 +21,14 @@ public enum GeometryType {
         return label_;
     }
 
-    public static GeometryType fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, GeometryType.UNKNOWN);
+    public static GeometryType fromString(final String propertyValue) {
+        if (propertyValue == null || propertyValue.isEmpty()) {
+            return UNKNOWN;
+        }
+        return Arrays.stream(values())
+                .filter(g -> g.label_.equalsIgnoreCase(propertyValue))
+                .findFirst()
+                .orElse(UNKNOWN);
     }
+
 }

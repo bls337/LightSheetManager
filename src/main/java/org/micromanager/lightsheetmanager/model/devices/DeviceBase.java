@@ -101,6 +101,28 @@ public class DeviceBase {
         }
     }
 
+    public double getPropertyUpperLimit(final String propertyName) {
+        try {
+            if (core_.hasPropertyLimits(deviceName_, propertyName)) {
+                return core_.getPropertyUpperLimit(deviceName_, propertyName);
+            }
+        } catch (Exception e) {
+            studio_.logs().logDebugMessage("Property " + propertyName + " has no upper limit or is non-numeric.");
+        }
+        return Double.MAX_VALUE;
+    }
+
+    public double getPropertyLowerLimit(final String propertyName) {
+        try {
+            if (core_.hasPropertyLimits(deviceName_, propertyName)) {
+                return core_.getPropertyLowerLimit(deviceName_, propertyName);
+            }
+        } catch (Exception e) {
+            studio_.logs().logDebugMessage("Property " + propertyName + " has no lower limit or is non-numeric.");
+        }
+        return -Double.MAX_VALUE; // Double.MIN_VALUE is a value close to 0 so use -Double.MAX_VALUE
+    }
+
     public boolean isPropertyPreInit(final String propertyName) {
         boolean result = false;
         try {

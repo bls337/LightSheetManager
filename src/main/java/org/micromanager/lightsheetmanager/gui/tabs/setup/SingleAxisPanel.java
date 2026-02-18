@@ -18,7 +18,7 @@ import java.util.Objects;
 public class SingleAxisPanel extends Panel {
 
 
-    private ComboBox cbxPattern_;
+    private ComboBox<SingleAxis.Pattern> cbxPattern_;
     private Spinner spnAmplitude_;
     private Spinner spnPeriod_;
 
@@ -42,20 +42,19 @@ public class SingleAxisPanel extends Panel {
         final JLabel lblPeriod = new JLabel("Period [ms]:");
 
 
-        final String[] patterns = SingleAxis.Pattern.toArray();
+        final SingleAxis.Pattern[] patterns = SingleAxis.Pattern.values();
 
-        String pattern = patterns[0];
+        SingleAxis.Pattern pattern = patterns[0];
         double amplitudeY = 0;
         int periodY = 0;
         if (isUsingPLogic_) {
-            final ASIScanner scanner = model_.devices()
-                    .device("IllumSlice");
-            pattern = scanner.sa().getPatternY().toString();
+            final ASIScanner scanner = model_.devices().device("IllumSlice");
+            pattern = scanner.sa().getPatternY();
             amplitudeY = scanner.sa().getAmplitudeY();
             periodY = scanner.sa().getPeriodY();
         }
 
-        cbxPattern_ = new ComboBox(patterns, pattern, 100, 24);
+        cbxPattern_ = new ComboBox<>(patterns, pattern, 100, 24);
         spnAmplitude_ = Spinner.createDoubleSpinner(amplitudeY, 0.0, 100.0, 1.0);
         spnPeriod_ = Spinner.createIntegerSpinner(periodY, 0, 100, 1);
 
@@ -74,7 +73,7 @@ public class SingleAxisPanel extends Panel {
                     .device("IllumSlice");
 
             cbxPattern_.registerListener(e -> {
-                galvo.sa().setPatternY(SingleAxis.Pattern.fromString(cbxPattern_.getSelected()));
+                galvo.sa().setPatternY(cbxPattern_.getSelected());
             });
 
             spnAmplitude_.registerListener(e -> {
