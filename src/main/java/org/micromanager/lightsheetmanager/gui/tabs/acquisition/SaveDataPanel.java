@@ -9,11 +9,14 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
+import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 
 import javax.swing.JLabel;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.util.EventObject;
 import java.util.Objects;
 
@@ -23,6 +26,8 @@ public class SaveDataPanel extends Panel {
     private TextField txtSaveFileName_;
 
     private Button btnBrowse_;
+    private Button btnOpen_;
+
     private ComboBox cbxSaveMode_;
     private CheckBox cbxSaveWhileAcquiring_;
 
@@ -69,6 +74,7 @@ public class SaveDataPanel extends Panel {
         txtSaveFileName_.setText(acqSettings.saveNamePrefix());
 
         btnBrowse_ = new Button("...", 26, 20);
+        btnOpen_ = new Button(Icons.FOLDER, 26, 20);
 
         cbxSaveMode_ = new ComboBox(DataStorage.SaveMode.toArray(),
                 acqSettings.saveMode().toString(), 110, 20);
@@ -80,14 +86,15 @@ public class SaveDataPanel extends Panel {
         add(txtSaveDirectory_, "");
         add(btnBrowse_, "wrap");
         add(lblSaveFileName, "");
-        add(txtSaveFileName_, "wrap");
+        add(txtSaveFileName_, "");
+        add(btnOpen_, "wrap");
         add(lblSaveMode, "");
-        add(cbxSaveMode_, "span 2, wrap");
+        add(cbxSaveMode_, "split 2, wrap");
         add(cbxSaveWhileAcquiring_, "span 2, wrap");
     }
 
     public void createEventHandlers() {
-        btnBrowse_.registerListener((EventObject e) -> {
+        btnBrowse_.registerListener(e -> {
             final File result = FileDialogs.openDir(frame_,
                     "Please select the directory to save images to...",
                     directorySelect_
@@ -97,6 +104,10 @@ public class SaveDataPanel extends Panel {
                 txtSaveDirectory_.setText(result.toString());
             }
         });
+
+        // use the text field so we don't need to update settings
+        btnOpen_.registerListener(e ->
+                openDirectory(txtSaveDirectory_.getText().trim()));
 
         cbxSaveWhileAcquiring_.registerListener(e ->
                 model_.acquisitions().settingsBuilder().saveImagesDuringAcquisition(
@@ -109,6 +120,26 @@ public class SaveDataPanel extends Panel {
                 model_.acquisitions().settingsBuilder().saveMode(
                         DataStorage.SaveMode.fromString(cbxSaveMode_.getSelected())));
 
+    }
+
+    private void openDirectory(final String path) {
+        final File directory = new File(path);
+        if (directory.exists()) {
+            if (Desktop.isDesktopSupported()) {
+                Desktop desktop = Desktop.getDesktop();
+                try {
+                    desktop.open(directory);
+                } catch (IOException e) {
+                    model_.studio().logs().logError(
+                            "Could not open the save directory.");
+                }
+            } else {
+                model_.studio().logs().logError(
+                        "Desktop is not supported on this platform.");
+            }
+        } else {
+            model_.studio().logs().logError("Directory does not exist.");
+        }
     }
 
 }

@@ -855,7 +855,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            nrSlicesSoftware *= 2;
 //        }
 
-        // TODO: make this more robust
+        // TODO: make this more robust, should this be the first imaging camera?
         String cameraName;
         if (model_.devices().adapter().numSimultaneousCameras() > 1) {
            cameraName = "ImagingCamera1";
@@ -1478,84 +1478,53 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     public double computeVolumeDuration(final DefaultAcquisitionSettingsSCAPE acqSettings) {
         final MultiChannelMode channelMode = acqSettings.channelSettings().channelMode();
-        final int numChannels = acqSettings.channelSettings().numChannels();
         final int numViews = acqSettings.volumeSettings().numViews();
+        final int numChannels = acqSettings.channelSettings().numChannels();
         final double delayBeforeView = acqSettings.volumeSettings().delayBeforeView();
+
         int numCameraTriggers = acqSettings.volumeSettings().slicesPerView();
         if (acqSettings.cameraMode() == CameraMode.OVERLAP) {
             numCameraTriggers += 1;
         }
 
-        //System.out.println(acqSettings.getTimingSettings().sliceDuration());
-
-        // stackDuration is per-side, per-channel, per-position
+        // stackDuration is per-view, per-channel, per-position
         final double stackDuration = numCameraTriggers * acqSettings.timingSettings().sliceDuration();
-        //System.out.println("stackDuration: " + stackDuration);
-        //System.out.println("numViews: " + numViews);
-        //System.out.println("numCameraTriggers: " + numCameraTriggers);
+
         if (acqSettings.isUsingStageScanning()) {
-           return 1.0;
-        } else {
-            double channelSwitchDelay = 0;
-            if (channelMode == MultiChannelMode.VOLUME) {
-                channelSwitchDelay = 500;   // estimate channel switching overhead time as 0.5s
-                // actual value will be hardware-dependent
-            }
-            if (channelMode == MultiChannelMode.SLICE_HW) {
-                return numViews * (delayBeforeView + stackDuration * numChannels);  // channelSwitchDelay = 0
+            final double rampDuration = 1; //getStageRampDuration(acqSettings);
+            final double retraceTime = 1; //getStageRetraceDuration(acqSettings);
+            // TODO(Jon): double-check these calculations below, at least they are better than before ;-)
+            if (acqSettings.acquisitionMode() == AcquisitionMode.STAGE_SCAN) {
+                if (channelMode == MultiChannelMode.SLICE_HW) {
+                    return retraceTime + (numViews * ((rampDuration * 2) + (stackDuration * numChannels)));
+                } else {
+                    // "normal" stage scan with volume channel switching
+                    if (numViews == 1) {
+                        // single-view so will retrace at beginning of each channel
+                        return ((rampDuration * 2) + stackDuration + retraceTime) * numChannels;
+                    } else {
+                        // will only retrace at very start/end
+                        return retraceTime + (numViews * ((rampDuration * 2) + stackDuration) * numChannels);
+                    }
+                }
             } else {
-                return numViews * numChannels
-                        * (delayBeforeView + stackDuration)
+                // TODO: do i need this case? is it correct?
+                // catch-all for NO_SCAN, etc
+                return (rampDuration * 2) + (stackDuration * numChannels * numViews) + retraceTime;
+            }
+        } else {
+            // GALVO_SCAN (piezo-like logic for SCAPE)
+            // estimate channel switching overhead time as 0.5s, actual value will be hardware-dependent
+            final double channelSwitchDelay = (channelMode == MultiChannelMode.VOLUME) ? 500.0 : 0.0;
+            if (channelMode == MultiChannelMode.SLICE_HW) {
+                // channels switched per slice
+                return numViews * (delayBeforeView + stackDuration * numChannels); // channelSwitchDelay = 0
+            } else { // VOLUME and VOLUME_HW
+                // channels switched per volume
+                return numViews * numChannels * (delayBeforeView + stackDuration)
                         + (numChannels - 1) * channelSwitchDelay;
             }
         }
-        // TODO: stage scanning still needs to be taken into consideration
-//        if (acqSettings.isStageScanning || acqSettings.isStageStepping) {
-//            final double rampDuration = getStageRampDuration(acqSettings);
-//            final double retraceTime = getStageRetraceDuration(acqSettings);
-//            // TODO double-check these calculations below, at least they are better than before ;-)
-//            if (acqSettings.spimMode == AcquisitionModes.Keys.STAGE_SCAN) {
-//                if (channelMode == MultichannelModes.Keys.SLICE_HW) {
-//                    return retraceTime + (numSides * ((rampDuration * 2) + (stackDuration * numChannels)));
-//                } else {  // "normal" stage scan with volume channel switching
-//                    if (numSides == 1) {
-//                        // single-view so will retrace at beginning of each channel
-//                        return ((rampDuration * 2) + stackDuration + retraceTime) * numChannels;
-//                    } else {
-//                        // will only retrace at very start/end
-//                        return retraceTime + (numSides * ((rampDuration * 2) + stackDuration) * numChannels);
-//                    }
-//                }
-//            } else if (acqSettings.spimMode == AcquisitionModes.Keys.STAGE_SCAN_UNIDIRECTIONAL
-//                    || acqSettings.spimMode == AcquisitionModes.Keys.STAGE_STEP_SUPPLEMENTAL_UNIDIRECTIONAL
-//                    || acqSettings.spimMode == AcquisitionModes.Keys.STAGE_SCAN_SUPPLEMENTAL_UNIDIRECTIONAL) {
-//                if (channelMode == MultichannelModes.Keys.SLICE_HW) {
-//                    return ((rampDuration * 2) + (stackDuration * numChannels) + retraceTime) * numSides;
-//                } else {  // "normal" stage scan with volume channel switching
-//                    return ((rampDuration * 2) + stackDuration + retraceTime) * numChannels * numSides;
-//                }
-//            } else {  // interleaved mode => one-way pass collecting both sides
-//                if (channelMode == MultichannelModes.Keys.SLICE_HW) {
-//                    // single pass with all sides and channels
-//                    return retraceTime + (rampDuration * 2 + stackDuration * numSides * numChannels);
-//                } else {  // one-way pass collecting both sides, then rewind for next channel
-//                    return ((rampDuration * 2) + (stackDuration * numSides) + retraceTime) * numChannels;
-//                }
-//            }
-//        } else { // piezo scan
-//            double channelSwitchDelay = 0;
-//            if (channelMode == MultichannelModes.Keys.VOLUME) {
-//                channelSwitchDelay = 500;   // estimate channel switching overhead time as 0.5s
-//                // actual value will be hardware-dependent
-//            }
-//            if (channelMode == MultichannelModes.Keys.SLICE_HW) {
-//                return numSides * (delayBeforeSide + stackDuration * numChannels);  // channelSwitchDelay = 0
-//            } else {
-//                return numSides * numChannels
-//                        * (delayBeforeSide + stackDuration)
-//                        + (numChannels - 1) * channelSwitchDelay;
-//            }
-//        }
     }
 
 }
