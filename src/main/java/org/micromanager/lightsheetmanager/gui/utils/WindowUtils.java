@@ -7,6 +7,11 @@ import javax.swing.JFrame;
 
 public final class WindowUtils {
 
+    /** This class should not be instantiated. */
+    private WindowUtils() {
+        throw new AssertionError("Utility class; do not instantiate.");
+    }
+
     /**
      * Returns true if the window is displayable and not null.
      *

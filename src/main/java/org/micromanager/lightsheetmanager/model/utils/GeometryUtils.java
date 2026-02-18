@@ -1,7 +1,12 @@
 package org.micromanager.lightsheetmanager.model.utils;
 
 // TODO: make this generic for diSPIM/SCOPE or have separate static classes
-public class GeometryUtils {
+public final class GeometryUtils {
+
+    /** This class should not be instantiated. */
+    private GeometryUtils() {
+        throw new AssertionError("Utility class; do not instantiate.");
+    }
 
     /***
      * Compute how far we need to shift each image for deskew relative to Z-step size (orthogonal to image) based on user-specified angle

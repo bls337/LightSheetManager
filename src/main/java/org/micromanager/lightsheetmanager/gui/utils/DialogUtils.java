@@ -10,7 +10,12 @@ import java.awt.Component;
  * A utility class for making dialog boxes.
  *
  */
-public class DialogUtils {
+public final class DialogUtils {
+
+    /** This class should not be instantiated. */
+    private DialogUtils() {
+        throw new AssertionError("Utility class; do not instantiate.");
+    }
 
     /**Standard error reporting or delegate to JTextArea component. */
     public static boolean SEND_ERROR_TO_COMPONENT = false;

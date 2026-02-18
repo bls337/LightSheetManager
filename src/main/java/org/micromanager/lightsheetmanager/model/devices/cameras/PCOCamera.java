@@ -9,8 +9,8 @@ import java.awt.Rectangle;
 
 /**
  * Support for PCO cameras.
- * Devices Adapter: PCO_Camera
- * Camera Support: Edge 5.5, Panda
+ * <p>Device Adapter: PCO_Camera
+ * <p>Camera Support: Edge 5.5, Panda
  */
 public class PCOCamera extends CameraBase implements LightSheetCamera {
 
