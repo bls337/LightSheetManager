@@ -8,7 +8,7 @@ import java.awt.Rectangle;
 
 /**
  * Support for Andor cameras.
- * <p>Devices Adapter: AndorSDK3
+ * <p>Device Adapter: AndorSDK3
  * <p>Camera Support: Andor Zyla 4.2, Andor Zyla 5.5
  */
 public class AndorCamera extends CameraBase implements LightSheetCamera {

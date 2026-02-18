@@ -8,7 +8,7 @@ import java.awt.Rectangle;
 
 /**
  * Support for Teledyne Photometrics cameras.
- * <p>Devices Adapter: PVCAM
+ * <p>Device Adapter: PVCAM
  * <p>Camera Support: Kinetix, Prime 95B, Prime
  */
 public class PVCamera extends CameraBase implements LightSheetCamera {

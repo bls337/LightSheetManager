@@ -71,7 +71,7 @@ public class CameraTab extends Panel implements ListeningPanel {
         final CameraBase camera = model_.devices().firstImagingCamera();
         if (camera != null) {
             final CameraLibrary camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
-            modes = CameraMode.getAvailableModes(camLib);
+            modes = CameraMode.modesByDeviceLibrary(camLib);
         }
 
         cmbCameraTriggerMode_ = new ComboBox<>(modes,

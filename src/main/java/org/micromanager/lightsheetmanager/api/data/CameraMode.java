@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.api.data;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -10,8 +9,6 @@ import java.util.stream.Stream;
 
 /**
  * Camera trigger modes.
- *
- * <p>All modes should use hardware triggering.
  */
 public enum CameraMode {
     INTERNAL("Internal"),
@@ -23,7 +20,7 @@ public enum CameraMode {
 
     private final String text_;
 
-    private static final Map<String, CameraMode> stringToEnum =
+    private static final Map<String, CameraMode> STRING_TO_ENUM =
             Stream.of(values()).collect(Collectors.toUnmodifiableMap(Object::toString, e -> e));
 
     CameraMode(final String text) {
@@ -31,7 +28,7 @@ public enum CameraMode {
     }
 
     public static CameraMode fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, CameraMode.EDGE);
+        return STRING_TO_ENUM.getOrDefault(symbol, CameraMode.EDGE);
     }
 
     /**
@@ -53,11 +50,11 @@ public enum CameraMode {
      * @param camLib the camera device adapter
      * @return {@code true} if the camera supports the mode
      */
-    private static boolean hasPseudoOverlapTrigger(CameraLibrary camLib) {
+    private static boolean hasPseudoOverlapTrigger(final CameraLibrary camLib) {
         return camLib == CameraLibrary.PCOCAMERA || camLib == CameraLibrary.PVCAM;
     }
 
-    private static boolean hasLevelTrigger(CameraLibrary camLib) {
+    private static boolean hasLevelTrigger(final CameraLibrary camLib) {
         return camLib == CameraLibrary.HAMAMATSU ||
                 camLib == CameraLibrary.ANDORSDK3 ||
                 camLib == CameraLibrary.PCOCAMERA;
@@ -69,31 +66,31 @@ public enum CameraMode {
      * @param camLib the camera device adapter
      * @return {@code true} if the camera supports the mode
      */
-    private static boolean hasLightSheetTrigger(CameraLibrary camLib) {
+    private static boolean hasLightSheetTrigger(final CameraLibrary camLib) {
         return camLib == CameraLibrary.HAMAMATSU ||
                 camLib == CameraLibrary.ANDORSDK3 ||
                 camLib == CameraLibrary.PVCAM || // not sure about this
                 camLib == CameraLibrary.DEMOCAMERA;  // for testing only
     }
 
-    public static boolean isCameraValid(CameraLibrary camLib) {
+    public static boolean isCameraValid(final CameraLibrary camLib) {
         return camLib != CameraLibrary.UNKNOWN;
     }
 
-    public static CameraMode[] getAvailableModes(CameraLibrary camLib) {
+    public static CameraMode[] modesByDeviceLibrary(final CameraLibrary cameraLibrary) {
         ArrayList<CameraMode> modes = new ArrayList<>();
-        if (isCameraValid(camLib)) {
+        if (isCameraValid(cameraLibrary)) {
             modes.add(CameraMode.EDGE);
-            if (hasLevelTrigger(camLib)) {
+            if (hasLevelTrigger(cameraLibrary)) {
                 modes.add(CameraMode.LEVEL);
             }
-            if (hasOverlapTrigger(camLib)) {
+            if (hasOverlapTrigger(cameraLibrary)) {
                 modes.add(CameraMode.OVERLAP);
             }
-            if (hasPseudoOverlapTrigger(camLib)) {
+            if (hasPseudoOverlapTrigger(cameraLibrary)) {
                 modes.add(CameraMode.PSEUDO_OVERLAP);
             }
-            if (hasLightSheetTrigger(camLib)) {
+            if (hasLightSheetTrigger(cameraLibrary)) {
                 modes.add(CameraMode.VIRTUAL_SLIT);
             }
         }

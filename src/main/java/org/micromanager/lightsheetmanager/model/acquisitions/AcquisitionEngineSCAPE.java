@@ -865,8 +865,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // TODO: maybe wrap this up into a method for clarity
         double cameraReadoutTime;
-        //final CameraBase camera = model_.devices().device(cameraName);
-        //final double cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
         final CameraLibrary cameraLibrary = CameraLibrary.fromString(
                 model_.devices().device(cameraName).getDeviceLibrary());
         switch (cameraLibrary) {
