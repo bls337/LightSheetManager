@@ -247,23 +247,13 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         }
     }
 
-    // TODO: keep long method name versions or just use aliases?
-
     public DefaultAcquisitionSettingsSCAPE settings() {
         return acqSettings_;
     }
-//
-//    public DefaultAcquisitionSettingsDISPIM getAcquisitionSettings() {
-//        return acqSettings_;
-//    }
-//
+
     public DefaultAcquisitionSettingsSCAPE.Builder settingsBuilder() {
         return asb_;
     }
-//
-//    public DefaultAcquisitionSettingsDISPIM.Builder getAcquisitionSettingsBuilder() {
-//        return asb_;
-//    }
 
     public AutofocusMM autofocus() {
         return autofocus_;

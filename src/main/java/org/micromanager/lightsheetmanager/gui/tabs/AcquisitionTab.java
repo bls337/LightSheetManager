@@ -4,7 +4,6 @@ import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
-import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
@@ -36,7 +35,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     private Panel pnlRight_;
     private Panel pnlButtons_;
 
-    private ComboBox cmbAcquisitionModes_;
+    private ComboBox<AcquisitionMode> cmbAcquisitionModes_;
 
     // acquisition buttons
     private ToggleButton btnRunAcquisition_;
@@ -167,8 +166,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         // acquisition mode combo box
         final boolean isUsingScanSettings = model_.devices().isUsingStageScanning();
         final GeometryType geometryType = model_.devices().adapter().geometry();
-        cmbAcquisitionModes_ = new ComboBox(AcquisitionMode.getLabels(geometryType, isUsingScanSettings),
-                acqSettings.acquisitionMode().toString(),
+        cmbAcquisitionModes_ = new ComboBox<>(AcquisitionMode.getValidModes(geometryType, isUsingScanSettings),
+                acqSettings.acquisitionMode(),
                 180, 24);
 
         cbxUseAdvancedTiming_ = new CheckBox("Use advanced timing settings",
@@ -269,11 +268,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         });
 
         // select the acquisition mode
-        cmbAcquisitionModes_.registerListener(e -> {
-            final String selected = cmbAcquisitionModes_.getSelected();
-            AcquisitionMode.fromString(selected).ifPresent(mode ->
-                    model_.acquisitions().settingsBuilder().acquisitionMode(mode));
-        });
+        cmbAcquisitionModes_.registerListener(e ->
+                model_.acquisitions().settingsBuilder().acquisitionMode(cmbAcquisitionModes_.getSelected()));
 
         // TODO: should timing recalc be part of setting use advanced timing value in model?
         // switches timing panels based on check box
@@ -326,9 +322,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
                 btnSpeedTest_.setEnabled(true);
             });
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            model_.studio().logs().logError("Acquisition was interrupted!");
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            model_.studio().logs().logError("Could not update UI components.");
         }
     }
 

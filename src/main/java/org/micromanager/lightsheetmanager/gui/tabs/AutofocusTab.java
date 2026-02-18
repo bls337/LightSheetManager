@@ -26,14 +26,14 @@ public class AutofocusTab extends Panel implements ListeningPanel {
     private Spinner spnNumImages_;
     private Spinner spnStepSize_;
     //private Spinner spnToleranceUm_;
-    private ComboBox cmbAutofocusMode_;
-    private ComboBox cmbScoringMethod_;
+    private ComboBox<AutofocusMode> cmbAutofocusMode_;
+    private ComboBox<AutofocusType> cmbScoringMethod_;
     private Button btnRunAutofocus_;
 
     // autofocus options during setup
     private CheckBox cbxAutofocusEveryPass_;
     private CheckBox cbxAutofocusBeforeAcq_;
-    private ComboBox cmbAutofocusChannel_;
+    private ComboBox<String> cmbAutofocusChannel_; // TODO: impl
     private Spinner spnAutofocusEveryX_;
     private Spinner spnMaxOffset_;
 
@@ -89,12 +89,10 @@ public class AutofocusTab extends Panel implements ListeningPanel {
 //        spnToleranceUm_ = Spinner.createDoubleSpinner(
 //                acqSettings.autofocusSettings().toleranceUm(), 0.0, 1.0, 0.01);
 
-        ComboBox.setDefaultSize(120, 20);
-        cmbScoringMethod_ = new ComboBox(AutofocusType.toArray(),
-                acqSettings.autofocusSettings().scoringMethod().toString());
-        ComboBox.setDefaultSize(140, 20);
-        cmbAutofocusMode_ = new ComboBox(AutofocusMode.toArray(),
-                acqSettings.autofocusSettings().mode().toString());
+        cmbScoringMethod_ = new ComboBox<>(AutofocusType.values(),
+                acqSettings.autofocusSettings().scoringMethod(), 120, 20);
+        cmbAutofocusMode_ = new ComboBox<>(AutofocusMode.values(),
+                acqSettings.autofocusSettings().mode(), 140, 20);
 
         btnRunAutofocus_ = new Button("Run Autofocus", 120, 30);
         btnRunAutofocus_.setEnabled(false); // FIXME: impl autofocus
@@ -108,7 +106,7 @@ public class AutofocusTab extends Panel implements ListeningPanel {
         cbxAutofocusEveryPass_ = new CheckBox("Autofocus every stage pass", 12, false, CheckBox.RIGHT);
         cbxAutofocusBeforeAcq_ = new CheckBox("Autofocus before starting acquisition", 12, false, CheckBox.RIGHT);
 
-        cmbAutofocusChannel_ = new ComboBox(labels, "None", 60, 20);
+        cmbAutofocusChannel_ = new ComboBox<>(labels, "None", 60, 20);
         spnAutofocusEveryX_ = Spinner.createIntegerSpinner(10, 0, 1000, 1);
         spnMaxOffset_ = Spinner.createIntegerSpinner(3, 0, 10, 1);
 
@@ -128,7 +126,7 @@ public class AutofocusTab extends Panel implements ListeningPanel {
         final Spinner spnCorrectEveryX = Spinner.createIntegerSpinner(100, 0, 1000, 1);
         final Spinner spnMaxDistance = Spinner.createIntegerSpinner(96, 0, 100, 1);
         final Spinner spnMinMovement = Spinner.createDoubleSpinner(1.0, 0.0, 10.0, 0.5);
-        final ComboBox cmbChannel = new ComboBox(labels, "None", 60, 20);
+        final ComboBox<String> cmbChannel = new ComboBox<>(labels, "None", 60, 20);
 
         // add ui elements to the panel
         add(lblTitle, "span 2, wrap");
@@ -211,10 +209,10 @@ public class AutofocusTab extends Panel implements ListeningPanel {
      //          .autofocusSettingsBuilder().toleranceUm(spnToleranceUm_.getDouble()));
 
         cmbAutofocusMode_.registerListener(e -> model_.acquisitions().settingsBuilder()
-                .autofocusSettingsBuilder().mode(AutofocusMode.fromString(cmbAutofocusMode_.getSelected())));
+                .autofocusSettingsBuilder().mode(cmbAutofocusMode_.getSelected()));
 
         cmbScoringMethod_.registerListener(e -> model_.acquisitions().settingsBuilder()
-                .autofocusSettingsBuilder().scoringMethod(AutofocusType.fromString(cmbScoringMethod_.getSelected())));
+                .autofocusSettingsBuilder().scoringMethod(cmbScoringMethod_.getSelected()));
 
         btnRunAutofocus_.registerListener(e -> model_.acquisitions().autofocus().run());
 

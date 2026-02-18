@@ -4,6 +4,7 @@ import mmcorej.DeviceType;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.LightSheetType;
+import org.micromanager.lightsheetmanager.model.utils.MathUtils;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -11,9 +12,9 @@ import java.util.stream.Collectors;
 
 
 /**
- * The device adapter "LightSheetDeviceManager".
- *
- * <p>Contained in the DeviceManager object as "LightSheetDeviceManager".
+ * The device adapter "LightSheetManager".
+ * <p>
+ * Contained in the DeviceManager object as "LightSheetDeviceManager".
  */
 public class LightSheetDeviceManager extends DeviceBase {
 
@@ -21,7 +22,6 @@ public class LightSheetDeviceManager extends DeviceBase {
     public static final String UNDEFINED = "Undefined";
 
     // TODO: use this for validation
-    // TODO: parse this to a more useful object for version comparisons?
     private String version_;
 
     // pre-init properties
@@ -41,8 +41,17 @@ public class LightSheetDeviceManager extends DeviceBase {
      */
     private void loadPreInitProperties() {
         version_ = getProperty("Version");
+
+        // if GeometryType.UNKNOWN then we open the plugin error screen
         geometryType_ = GeometryType.fromString(getProperty("MicroscopeGeometry"));
+        if (geometryType_ == GeometryType.UNKNOWN) {
+            studio_.logs().logError("LightSheetDeviceManager: Failed to identify microscope geometry! "
+                    + "Device adapter returned: " + getProperty("MicroscopeGeometry"));
+        }
+
+        // default to LightSheetType.STATIC on parsing error
         lightSheetType_ = LightSheetType.fromString(getProperty("LightSheetType"));
+
         // change defaults based on microscope geometry
         int defaultImaging = 1;
         int defaultIllumination = 1;
@@ -50,9 +59,22 @@ public class LightSheetDeviceManager extends DeviceBase {
             defaultImaging = 2;
             defaultIllumination = 2;
         }
-        numImagingPaths_ = parsePropertyInt("ImagingPaths", defaultImaging);
-        numIlluminationPaths_ = parsePropertyInt("IlluminationPaths", defaultIllumination);
-        numSimultaneousCameras_ = parsePropertyInt("SimultaneousCameras", 1);
+
+        // use the defaults if there is a parsing error
+        final int numImaging = parsePropertyInt("ImagingPaths", defaultImaging);
+        final int numIllum = parsePropertyInt("IlluminationPaths", defaultIllumination);
+        final int numCameras = parsePropertyInt("SimultaneousCameras", 1);
+
+        // constrain the values to the range of the property limits
+        numImagingPaths_ = MathUtils.clamp(numImaging,
+                (int) getPropertyLowerLimit("ImagingPaths"),
+                (int) getPropertyUpperLimit("ImagingPaths"));
+        numIlluminationPaths_ = MathUtils.clamp(numIllum,
+                (int) getPropertyLowerLimit("IlluminationPaths"),
+                (int) getPropertyUpperLimit("IlluminationPaths"));
+        numSimultaneousCameras_ = MathUtils.clamp(numCameras,
+                (int) getPropertyLowerLimit("SimultaneousCameras"),
+                (int) getPropertyUpperLimit("SimultaneousCameras"));
     }
 
     /**
@@ -69,13 +91,13 @@ public class LightSheetDeviceManager extends DeviceBase {
     }
 
     private boolean isPositionDevice(final String deviceName) {
-        final DeviceType deviceType = getDeviceType(deviceName);
+        final DeviceType deviceType = deviceType(deviceName);
         return deviceType == DeviceType.StageDevice
                 || deviceType == DeviceType.XYStageDevice
                 || deviceType == DeviceType.GalvoDevice;
     }
 
-    private DeviceType getDeviceType(final String deviceName) {
+    private DeviceType deviceType(final String deviceName) {
         try {
             return core_.getDeviceType(deviceName);
         } catch (Exception e) {
@@ -128,7 +150,7 @@ public class LightSheetDeviceManager extends DeviceBase {
      */
     public Map<String, DeviceType> deviceTypeMap() {
         return deviceMap().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> getDeviceType(e.getValue())));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> deviceType(e.getValue())));
     }
 
     /**

@@ -24,7 +24,7 @@ public enum CameraMode {
     private final String text_;
 
     private static final Map<String, CameraMode> stringToEnum =
-            Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
+            Stream.of(values()).collect(Collectors.toUnmodifiableMap(Object::toString, e -> e));
 
     CameraMode(final String text) {
         text_ = text;
@@ -32,15 +32,6 @@ public enum CameraMode {
 
     public static CameraMode fromString(final String symbol) {
         return stringToEnum.getOrDefault(symbol, CameraMode.EDGE);
-    }
-
-    /**
-     * @return an array of Strings containing all possible camera trigger modes.
-     */
-    public static String[] toArray() {
-        return Arrays.stream(values())
-                .map(CameraMode::toString)
-                .toArray(String[]::new);
     }
 
     /**
@@ -89,7 +80,7 @@ public enum CameraMode {
         return camLib != CameraLibrary.UNKNOWN;
     }
 
-    public static String[] getAvailableModes(CameraLibrary camLib) {
+    public static CameraMode[] getAvailableModes(CameraLibrary camLib) {
         ArrayList<CameraMode> modes = new ArrayList<>();
         if (isCameraValid(camLib)) {
             modes.add(CameraMode.EDGE);
@@ -108,7 +99,7 @@ public enum CameraMode {
         }
         return modes.stream()
                 .map(CameraMode::toString)
-                .toArray(String[]::new);
+                .toArray(CameraMode[]::new);
     }
 
     @Override

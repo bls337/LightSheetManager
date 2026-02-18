@@ -17,8 +17,8 @@ public enum CameraLibrary {
 
     private final String text_;
 
-    private static final Map<String, CameraLibrary> stringToEnum =
-            Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
+    private static final Map<String, CameraLibrary> STRING_TO_ENUM =
+            Stream.of(values()).collect(Collectors.toUnmodifiableMap(Object::toString, e -> e));
 
     CameraLibrary(final String text) {
         text_ = text;
@@ -30,6 +30,6 @@ public enum CameraLibrary {
     }
 
     public static CameraLibrary fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, CameraLibrary.UNKNOWN);
+        return STRING_TO_ENUM.getOrDefault(symbol, CameraLibrary.UNKNOWN);
     }
 }

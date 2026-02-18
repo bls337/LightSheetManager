@@ -13,8 +13,8 @@ import java.util.Objects;
 
 public class VolumeSettingsPanel extends Panel {
 
-    private ComboBox cmbNumViews_;
-    private ComboBox cmbFirstView_;
+    private ComboBox<Integer> cmbNumViews_;
+    private ComboBox<Integer> cmbFirstView_;
 
     private Spinner spnViewDelay_;
     private Spinner spnSliceStepSize_;
@@ -38,11 +38,10 @@ public class VolumeSettingsPanel extends Panel {
                 .settings().volumeSettings();
 
         // create labels for combo boxes
-        ArrayList<String> labels = new ArrayList<>(numImagingPaths);
+        Integer[] viewOptions = new Integer[numImagingPaths];
         for (int i = 0; i < numImagingPaths; i++) {
-            labels.add(String.valueOf(i+1));
+            viewOptions[i] = i + 1;
         }
-        final String[] lbls = labels.toArray(new String[0]);
 
         final Label lblNumViews = new Label("Number of views:");
         final Label lblFirstView = new Label("First view:");
@@ -54,15 +53,15 @@ public class VolumeSettingsPanel extends Panel {
         // than the number of sides, default to 1.
         int numViews = volumeSettings.numViews();
         int firstView = volumeSettings.firstView();
-        if (numViews > labels.size()) {
+        if (numViews > viewOptions.length) {
             numViews = 1;
         }
-        if (firstView > labels.size()) {
+        if (firstView > viewOptions.length) {
             firstView = 1;
         }
 
-        cmbNumViews_ = new ComboBox(lbls, String.valueOf(numViews), 60, 20);
-        cmbFirstView_ = new ComboBox(lbls, String.valueOf(firstView), 60, 20);
+        cmbNumViews_ = new ComboBox<>(viewOptions, numViews, 60, 20);
+        cmbFirstView_ = new ComboBox<>(viewOptions, firstView, 60, 20);
 
         spnViewDelay_ = Spinner.createDoubleSpinner(
                 volumeSettings.delayBeforeView(), 0.0, Double.MAX_VALUE, 0.25);
@@ -101,12 +100,12 @@ public class VolumeSettingsPanel extends Panel {
 
         cmbNumViews_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
-                    .numViews(Integer.parseInt(cmbNumViews_.getSelected()));
+                    .numViews(cmbNumViews_.getSelected());
         });
 
         cmbFirstView_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
-                    .firstView(Integer.parseInt(cmbFirstView_.getSelected()));
+                    .firstView(cmbFirstView_.getSelected());
         });
 
         spnViewDelay_.registerListener(e -> {

@@ -6,8 +6,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 // To add a new AcquisitionMode:
 // 1) Add a new constant to the enum.
@@ -63,9 +61,6 @@ public enum AcquisitionMode {
     // Display text used in the UI
     private final String text_;
 
-    private static final Map<String, AcquisitionMode> STRING_TO_ENUM =
-          Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
-
     AcquisitionMode(final String text) {
         text_ = text;
     }
@@ -94,39 +89,13 @@ public enum AcquisitionMode {
      * @param hasStageScanning {@code true} if stage scan hardware is available
      * @return a {@code List} of {@link AcquisitionMode} constants
      */
-    public static List<AcquisitionMode> getValidModes(final GeometryType geometry, final boolean hasStageScanning) {
+    public static AcquisitionMode[] getValidModes(final GeometryType geometry, final boolean hasStageScanning) {
         return Optional.ofNullable(geometry)
-              .map(MODES_BY_GEOMETRY::get) // returns null if geometry is not in map
-              .orElse(Collections.emptyList())
-              .stream()
-              .filter(mode -> hasStageScanning || !mode.isStageScanMode())
-              .collect(Collectors.toList());
+                .map(MODES_BY_GEOMETRY::get) // returns null if geometry is not in map
+                .orElse(Collections.emptyList())
+                .stream()
+                .filter(mode -> hasStageScanning || !mode.isStageScanMode())
+                .toArray(AcquisitionMode[]::new);
     }
 
-    /**
-     * Return an array of {@code String} labels for a dropdown menu.
-     *
-     * @param geometry the microscope {@link GeometryType}
-     * @param hasStageScanning {@code true} if stage scan hardware is available
-     * @return an array of strings
-     */
-    public static String[] getLabels(final GeometryType geometry, final boolean hasStageScanning) {
-        return getValidModes(geometry, hasStageScanning).stream()
-              .map(AcquisitionMode::toString)
-              .toArray(String[]::new);
-    }
-
-    /**
-     * Returns the {@link AcquisitionMode} associated with the string label.
-     * <p>
-     * If the provided string is {@code null} or does not match any known
-     * acquisition mode, an empty {@link Optional} is returned.
-     *
-     * @param str the string label to convert (Example: "Stage scan")
-     * @return an {@link Optional} containing the matching {@link AcquisitionMode},
-     * or an empty {@code Optional} if no match is found.
-     */
-    public static Optional<AcquisitionMode> fromString(final String str) {
-        return Optional.ofNullable(str).map(STRING_TO_ENUM::get);
-    }
 }

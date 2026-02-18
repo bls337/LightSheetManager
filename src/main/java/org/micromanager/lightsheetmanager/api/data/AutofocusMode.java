@@ -1,10 +1,5 @@
 package org.micromanager.lightsheetmanager.api.data;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 /**
  * The autofocus mode for the general autofocus settings.
  */
@@ -14,21 +9,8 @@ public enum AutofocusMode {
 
     private final String name_;
 
-    private static final Map<String, AutofocusMode> stringToEnum =
-            Stream.of(values()).collect(Collectors.toMap(Object::toString, e -> e));
-
     AutofocusMode(final String name) {
         name_ = name;
-    }
-
-    public static String[] toArray() {
-        return Arrays.stream(values())
-                .map(AutofocusMode::toString)
-                .toArray(String[]::new);
-    }
-
-    public static AutofocusMode fromString(final String symbol) {
-        return stringToEnum.getOrDefault(symbol, AutofocusMode.FIXED_PIEZO_SWEEP_SLICE);
     }
 
     @Override

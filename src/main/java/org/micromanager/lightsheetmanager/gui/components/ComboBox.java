@@ -5,49 +5,22 @@ import javax.swing.JComboBox;
 import java.awt.Dimension;
 import java.util.Arrays;
 
-public class ComboBox extends JComboBox<String> {
+public class ComboBox<T> extends JComboBox<T> {
 
-    private static int defaultWidth = 100;
-    private static int defaultHeight = 20;
-
-    private String selected;
-    private final String[] labels;
-
-    public ComboBox(final String[] labels, final String selected) {
+    public ComboBox(final T[] labels, final T selected, final int width, final int height) {
         super(labels);
-        this.labels = labels;
-        this.selected = selected;
-        init(defaultWidth, defaultHeight);
-    }
-
-    public ComboBox(final String[] labels, final String selected, final int width, final int height) {
-        super(labels);
-        this.labels = labels;
-        this.selected = selected;
-        init(width, height);
-    }
-
-    private void init(final int width, final int height) {
         setAbsoluteSize(width, height);
-        setSelectedIndex(getIndex(selected));
+        setSelectedItem(selected);
         setFocusable(false); // removes the focus highlight
     }
 
-    public static void setDefaultSize(final int width, final int height) {
-        defaultWidth = width;
-        defaultHeight = height;
+    @SuppressWarnings("unchecked")
+    public T getSelected() {
+        return (T) getSelectedItem();
     }
 
-    private int getIndex(final String label) {
-        return Arrays.asList(labels).indexOf(label);
-    }
-
-    public String getSelected() {
-        return selected;
-    }
-
-    public void setSelected(final String label) {
-        setSelectedIndex(getIndex(label));
+    public void setSelected(final T item) {
+        setSelectedItem(item);
     }
 
     public void setAbsoluteSize(final int width, final int height) {
@@ -58,10 +31,7 @@ public class ComboBox extends JComboBox<String> {
     }
 
     public void registerListener(final Method method) {
-        addActionListener(event -> {
-            selected = (String)getSelectedItem();
-            method.run(event);
-        });
+        addActionListener(method::run);
     }
 
 }
