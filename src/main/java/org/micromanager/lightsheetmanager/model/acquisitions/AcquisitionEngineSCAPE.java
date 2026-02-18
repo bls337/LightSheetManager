@@ -1354,21 +1354,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         );
     }
 
-    private double computeTimePointDuration() {
-        final double volumeDuration = computeVolumeDuration(acqSettings_);
-        if (acqSettings_.isUsingMultiplePositions()) {
-            // use 1.5 seconds motor move between positions
-            // (could be wildly off but was estimated using actual system
-            // and then slightly padded to be conservative to avoid errors
-            // where positions aren't completed in time for next position)
-            // could estimate the actual time by analyzing the position's relative locations
-            //   and using the motor speed and acceleration time
-            return studio_.positions().getPositionList().getNumberOfPositions() *
-                    (volumeDuration + 1500 + acqSettings_.postMoveDelay());
-        }
-        return volumeDuration;
-    }
-
     @Override
     public void updateDurationLabels() {
         updateSlicePeriodLabel(pnlVolumeDurations_.getSliceDurationLabel());
@@ -1380,12 +1365,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
         model_.acquisitions().recalculateSliceTiming();
         model_.acquisitions().settingsBuilder().build();
-        label.setText(String.format("%.3f ms", acqSettings.timingSettings().sliceDuration()));
+        label.setText(String.format("%.3f ms", acqSettings_.timingSettings().sliceDuration()));
         //System.out.println("updating slice label to: " + acqSettings.timingSettings().sliceDuration());
     }
 
     private void updateVolumeDurationLabel(final JLabel label) {
-        double duration = computeVolumeDuration(model_.acquisitions().settingsBuilder().build());
+        final double duration = computeVolumeDuration(model_.acquisitions().settingsBuilder().build());
         if (duration > 1000) {
            label.setText(String.format("%.3f s", duration / 1000)); // round to ms
         } else {
@@ -1398,7 +1383,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     */
     private void updateTotalTimeDurationLabel(final JLabel label) {
         String s = "";
-        double duration = computeTotalTimeDuration();
+        final double duration = computeTotalTimeDuration();
         if (duration < 60) {  // less than 1 min
             s += String.format("%.3f s", duration);
         } else if (duration < 60*60) { // between 1 min and 1 hour
@@ -1422,10 +1407,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     * is that it also takes into account the multiple positions, if any.
     * @return duration in ms
     */
-    private double computeTimePointDuration2() {
-        final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
-        final double volumeDuration = computeVolumeDuration(acqSettings);
-        if (acqSettings.isUsingMultiplePositions()) {
+    private double computeTimePointDuration() {
+        final double volumeDuration = computeVolumeDuration(acqSettings_);
+        if (acqSettings_.isUsingMultiplePositions()) {
             try {
                 // use 1.5 seconds motor move between positions
                 // (could be wildly off but was estimated using actual system
@@ -1434,9 +1418,10 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 // could estimate the actual time by analyzing the position's relative locations
                 //   and using the motor speed and acceleration time
                 return studio_.positions().getPositionList().getNumberOfPositions() *
-                        (volumeDuration + 1500 + model_.acquisitions().settings().postMoveDelay());
+                        (volumeDuration + 1500 + acqSettings_.postMoveDelay());
             } catch (Exception e) {
-                studio_.logs().showError("Error getting position list for multiple XY positions");
+                studio_.logs().logError("Error getting position list for multiple XY positions");
+                return volumeDuration;
             }
         }
         return volumeDuration;
