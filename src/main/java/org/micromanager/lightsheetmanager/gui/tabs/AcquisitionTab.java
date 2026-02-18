@@ -326,9 +326,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
                 btnSpeedTest_.setEnabled(true);
             });
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            model_.studio().logs().logError("Acquisition was interrupted!");
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            model_.studio().logs().logError("Could not update UI components.");
         }
     }
 

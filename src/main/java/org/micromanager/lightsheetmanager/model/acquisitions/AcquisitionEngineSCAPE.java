@@ -902,14 +902,14 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // test acq was here
 
-        double volumeDuration = computeActualVolumeDuration(acqSettings_);
-        double timepointDuration = computeTimePointDuration();
-        long timepointIntervalMs = Math.round(acqSettings_.timePointInterval() * 1000.0);
+        final double volumeDuration = computeVolumeDuration(acqSettings_);
+        final double timepointDuration = computeTimePointDuration();
+        final long timepointIntervalMs = Math.round(acqSettings_.timePointInterval() * 1000.0);
 
         // use hardware timing if < 1 second between time points
         // experimentally need ~0.5 sec to set up acquisition, this gives a bit of cushion
         // cannot do this in getCurrentAcquisitionSettings because of mutually recursive
-        // call with computeActualVolumeDuration()
+        // call with computeVolumeDuration()
         boolean isUsingHardwareTimePoints = false; // TODO: asb_ not built yet
         if (acqSettings_.isUsingTimePoints()
                 && acqSettings_.numTimePoints() > 1
@@ -1355,7 +1355,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     private double computeTimePointDuration() {
-        final double volumeDuration = computeActualVolumeDuration(acqSettings_);
+        final double volumeDuration = computeVolumeDuration(acqSettings_);
         if (acqSettings_.isUsingMultiplePositions()) {
             // use 1.5 seconds motor move between positions
             // (could be wildly off but was estimated using actual system
@@ -1367,38 +1367,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     (volumeDuration + 1500 + acqSettings_.postMoveDelay());
         }
         return volumeDuration;
-    }
-
-    private double computeActualVolumeDuration(final DefaultAcquisitionSettingsSCAPE acqSettings) {
-        final MultiChannelMode channelMode = acqSettings.channelSettings().channelMode();
-        final int numChannels = acqSettings.channelSettings().numChannels();
-        final int numViews = acqSettings.volumeSettings().numViews();
-        final double delayBeforeSide = acqSettings.volumeSettings().delayBeforeView();
-        int numCameraTriggers = acqSettings.volumeSettings().slicesPerView();
-        if (acqSettings.cameraMode() == CameraMode.OVERLAP) {
-            numCameraTriggers += 1;
-        }
-        // stackDuration is per-side, per-channel, per-position
-
-        final double stackDuration = numCameraTriggers * acqSettings.timingSettings().sliceDuration();
-        if (acqSettings.isUsingStageScanning()) { // || acqSettings.isStageStepping) {
-            // TODO: stage scanning code
-            return 0;
-        } else {
-            // piezo scan
-            double channelSwitchDelay = 0;
-            if (channelMode == MultiChannelMode.VOLUME) {
-                channelSwitchDelay = 500;   // estimate channel switching overhead time as 0.5s
-                // actual value will be hardware-dependent
-            }
-            if (channelMode == MultiChannelMode.SLICE_HW) {
-                return numViews * (delayBeforeSide + stackDuration * numChannels);  // channelSwitchDelay = 0
-            } else {
-                return numViews * numChannels
-                        * (delayBeforeSide + stackDuration)
-                        + (numChannels - 1) * channelSwitchDelay;
-            }
-        }
     }
 
     @Override
@@ -1413,7 +1381,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         model_.acquisitions().recalculateSliceTiming();
         model_.acquisitions().settingsBuilder().build();
         label.setText(String.format("%.3f ms", acqSettings.timingSettings().sliceDuration()));
-        System.out.println("updating slice label to: " + acqSettings.timingSettings().sliceDuration());
+        //System.out.println("updating slice label to: " + acqSettings.timingSettings().sliceDuration());
     }
 
     private void updateVolumeDurationLabel(final JLabel label) {
@@ -1445,10 +1413,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     private double computeTotalTimeDuration() {
         final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settingsBuilder().build();
-        final double duration = acqSettings.numTimePoints() * acqSettings.timePointInterval()
+        return acqSettings.numTimePoints() * acqSettings.timePointInterval()
                 + computeTimePointDuration()/1000;
-       System.out.println("duratioN: " + duration);
-        return duration;
     }
 
    /**
