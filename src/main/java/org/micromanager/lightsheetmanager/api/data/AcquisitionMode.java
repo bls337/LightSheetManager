@@ -73,7 +73,7 @@ public enum AcquisitionMode {
     }
 
     /**
-     * Returns {@code true} if the {@link AcquisitionMode} is a stage scan mode.
+     * Returns {@code true} if the {@code AcquisitionMode} is a stage scan mode.
      *
      * @return {@code true} if the mode is stage scan mode
      */
@@ -89,7 +89,7 @@ public enum AcquisitionMode {
      *
      * @param geometryType the {@link GeometryType} to query; if {@code null}, an empty list is returned
      * @param hasStageScanning {@code true} if stage scan hardware is available
-     * @return an array of {@link AcquisitionMode} constants
+     * @return an array of {@code AcquisitionMode} constants
      */
     public static AcquisitionMode[] modesByType(final GeometryType geometryType, final boolean hasStageScanning) {
         return Optional.ofNullable(geometryType)

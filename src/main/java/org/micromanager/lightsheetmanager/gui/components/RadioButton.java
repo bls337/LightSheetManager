@@ -79,13 +79,24 @@ public class RadioButton extends JPanel {
         }
     }
 
-    public String getSelectedButtonText() {
+    // Returns the text of the selected button.
+    public String getSelectedText() {
         for (final JRadioButton button : buttons) {
             if (button.isSelected()) {
                 return button.getText();
             }
         }
         return "";
+    }
+
+    // Returns the selected index or -1 if nothing is selected.
+    public int getSelectedIndex() {
+        for (int i = 0; i < buttons.size(); i++) {
+            if (buttons.get(i).isSelected()) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public void registerListener(final Method method) {

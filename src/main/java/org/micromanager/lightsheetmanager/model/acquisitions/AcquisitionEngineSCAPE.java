@@ -85,15 +85,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            return false;
 //        }
 
-        // we must have an active camera if we are using simultaneous cameras
-        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
-            final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
-            if (cameras.length > 0 && !cameras[0].isActive()) {
-                studio_.logs().showError("The primary camera MUST be active in simultaneous cameras mode!");
-                return false;
-            }
-        }
-
         // set the "Core-Camera" property to the first logical camera device
         final String cameraName = model_.devices().firstImagingCamera().getDeviceName();
         try {
