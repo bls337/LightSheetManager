@@ -8,7 +8,6 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class VolumeSettingsPanel extends Panel {
@@ -30,8 +29,13 @@ public class VolumeSettingsPanel extends Panel {
     }
 
     private void createUserInterface() {
-        final GeometryType geometryType = model_.devices().adapter().geometry();
+        setMigLayout(
+                "insets 10 10 10 10, fillx",
+                "[grow, left] 10 [right]",
+                "[]5[]"
+        );
 
+        final GeometryType geometryType = model_.devices().adapter().geometry();
         final int numImagingPaths = model_.devices().adapter().numImagingPaths();
 
         final DefaultVolumeSettings volumeSettings = model_.acquisitions()
