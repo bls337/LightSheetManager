@@ -33,9 +33,9 @@ public class AdvancedTimingPanel extends Panel {
 
     private void createUserInterface() {
         setMigLayout(
-            "insets 10 10 10 10",
-            "",
-            "[]5[]"
+                "insets 10 10 10 10, fillx",
+                "[grow, left] 10 [right]",
+                "[]5[]"
         );
 
         final Label lblDelayBeforeScan = new Label("Delay Before Scan [ms]: ");

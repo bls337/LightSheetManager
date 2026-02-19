@@ -41,6 +41,12 @@ public class SliceSettingsPanel extends Panel {
     }
 
     private void createUserInterface() {
+        setMigLayout(
+                "insets 10 10 10 10, fillx",
+                "[grow, left] 10 [right]",
+                "[]5[]"
+        );
+
         final DefaultSliceSettingsLS sliceSettingsLS = model_.acquisitions()
                 .settings().sliceSettingsLS();
 

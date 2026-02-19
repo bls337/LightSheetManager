@@ -8,6 +8,7 @@ import net.miginfocom.swing.MigLayout;
 import org.micromanager.internal.dialogs.ComponentTitledBorder;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 
 public class Panel extends JPanel {
@@ -16,7 +17,6 @@ public class Panel extends JPanel {
         setMigLayout("", "", "");
     }
 
-    // TODO: do i need this?
     public Panel(final String text) {
         setMigLayout("", "", "");
         final TitledBorder titledBorder = BorderFactory.createTitledBorder(
@@ -26,7 +26,6 @@ public class Panel extends JPanel {
         setBorder(titledBorder);
     }
 
-    // TODO: maybe parameterize font options and use static factory methods?
     public Panel(final String text, int side) { // side = TitledBorder.CENTER, etc
         setMigLayout("", "", "");
         final TitledBorder titledBorder = BorderFactory.createTitledBorder(
@@ -59,6 +58,13 @@ public class Panel extends JPanel {
      */
     public void setMigLayout(final String layout, final String cols, final String rows) {
         setLayout(new MigLayout(layout, cols, rows));
+    }
+
+    public void setAbsoluteSize(final int width, final int height) {
+        final Dimension size = new Dimension(width, height);
+        setPreferredSize(size);
+        setMinimumSize(size);
+        setMaximumSize(size);
     }
 
 }

@@ -98,13 +98,13 @@ public class LightSheetManagerFrame extends JFrame {
         // use MigLayout as the layout manager
         setLayout(new MigLayout(
                 "insets 10 10 10 10",
-                "[]20[]",
+                "[grow, fill]",
                 "[]10[]"
         ));
 
         // main control area
-        final int width = 900;
-        final int height = 600;
+        final int width = 920;
+        final int height = 620;
         tabPanel_ = new TabPanel(model_, this, width, height);
 
         // add ui elements to the panel

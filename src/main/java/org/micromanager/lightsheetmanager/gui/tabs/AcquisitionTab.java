@@ -1,11 +1,9 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
-import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
-import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
@@ -91,8 +89,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
 
         setMigLayout(
-                "insets 10 10 10 10",
-                "[]5[]",
+                "insets 10 10 10 10, ax center",
+                "[300!]8[pref!]8[300!]",
                 "[]5[]"
         );
 
@@ -101,9 +99,13 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         final Panel pnlCenter = new Panel();
         pnlRight_ = new Panel();
 
-        // durations
-        pnlDurations_ = new VolumeDurationPanel(model_);
+        pnlCenter.setMigLayout(
+                "",
+                "",
+                "[]10[]"
+        );
 
+        pnlDurations_ = new VolumeDurationPanel(model_);
         pnlVolumeSettings_ = new VolumeSettingsPanel(model_);
 
         // switch between these two panels
@@ -129,8 +131,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         // acquisition buttons
         pnlButtons_ = new Panel();
         pnlButtons_.setMigLayout(
-                "",
-                "[]24[]",
+                "center",
+                "[]26[]",
                 ""
         );
 
@@ -147,27 +149,24 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         );
         btnPauseAcquisition_.setEnabled(false);
 
-        Button.setDefaultSize(120, 30);
-        btnTestAcquisition_ = new Button("Test Acquisition");
-        btnOpenPlaylist_ = new Button("Playlist...");
-        btnSpeedTest_ = new Button("Speed test");
+        btnTestAcquisition_ = new Button("Test Acquisition", 120, 30);
+        btnOpenPlaylist_ = new Button("Playlist...", 120, 30);
+        btnSpeedTest_ = new Button("Speed test", 120, 30);
 
-        Button.setDefaultSize(140, 30);
-        btnRunOverviewAcq_ = new Button("Overview Acquisition");
+        btnRunOverviewAcq_ = new Button("Overview Acquisition", 140, 30);
 
         final boolean isUsingChannels = acqSettings.isUsingChannels();
         cbxUseChannels_ = new CheckBox("Channels", isUsingChannels);
         pnlChannelTable_ = new ChannelTablePanel(model_, cbxUseChannels_);
-        pnlChannelTable_.setMaximumSize(new Dimension(270, 400));
 
         // disable elements based on acqSettings
         pnlChannelTable_.setItemsEnabled(isUsingChannels);
 
         // acquisition mode combo box
-        final boolean isUsingScanSettings = model_.devices().isUsingStageScanning();
-        final GeometryType geometryType = model_.devices().adapter().geometry();
         cmbAcquisitionModes_ = new ComboBox<>(
-                AcquisitionMode.modesByType(geometryType, isUsingScanSettings),
+                AcquisitionMode.modesByType(
+                        model_.devices().adapter().geometry(),
+                        model_.devices().isUsingStageScanning()),
                 acqSettings.acquisitionMode(),
                 180, 24);
 
@@ -176,6 +175,11 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
         btnRunOverviewAcq_.setEnabled(false); // TODO: re-enable when these features are put in
         btnTestAcquisition_.setEnabled(false);
+
+        // set ui sizes, should match the MigLayout constraints
+        pnlChannelTable_.setAbsoluteSize(280, 400);
+        pnlLeft.setAbsoluteSize(300, 420);
+        pnlRight_.setAbsoluteSize(300, 420);
 
         // acquisition buttons
         pnlButtons_.add(btnRunAcquisition_, "");
@@ -195,25 +199,17 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlCenter.add(new JLabel("Acquisition mode:"), "split 2");
         pnlCenter.add(cmbAcquisitionModes_, "");
 
-        final boolean isUsingAdvSettings =
-                model_.acquisitions().settings().isUsingAdvancedTiming();
-
         pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
-        if (isUsingAdvSettings) {
-            pnlRight_.add(pnlAdvancedTiming_, "growx, wrap");
-        } else {
-            pnlRight_.add(pnlSliceSettings_, "growx, wrap");
-        }
+        pnlRight_.add(model_.acquisitions().settings().isUsingAdvancedTiming() ?
+                pnlAdvancedTiming_ : pnlSliceSettings_, "growx, wrap");
         pnlRight_.add(cbxUseAdvancedTiming_, "growx");
 
-        // TODO: consider putting durations into the model, since recalculating the slice timing shouldn't happen here
-        // includes calculating the slice timing
-        //updateDurationLabels();
+        // add panels
+        add(pnlLeft, "aligny top");
+        add(pnlCenter, "aligny top");
+        add(pnlRight_, "aligny top, wrap");
 
-        add(pnlLeft, "");
-        add(pnlCenter, "");
-        add(pnlRight_, "wrap");
-        add(pnlButtons_, "span 3, gaptop 60");
+        add(pnlButtons_, "span 3, growx, center, pushy, aligny bottom");
     }
 
     /**
@@ -290,19 +286,14 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     /**
      * Switch between slice timing panel and advanced timing panel.
      *
-     * @param state the state of the CheckBox
+     * @param useAdvancedTiming {@code true} to swap to the advanced timing panel
      */
-    private void swapTimingSettingsPanels(final boolean state) {
+    private void swapTimingSettingsPanels(final boolean useAdvancedTiming) {
         pnlRight_.removeAll();
-        if (state) {
-            pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
-            pnlRight_.add(pnlAdvancedTiming_, "growx, wrap");
-            pnlRight_.add(cbxUseAdvancedTiming_, "growx");
-        } else {
-            pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
-            pnlRight_.add(pnlSliceSettings_, "growx, wrap");
-            pnlRight_.add(cbxUseAdvancedTiming_, "growx");
-        }
+        pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
+        pnlRight_.add(useAdvancedTiming ?
+                pnlAdvancedTiming_ : pnlSliceSettings_, "growx, wrap");
+        pnlRight_.add(cbxUseAdvancedTiming_, "growx");
         pnlRight_.revalidate();
         pnlRight_.repaint();
     }
