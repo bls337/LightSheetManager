@@ -356,32 +356,15 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         postMoveDelay_ = builder.postMoveDelay_;
         liveScanPeriod_= builder.liveScanPeriod_;
     }
-    //    /**
+
+//    /**
 //     * Creates a Builder populated with settings of this DefaultAcquisitionSettingsDISPIM instance.
 //     *
 //     * @return DefaultAcquisitionSettingsDISPIM.Builder pre-populated with settings of this instance.
 //     */
 //    @Override
 //    public DefaultAcquisitionSettingsDISPIM.Builder copyBuilder() {
-//        return new Builder(
-//                timingSettings_.copyBuilder(),
-//                volumeSettings_.copyBuilder(),
-//                sliceSettings_.copyBuilder(),
-//                sliceSettingsLS_.copyBuilder(),
-//                acquisitionMode_,
-//                channelMode_,
-//                cameraMode_,
-//                useChannels_,
-//                useTimePoints_,
-//                useAutofocus_,
-//                useStageScanning_,
-//                useMultiplePositions_,
-//                useHardwareTimePoints_,
-//                useAdvancedTiming_,
-//                numTimePoints_,
-//                timePointInterval_,
-//                postMoveDelay_
-//        );
+//        return new Builder(this);
 //    }
 
     /**

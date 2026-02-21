@@ -835,7 +835,6 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 break;
             default:
                 studio_.logs().showError("Invalid camera mode");
-                // FIXME: set to invalid!
                 break;
         }
 

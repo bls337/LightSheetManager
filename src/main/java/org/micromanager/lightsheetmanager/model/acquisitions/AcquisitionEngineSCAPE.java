@@ -17,7 +17,6 @@ import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
-import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
@@ -948,7 +947,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 //        }
 
-        final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder());
+        final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder().build());
         if (exposureTime + cameraReadoutTime > sliceDuration) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
@@ -998,7 +997,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             DefaultTimingSettings.Builder tsb = getTimingFromExposure();
             asb_.timingSettingsBuilder(tsb);
         }
-        final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder());
+        final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder().build());
         asb_.timingSettingsBuilder().sliceDuration(sliceDuration);
         //System.out.println(asb_.timingSettingsBuilder());
     }
@@ -1101,7 +1100,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
-           double globalDelay = acqSettings_.sliceSettings().slicePeriod() - getSliceDuration(tsb);
+           double globalDelay = acqSettings_.sliceSettings().slicePeriod() - getSliceDuration(tsb.build());
            if (cameraMode == CameraMode.VIRTUAL_SLIT) {
               globalDelay = 0;
            }
@@ -1129,7 +1128,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         tsb.delayBeforeScan(delayBeforeScan);
 
         // update the slice duration based on our new values
-        tsb.sliceDuration(getSliceDuration(tsb));
+        tsb.sliceDuration(getSliceDuration(tsb.build()));
         return tsb;
     }
 
@@ -1281,13 +1280,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 break;
             default:
                 studio_.logs().showError("Invalid camera mode");
-                // FIXME: set to invalid!
                 break;
         }
 
         // fix corner case of negative calculated scanDelay
         if (delayBeforeScan < 0) {
-            delayBeforeCamera-= delayBeforeScan;
+            delayBeforeCamera -= delayBeforeScan;
             delayBeforeLaser -= delayBeforeScan;
             delayBeforeScan = 0;  // same as (-= delayBeforeScan)
         }
@@ -1303,7 +1301,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // update the slice duration based on our new values
-        sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
+        //sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
 
         tsb.scansPerSlice(scansPerSlice);
         tsb.scanDuration(scanDuration);
@@ -1313,7 +1311,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         tsb.delayBeforeCamera(delayBeforeCamera);
         tsb.delayBeforeLaser(delayBeforeLaser);
         tsb.delayBeforeScan(delayBeforeScan);
-        tsb.sliceDuration(sliceDuration);
+
+        tsb.sliceDuration(getSliceDuration(tsb.build()));
         return tsb;
     }
 
@@ -1334,14 +1333,13 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         );
     }
 
-    private double getSliceDuration(DefaultTimingSettings.Builder tsb) {
-        DefaultTimingSettings s = tsb.build();
+    private double getSliceDuration(final DefaultTimingSettings ts) {
         // slice duration is the max out of the scan time, laser time, and camera time
         return Math.max(Math.max(
-                        s.delayBeforeScan() + (s.scanDuration() * s.scansPerSlice()),   // scan time
-                        s.delayBeforeLaser() + s.laserTriggerDuration()                 // laser time
+                        ts.delayBeforeScan() + (ts.scanDuration() * ts.scansPerSlice()),  // scan time
+                        ts.delayBeforeLaser() + ts.laserTriggerDuration()                 // laser time
                 ),
-                s.delayBeforeCamera() + s.cameraTriggerDuration()                      // camera time
+                ts.delayBeforeCamera() + ts.cameraTriggerDuration()                       // camera time
         );
     }
 
