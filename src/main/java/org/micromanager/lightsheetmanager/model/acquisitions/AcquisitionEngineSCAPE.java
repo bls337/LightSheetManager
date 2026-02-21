@@ -1280,13 +1280,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 break;
             default:
                 studio_.logs().showError("Invalid camera mode");
-                // FIXME: set to invalid!
                 break;
         }
 
         // fix corner case of negative calculated scanDelay
         if (delayBeforeScan < 0) {
-            delayBeforeCamera-= delayBeforeScan;
+            delayBeforeCamera -= delayBeforeScan;
             delayBeforeLaser -= delayBeforeScan;
             delayBeforeScan = 0;  // same as (-= delayBeforeScan)
         }
@@ -1302,7 +1301,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // update the slice duration based on our new values
-        sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
+        //sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
 
         tsb.scansPerSlice(scansPerSlice);
         tsb.scanDuration(scanDuration);
@@ -1312,7 +1311,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         tsb.delayBeforeCamera(delayBeforeCamera);
         tsb.delayBeforeLaser(delayBeforeLaser);
         tsb.delayBeforeScan(delayBeforeScan);
-        tsb.sliceDuration(sliceDuration);
+
+        tsb.sliceDuration(getSliceDuration(tsb.build()));
         return tsb;
     }
 
