@@ -1206,8 +1206,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // (start scanner 0.25ms later than it would be otherwise)
         // this time-shift opposes the Bessel filter delay
         // scanDelayFilter won't be negative unless scanFilterFreq is more than 3kHz which shouldn't happen
-        // TODO: only do this when PLC exists
-        scanDelayFilter -= 0.25;
+        if (model_.devices().isUsingPLogic()) {
+            scanDelayFilter -= 0.25;
+        }
 
         double delayBeforeScan = globalExposureDelayMax - scanLaserBufferTime   // start scan 0.25ms before camera's global exposure
                 - scanDelayFilter; // start galvo moving early due to card's Bessel filter and delay of TTL signals via PLC
@@ -1227,7 +1228,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         double cameraExposure = NumberUtils.ceilToQuarterMs(cameraResetTime) + laserTriggerDuration;
 
-        switch (acqSettings_.cameraMode()) {
+        final CameraMode cameraMode = acqSettings_.cameraMode();
+        switch (cameraMode) {
             case EDGE:
                 cameraTriggerDuration = 1;  // doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
                 cameraExposure += 0.1; // add 0.1ms as safety margin, may require adding an additional 0.25ms to slice
@@ -1301,14 +1303,32 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             delayBeforeScan = 0;  // same as (-= delayBeforeScan)
         }
 
-        // fix corner case of (exposure time + readout time) being greater than the slice duration
-        // most of the time the slice duration is already larger
-        sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserTriggerDuration, delayBeforeCamera, cameraTriggerDuration);
-        final double globalDelay = NumberUtils.ceilToQuarterMs((cameraExposure + cameraReadoutTime) - sliceDuration);
-        if (globalDelay > 0) {
+        // if a specific slice period was requested, add corresponding delay to scan/laser/camera
+        double globalDelay = 0;
+        if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
+            globalDelay = acqSettings_.sliceSettings().slicePeriod() - getSliceDuration(tsb.build());
+            if (cameraMode == CameraMode.VIRTUAL_SLIT) {
+                globalDelay = 0;
+            }
+            // only true when user has specified period that is unattainable
+            if (globalDelay < 0) {
+                globalDelay = 0;
+                studio_.logs().showError("Increasing slice period to meet laser exposure constraint\n"
+                        + "(time required for camera readout; readout time depends on ROI).");
+            }
             delayBeforeCamera += globalDelay;
             delayBeforeLaser += globalDelay;
             delayBeforeScan += globalDelay;
+        }
+
+        // fix corner case of (exposure time + readout time) being greater than the slice duration
+        // most of the time the slice duration is already larger
+        sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserTriggerDuration, delayBeforeCamera, cameraTriggerDuration);
+        final double extraGlobalDelay = NumberUtils.ceilToQuarterMs((cameraExposure + cameraReadoutTime) - sliceDuration);
+        if (globalDelay > 0) {
+            delayBeforeCamera += extraGlobalDelay;
+            delayBeforeLaser += extraGlobalDelay;
+            delayBeforeScan += extraGlobalDelay;
         }
 
         tsb.scansPerSlice(scansPerSlice)
