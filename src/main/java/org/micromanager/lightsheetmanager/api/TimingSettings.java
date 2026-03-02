@@ -60,20 +60,17 @@ public interface TimingSettings {
          */
         Builder cameraExposure(final double exposureMs);
 
-
-        /**
-         * Sets the slice duration of each slice.
-         *
-         * @param durationMs the duration in milliseconds
-         */
-        Builder sliceDuration(final double durationMs);
-
         /**
          * Sets the scan direction.
          *
          * @param state true to invert the scan direction
          */
         Builder useAlternateScanDirection(final boolean state);
+
+        /**
+         * Computes the slice duration from the other timing settings.
+         */
+        double sliceDuration();
 
         /**
          * Creates an immutable instance of TimingSettings

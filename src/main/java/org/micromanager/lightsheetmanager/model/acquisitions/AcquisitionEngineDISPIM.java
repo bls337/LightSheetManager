@@ -866,7 +866,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         tsb.delayBeforeCamera(delayBeforeCamera);
         tsb.delayBeforeLaser(delayBeforeLaser);
         tsb.delayBeforeScan(delayBeforeScan);
-        tsb.sliceDuration(sliceDuration);
+        //tsb.sliceDuration(sliceDuration); // Note: sliceDuration removed, computed dynamically
         return tsb;
     }
 

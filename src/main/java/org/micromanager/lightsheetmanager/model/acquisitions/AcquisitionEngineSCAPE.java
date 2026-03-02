@@ -997,8 +997,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             DefaultTimingSettings.Builder tsb = getTimingFromExposure();
             asb_.timingSettingsBuilder(tsb);
         }
-        final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder().build());
-        asb_.timingSettingsBuilder().sliceDuration(sliceDuration);
+        // Note: sliceDuration is computed automatically when build() is called
+        //final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder().build());
+        //asb_.timingSettingsBuilder().sliceDuration(sliceDuration);
         //System.out.println(asb_.timingSettingsBuilder());
     }
 
@@ -1038,7 +1039,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriodMin - laserDuration);
         // extra quarter millisecond to make sure interleaved slices works (otherwise laser signal never goes low)
         final double sliceLaserInterleaved =
-                (acqSettings_.channelSettings().channelMode() == MultiChannelMode.SLICE_HW ? 0.25f : 0.f);
+                (acqSettings_.channelSettings().channelMode() == MultiChannelMode.SLICE_HW ? 0.25 : 0.0);
 
         // TODO: is this getting the correct value?
         final double actualCameraResetTime =
@@ -1139,7 +1140,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // update the slice duration based on our new values
-        tsb.sliceDuration(getSliceDuration(tsb.build()));
+        // tsb.sliceDuration(getSliceDuration(tsb.build()));
         return tsb;
     }
 
@@ -1341,7 +1342,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 .delayBeforeScan(delayBeforeScan);
 
         // update the slice duration based on our new values
-        tsb.sliceDuration(getSliceDuration(tsb.build()));
+        // tsb.sliceDuration(getSliceDuration(tsb.build()));
         return tsb;
     }
 
