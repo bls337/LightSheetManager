@@ -1113,9 +1113,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         double globalDelay = 0;
         if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
            globalDelay = acqSettings_.sliceSettings().slicePeriod() - getSliceDuration(tsb.build());
-           if (cameraMode == CameraMode.VIRTUAL_SLIT) {
-              globalDelay = 0;
-           }
            // only true when user has specified period that is unattainable
            if (globalDelay < 0) {
               globalDelay = 0;
@@ -1194,14 +1191,14 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // than we otherwise would (Bessel filter selected b/c stretches out pulse without any ripples)
         // delay to start is (empirically) 0.07ms + 0.25/(freq in kHz)
         // delay to midpoint is empirically 0.38/(freq in kHz)
-        // group delay for 5th-order bessel filter ~0.39/freq from theory and ~0.4/freq from IC datasheet
+        // group delay for 5th-order Bessel filter ~0.39/freq from theory and ~0.4/freq from IC datasheet
         //final double scanFilterFreq = Math.max(scanner1.getFilterFreqX(), scanner2.getFilterFreqX());
         final double scanFilterFreq = scanner1.getFilterFreqX();
-
         double scanDelayFilter = 0;
         if (scanFilterFreq != 0) {
-            scanDelayFilter = NumberUtils.roundToQuarterMs(0.39/scanFilterFreq);
+            scanDelayFilter = NumberUtils.roundToQuarterMs(0.39 / scanFilterFreq);
         }
+
         // If the PLogic card is used, account for 0.25ms delay it introduces to
         // the camera and laser trigger signals => subtract 0.25ms from the scanner delay
         // (start scanner 0.25ms later than it would be otherwise)
@@ -1215,10 +1212,6 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 - scanDelayFilter; // start galvo moving early due to card's Bessel filter and delay of TTL signals via PLC
         double delayBeforeLaser = globalExposureDelayMax; // turn on laser as soon as camera's global exposure is reached
         double delayBeforeCamera = cameraReadoutMax; // camera must read out last frame before triggering again
-        int scansPerSlice = 1;
-
-        double cameraTriggerDuration = 0; // set in the switch statement below
-        double sliceDuration;
 
         // figure out desired time for camera to be exposing (including reset time)
         // because both camera trigger and laser on occur on 0.25ms intervals (i.e. we may not
@@ -1227,70 +1220,56 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         //    but not in the camera exposure time
         // TODO: skipped PVCAM case, this should already be handled by camera.getResetTime(camMode); but there may be differences
 
+        // make sure to accumulate values so our comparison logic works at the end of the method
         double cameraExposure = NumberUtils.ceilToQuarterMs(cameraResetTime) + laserTriggerDuration;
+
+        // cameraExposure will be modified in the switch, sliceDuration does not depend on it
+        tsb.scansPerSlice(1)
+                .scanDuration(scanDuration)
+                .cameraTriggerDuration(1.0) // a reasonable default
+                .laserTriggerDuration(laserTriggerDuration)
+                .delayBeforeScan(delayBeforeScan)
+                .delayBeforeLaser(delayBeforeLaser)
+                .delayBeforeCamera(delayBeforeCamera)
+                .cameraExposure(cameraExposure); // base exposure before camera mode specific adjustments
 
         final CameraMode cameraMode = acqSettings_.cameraMode();
         switch (cameraMode) {
             case EDGE:
-                cameraTriggerDuration = 1;  // doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
-                cameraExposure += 0.1; // add 0.1ms as safety margin, may require adding an additional 0.25ms to slice
+                // cameraTriggerDuration: doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
+                cameraExposure += 0.1; // add 0.1ms as safety margin, may require adding 0.25ms to slice
+                tsb.cameraExposure(cameraExposure);
                 // slight delay between trigger and actual exposure start
                 //   is included in exposure time for Hamamatsu and negligible for Andor and PCO cameras
                 // ensure not to miss triggers by not being done with readout in time for next trigger, add 0.25ms if needed
-                sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserTriggerDuration, delayBeforeCamera, cameraTriggerDuration);
-                if (sliceDuration < (cameraExposure + cameraReadoutTime)) {
+                if (tsb.sliceDuration() < (cameraExposure + cameraReadoutTime)) {
                     delayBeforeCamera += 0.25;
                     delayBeforeLaser += 0.25;
                     delayBeforeScan += 0.25;
+                    // sync with builder
+                    tsb.delayBeforeScan(delayBeforeScan)
+                            .delayBeforeLaser(delayBeforeLaser)
+                            .delayBeforeCamera(delayBeforeCamera);
                 }
                 break;
             case LEVEL: // AKA "bulb mode", TTL rising starts exposure, TTL falling ends it
-                cameraTriggerDuration = NumberUtils.ceilToQuarterMs(cameraExposure);
-                cameraExposure = 1; // doesn't really matter, controlled by TTL
+                tsb.cameraTriggerDuration(NumberUtils.ceilToQuarterMs(cameraExposure));
+                tsb.cameraExposure(1.0); // doesn't really matter, controlled by TTL
                 break;
             case OVERLAP: // only Hamamatsu or Andor
-                cameraTriggerDuration = 1;  // doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
-                cameraExposure = 1;  // doesn't really matter, controlled by interval between triggers
+                // cameraTriggerDuration: doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
+                tsb.cameraExposure(1.0); // doesn't really matter, controlled by interval between triggers
                 break;
             case PSEUDO_OVERLAP:// PCO or Photometrics, enforce 0.25ms between end exposure and start of next exposure by triggering camera 0.25ms into the slice
-                cameraTriggerDuration = 1;  // doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
+                // cameraTriggerDuration: doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
                 // leave cameraExposure alone if using PVCAM device library
                 if (!camera.getDeviceLibrary().equals("PVCAM")) {
-                    sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserTriggerDuration, delayBeforeCamera, cameraTriggerDuration);
-                    cameraExposure = sliceDuration - delayBeforeCamera;  // s.cameraDelay should be 0.25ms for PCO
+                    cameraExposure = tsb.sliceDuration() - delayBeforeCamera;  // delayBeforeCamera should be 0.25ms for PCO
+                    tsb.cameraExposure(cameraExposure);
                 }
-                if (cameraReadoutMax < 0.24f) {
+                if (cameraReadoutMax < 0.24) {
                     studio_.logs().showError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
                 }
-                break;
-            case VIRTUAL_SLIT:
-                // each slice period goes like this:
-                // 1. scan reset time (use to add any extra settling time to the start of each slice)
-                // 2. start scan, wait scan settle time
-                // 3. trigger camera/laser when scan settle time elapses
-                // 4. scan for total of exposure time plus readout time (total time some row is exposing) plus settle time plus extra 0.25ms to prevent artifacts
-                // 5. laser turns on 0.25ms before camera trigger and stays on until exposure is ending
-                // TODO revisit this after further experimentation
-                cameraTriggerDuration = 1;  // only need to trigger camera
-                final double shutterWidth = acqSettings_.sliceSettingsLS().shutterWidth();
-                final double shutterSpeed = acqSettings_.sliceSettingsLS().shutterSpeedFactor();
-                ///final double shutterWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_WIDTH);
-                //final int shutterSpeed = props_.getPropValueInteger(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_SPEED);
-                double pixelSize = core_.getPixelSizeUm();
-                if (pixelSize < 1e-6) {  // can't compare equality directly with floating point values so call < 1e-9 is zero or negative
-                    pixelSize = 0.1625;  // default to pixel size of 40x with sCMOS = 6.5um/40
-                }
-                final double rowReadoutTime = camera.getRowReadoutTime();
-                cameraExposure = rowReadoutTime * (int)(shutterWidth/pixelSize) * shutterSpeed;
-                // s.cameraExposure = (rowReadoutTime * shutterWidth / pixelSize * shutterSpeed);
-                final double totalExposureMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime + cameraExposure + 0.05);  // 50-300us extra cushion time
-                final double scanSettle = acqSettings_.sliceSettingsLS().scanSettleTime();
-                final double scanReset = acqSettings_.sliceSettingsLS().scanResetTime();
-                delayBeforeScan = scanReset - scanDelayFilter;
-                scanDuration = scanSettle + (totalExposureMax*shutterSpeed) + scanLaserBufferTime;
-                delayBeforeCamera = scanReset + scanSettle;
-                delayBeforeLaser = delayBeforeCamera - scanLaserBufferTime; // trigger laser just before camera to make sure it's on already
-                laserTriggerDuration = (totalExposureMax*shutterSpeed) + scanLaserBufferTime; // laser will turn off as exposure is ending
                 break;
             default:
                 studio_.logs().showError("Invalid camera mode");
@@ -1301,16 +1280,17 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         if (delayBeforeScan < 0) {
             delayBeforeCamera -= delayBeforeScan;
             delayBeforeLaser -= delayBeforeScan;
-            delayBeforeScan = 0;  // same as (-= delayBeforeScan)
+            delayBeforeScan = 0; // same as (-= delayBeforeScan)
+            // sync with builder
+            tsb.delayBeforeScan(delayBeforeScan)
+                    .delayBeforeLaser(delayBeforeLaser)
+                    .delayBeforeCamera(delayBeforeCamera);
         }
 
         // if a specific slice period was requested, add corresponding delay to scan/laser/camera
         double globalDelay = 0;
         if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
-            globalDelay = acqSettings_.sliceSettings().slicePeriod() - getSliceDuration(tsb.build());
-            if (cameraMode == CameraMode.VIRTUAL_SLIT) {
-                globalDelay = 0;
-            }
+            globalDelay = acqSettings_.sliceSettings().slicePeriod() - tsb.sliceDuration();
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
@@ -1320,47 +1300,23 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             delayBeforeCamera += globalDelay;
             delayBeforeLaser += globalDelay;
             delayBeforeScan += globalDelay;
+            // sync with builder
+            tsb.delayBeforeScan(delayBeforeScan)
+                    .delayBeforeLaser(delayBeforeLaser)
+                    .delayBeforeCamera(delayBeforeCamera);
         }
 
         // fix corner case of (exposure time + readout time) being greater than the slice duration
         // most of the time the slice duration is already larger
-        sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserTriggerDuration, delayBeforeCamera, cameraTriggerDuration);
-        final double extraGlobalDelay = NumberUtils.ceilToQuarterMs((cameraExposure + cameraReadoutTime) - sliceDuration);
-        if (globalDelay > 0) {
-            delayBeforeCamera += extraGlobalDelay;
-            delayBeforeLaser += extraGlobalDelay;
-            delayBeforeScan += extraGlobalDelay;
+        final double extraGlobalDelay = NumberUtils.ceilToQuarterMs(
+                (cameraExposure + cameraReadoutTime) - tsb.sliceDuration());
+        if (extraGlobalDelay > 0) {
+            tsb.delayBeforeScan(delayBeforeScan + extraGlobalDelay)
+                    .delayBeforeLaser(delayBeforeLaser + extraGlobalDelay)
+                    .delayBeforeCamera(delayBeforeCamera + extraGlobalDelay);
         }
 
-        tsb.scansPerSlice(scansPerSlice)
-                .scanDuration(scanDuration)
-                .cameraExposure(cameraExposure)
-                .laserTriggerDuration(laserTriggerDuration)
-                .cameraTriggerDuration(cameraTriggerDuration)
-                .delayBeforeCamera(delayBeforeCamera)
-                .delayBeforeLaser(delayBeforeLaser)
-                .delayBeforeScan(delayBeforeScan);
-
-        // update the slice duration based on our new values
-        // tsb.sliceDuration(getSliceDuration(tsb.build()));
         return tsb;
-    }
-
-    private double getSliceDuration(
-            final double delayBeforeScan,
-            final double scanDuration,
-            final double scansPerSlice,
-            final double delayBeforeLaser,
-            final double laserDuration,
-            final double delayBeforeCamera,
-            final double cameraDuration) {
-        // slice duration is the max out of the scan time, laser time, and camera time
-        return Math.max(Math.max(
-                        delayBeforeScan + (scanDuration * scansPerSlice),   // scan time
-                        delayBeforeLaser + laserDuration                    // laser time
-                ),
-                delayBeforeCamera + cameraDuration                      // camera time
-        );
     }
 
     private double getSliceDuration(final DefaultTimingSettings ts) {

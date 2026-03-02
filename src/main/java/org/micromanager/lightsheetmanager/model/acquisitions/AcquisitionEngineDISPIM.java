@@ -801,7 +801,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 // TODO: not dealing with PVCAM (maybe throw error on unknown cam lib)
                 sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
                 cameraExposure = sliceDuration - delayBeforeCamera;  // s.cameraDelay should be 0.25ms for PCO
-                if (cameraReadoutMax < 0.24f) {
+                if (cameraReadoutMax < 0.24) {
                     studio_.logs().showError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
                 }
                 break;
