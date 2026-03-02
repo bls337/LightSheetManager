@@ -753,8 +753,9 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // (start scanner 0.25ms later than it would be otherwise)
         // this time-shift opposes the Bessel filter delay
         // scanDelayFilter won't be negative unless scanFilterFreq is more than 3kHz which shouldn't happen
-        // TODO: only do this when PLC exists
-        scanDelayFilter -= 0.25;
+        if (model_.devices().isUsingPLogic()) {
+            scanDelayFilter -= 0.25;
+        }
 
         double delayBeforeScan = globalExposureDelayMax - scanLaserBufferTime   // start scan 0.25ms before camera's global exposure
                 - scanDelayFilter; // start galvo moving early due to card's Bessel filter and delay of TTL signals via PLC
