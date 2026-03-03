@@ -13,7 +13,6 @@ public class DefaultTimingSettings implements TimingSettings {
         private double delayBeforeCamera_ = 0.0;
         private double cameraTriggerDuration_ = 1.0;
         private double cameraExposure_ = 1.0;
-        private double sliceDuration_ = 0.0;
         private boolean alternateScanDirection_ = false;
 
         public Builder() {
@@ -28,7 +27,6 @@ public class DefaultTimingSettings implements TimingSettings {
             delayBeforeCamera_ = timingSettings.delayBeforeCamera_;
             cameraTriggerDuration_ = timingSettings.cameraTriggerDuration_;
             cameraExposure_ = timingSettings.cameraExposure_;
-            sliceDuration_ = timingSettings.sliceDuration_;
             alternateScanDirection_ = timingSettings.alternateScanDirection_;
         }
 
@@ -121,17 +119,6 @@ public class DefaultTimingSettings implements TimingSettings {
         }
 
         /**
-         * Sets the slice duration of each slice.
-         *
-         * @param durationMs the duration in milliseconds
-         */
-        @Override
-        public TimingSettings.Builder sliceDuration(final double durationMs) {
-            sliceDuration_ = durationMs;
-            return this;
-        }
-
-        /**
          * Sets the scan direction.
          *
          * @param state true to invert the scan direction
@@ -142,15 +129,29 @@ public class DefaultTimingSettings implements TimingSettings {
             return this;
         }
 
+        /**
+         * Computes the slice duration from the other timing settings.
+         */
+        @Override
+        public double sliceDuration() {
+            return Math.max(Math.max(
+                            delayBeforeScan_ + (scanDuration_ * scansPerSlice_), // scan time
+                            delayBeforeLaser_ + laserTriggerDuration_            // laser time
+                    ),
+                    delayBeforeCamera_ + cameraTriggerDuration_                  // camera time
+            );
+        }
+
         @Override
         public String toString() {
             return String.format("%s[scansPerSlice_=%s, delayBeforeScan_=%s, scanDuration_=%s, "
                             + "delayBeforeLaser_=%s, laserTriggerDuration_=%s, delayBeforeCamera_=%s, "
-                            + "cameraTriggerDuration_=%s, cameraExposure_=%s, sliceDuration_=%s, "
-                            + "alternateScanDirection_=%s]",
-                    getClass().getSimpleName(),  scansPerSlice_, delayBeforeScan_, scanDuration_,
-                    delayBeforeLaser_, laserTriggerDuration_, delayBeforeCamera_,
-                    cameraTriggerDuration_, cameraExposure_, sliceDuration_,  alternateScanDirection_
+                            + "cameraTriggerDuration_=%s, cameraExposure_=%s, "
+                            + "sliceDuration=%s, alternateScanDirection_=%s]",
+                    getClass().getSimpleName(),
+                    scansPerSlice_, delayBeforeScan_, scanDuration_, delayBeforeLaser_, laserTriggerDuration_,
+                    delayBeforeCamera_, cameraTriggerDuration_, cameraExposure_,
+                    sliceDuration(), alternateScanDirection_
             );
         }
 
@@ -185,7 +186,7 @@ public class DefaultTimingSettings implements TimingSettings {
         delayBeforeCamera_ = builder.delayBeforeCamera_;
         cameraTriggerDuration_ = builder.cameraTriggerDuration_;
         cameraExposure_ = builder.cameraExposure_;
-        sliceDuration_ = builder.sliceDuration_;
+        sliceDuration_ = builder.sliceDuration();
         alternateScanDirection_ = builder.alternateScanDirection_;
     }
 
@@ -313,12 +314,4 @@ public class DefaultTimingSettings implements TimingSettings {
         );
     }
 
-//    public double getSliceDuration() {
-//        // slice duration is the max out of the scan time, laser time, and camera time
-//        return Math.max(Math.max(
-//                scanDelay_ + (scanDuration_ * scanNum_),    // scan time
-//                laserDelay_ + laserDuration_),              // laser time
-//            cameraDelay_ + cameraDuration_                  // camera time
-//        );
-//    }
 }
