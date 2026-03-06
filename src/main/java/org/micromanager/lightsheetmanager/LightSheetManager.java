@@ -45,7 +45,7 @@ public class LightSheetManager implements LightSheetManagerAPI {
         positionUpdater_ = new PositionUpdater(this);
 
         // set during setup if there is an error
-        errorText_ = "no errors";
+        errorText_ = "";
     }
 
     /**
@@ -57,6 +57,10 @@ public class LightSheetManager implements LightSheetManagerAPI {
 
         // first we check to see if the device adapter is present
         if (!deviceManager_.hasDeviceAdapter()) {
+            final String message = "Could not find the Light Sheet Manager " +
+                    "device adapter in the hardware configuration.";
+            studio_.logs().logError(message);
+            errorText_ = message;
             return false;
         }
 
@@ -74,8 +78,9 @@ public class LightSheetManager implements LightSheetManagerAPI {
                 acqEngine_ = new AcquisitionEngineDISPIM(this);
                 break;
             default:
-                studio_.logs().logError(
-                        "setup error, AcquisitionEngine not implemented for " + geometryType);
+                final String message = "AcquisitionEngine not implemented for " + geometryType;
+                studio_.logs().logError(message);
+                errorText_ = message;
                 return false; // early exit => error
         }
 

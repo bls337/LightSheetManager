@@ -42,7 +42,14 @@ public class LightSheetManagerFrame extends JFrame {
             final GeometryType geometryType = model_.devices().adapter().geometry();
             switch (geometryType) {
                 case DISPIM:
+                    createUserInterface();
+                    break;
                 case SCAPE:
+                    if (model_.devices().adapter().numImagingPaths() > 1) {
+                        model_.setErrorText("SCAPE geometry does not support multiple imaging paths. "
+                                + " Use the \"SimultaneousCameras\" property to support multiple cameras.");
+                        createErrorUserInterface();
+                    }
                     createUserInterface();
                     break;
                 default:
@@ -52,8 +59,7 @@ public class LightSheetManagerFrame extends JFrame {
                     break;
             }
         } else {
-            model_.setErrorText("Error creating the data model. " +
-                    "Do you have the Light Sheet Manager device adapter in your hardware configuration?");
+            // error text set in model_ setup
             createErrorUserInterface();
         }
 
@@ -73,7 +79,7 @@ public class LightSheetManagerFrame extends JFrame {
                 "[]10[]"
         ));
         final Label lblTitle = new Label("Light Sheet Manager", Font.BOLD, 16);
-        final Label lblError = new Label("Error: " + model_.getErrorText(), Font.BOLD, 14);
+        final Label lblError = new Label(model_.getErrorText(), Font.BOLD, 14);
 
         add(lblTitle, "wrap");
         add(lblError, "");
@@ -104,7 +110,7 @@ public class LightSheetManagerFrame extends JFrame {
 
         // main control area
         final int width = 920;
-        final int height = 620;
+        final int height = 680;
         tabPanel_ = new TabPanel(model_, this, width, height);
 
         // add ui elements to the panel

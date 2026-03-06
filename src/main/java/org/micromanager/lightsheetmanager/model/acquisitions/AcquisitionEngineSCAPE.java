@@ -553,7 +553,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             final LightSheetDeviceManager adapter = model_.devices().adapter();
             if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
                // multiple simultaneous cameras
-                if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+                //if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+                if (true) {
                     // use 2 cameras
                     final ArrayList<String> names = new ArrayList<>();
                     final CameraBase[] cameraList = model_.devices().imagingCameras();

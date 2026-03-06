@@ -35,6 +35,8 @@ public class VolumeSettingsPanel extends Panel {
                 "[]5[]"
         );
 
+        setAbsoluteSize(275, 115);
+
         final GeometryType geometryType = model_.devices().adapter().geometry();
         final int numImagingPaths = model_.devices().adapter().numImagingPaths();
 

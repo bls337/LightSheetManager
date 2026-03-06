@@ -21,7 +21,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
 
         private CameraMode cameraMode_ = CameraMode.EDGE;
         private CameraData[] imagingCameraOrder_ = {};
-        private boolean useSimultaneousCameras_ = true;
 
         private boolean useChannels_ = false;
         private boolean useTimePoints_ = false;
@@ -58,7 +57,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             acquisitionMode_ = acqSettings.acquisitionMode_;
             cameraMode_ = acqSettings.cameraMode_;
             imagingCameraOrder_ = acqSettings.imagingCameraOrder_;
-            useSimultaneousCameras_ = acqSettings.useSimultaneousCameras_;
             useChannels_ = acqSettings.useChannels_;
             useTimePoints_ = acqSettings.useTimePoints_;
             useAutofocus_ = acqSettings.useAutofocus_;
@@ -108,17 +106,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         @Override
         public Builder imagingCameraOrder(final CameraData[] cameraOrder) {
             imagingCameraOrder_ = cameraOrder;
-            return this;
-        }
-
-        /**
-         * Sets the acquisition to acquire from multiple simultaneous cameras.
-         *
-         * @param state true if acquiring from both sides
-         */
-        @Override
-        public Builder useSimultaneousCameras(final boolean state) {
-            useSimultaneousCameras_ = state;
             return this;
         }
 
@@ -311,7 +298,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
 
     private final CameraMode cameraMode_;
     private final CameraData[] imagingCameraOrder_;
-    private final boolean useSimultaneousCameras_;
 
     private final boolean useChannels_;
     private final boolean useTimePoints_;
@@ -343,7 +329,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
         imagingCameraOrder_ = builder.imagingCameraOrder_;
-        useSimultaneousCameras_ = builder.useSimultaneousCameras_;
         useChannels_ = builder.useChannels_;
         useTimePoints_ = builder.useTimePoints_;
         useAutofocus_ = builder.useAutofocus_;
@@ -477,16 +462,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     @Override
     public CameraData[] imagingCameraOrder() {
         return imagingCameraOrder_;
-    }
-
-    /**
-     * Returns true if acquiring from all active imaging cameras on a single view.
-     *
-     * @return true if acquiring from all active imaging cameras on a single view
-     */
-    @Override
-    public boolean isUsingSimultaneousCameras() {
-        return useSimultaneousCameras_;
     }
 
     /**
