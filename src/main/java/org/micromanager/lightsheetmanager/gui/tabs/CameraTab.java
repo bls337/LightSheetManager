@@ -31,7 +31,6 @@ public class CameraTab extends Panel implements ListeningPanel {
 
     private ComboBox<CameraMode> cmbCameraTriggerMode_;
     private RadioButton radPrimaryCamera_;
-    private CheckBox cbxUseSimultaneousCameras_;
     private List<CheckBox> cbxCameras_;
     private int selectedIndex_;
 
@@ -94,8 +93,6 @@ public class CameraTab extends Panel implements ListeningPanel {
 
         // simultaneous camera settings
         radPrimaryCamera_ = new RadioButton(cameraNames, primaryCamera, RadioButton.VERTICAL);
-        cbxUseSimultaneousCameras_ = new CheckBox("Acquire from all active cameras simultaneously",
-                model_.acquisitions().settings().isUsingSimultaneousCameras());
 
         // active check boxes
         final Panel pnlCheckboxes = new Panel();
@@ -140,7 +137,6 @@ public class CameraTab extends Panel implements ListeningPanel {
         add(lblTitle, "wrap");
         if (model_.devices().adapter().numSimultaneousCameras() > 1) {
             pnlPrimaryCamera.add(pnlCameraSelectionRow, "wrap");
-            pnlPrimaryCamera.add(cbxUseSimultaneousCameras_, "wrap");
             add(pnlROI, "growx");
             add(pnlPrimaryCamera, "wrap");
         } else {
@@ -166,11 +162,6 @@ public class CameraTab extends Panel implements ListeningPanel {
         for (CheckBox cbx : cbxCameras_) {
             cbx.registerListener(e -> computeCameraOrder());
         }
-
-        // use all active cameras
-        cbxUseSimultaneousCameras_.registerListener(e ->
-                model_.acquisitions().settingsBuilder()
-                        .useSimultaneousCameras(cbxUseSimultaneousCameras_.isSelected()));
 
         //model_.studio().core().setROI();
     }
