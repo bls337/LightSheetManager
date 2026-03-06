@@ -281,7 +281,8 @@ public class DeviceManager {
 
     public CameraBase firstImagingCamera() {
         String deviceKey;
-        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+        //if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+        if (true) {
             deviceKey =  firstActiveCameraName();
         } else {
             final LightSheetDeviceManager adapter = model_.devices().adapter();
@@ -326,7 +327,7 @@ public class DeviceManager {
         List<String> names = new ArrayList<>();
         final LightSheetDeviceManager adapter = model_.devices().adapter();
         final int numImagingPaths = adapter.numImagingPaths();
-        final int numCameras  = adapter.numSimultaneousCameras();
+        final int numCameras = adapter.numSimultaneousCameras();
         for (int i = 0; i < numImagingPaths; i++) {
             for (int j = 0; j < numCameras; j++) {
                 String cameraName = "Imaging";
@@ -345,7 +346,8 @@ public class DeviceManager {
 
     public CameraBase[] imagingCameras() {
         String[] cameraNames;
-        if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+        //if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
+        if (true) {
             ArrayList<String> names = new ArrayList<>();
             final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
             for (CameraData camera : cameras) {

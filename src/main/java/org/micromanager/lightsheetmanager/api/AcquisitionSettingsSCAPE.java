@@ -41,13 +41,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
         T imagingCameraOrder(final CameraData[] cameraOrder);
 
         /**
-         * Sets the acquisition to acquire from multiple simultaneous cameras.
-         *
-         * @param state true if acquiring from both sides
-         */
-        T useSimultaneousCameras(final boolean state);
-
-        /**
          * Sets the acquisition to use channels.
          *
          * @param state true to use channels.
@@ -208,13 +201,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      * @return the imaging camera order
      */
     CameraData[] imagingCameraOrder();
-
-    /**
-     * Returns true if acquiring from both imaging cameras.
-     *
-     * @return true if acquiring from both imaging cameras
-     */
-    boolean isUsingSimultaneousCameras();
 
     /**
      * Returns true if using channels.
