@@ -7,15 +7,16 @@ import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SaveDataPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.MultiPositionPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.gui.tabs.channels.ChannelTablePanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.CameraSelectionPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.MultiPositionPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SaveDataPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeSettingsPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.channels.ChannelTablePanel;
 import org.micromanager.lightsheetmanager.gui.playlist.AcquisitionTableFrame;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
@@ -56,6 +57,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
     // save data
     private SaveDataPanel pnlSaveData_;
+
+    // cameras
+    private CameraSelectionPanel pnlCameras_;
 
     // channels
     private CheckBox cbxUseChannels_;
@@ -120,6 +124,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlMultiPositions_.setPanelEnabled(acqSettings.isUsingMultiplePositions());
 
         pnlSaveData_ = new SaveDataPanel(model_, frame_);
+        pnlCameras_ = new CameraSelectionPanel(model_);
 
         // time points
         cbxUseTimePoints_ = new CheckBox(
@@ -178,7 +183,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
         // set ui sizes, should match the MigLayout constraints
         pnlChannelTable_.setAbsoluteSize(280, 400);
-        pnlLeft.setAbsoluteSize(300, 420);
+        pnlLeft.setAbsoluteSize(300, 580);
         pnlRight_.setAbsoluteSize(300, 420);
 
         // acquisition buttons
@@ -193,7 +198,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlLeft.add(pnlDurations_, "growx, growy");
         pnlLeft.add(pnlTimePoints_, "growx, growy, wrap");
         pnlLeft.add(pnlMultiPositions_, "growx, span 2, wrap");
-        pnlLeft.add(pnlSaveData_, "growx, span 2");
+        pnlLeft.add(pnlSaveData_, "growx, span 2, wrap");
+        pnlLeft.add(pnlCameras_, "growx, span 2");
 
         pnlCenter.add(pnlChannelTable_, "wrap");
         pnlCenter.add(new JLabel("Acquisition mode:"), "split 2");

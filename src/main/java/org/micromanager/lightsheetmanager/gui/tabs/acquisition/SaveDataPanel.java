@@ -55,6 +55,11 @@ public class SaveDataPanel extends Panel {
     }
 
     public void createUserInterface() {
+        setMigLayout(
+                "",
+                "",
+                "[]5[]"
+        );
 
         final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
 
