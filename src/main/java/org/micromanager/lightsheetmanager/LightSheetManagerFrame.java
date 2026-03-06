@@ -42,7 +42,14 @@ public class LightSheetManagerFrame extends JFrame {
             final GeometryType geometryType = model_.devices().adapter().geometry();
             switch (geometryType) {
                 case DISPIM:
+                    createUserInterface();
+                    break;
                 case SCAPE:
+                    if (model_.devices().adapter().numImagingPaths() > 1) {
+                        model_.setErrorText("SCAPE geometry does not support multiple imaging paths. "
+                                + " Use the \"SimultaneousCameras\" property to support multiple cameras.");
+                        createErrorUserInterface();
+                    }
                     createUserInterface();
                     break;
                 default:
@@ -73,7 +80,7 @@ public class LightSheetManagerFrame extends JFrame {
                 "[]10[]"
         ));
         final Label lblTitle = new Label("Light Sheet Manager", Font.BOLD, 16);
-        final Label lblError = new Label("Error: " + model_.getErrorText(), Font.BOLD, 14);
+        final Label lblError = new Label(model_.getErrorText(), Font.BOLD, 14);
 
         add(lblTitle, "wrap");
         add(lblError, "");
