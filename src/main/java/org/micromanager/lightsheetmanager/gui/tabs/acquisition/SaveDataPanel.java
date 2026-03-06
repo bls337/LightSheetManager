@@ -84,10 +84,10 @@ public class SaveDataPanel extends Panel {
 
         add(lblSaveDirectory, "");
         add(txtSaveDirectory_, "");
-        add(btnBrowse_, "wrap");
-        add(lblSaveFileName, "");
-        add(txtSaveFileName_, "");
+        add(btnBrowse_, "");
         add(btnOpen_, "wrap");
+        add(lblSaveFileName, "");
+        add(txtSaveFileName_, "wrap");
         add(lblSaveMode, "");
         add(cbxSaveMode_, "split 2, wrap");
         add(cbxSaveWhileAcquiring_, "span 2, wrap");
