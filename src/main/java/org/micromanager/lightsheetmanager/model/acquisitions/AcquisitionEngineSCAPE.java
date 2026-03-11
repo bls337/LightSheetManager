@@ -19,7 +19,7 @@ import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
+import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
@@ -962,7 +962,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // must use PLogic for channels when using hardware time points
         if (isUsingHardwareTimePoints) {
-            if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().channelMode() == MultiChannelMode.VOLUME) {
+            if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().channelMode() == ChannelMode.VOLUME) {
                 studio_.logs().showError("Cannot use hardware time points (small time point interval) " +
                         "with software channels (need to use PLogic channel switching).");
                 return false;
@@ -1028,7 +1028,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriodMin - laserDuration);
         // extra quarter millisecond to make sure interleaved slices works (otherwise laser signal never goes low)
         final double sliceLaserInterleaved =
-                (acqSettings_.channelSettings().channelMode() == MultiChannelMode.SLICE_HW ? 0.25 : 0.0);
+                (acqSettings_.channelSettings().channelMode() == ChannelMode.SLICE_HW ? 0.25 : 0.0);
 
         // TODO: is this getting the correct value?
         final double actualCameraResetTime =
@@ -1060,7 +1060,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 break;
             case OVERLAP: // e.g.
                 if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().numChannels() > 1
-                        && acqSettings_.channelSettings().channelMode() == MultiChannelMode.SLICE_HW) {
+                        && acqSettings_.channelSettings().channelMode() == ChannelMode.SLICE_HW) {
                     // for interleaved slices we should illuminate during global exposure but not during readout/reset time after each trigger
                     scansPerSlice = 1;
                     scanDuration = 1.0;
@@ -1375,8 +1375,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     private double computeTotalTimeDuration() {
-        return acqSettings_.numTimePoints() * acqSettings_.timePointInterval()
-                + (computeTimePointDuration() / 1000.0);
+        return (acqSettings_.numTimePoints() - 1) * acqSettings_.timePointInterval()
+                + computeTimePointDuration() / 1000.0;
     }
 
    /**
@@ -1405,7 +1405,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     public double computeVolumeDuration() {
-        final MultiChannelMode channelMode = acqSettings_.channelSettings().channelMode();
+        final ChannelMode channelMode = acqSettings_.channelSettings().channelMode();
         final int numViews = acqSettings_.volumeSettings().numViews();
         final int numChannels = acqSettings_.channelSettings().numChannels();
         final double delayBeforeView = acqSettings_.volumeSettings().delayBeforeView();
@@ -1423,7 +1423,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             final double retraceTime = 1; //getStageRetraceDuration(acqSettings);
             // TODO(Jon): double-check these calculations below, at least they are better than before ;-)
             if (acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN) {
-                if (channelMode == MultiChannelMode.SLICE_HW) {
+                if (channelMode == ChannelMode.SLICE_HW) {
                     return retraceTime + (numViews * ((rampDuration * 2) + (stackDuration * numChannels)));
                 } else {
                     // "normal" stage scan with volume channel switching
@@ -1443,8 +1443,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         } else {
             // GALVO_SCAN (piezo-like logic for SCAPE)
             // estimate channel switching overhead time as 0.5s, actual value will be hardware-dependent
-            final double channelSwitchDelay = (channelMode == MultiChannelMode.VOLUME) ? 500.0 : 0.0;
-            if (channelMode == MultiChannelMode.SLICE_HW) {
+            final double channelSwitchDelay = (channelMode == ChannelMode.VOLUME) ? 500.0 : 0.0;
+            if (channelMode == ChannelMode.SLICE_HW) {
                 // channels switched per slice
                 return numViews * (delayBeforeView + stackDuration * numChannels); // channelSwitchDelay = 0
             } else { // VOLUME and VOLUME_HW

@@ -4,7 +4,7 @@ import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
+import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 
 public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings implements AcquisitionSettingsDISPIM {
 
@@ -17,7 +17,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
-        private MultiChannelMode channelMode_ = MultiChannelMode.VOLUME;
+        private ChannelMode channelMode_ = ChannelMode.VOLUME;
         private CameraMode cameraMode_ = CameraMode.EDGE;
 
         private boolean useChannels_ = false;
@@ -92,7 +92,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
          * @param channelMode the channel mode.
          */
         @Override
-        public Builder channelMode(final MultiChannelMode channelMode) {
+        public Builder channelMode(final ChannelMode channelMode) {
             channelMode_ = channelMode;
             return this;
         }
@@ -327,7 +327,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
     private final AcquisitionMode acquisitionMode_;
-    private final MultiChannelMode channelMode_;
+    private final ChannelMode channelMode_;
     private final CameraMode cameraMode_;
 
     private final boolean useChannels_;
@@ -504,7 +504,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
      * @return the channel mode.
      */
     @Override
-    public MultiChannelMode channelMode() {
+    public ChannelMode channelMode() {
         return channelMode_;
     }
 

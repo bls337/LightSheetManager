@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.ChannelSettings;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
+import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 import java.util.Arrays;
@@ -12,7 +12,7 @@ public class DefaultChannelSettings implements ChannelSettings {
     public static class Builder implements ChannelSettings.Builder {
 
         private String channelGroup_ = "";
-        private MultiChannelMode channelMode_ = MultiChannelMode.VOLUME;
+        private ChannelMode channelMode_ = ChannelMode.VOLUME;
         private HashMap<String, ChannelSpec[]> groups_ = new HashMap<>();
 
         public Builder() {
@@ -31,7 +31,7 @@ public class DefaultChannelSettings implements ChannelSettings {
         }
 
         @Override
-        public ChannelSettings.Builder channelMode(final MultiChannelMode mode) {
+        public ChannelSettings.Builder channelMode(final ChannelMode mode) {
             channelMode_ = mode;
             return this;
         }
@@ -49,7 +49,7 @@ public class DefaultChannelSettings implements ChannelSettings {
     }
 
     private final String channelGroup_;
-    private final MultiChannelMode channelMode_;
+    private final ChannelMode channelMode_;
     private final HashMap<String, ChannelSpec[]> groups_;
 
     // default value for when the channel group key is not found
@@ -66,16 +66,18 @@ public class DefaultChannelSettings implements ChannelSettings {
     }
 
    /**
-    * Returns the number of used channels for the selected channel group,
-    * and returns 0 if the channel group does not exist.
+    * Returns the number of used channels for the selected channel group.
+    * <p>
+    * Always defaults to 1 channel.
     *
     * @return the number of channels in the channel group
     */
     @Override
     public int numChannels() {
-        return Arrays.stream(groups_.getOrDefault(channelGroup_, EMPTY_CHANNELS))
+        final int count = (int) Arrays.stream(groups_.getOrDefault(channelGroup_, EMPTY_CHANNELS))
               .filter(ChannelSpec::useChannel)
-              .toArray(ChannelSpec[]::new).length;
+              .count();
+        return Math.max(1, count);
     }
 
    /**
@@ -104,7 +106,7 @@ public class DefaultChannelSettings implements ChannelSettings {
     * @return the channel mode
     */
     @Override
-    public MultiChannelMode channelMode() {
+    public ChannelMode channelMode() {
         return channelMode_;
     }
 

@@ -1,6 +1,6 @@
 package org.micromanager.lightsheetmanager.api;
 
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
+import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 public interface ChannelSettings {
@@ -9,7 +9,7 @@ public interface ChannelSettings {
 
         Builder channelGroup(final String group);
 
-        Builder channelMode(final MultiChannelMode mode);
+        Builder channelMode(final ChannelMode mode);
 
         Builder channels(final ChannelSpec[] channels);
 
@@ -22,7 +22,7 @@ public interface ChannelSettings {
 
     String channelGroup();
 
-    MultiChannelMode channelMode();
+    ChannelMode channelMode();
 
     String[] channelGroups();
 

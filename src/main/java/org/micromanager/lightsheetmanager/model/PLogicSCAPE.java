@@ -7,7 +7,7 @@ import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
+import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
@@ -282,7 +282,7 @@ public class PLogicSCAPE {
 
     // compute how many channels we do in each one-way scan
     private int computeScanChannelsPerPass(DefaultAcquisitionSettingsSCAPE settings) {
-        return settings.channelSettings().channelMode() == MultiChannelMode.SLICE_HW ? settings.channelSettings().numChannels() : 1;
+        return settings.channelSettings().channelMode() == ChannelMode.SLICE_HW ? settings.channelSettings().numChannels() : 1;
     }
 
     /**
@@ -405,7 +405,7 @@ public class PLogicSCAPE {
             // if we are changing color slice by slice then set controller to do multiple slices per piezo move
             // otherwise just set to 1 slice per piezo move
             int numSlicesPerPiezo = 1;
-            if (settings.isUsingChannels() && settings.channelSettings().channelMode() == MultiChannelMode.SLICE_HW) {
+            if (settings.isUsingChannels() && settings.channelSettings().channelMode() == ChannelMode.SLICE_HW) {
                 numSlicesPerPiezo = settings.channelSettings().numChannels();
             }
             scanner_.setSPIMNumSlicesPerPiezo(numSlicesPerPiezo);
@@ -415,7 +415,7 @@ public class PLogicSCAPE {
             // otherwise (no channels, software switching, slice by slice HW switching)
             //   just do one volume per start trigger
             int numVolumesPerTrigger = 1;
-            if (settings.isUsingChannels() && settings.channelSettings().channelMode() == MultiChannelMode.VOLUME_HW) {
+            if (settings.isUsingChannels() && settings.channelSettings().channelMode() == ChannelMode.VOLUME_HW) {
                 numVolumesPerTrigger = settings.channelSettings().numChannels();
             }
 
@@ -637,11 +637,11 @@ public class PLogicSCAPE {
 
     public boolean setupHardwareChannelSwitching(final DefaultAcquisitionSettingsSCAPE settings) {
 
-        MultiChannelMode channelMode = settings.channelSettings().channelMode();
+        ChannelMode channelMode = settings.channelSettings().channelMode();
 
         // PLogic can only handle up to 4 channels
         if ((settings.channelSettings().numChannels() > 4) &&
-                (channelMode == MultiChannelMode.VOLUME_HW || channelMode == MultiChannelMode.SLICE_HW)) {
+                (channelMode == ChannelMode.VOLUME_HW || channelMode == ChannelMode.SLICE_HW)) {
             studio_.logs().showError("PLogic card cannot handle more than 4 channels for hardware switching.");
             return false;
         }
@@ -808,7 +808,7 @@ public class PLogicSCAPE {
                 // if we are doing per-volume switching with side B first then counter will start at 1 instead of 0
                 // the following lines account for this by incrementing the channel number "match" by 1 in this special case
                 int adjustedChannelNum = channelNum;
-                if (channelMode == MultiChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 1)) {
+                if (channelMode == ChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 1)) {
                     adjustedChannelNum = (channelNum + 1) % settings.channelSettings().numChannels();
                 }
                 // map the channel number to the equivalent addresses for the AND4
