@@ -5,7 +5,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
+import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 import javax.swing.JLabel;
@@ -24,7 +24,7 @@ public class ChannelTablePanel extends Panel {
     private Button btnRefresh_;
 
     private ComboBox<String> cmbChannelGroup_;
-    private ComboBox<MultiChannelMode> cmbChannelMode_;
+    private ComboBox<ChannelMode> cmbChannelMode_;
 
     private final ChannelTable table_;
     private final LightSheetManager model_;
@@ -54,7 +54,7 @@ public class ChannelTablePanel extends Panel {
                 model_.acquisitions().settings().channelSettings().channelGroup(),
                 120, 22);
 
-        cmbChannelMode_ = new ComboBox<>(MultiChannelMode.values(),
+        cmbChannelMode_ = new ComboBox<>(ChannelMode.values(),
                 model_.acquisitions().settings().channelSettings().channelMode(),
                 120, 22);
 

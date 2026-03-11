@@ -17,7 +17,7 @@ import org.micromanager.data.internal.ndtiff.NDTiffAdapter;
 import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
+import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
@@ -915,7 +915,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
     }
 
     private double computeActualVolumeDuration(final DefaultAcquisitionSettingsDISPIM acqSettings) {
-        final MultiChannelMode channelMode = acqSettings.channelMode();
+        final ChannelMode channelMode = acqSettings.channelMode();
         final int numChannels = acqSettings.numChannels();
         final int numViews = acqSettings.volumeSettings().numViews();
         final double delayBeforeSide = acqSettings.volumeSettings().delayBeforeView();
@@ -932,11 +932,11 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         } else {
             // piezo scan
             double channelSwitchDelay = 0;
-            if (channelMode == MultiChannelMode.VOLUME) {
+            if (channelMode == ChannelMode.VOLUME) {
                 channelSwitchDelay = 500;   // estimate channel switching overhead time as 0.5s
                 // actual value will be hardware-dependent
             }
-            if (channelMode == MultiChannelMode.SLICE_HW) {
+            if (channelMode == ChannelMode.SLICE_HW) {
                 return numViews * (delayBeforeSide + stackDuration * numChannels);  // channelSwitchDelay = 0
             } else {
                 return numViews * numChannels

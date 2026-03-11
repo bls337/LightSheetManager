@@ -12,7 +12,7 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSetting
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
+import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
@@ -365,7 +365,7 @@ public class PLogicDISPIM {
 
     // compute how many channels we do in each one-way scan
     private int computeScanChannelsPerPass(DefaultAcquisitionSettingsDISPIM settings) {
-        return settings.channelMode() == MultiChannelMode.SLICE_HW ? settings.numChannels() : 1;
+        return settings.channelMode() == ChannelMode.SLICE_HW ? settings.numChannels() : 1;
     }
 
     /**
@@ -519,7 +519,7 @@ public class PLogicDISPIM {
                 // if we are changing color slice by slice then set controller to do multiple slices per piezo move
                 // otherwise just set to 1 slice per piezo move
                 int numSlicesPerPiezo = 1;
-                if (settings.isUsingChannels() && settings.channelMode() == MultiChannelMode.SLICE_HW) {
+                if (settings.isUsingChannels() && settings.channelMode() == ChannelMode.SLICE_HW) {
                     numSlicesPerPiezo = settings.numChannels();
                 }
                 scanner.setSPIMNumSlicesPerPiezo(numSlicesPerPiezo);
@@ -529,7 +529,7 @@ public class PLogicDISPIM {
                 // otherwise (no channels, software switching, slice by slice HW switching)
                 //   just do one volume per start trigger
                 int numVolumesPerTrigger = 1;
-                if (settings.isUsingChannels() && settings.channelMode() == MultiChannelMode.VOLUME_HW) {
+                if (settings.isUsingChannels() && settings.channelMode() == ChannelMode.VOLUME_HW) {
                     numVolumesPerTrigger = settings.numChannels();
                 }
 
@@ -751,11 +751,11 @@ public class PLogicDISPIM {
 
     public boolean setupHardwareChannelSwitching(final DefaultAcquisitionSettingsDISPIM settings) {
 
-        MultiChannelMode channelMode = settings.channelMode();
+        ChannelMode channelMode = settings.channelMode();
 
         // PLogic can only handle up to 4 channels
         if ((settings.numChannels() > 4) &&
-                (channelMode == MultiChannelMode.VOLUME_HW || channelMode == MultiChannelMode.SLICE_HW)) {
+                (channelMode == ChannelMode.VOLUME_HW || channelMode == ChannelMode.SLICE_HW)) {
             studio_.logs().showError("PLogic card cannot handle more than 4 channels for hardware switching.");
             return false;
         }
@@ -879,7 +879,7 @@ public class PLogicDISPIM {
                 // if we are doing per-volume switching with side B first then counter will start at 1 instead of 0
                 // the following lines account for this by incrementing the channel number "match" by 1 in this special case
                 int adjustedChannelNum = channelNum;
-                if (channelMode == MultiChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 1)) {
+                if (channelMode == ChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 1)) {
                     adjustedChannelNum = (channelNum + 1) % settings.numChannels();
                 }
                 // map the channel number to the equivalent addresses for the AND4

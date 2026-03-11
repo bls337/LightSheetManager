@@ -19,8 +19,7 @@ import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.MultiChannelMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
@@ -893,7 +892,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // test acq was here
 
-        final double volumeDuration = computeVolumeDuration(acqSettings_);
+        final double volumeDuration = computeVolumeDuration();
         final double timepointDuration = computeTimePointDuration();
         final long timepointIntervalMs = Math.round(acqSettings_.timePointInterval() * 1000.0);
 
@@ -963,7 +962,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // must use PLogic for channels when using hardware time points
         if (isUsingHardwareTimePoints) {
-            if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().channelMode() == MultiChannelMode.VOLUME) {
+            if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().channelMode() == ChannelMode.VOLUME) {
                 studio_.logs().showError("Cannot use hardware time points (small time point interval) " +
                         "with software channels (need to use PLogic channel switching).");
                 return false;
@@ -995,8 +994,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     public void recalculateSliceTiming() {
         // update timing settings if not using advanced timing
         if (!acqSettings_.isUsingAdvancedTiming()) {
-            DefaultTimingSettings.Builder tsb = getTimingFromExposure();
-            asb_.timingSettingsBuilder(tsb);
+            asb_.timingSettingsBuilder(getTimingFromExposure());
         }
         // Note: sliceDuration is computed automatically when build() is called
         //final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder().build());
@@ -1030,7 +1028,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriodMin - laserDuration);
         // extra quarter millisecond to make sure interleaved slices works (otherwise laser signal never goes low)
         final double sliceLaserInterleaved =
-                (acqSettings_.channelSettings().channelMode() == MultiChannelMode.SLICE_HW ? 0.25 : 0.0);
+                (acqSettings_.channelSettings().channelMode() == ChannelMode.SLICE_HW ? 0.25 : 0.0);
 
         // TODO: is this getting the correct value?
         final double actualCameraResetTime =
@@ -1062,7 +1060,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 break;
             case OVERLAP: // e.g.
                 if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().numChannels() > 1
-                        && acqSettings_.channelSettings().channelMode() == MultiChannelMode.SLICE_HW) {
+                        && acqSettings_.channelSettings().channelMode() == ChannelMode.SLICE_HW) {
                     // for interleaved slices we should illuminate during global exposure but not during readout/reset time after each trigger
                     scansPerSlice = 1;
                     scanDuration = 1.0;
@@ -1156,7 +1154,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // 4. start scan 0.25ms before camera global exposure and shifted up in time to account for delay introduced by Bessel filter
         // 5. turn on laser as soon as camera global exposure, leave laser on for desired light exposure time
         // 7. end camera exposure in final 0.25ms, post-filter scan waveform also ends now
-        ASIScanner scanner1 = model_.devices().device("IllumSlice"); //.getDevice("IllumBeam");
+        ASIScanner scanner = model_.devices().device("IllumSlice"); //.getDevice("IllumBeam");
         // ASIScanner scanner2 = model_.devices().getDevice("Illum2Beam");
 
         CameraBase camera = model_.devices().firstImagingCamera(); //.getDevice("ImagingCamera");
@@ -1197,7 +1195,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // delay to midpoint is empirically 0.38/(freq in kHz)
         // group delay for 5th-order Bessel filter ~0.39/freq from theory and ~0.4/freq from IC datasheet
         //final double scanFilterFreq = Math.max(scanner1.getFilterFreqX(), scanner2.getFilterFreqX());
-        final double scanFilterFreq = scanner1.getFilterFreqX();
+        final double scanFilterFreq = (scanner == null) ? 0.4 : scanner.getFilterFreqX(); // default to 0.4 if no scanner
         double scanDelayFilter = 0;
         if (scanFilterFreq != 0) {
             scanDelayFilter = NumberUtils.roundToQuarterMs(0.39 / scanFilterFreq);
@@ -1338,21 +1336,19 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     @Override
     public void updateDurationLabels() {
+        model_.acquisitions().recalculateSliceTiming();
+        model_.acquisitions().settingsBuilder().build();
         updateSlicePeriodLabel(pnlVolumeDurations_.getSliceDurationLabel());
         updateVolumeDurationLabel(pnlVolumeDurations_.getVolumeDurationLabel());
         updateTotalTimeDurationLabel(pnlVolumeDurations_.getTotalDurationLabel());
     }
 
     private void updateSlicePeriodLabel(final JLabel label) {
-        final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
-        model_.acquisitions().recalculateSliceTiming();
-        model_.acquisitions().settingsBuilder().build();
         label.setText(String.format("%.3f ms", acqSettings_.timingSettings().sliceDuration()));
-        //System.out.println("updating slice label to: " + acqSettings.timingSettings().sliceDuration());
     }
 
     private void updateVolumeDurationLabel(final JLabel label) {
-        final double duration = computeVolumeDuration(model_.acquisitions().settingsBuilder().build());
+        final double duration = computeVolumeDuration();
         if (duration > 1000) {
            label.setText(String.format("%.3f s", duration / 1000)); // round to ms
         } else {
@@ -1368,7 +1364,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         final double duration = computeTotalTimeDuration();
         if (duration < 60) {  // less than 1 min
             s += String.format("%.3f s", duration);
-        } else if (duration < 60*60) { // between 1 min and 1 hour
+        } else if (duration < (60*60)) { // between 1 min and 1 hour
             s += String.format("%.3f min", Math.floor(duration/60));
             s += String.format("%.3f s", (double)Math.round(duration % 60));
         } else { // longer than 1 hour
@@ -1379,9 +1375,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     private double computeTotalTimeDuration() {
-        final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settingsBuilder().build();
-        return acqSettings.numTimePoints() * acqSettings.timePointInterval()
-                + computeTimePointDuration()/1000;
+        return (acqSettings_.numTimePoints() - 1) * acqSettings_.timePointInterval()
+                + computeTimePointDuration() / 1000.0;
     }
 
    /**
@@ -1390,7 +1385,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     * @return duration in ms
     */
     private double computeTimePointDuration() {
-        final double volumeDuration = computeVolumeDuration(acqSettings_);
+        final double volumeDuration = computeVolumeDuration();
         if (acqSettings_.isUsingMultiplePositions()) {
             try {
                 // use 1.5 seconds motor move between positions
@@ -1409,26 +1404,26 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         return volumeDuration;
     }
 
-    public double computeVolumeDuration(final DefaultAcquisitionSettingsSCAPE acqSettings) {
-        final MultiChannelMode channelMode = acqSettings.channelSettings().channelMode();
-        final int numViews = acqSettings.volumeSettings().numViews();
-        final int numChannels = acqSettings.channelSettings().numChannels();
-        final double delayBeforeView = acqSettings.volumeSettings().delayBeforeView();
+    public double computeVolumeDuration() {
+        final ChannelMode channelMode = acqSettings_.channelSettings().channelMode();
+        final int numViews = acqSettings_.volumeSettings().numViews();
+        final int numChannels = acqSettings_.channelSettings().numChannels();
+        final double delayBeforeView = acqSettings_.volumeSettings().delayBeforeView();
 
-        int numCameraTriggers = acqSettings.volumeSettings().slicesPerView();
-        if (acqSettings.cameraMode() == CameraMode.OVERLAP) {
+        int numCameraTriggers = acqSettings_.volumeSettings().slicesPerView();
+        if (acqSettings_.cameraMode() == CameraMode.OVERLAP) {
             numCameraTriggers += 1;
         }
 
         // stackDuration is per-view, per-channel, per-position
-        final double stackDuration = numCameraTriggers * acqSettings.timingSettings().sliceDuration();
+        final double stackDuration = numCameraTriggers * acqSettings_.timingSettings().sliceDuration();
 
-        if (acqSettings.isUsingStageScanning()) {
+        if (acqSettings_.isUsingStageScanning()) {
             final double rampDuration = 1; //getStageRampDuration(acqSettings);
             final double retraceTime = 1; //getStageRetraceDuration(acqSettings);
             // TODO(Jon): double-check these calculations below, at least they are better than before ;-)
-            if (acqSettings.acquisitionMode() == AcquisitionMode.STAGE_SCAN) {
-                if (channelMode == MultiChannelMode.SLICE_HW) {
+            if (acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN) {
+                if (channelMode == ChannelMode.SLICE_HW) {
                     return retraceTime + (numViews * ((rampDuration * 2) + (stackDuration * numChannels)));
                 } else {
                     // "normal" stage scan with volume channel switching
@@ -1448,8 +1443,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         } else {
             // GALVO_SCAN (piezo-like logic for SCAPE)
             // estimate channel switching overhead time as 0.5s, actual value will be hardware-dependent
-            final double channelSwitchDelay = (channelMode == MultiChannelMode.VOLUME) ? 500.0 : 0.0;
-            if (channelMode == MultiChannelMode.SLICE_HW) {
+            final double channelSwitchDelay = (channelMode == ChannelMode.VOLUME) ? 500.0 : 0.0;
+            if (channelMode == ChannelMode.SLICE_HW) {
                 // channels switched per slice
                 return numViews * (delayBeforeView + stackDuration * numChannels); // channelSwitchDelay = 0
             } else { // VOLUME and VOLUME_HW
