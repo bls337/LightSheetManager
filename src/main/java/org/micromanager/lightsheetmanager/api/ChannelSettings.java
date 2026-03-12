@@ -7,6 +7,8 @@ public interface ChannelSettings {
 
     interface Builder {
 
+        Builder enabled(final boolean state);
+
         Builder channelGroup(final String group);
 
         Builder channelMode(final ChannelMode mode);
@@ -15,6 +17,8 @@ public interface ChannelSettings {
 
         ChannelSettings build();
     }
+
+    boolean enabled();
 
     int numChannels();
 
