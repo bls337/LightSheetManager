@@ -1,10 +1,10 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
-import org.micromanager.lightsheetmanager.api.ScanSettings;
+import org.micromanager.lightsheetmanager.api.StageScanSettings;
 
-public class DefaultScanSettings implements ScanSettings {
+public class DefaultStageScanSettings implements StageScanSettings {
 
-    public static class Builder implements ScanSettings.Builder {
+    public static class Builder implements StageScanSettings.Builder {
 
         private double scanAccelerationFactor_ = 1;
         private int scanOvershootDistance_ = 0;
@@ -17,7 +17,7 @@ public class DefaultScanSettings implements ScanSettings {
         public Builder() {
         }
 
-        private Builder(DefaultScanSettings scanSettings) {
+        private Builder(DefaultStageScanSettings scanSettings) {
             scanAccelerationFactor_ = scanSettings.scanAccelerationFactor_;
             scanOvershootDistance_ = scanSettings.scanOvershootDistance_;
             scanRetraceSpeed_ = scanSettings.scanRetraceSpeed_;
@@ -28,50 +28,50 @@ public class DefaultScanSettings implements ScanSettings {
         }
 
         @Override
-        public ScanSettings.Builder scanAccelerationFactor(final double factor) {
+        public StageScanSettings.Builder scanAccelerationFactor(final double factor) {
             scanAccelerationFactor_ = factor;
             return this;
         }
 
         @Override
-        public ScanSettings.Builder scanOvershootDistance(final int distance) {
+        public StageScanSettings.Builder scanOvershootDistance(final int distance) {
             scanOvershootDistance_ = distance;
             return this;
         }
 
         @Override
-        public ScanSettings.Builder scanRetraceSpeed(final double speed) {
+        public StageScanSettings.Builder scanRetraceSpeed(final double speed) {
             scanRetraceSpeed_ = speed;
             return this;
         }
 
         @Override
-        public ScanSettings.Builder scanAngleFirstView(final double angle) {
+        public StageScanSettings.Builder scanAngleFirstView(final double angle) {
             scanAngleFirstView_ = angle;
             return this;
         }
 
         @Override
-        public ScanSettings.Builder scanReturnToOriginalPosition(final boolean state) {
+        public StageScanSettings.Builder scanReturnToOriginalPosition(final boolean state) {
             scanReturnToOriginalPosition_ = state;
             return this;
         }
 
         @Override
-        public ScanSettings.Builder scanFromCurrentPosition(final boolean state) {
+        public StageScanSettings.Builder scanFromCurrentPosition(final boolean state) {
             scanFromCurrentPosition_ = state;
             return this;
         }
 
         @Override
-        public ScanSettings.Builder scanFromNegativeDirection(final boolean state) {
+        public StageScanSettings.Builder scanFromNegativeDirection(final boolean state) {
             scanFromNegativeDirection_ = state;
             return this;
         }
 
         @Override
-        public DefaultScanSettings build() {
-            return new DefaultScanSettings(this);
+        public DefaultStageScanSettings build() {
+            return new DefaultStageScanSettings(this);
         }
 
     }
@@ -84,7 +84,7 @@ public class DefaultScanSettings implements ScanSettings {
     private final boolean scanFromCurrentPosition_;
     private final boolean scanFromNegativeDirection_;
 
-    private DefaultScanSettings(Builder builder) {
+    private DefaultStageScanSettings(Builder builder) {
         scanAccelerationFactor_ = builder.scanAccelerationFactor_;
         scanOvershootDistance_ = builder.scanOvershootDistance_;
         scanRetraceSpeed_ = builder.scanRetraceSpeed_;
@@ -95,8 +95,8 @@ public class DefaultScanSettings implements ScanSettings {
     }
 
     @Override
-    public DefaultScanSettings.Builder copyBuilder() {
-        return new DefaultScanSettings.Builder(this);
+    public DefaultStageScanSettings.Builder copyBuilder() {
+        return new DefaultStageScanSettings.Builder(this);
     }
 
     @Override

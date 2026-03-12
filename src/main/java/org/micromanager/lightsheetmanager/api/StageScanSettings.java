@@ -3,7 +3,7 @@ package org.micromanager.lightsheetmanager.api;
 /**
  * This interface implements settings for ASI stages with the scan module.
  */
-public interface ScanSettings {
+public interface StageScanSettings {
 
     interface Builder {
 
@@ -26,7 +26,7 @@ public interface ScanSettings {
          *
          * @return Immutable version of ScanSettings
          */
-        ScanSettings build();
+        StageScanSettings build();
     }
 
     Builder copyBuilder();

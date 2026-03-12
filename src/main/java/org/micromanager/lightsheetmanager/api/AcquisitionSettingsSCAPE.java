@@ -4,7 +4,7 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultScanSettings;
+import org.micromanager.lightsheetmanager.api.internal.DefaultStageScanSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
@@ -165,7 +165,7 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      *
      * @return immutable DefaultScanSettings instance.
      */
-    DefaultScanSettings scanSettings();
+    DefaultStageScanSettings scanSettings();
 
     /**
      * Returns the immutable DefaultSheetCalibration instance.

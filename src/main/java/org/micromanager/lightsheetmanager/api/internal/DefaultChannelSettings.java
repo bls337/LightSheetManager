@@ -74,10 +74,9 @@ public class DefaultChannelSettings implements ChannelSettings {
     */
     @Override
     public int numChannels() {
-        final int count = (int) Arrays.stream(groups_.getOrDefault(channelGroup_, EMPTY_CHANNELS))
-              .filter(ChannelSpec::useChannel)
-              .count();
-        return Math.max(1, count);
+        return (int)Arrays.stream(groups_.getOrDefault(channelGroup_, EMPTY_CHANNELS))
+                .filter(ChannelSpec::useChannel)
+                .count();
     }
 
    /**

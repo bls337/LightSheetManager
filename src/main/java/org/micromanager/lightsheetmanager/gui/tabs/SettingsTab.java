@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
@@ -123,11 +124,17 @@ public class SettingsTab extends Panel implements ListeningPanel {
             pnlLightSheet.add(lblSliceAxisFilterFreq, "");
             pnlLightSheet.add(spnSliceAxisFilterFreq_, "wrap");
         }
-        pnlLightSheet.add(lblLiveScanPeriod, "");
-        pnlLightSheet.add(spnLiveScanPeriod_, "");
+
+        // changes scan rate for live mode viewing
+        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
+            pnlLightSheet.add(lblLiveScanPeriod, "");
+            pnlLightSheet.add(spnLiveScanPeriod_, "");
+        }
 
         add(pnlScanSettings, "wrap");
-        add(pnlLightSheet, "growx");
+        if (isUsingPLogic_) {
+            add(pnlLightSheet, "growx");
+        }
     }
 
     private void createEventHandlers() {
