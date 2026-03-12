@@ -14,7 +14,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private DefaultVolumeSettings.Builder vsb_ = new DefaultVolumeSettings.Builder();
         private DefaultSliceSettings.Builder ssb_ = new DefaultSliceSettings.Builder();
         private DefaultSliceSettingsLS.Builder ssbLS_ = new DefaultSliceSettingsLS.Builder();
-        private DefaultScanSettings.Builder scsb_ = new DefaultScanSettings.Builder();
+        private DefaultStageScanSettings.Builder scsb_ = new DefaultStageScanSettings.Builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[1];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[1];
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
@@ -235,7 +235,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             return ssbLS_;
         }
 
-        public DefaultScanSettings.Builder scanSettingsBuilder() {
+        public DefaultStageScanSettings.Builder scanSettingsBuilder() {
             return scsb_;
         }
 
@@ -290,7 +290,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final DefaultVolumeSettings volumeSettings_;
     private final DefaultSliceSettingsLS sliceSettingsLS_;
     private final DefaultSliceSettings sliceSettings_;
-    private final DefaultScanSettings scanSettings_;
+    private final DefaultStageScanSettings scanSettings_;
     private final DefaultSheetCalibration[] sheetCalibrations_;
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
@@ -408,7 +408,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return immutable DefaultScanSettings instance.
      */
     @Override
-    public DefaultScanSettings scanSettings() {
+    public DefaultStageScanSettings scanSettings() {
         return scanSettings_;
     }
 
