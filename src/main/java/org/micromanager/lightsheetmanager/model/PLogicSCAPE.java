@@ -221,7 +221,7 @@ public class PLogicSCAPE {
             if (isInterleaved) {
                 numLines = 1;  // assure in acquisition code that we can't have single-sided interleaved
             }
-            if (settings.isUsingChannels()) {
+            if (settings.channels().enabled()) {
                 numLines = numLines * (settings.channels().count() / computeScanChannelsPerPass(settings));
             }
             xyStage_.setScanNumLines(numLines);
@@ -405,7 +405,7 @@ public class PLogicSCAPE {
             // if we are changing color slice by slice then set controller to do multiple slices per piezo move
             // otherwise just set to 1 slice per piezo move
             int numSlicesPerPiezo = 1;
-            if (settings.isUsingChannels() && settings.channels().mode() == ChannelMode.SLICE_HW) {
+            if (settings.channels().enabled() && settings.channels().mode() == ChannelMode.SLICE_HW) {
                 numSlicesPerPiezo = settings.channels().count();
             }
             scanner_.setSPIMNumSlicesPerPiezo(numSlicesPerPiezo);
@@ -415,7 +415,7 @@ public class PLogicSCAPE {
             // otherwise (no channels, software switching, slice by slice HW switching)
             //   just do one volume per start trigger
             int numVolumesPerTrigger = 1;
-            if (settings.isUsingChannels() && settings.channels().mode() == ChannelMode.VOLUME_HW) {
+            if (settings.channels().enabled() && settings.channels().mode() == ChannelMode.VOLUME_HW) {
                 numVolumesPerTrigger = settings.channels().count();
             }
 

@@ -72,7 +72,7 @@ public class UserSettings {
      * Load user settings.
      */
     public void load() {
-        // get json from settings based on microscope geometry type
+        // get JSON from settings based on microscope geometry type
         final GeometryType geometryType = model_.devices().adapter().geometry();
 
         final String key = SETTINGS_PREFIX + geometryType.toString().toUpperCase();

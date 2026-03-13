@@ -191,7 +191,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             summaryMetadata.put(PropertyKey.CHANNEL_GROUP.key(), acqSettings_.channels().group());
             JSONArray chNames = new JSONArray();
             JSONArray chColors = new JSONArray();
-            if (acqSettings_.isUsingChannels() && acqSettings_.channels().count() > 0) {
+            if (acqSettings_.channels().enabled() && acqSettings_.channels().count() > 0) {
                 for (ChannelSpec c : acqSettings_.channels().used()) {
                     chNames.put(c.getName());
 //                chColors.put(c.getRGB());
@@ -210,7 +210,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             summaryMetadata
                   .put(PropertyKey.SLICES.key(), doProjections ? 1 : acqSettings_.volume().slicesPerView());
 
-            summaryMetadata.put(PropertyKey.CHANNELS.key(), acqSettings_.isUsingChannels() ?
+            summaryMetadata.put(PropertyKey.CHANNELS.key(), acqSettings_.channels().enabled() ?
                   acqSettings_.channels().count() : 1);
             summaryMetadata
                   .put(PropertyKey.POSITIONS.key(), acqSettings_.isUsingMultiplePositions() ?

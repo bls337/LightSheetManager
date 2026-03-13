@@ -585,7 +585,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         if (acqSettings_.isUsingHardwareTimePoints()) {
             AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
-            if (acqSettings_.isUsingChannels()) {
+            if (acqSettings_.channels().enabled()) {
                 currentAcquisition_.submitEventIterator(
                         LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
                                 baseEvent.copy(), acqSettings_, cameraNames, null));
@@ -621,7 +621,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     //  If yes, then nothing more to do here.
 
                     // Loop 3: Channels; Loop 4: Z slices
-                    if (acqSettings_.isUsingChannels()) {
+                    if (acqSettings_.channels().enabled()) {
                         currentAcquisition_.submitEventIterator(
                                 LSMAcquisitionEvents.createChannelAcqEvents(
                                         baseEvent.copy(), acqSettings_, cameraNames, null));
@@ -805,7 +805,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // TODO: channels need to modify panels and need extraChannelOffset_
         boolean changeChannelPerVolumeSoftware = false;
         boolean changeChannelPerVolumeDoneFirst = false;
-        if (acqSettings_.isUsingChannels()) {
+        if (acqSettings_.channels().enabled()) {
             if (acqSettings_.channels().count() == 0) {
                 studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
                 return false; // early exit
@@ -962,7 +962,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // must use PLogic for channels when using hardware time points
         if (isUsingHardwareTimePoints) {
-            if (acqSettings_.isUsingChannels() && acqSettings_.channels().mode() == ChannelMode.VOLUME) {
+            if (acqSettings_.channels().enabled() && acqSettings_.channels().mode() == ChannelMode.VOLUME) {
                 studio_.logs().showError("Cannot use hardware time points (small time point interval) " +
                         "with software channels (need to use PLogic channel switching).");
                 return false;
@@ -1059,7 +1059,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 delayBeforeScan = 0.0;
                 break;
             case OVERLAP: // e.g.
-                if (acqSettings_.isUsingChannels() && acqSettings_.channels().count() > 1
+                if (acqSettings_.channels().enabled() && acqSettings_.channels().count() > 1
                         && acqSettings_.channels().mode() == ChannelMode.SLICE_HW) {
                     // for interleaved slices we should illuminate during global exposure but not during readout/reset time after each trigger
                     scansPerSlice = 1;
