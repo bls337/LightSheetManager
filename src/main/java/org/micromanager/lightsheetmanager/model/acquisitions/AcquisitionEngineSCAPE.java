@@ -947,7 +947,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 //        }
 
-        final double sliceDuration = asb_.tsb().sliceDuration();
+        final double sliceDuration = asb_.timingBuilder().sliceDuration();
         if (exposureTime + cameraReadoutTime > sliceDuration) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations

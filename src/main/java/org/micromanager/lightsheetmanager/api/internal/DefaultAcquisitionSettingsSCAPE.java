@@ -240,18 +240,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             return slcb_[view-1];
         }
 
-        public DefaultTimingSettings.Builder tsb() {
-            return tsb_;
-        }
-
-        public DefaultVolumeSettings.Builder vsb() {
-            return vsb_;
-        }
-
-        public DefaultSliceSettings.Builder ssb() {
-            return ssb_;
-        }
-
         public void timingBuilder(DefaultTimingSettings.Builder tsb) {
             tsb_ = tsb;
         }

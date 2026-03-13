@@ -276,18 +276,6 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             return slcb_[view-1];
         }
 
-        public DefaultTimingSettings.Builder tsb() {
-            return tsb_;
-        }
-
-        public DefaultVolumeSettings.Builder vsb() {
-            return vsb_;
-        }
-
-        public DefaultSliceSettings.Builder ssb() {
-            return ssb_;
-        }
-
         public void timingSettingsBuilder(DefaultTimingSettings.Builder tsb) {
             tsb_ = tsb;
         }
