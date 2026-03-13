@@ -175,9 +175,10 @@ public class SettingsTab extends Panel implements ListeningPanel {
                     e -> scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble()));
         }
 
-        spnLiveScanPeriod_.registerListener(
-                e -> model_.acquisitions().settingsBuilder()
-                        .liveScanPeriod(spnLiveScanPeriod_.getDouble()));
+        // TODO: make this work with diSPIM settings
+//        spnLiveScanPeriod_.registerListener(
+//                e -> model_.acquisitions().settingsBuilder()
+//                        .liveScanPeriod(spnLiveScanPeriod_.getDouble()));
 
     }
 

@@ -104,13 +104,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
         T postMoveDelay(final int postMoveDelay);
 
         /**
-         * Sets the live scan period.
-         *
-         * @param liveScanPeriod the channel array
-         */
-        T liveScanPeriod(final double liveScanPeriod);
-
-        /**
          * Creates an immutable instance of AcquisitionSettingsSCAPE
          *
          * @return Immutable version of AcquisitionSettingsSCAPE
@@ -271,6 +264,4 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      * @return the post move delay in milliseconds.
      */
     int postMoveDelay();
-
-    double liveScanPeriod();
 }

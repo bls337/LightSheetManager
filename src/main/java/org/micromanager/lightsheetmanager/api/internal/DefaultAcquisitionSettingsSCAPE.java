@@ -33,7 +33,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private int numTimePoints_ = 1;
         private double timePointInterval_ = 0.0;
         private int postMoveDelay_ = 0;
-        private double liveScanPeriod_ = 20.0;
 
         public Builder() {
             for (int i = 0; i < 1; i++) {
@@ -42,32 +41,31 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             }
         }
 
-        public Builder(final DefaultAcquisitionSettingsSCAPE acqSettings) {
-            super(acqSettings);
-            csb_ = acqSettings.channelSettings_.copyBuilder();
-            tsb_ = acqSettings.timingSettings_.copyBuilder();
-            vsb_ = acqSettings.volumeSettings_.copyBuilder();
-            ssb_ = acqSettings.sliceSettings_.copyBuilder();
-            ssbLS_ = acqSettings.sliceSettingsLS_.copyBuilder();
-            scsb_ = acqSettings.scanSettings_.copyBuilder();
+        public Builder(final DefaultAcquisitionSettingsSCAPE settings) {
+            super(settings);
+            csb_ = settings.channelSettings_.copyBuilder();
+            tsb_ = settings.timingSettings_.copyBuilder();
+            vsb_ = settings.volumeSettings_.copyBuilder();
+            ssb_ = settings.sliceSettings_.copyBuilder();
+            ssbLS_ = settings.sliceSettingsLS_.copyBuilder();
+            scsb_ = settings.scanSettings_.copyBuilder();
             for (int i = 0; i < 1; i++) {
-                slcb_[i] = acqSettings.sliceCalibrations_[i].copyBuilder();
-                shcb_[i] = acqSettings.sheetCalibrations_[i].copyBuilder();
+                slcb_[i] = settings.sliceCalibrations_[i].copyBuilder();
+                shcb_[i] = settings.sheetCalibrations_[i].copyBuilder();
             }
-            acquisitionMode_ = acqSettings.acquisitionMode_;
-            cameraMode_ = acqSettings.cameraMode_;
-            imagingCameraOrder_ = acqSettings.imagingCameraOrder_;
-            useChannels_ = acqSettings.useChannels_;
-            useTimePoints_ = acqSettings.useTimePoints_;
-            useAutofocus_ = acqSettings.useAutofocus_;
-            useMultiplePositions_ = acqSettings.useMultiplePositions_;
-            useHardwareTimePoints_ = acqSettings.useHardwareTimePoints_;
-            useStageScanning_ = acqSettings.useStageScanning_;
-            useAdvancedTiming_ =  acqSettings.useAdvancedTiming_;
-            numTimePoints_ = acqSettings.numTimePoints_;
-            timePointInterval_ = acqSettings.timePointInterval_;
-            postMoveDelay_ = acqSettings.postMoveDelay_;
-            liveScanPeriod_ = acqSettings.liveScanPeriod_;
+            acquisitionMode_ = settings.acquisitionMode_;
+            cameraMode_ = settings.cameraMode_;
+            imagingCameraOrder_ = settings.imagingCameraOrder_;
+            useChannels_ = settings.useChannels_;
+            useTimePoints_ = settings.useTimePoints_;
+            useAutofocus_ = settings.useAutofocus_;
+            useMultiplePositions_ = settings.useMultiplePositions_;
+            useHardwareTimePoints_ = settings.useHardwareTimePoints_;
+            useStageScanning_ = settings.useStageScanning_;
+            useAdvancedTiming_ =  settings.useAdvancedTiming_;
+            numTimePoints_ = settings.numTimePoints_;
+            timePointInterval_ = settings.timePointInterval_;
+            postMoveDelay_ = settings.postMoveDelay_;
         }
 
         /**
@@ -208,12 +206,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             return this;
         }
 
-        @Override
-        public Builder liveScanPeriod(double liveScanPeriod) {
-            liveScanPeriod_ = liveScanPeriod;
-            return this;
-        }
-
         // getters for sub-builders
         public DefaultChannelSettings.Builder channelBuilder() {
             return csb_;
@@ -310,7 +302,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final int numTimePoints_;
     private final double timePointInterval_;
     private final int postMoveDelay_;
-    private final double liveScanPeriod_;
 
     private DefaultAcquisitionSettingsSCAPE(Builder builder) {
         super(builder);
@@ -339,16 +330,15 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         numTimePoints_ = builder.numTimePoints_;
         timePointInterval_ = builder.timePointInterval_;
         postMoveDelay_ = builder.postMoveDelay_;
-        liveScanPeriod_= builder.liveScanPeriod_;
     }
 
 //    /**
-//     * Creates a Builder populated with settings of this DefaultAcquisitionSettingsDISPIM instance.
+//     * Creates a Builder populated with settings of this DefaultAcquisitionSettingsSCAPE instance.
 //     *
-//     * @return DefaultAcquisitionSettingsDISPIM.Builder pre-populated with settings of this instance.
+//     * @return DefaultAcquisitionSettingsSCAPE.Builder pre-populated with settings of this instance.
 //     */
 //    @Override
-//    public DefaultAcquisitionSettingsDISPIM.Builder copyBuilder() {
+//    public DefaultAcquisitionSettingsSCAPE.Builder copyBuilder() {
 //        return new Builder(this);
 //    }
 
@@ -562,11 +552,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     @Override
     public int postMoveDelay() {
         return postMoveDelay_;
-    }
-
-    @Override
-    public double liveScanPeriod() {
-        return liveScanPeriod_;
     }
 
     // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
