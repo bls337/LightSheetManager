@@ -9,29 +9,29 @@ public interface ChannelSettings {
 
         Builder enabled(final boolean state);
 
-        Builder channelGroup(final String group);
+        Builder group(final String group);
 
-        Builder channelMode(final ChannelMode mode);
+        Builder mode(final ChannelMode mode);
 
-        Builder channels(final ChannelSpec[] channels);
+        Builder data(final ChannelSpec[] channels);
 
         ChannelSettings build();
     }
 
     boolean enabled();
 
-    int numChannels();
+    int count();
 
     int numGroups();
 
-    String channelGroup();
+    String group();
 
-    ChannelMode channelMode();
+    ChannelMode mode();
 
-    String[] channelGroups();
+    String[] groupNames();
 
-    ChannelSpec[] channels();
+    ChannelSpec[] used();
 
-    ChannelSpec[] allChannels();
+    ChannelSpec[] data();
 
 }

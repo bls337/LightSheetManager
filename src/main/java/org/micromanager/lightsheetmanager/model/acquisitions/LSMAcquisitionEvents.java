@@ -38,12 +38,12 @@ public class LSMAcquisitionEvents {
               timelapse(acquisitionSettings.numTimePoints(),
                     acquisitionSettings.timePointInterval());
 
-      if (acquisitionSettings.channelSettings().numChannels() == 1) {
+      if (acquisitionSettings.channels().count() == 1) {
          throw new RuntimeException("Expected multiple channels but only one found");
       }
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels;
-      channels = channels(acquisitionSettings.channelSettings().channels());
+      channels = channels(acquisitionSettings.channels().used());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
               acquisitionSettings.volumeSettings().slicesPerView());
@@ -95,7 +95,7 @@ public class LSMAcquisitionEvents {
            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor, boolean interleaved) {
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
-              channels(acquisitionSettings.channelSettings().channels());
+              channels(acquisitionSettings.channels().used());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
               acquisitionSettings.volumeSettings().slicesPerView());
@@ -138,7 +138,7 @@ public class LSMAcquisitionEvents {
            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
-              channels(acquisitionSettings.channelSettings().channels());
+              channels(acquisitionSettings.channels().used());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 

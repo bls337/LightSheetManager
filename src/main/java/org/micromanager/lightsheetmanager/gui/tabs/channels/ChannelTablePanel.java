@@ -51,11 +51,11 @@ public class ChannelTablePanel extends Panel {
 
         final String[] groupLabels = table_.getChannelGroups();
         cmbChannelGroup_ = new ComboBox<>(groupLabels,
-                model_.acquisitions().settings().channelSettings().channelGroup(),
+                model_.acquisitions().settings().channels().group(),
                 120, 22);
 
         cmbChannelMode_ = new ComboBox<>(ChannelMode.values(),
-                model_.acquisitions().settings().channelSettings().channelMode(),
+                model_.acquisitions().settings().channels().mode(),
                 120, 22);
 
         add(lblChannelGroup_, "split 2");
@@ -75,10 +75,10 @@ public class ChannelTablePanel extends Panel {
             final String channelGroup = cmbChannelGroup_.getSelected();
             table_.updatePresetComboBoxes(channelGroup);
             // set the channel group to use when we get the channels
-            model_.acquisitions().settingsBuilder().channelSettingsBuilder().channelGroup(channelGroup);
+            model_.acquisitions().settingsBuilder().channelSettingsBuilder().group(channelGroup);
             model_.acquisitions().updateAcquisitionSettings();
             // update the table data model and refresh ui
-            table_.getData().setChannels(channelGroup, model_.acquisitions().settings().channelSettings().channels());
+            table_.getData().setChannels(channelGroup, model_.acquisitions().settings().channels().used());
             table_.getData().setChannelGroup(channelGroup);
             table_.refreshData();
         });
@@ -87,7 +87,7 @@ public class ChannelTablePanel extends Panel {
         btnAddChannel_.registerListener(e -> {
             table_.getTableModel().addEmptyChannel();
             final ChannelSpec[] channels = table_.getData().getChannels();
-            model_.acquisitions().settingsBuilder().channelSettingsBuilder().channels(channels);
+            model_.acquisitions().settingsBuilder().channelSettingsBuilder().data(channels);
             //System.out.println("add channel");
             //table_.getData().printChannelData();
         });
@@ -98,14 +98,14 @@ public class ChannelTablePanel extends Panel {
             if (row != -1) { // is any row selected?
                 table_.getTableModel().removeChannel(row);
                 final ChannelSpec[] channels = table_.getData().getChannels();
-                model_.acquisitions().settingsBuilder().channelSettingsBuilder().channels(channels);
+                model_.acquisitions().settingsBuilder().channelSettingsBuilder().data(channels);
                 //System.out.println("remove row index: " + row);
             }
         });
 
         // refresh channel table
         btnRefresh_.registerListener(e -> {
-            final String channelGroup = model_.acquisitions().settings().channelSettings().channelGroup();
+            final String channelGroup = model_.acquisitions().settings().channels().group();
             final String[] groups = table_.getChannelGroups();
             cmbChannelGroup_.removeAllItems();
             for (String group : groups) {
@@ -122,7 +122,7 @@ public class ChannelTablePanel extends Panel {
         // select channel mode
         cmbChannelMode_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().channelSettingsBuilder()
-                  .channelMode(cmbChannelMode_.getSelected());
+                  .mode(cmbChannelMode_.getSelected());
         });
 
     }

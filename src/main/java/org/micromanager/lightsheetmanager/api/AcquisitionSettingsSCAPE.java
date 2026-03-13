@@ -130,7 +130,7 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      *
      * @return immutable DefaultChannelSettings instance.
      */
-    DefaultChannelSettings channelSettings();
+    DefaultChannelSettings channels();
 
     /**
      * Returns the immutable DefaultTimingSettings instance.

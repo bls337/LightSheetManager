@@ -222,7 +222,7 @@ public class PLogicSCAPE {
                 numLines = 1;  // assure in acquisition code that we can't have single-sided interleaved
             }
             if (settings.isUsingChannels()) {
-                numLines = numLines * (settings.channelSettings().numChannels() / computeScanChannelsPerPass(settings));
+                numLines = numLines * (settings.channels().count() / computeScanChannelsPerPass(settings));
             }
             xyStage_.setScanNumLines(numLines);
 
@@ -282,7 +282,7 @@ public class PLogicSCAPE {
 
     // compute how many channels we do in each one-way scan
     private int computeScanChannelsPerPass(DefaultAcquisitionSettingsSCAPE settings) {
-        return settings.channelSettings().channelMode() == ChannelMode.SLICE_HW ? settings.channelSettings().numChannels() : 1;
+        return settings.channels().mode() == ChannelMode.SLICE_HW ? settings.channels().count() : 1;
     }
 
     /**
@@ -405,8 +405,8 @@ public class PLogicSCAPE {
             // if we are changing color slice by slice then set controller to do multiple slices per piezo move
             // otherwise just set to 1 slice per piezo move
             int numSlicesPerPiezo = 1;
-            if (settings.isUsingChannels() && settings.channelSettings().channelMode() == ChannelMode.SLICE_HW) {
-                numSlicesPerPiezo = settings.channelSettings().numChannels();
+            if (settings.isUsingChannels() && settings.channels().mode() == ChannelMode.SLICE_HW) {
+                numSlicesPerPiezo = settings.channels().count();
             }
             scanner_.setSPIMNumSlicesPerPiezo(numSlicesPerPiezo);
 
@@ -415,8 +415,8 @@ public class PLogicSCAPE {
             // otherwise (no channels, software switching, slice by slice HW switching)
             //   just do one volume per start trigger
             int numVolumesPerTrigger = 1;
-            if (settings.isUsingChannels() && settings.channelSettings().channelMode() == ChannelMode.VOLUME_HW) {
-                numVolumesPerTrigger = settings.channelSettings().numChannels();
+            if (settings.isUsingChannels() && settings.channels().mode() == ChannelMode.VOLUME_HW) {
+                numVolumesPerTrigger = settings.channels().count();
             }
 
             // can either trigger controller once for all the time points and
@@ -637,10 +637,10 @@ public class PLogicSCAPE {
 
     public boolean setupHardwareChannelSwitching(final DefaultAcquisitionSettingsSCAPE settings) {
 
-        ChannelMode channelMode = settings.channelSettings().channelMode();
+        ChannelMode channelMode = settings.channels().mode();
 
         // PLogic can only handle up to 4 channels
-        if ((settings.channelSettings().numChannels() > 4) &&
+        if ((settings.channels().count() > 4) &&
                 (channelMode == ChannelMode.VOLUME_HW || channelMode == ChannelMode.SLICE_HW)) {
             studio_.logs().showError("PLogic card cannot handle more than 4 channels for hardware switching.");
             return false;
@@ -664,7 +664,7 @@ public class PLogicSCAPE {
         }
 
         // set up hardware counter
-        switch (settings.channelSettings().numChannels()) {
+        switch (settings.channels().count()) {
             case 1:
                 plcLaser_.setPreset(22); // no counter
                 break;
@@ -691,7 +691,7 @@ public class PLogicSCAPE {
         // make sure the counters get reset on the acquisition start flag
         // turns out we can only do this for 2-counter and 4-counter implemented with D-flops
         // TODO: figure out alternative for 3-position counter
-        if (settings.channelSettings().numChannels() != 3) {
+        if (settings.channels().count() != 3) {
             plcLaser_.setPointerPosition(counterLSBAddr);
             plcLaser_.setCellInput(3, acquisitionFlagAddr + ASIPLogic.addrEdge);
             plcLaser_.setPointerPosition(counterMSBAddr);
@@ -724,8 +724,8 @@ public class PLogicSCAPE {
                 int lutValue = 0;
                 // populate a 3-input lookup table with the combinations of lasers present
                 // the LUT "MSB" is the laserTrigger, then the counter MSB, then the counter LSB
-                for (int channelNum = 0; channelNum < settings.channelSettings().numChannels(); ++channelNum) {
-                    if (doesPLogicChannelIncludeLaser(laserNum, settings.channelSettings().channels()[channelNum], settings.channelSettings().channelGroup())) {
+                for (int channelNum = 0; channelNum < settings.channels().count(); ++channelNum) {
+                    if (doesPLogicChannelIncludeLaser(laserNum, settings.channels().used()[channelNum], settings.channels().group())) {
                         lutValue += (int) Math.pow(2, channelNum + 4);  // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
                     }
                 }
@@ -758,10 +758,10 @@ public class PLogicSCAPE {
                 int lutValue = 0;
                 // populate a 3-input lookup table with the combinations of lasers present
                 // the LUT "MSB" is the laserTrigger, then the counter MSB, then the counter LSB
-                for (int channelNum = 0; channelNum < settings.channelSettings().numChannels(); ++channelNum) {
+                for (int channelNum = 0; channelNum < settings.channels().count(); ++channelNum) {
                     if (doesPLogicChannelIncludeLaser(laserNum,
-                          settings.channelSettings().channels()[channelNum],
-                          settings.channelSettings().channelGroup())) {
+                          settings.channels().used()[channelNum],
+                          settings.channels().group())) {
                         // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
                         lutValue += (int) Math.pow(2, channelNum + 4);
                     }
@@ -784,9 +784,9 @@ public class PLogicSCAPE {
 
             // identify BNC from the preset and set counter inputs for 13-16 appropriately
             boolean[] hardwareChannelUsed = new boolean[4]; // initialized to all false
-            for (int channelNum = 0; channelNum < settings.channelSettings().numChannels(); channelNum++) {
+            for (int channelNum = 0; channelNum < settings.channels().count(); channelNum++) {
                 // we already know there are between 1 and 4 channels
-                int outputNum = getPLogicOutputFromChannel(settings.channelSettings().channels()[channelNum], settings.channelSettings().channelGroup());
+                int outputNum = getPLogicOutputFromChannel(settings.channels().used()[channelNum], settings.channels().group());
                 // TODO: handle case where we have multiple simultaneous outputs, e.g. outputs 6/7 together
                 // Note: harsh recently asked about double triggering, but ended up needing to split 1-4
                 if (outputNum < 5) {  // check for error in getPLogicOutputFromChannel()
@@ -809,7 +809,7 @@ public class PLogicSCAPE {
                 // the following lines account for this by incrementing the channel number "match" by 1 in this special case
                 int adjustedChannelNum = channelNum;
                 if (channelMode == ChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 1)) {
-                    adjustedChannelNum = (channelNum + 1) % settings.channelSettings().numChannels();
+                    adjustedChannelNum = (channelNum + 1) % settings.channels().count();
                 }
                 // map the channel number to the equivalent addresses for the AND4
                 // inputs should be either 3 (for LSB high) or 67 (for LSB low)

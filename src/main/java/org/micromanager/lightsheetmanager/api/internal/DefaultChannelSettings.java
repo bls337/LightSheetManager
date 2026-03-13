@@ -22,7 +22,7 @@ public class DefaultChannelSettings implements ChannelSettings {
         public Builder(final DefaultChannelSettings channelSettings) {
             group_ = channelSettings.group_;
             mode_ = channelSettings.mode_;
-            groups_ = channelSettings.groups_;
+            groups_ = new HashMap<>(channelSettings.groups_); // deep copy
         }
 
         @Override
@@ -32,19 +32,19 @@ public class DefaultChannelSettings implements ChannelSettings {
         }
 
         @Override
-        public ChannelSettings.Builder channelGroup(final String group) {
+        public ChannelSettings.Builder group(final String group) {
             group_ = group;
             return this;
         }
 
         @Override
-        public ChannelSettings.Builder channelMode(final ChannelMode mode) {
+        public ChannelSettings.Builder mode(final ChannelMode mode) {
             mode_ = mode;
             return this;
         }
 
         @Override
-        public ChannelSettings.Builder channels(final ChannelSpec[] channels) {
+        public ChannelSettings.Builder data(final ChannelSpec[] channels) {
             groups_.put(group_, channels);
             return this;
         }
@@ -74,27 +74,28 @@ public class DefaultChannelSettings implements ChannelSettings {
         return new Builder(this);
     }
 
+    /**
+     * Return true if channels are enabled.
+     *
+     * @return true if channels are enabled
+     */
     @Override
     public boolean enabled() {
         return enabled_;
     }
 
     /**
-     * Returns the number of used channels for the selected channel group.
-     * <p>
-     * Always defaults to 1 channel.
+     * Returns the number of used channels in the channel group.
      *
-     * @return the number of channels in the channel group
+     * @return the number of used channels in the channel group
      */
     @Override
-    public int numChannels() {
-        return (int) Arrays.stream(groups_.getOrDefault(group_, EMPTY_CHANNELS))
-                .filter(ChannelSpec::useChannel)
-                .count();
+    public int count() {
+        return used().length;
     }
 
     /**
-     * Returns the number of channel groups in the channel settings.
+     * Returns the number of channel groups.
      *
      * @return the number of channel groups
      */
@@ -109,7 +110,7 @@ public class DefaultChannelSettings implements ChannelSettings {
      * @return the channel group
      */
     @Override
-    public String channelGroup() {
+    public String group() {
         return group_;
     }
 
@@ -119,27 +120,27 @@ public class DefaultChannelSettings implements ChannelSettings {
      * @return the channel mode
      */
     @Override
-    public ChannelMode channelMode() {
+    public ChannelMode mode() {
         return mode_;
     }
 
     /**
-     * Returns an array of all channel groups.
+     * Returns an array of all channel group names.
      *
-     * @return an array of channel groups
+     * @return an array of channel group names
      */
     @Override
-    public String[] channelGroups() {
+    public String[] groupNames() {
         return groups_.keySet().toArray(String[]::new);
     }
 
     /**
-     * Returns the used channels for the selected channel group.
+     * Returns the used channels in the channel group.
      *
-     * @return the channels for the channel group
+     * @return the used channels in the channel group
      */
     @Override
-    public ChannelSpec[] channels() {
+    public ChannelSpec[] used() {
         return Arrays.stream(groups_.getOrDefault(group_, EMPTY_CHANNELS))
                 .filter(ChannelSpec::useChannel)
                 .toArray(ChannelSpec[]::new);
@@ -151,7 +152,7 @@ public class DefaultChannelSettings implements ChannelSettings {
      * @return all channels for the selected channel group
      */
     @Override
-    public ChannelSpec[] allChannels() {
+    public ChannelSpec[] data() {
         return groups_.getOrDefault(group_, EMPTY_CHANNELS);
     }
 

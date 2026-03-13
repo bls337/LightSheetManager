@@ -358,7 +358,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return immutable DefaultChannelSettings instance.
      */
     @Override
-    public DefaultChannelSettings channelSettings() {
+    public DefaultChannelSettings channels() {
         return channelSettings_;
     }
 
@@ -403,9 +403,9 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     }
 
     /**
-     * Returns the immutable DefaultScanSettings instance.
+     * Returns the immutable DefaultStageScanSettings instance.
      *
-     * @return immutable DefaultScanSettings instance.
+     * @return immutable DefaultStageScanSettings instance.
      */
     @Override
     public DefaultStageScanSettings scanSettings() {
