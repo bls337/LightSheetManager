@@ -19,10 +19,11 @@ public class DefaultChannelSettings implements ChannelSettings {
         public Builder() {
         }
 
-        public Builder(final DefaultChannelSettings channelSettings) {
-            group_ = channelSettings.group_;
-            mode_ = channelSettings.mode_;
-            groups_ = new HashMap<>(channelSettings.groups_); // deep copy
+        public Builder(final DefaultChannelSettings settings) {
+            enabled_ = settings.enabled_;
+            group_ = settings.group_;
+            mode_ = settings.mode_;
+            groups_ = new HashMap<>(settings.groups_); // deep copy
         }
 
         @Override
