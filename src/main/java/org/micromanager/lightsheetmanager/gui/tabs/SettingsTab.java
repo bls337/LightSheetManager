@@ -41,8 +41,7 @@ public class SettingsTab extends Panel implements ListeningPanel {
     }
 
     private void createUserInterface() {
-        final DefaultAcquisitionSettingsSCAPE acqSettings =
-                model_.acquisitions().settings();
+        final DefaultAcquisitionSettingsSCAPE settings = model_.acquisitions().settings();
 
         // check for devices to set up the tab
         isUsingPLogic_ = model_.devices().isUsingPLogic();
@@ -61,28 +60,28 @@ public class SettingsTab extends Panel implements ListeningPanel {
 
         // Scan Spinners
         spnScanAcceleration_ = Spinner.createDoubleSpinner(
-                acqSettings.scanSettings().scanAccelerationFactor(),
+                settings.stageScan().scanAccelerationFactor(),
                 0.1, 1000.0, 1.0);
 
         spnScanOvershootDist_ = Spinner.createIntegerSpinner(
-                acqSettings.scanSettings().scanOvershootDistance(),
+                settings.stageScan().scanOvershootDistance(),
                 0, 1000, 10);
 
         spnScanRetraceSpeed_ = Spinner.createDoubleSpinner(
-                acqSettings.scanSettings().scanRetraceSpeed(),
+                settings.stageScan().scanRetraceSpeed(),
                 0.01, 99.0, 1.0);
 
         spnScanAngleFirstView_ = Spinner.createDoubleSpinner(
-                acqSettings.scanSettings().scanAngleFirstView(),
+                settings.stageScan().scanAngleFirstView(),
                 1.0, 89.0, 1.0);
 
         // Scan CheckBoxes
         cbxScanFromCurrentPosition_ = new CheckBox("Scan from current position instead of center",
-                acqSettings.scanSettings().scanFromCurrentPosition());
+                settings.stageScan().scanFromCurrentPosition());
         cbxScanNegativeDirection_ = new CheckBox("Scan negative direction",
-                acqSettings.scanSettings().scanFromNegativeDirection());
+                settings.stageScan().scanFromNegativeDirection());
         cbxReturnToOriginalPosition_ = new CheckBox("Return to original position after scan",
-                acqSettings.scanSettings().scanReturnToOriginalPosition());
+                settings.stageScan().scanReturnToOriginalPosition());
 
         final Panel pnlLightSheet = new Panel("Light Sheet Scanner");
         pnlLightSheet.setMigLayout(
@@ -142,26 +141,26 @@ public class SettingsTab extends Panel implements ListeningPanel {
         // Scan Settings
         if (isUsingScanSettings_) {
             spnScanAcceleration_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                    model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .scanAccelerationFactor(spnScanAcceleration_.getDouble()));
             spnScanOvershootDist_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                    model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .scanOvershootDistance(spnScanOvershootDist_.getInt()));
             spnScanRetraceSpeed_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                    model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .scanRetraceSpeed(spnScanRetraceSpeed_.getDouble()));
             spnScanAngleFirstView_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                    model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .scanAngleFirstView(spnScanAngleFirstView_.getDouble()));
 
             cbxScanFromCurrentPosition_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                    model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .scanFromCurrentPosition(cbxScanFromCurrentPosition_.isSelected()));
             cbxScanNegativeDirection_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                    model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .scanFromNegativeDirection(cbxScanNegativeDirection_.isSelected()));
             cbxReturnToOriginalPosition_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().scanSettingsBuilder()
+                    model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .scanReturnToOriginalPosition(cbxReturnToOriginalPosition_.isSelected()));
         }
 

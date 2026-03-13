@@ -137,35 +137,35 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      *
      * @return immutable DefaultTimingSettings instance.
      */
-    DefaultTimingSettings timingSettings();
+    DefaultTimingSettings timing();
 
     /**
      * Returns the immutable DefaultVolumeSettings instance.
      *
      * @return immutable DefaultVolumeSettings instance.
      */
-    DefaultVolumeSettings volumeSettings();
+    DefaultVolumeSettings volume();
 
     /**
      * Returns the immutable DefaultSliceSettings instance.
      *
      * @return immutable DefaultSliceSettings instance.
      */
-    DefaultSliceSettings sliceSettings();
+    DefaultSliceSettings slice();
 
     /**
      * Returns the immutable DefaultSliceSettingsLS instance.
      *
      * @return immutable DefaultSliceSettingsLS instance.
      */
-    DefaultSliceSettingsLS sliceSettingsLS();
+    DefaultSliceSettingsLS sliceLS();
 
     /**
      * Returns the immutable DefaultScanSettings instance.
      *
      * @return immutable DefaultScanSettings instance.
      */
-    DefaultStageScanSettings scanSettings();
+    DefaultStageScanSettings stageScan();
 
     /**
      * Returns the immutable DefaultSheetCalibration instance.

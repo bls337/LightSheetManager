@@ -687,7 +687,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
             return;
         }
         DefaultTimingSettings.Builder tsb = getTimingFromPeriodAndLightExposure();
-        asb_.timingSettingsBuilder(tsb);
+        asb_.timingBuilder(tsb);
         // TODO: update gui (but not in the model)
     }
 

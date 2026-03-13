@@ -208,7 +208,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                   acqSettings_.numTimePoints() : 1);
 
             summaryMetadata
-                  .put(PropertyKey.SLICES.key(), doProjections ? 1 : acqSettings_.volumeSettings().slicesPerView());
+                  .put(PropertyKey.SLICES.key(), doProjections ? 1 : acqSettings_.volume().slicesPerView());
 
             summaryMetadata.put(PropertyKey.CHANNELS.key(), acqSettings_.isUsingChannels() ?
                   acqSettings_.channels().count() : 1);
@@ -235,7 +235,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
             // add "z-step_um" metadata to the image viewer (used in the deskew plugin)
             DefaultSummaryMetadata dsmd = (DefaultSummaryMetadata) dsmb
-                  .zStepUm(acqSettings_.volumeSettings().sliceStepSize())
+                  .zStepUm(acqSettings_.volume().sliceStepSize())
                   .build();
 
             summaryMetadata.put(PropertyKey.MICRO_MANAGER_VERSION.key(),

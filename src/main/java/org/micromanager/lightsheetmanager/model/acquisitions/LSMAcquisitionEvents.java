@@ -46,7 +46,7 @@ public class LSMAcquisitionEvents {
       channels = channels(acquisitionSettings.channels().used());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-              acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volume().slicesPerView());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
@@ -73,7 +73,7 @@ public class LSMAcquisitionEvents {
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-              acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volume().slicesPerView());
 
       ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
 
@@ -98,7 +98,7 @@ public class LSMAcquisitionEvents {
               channels(acquisitionSettings.channels().used());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-              acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volume().slicesPerView());
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
@@ -124,7 +124,7 @@ public class LSMAcquisitionEvents {
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-              acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volume().slicesPerView());
 
       ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
       acqFunctions.add(cameras);
@@ -143,7 +143,7 @@ public class LSMAcquisitionEvents {
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-              acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volume().slicesPerView());
 
       ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
       acqFunctions.add(channels);
@@ -160,7 +160,7 @@ public class LSMAcquisitionEvents {
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
       Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack = zStack(0,
-              acquisitionSettings.volumeSettings().slicesPerView());
+              acquisitionSettings.volume().slicesPerView());
       
       ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
       acqFunctions.add(cameras);

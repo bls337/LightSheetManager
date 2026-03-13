@@ -52,7 +52,7 @@ public class AutofocusMM {
 
         // TODO: is this correct?
         final double exposure = model_.acquisitions()
-                .settingsBuilder().timingSettingsBuilder().build()
+                .settingsBuilder().timingBuilder().build()
                 .cameraExposure();
 
         // convert numImages and stepSizeUm to OughtaFocus plugin

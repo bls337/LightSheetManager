@@ -75,7 +75,7 @@ public class ChannelTablePanel extends Panel {
             final String channelGroup = cmbChannelGroup_.getSelected();
             table_.updatePresetComboBoxes(channelGroup);
             // set the channel group to use when we get the channels
-            model_.acquisitions().settingsBuilder().channelSettingsBuilder().group(channelGroup);
+            model_.acquisitions().settingsBuilder().channelBuilder().group(channelGroup);
             model_.acquisitions().updateAcquisitionSettings();
             // update the table data model and refresh ui
             table_.getData().setChannels(channelGroup, model_.acquisitions().settings().channels().used());
@@ -87,7 +87,7 @@ public class ChannelTablePanel extends Panel {
         btnAddChannel_.registerListener(e -> {
             table_.getTableModel().addEmptyChannel();
             final ChannelSpec[] channels = table_.getData().getChannels();
-            model_.acquisitions().settingsBuilder().channelSettingsBuilder().data(channels);
+            model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
             //System.out.println("add channel");
             //table_.getData().printChannelData();
         });
@@ -98,7 +98,7 @@ public class ChannelTablePanel extends Panel {
             if (row != -1) { // is any row selected?
                 table_.getTableModel().removeChannel(row);
                 final ChannelSpec[] channels = table_.getData().getChannels();
-                model_.acquisitions().settingsBuilder().channelSettingsBuilder().data(channels);
+                model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
                 //System.out.println("remove row index: " + row);
             }
         });
@@ -121,7 +121,7 @@ public class ChannelTablePanel extends Panel {
 
         // select channel mode
         cmbChannelMode_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().channelSettingsBuilder()
+            model_.acquisitions().settingsBuilder().channelBuilder()
                   .mode(cmbChannelMode_.getSelected());
         });
 

@@ -151,7 +151,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     return false;
                 }
                 if (acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
-                    if (acqSettings_.volumeSettings().numViews() < 2) {
+                    if (acqSettings_.volume().numViews() < 2) {
                         studio_.logs().showError("Interleaved stage scan requires two sides.");
                     }
                     return false;
@@ -263,7 +263,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
         try {
-            summaryMetadata.put("z-um_step", acqSettings_.volumeSettings().sliceStepSize());
+            summaryMetadata.put("z-um_step", acqSettings_.volume().sliceStepSize());
         } catch (JSONException e) {
             studio_.logs().logError("Failed to add z-um_step metadata: " + e.getMessage());
         }
@@ -469,7 +469,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                         xyStage.setAccelerationX(scanAccelX_);
                         controllerInstance.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
                         controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(),
-                            acqSettings_.volumeSettings().firstView());
+                            acqSettings_.volume().firstView());
                         return event;
                     }
 
@@ -570,7 +570,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 }
             } else {
                // standard camera setup
-               if (acqSettings_.volumeSettings().numViews() > 1) {
+               if (acqSettings_.volume().numViews() > 1) {
                   cameraNames = new String[] {
                         model_.devices().device("Imaging1Camera").getDeviceName(),
                         model_.devices().device("Imaging2Camera").getDeviceName()
@@ -722,7 +722,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         if (acqSettings_.isUsingStageScanning()) {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
             final boolean returnToOriginalPosition =
-                    acqSettings_.scanSettings().scanReturnToOriginalPosition();
+                    acqSettings_.stageScan().scanReturnToOriginalPosition();
 
             // make sure stage scanning state machine is stopped,
             // otherwise setting speed/position won't take
@@ -800,7 +800,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // setup channels
         int nrChannelsSoftware = acqSettings_.channels().count();  // how many times we trigger the controller per stack
-        int nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView();
+        int nrSlicesSoftware = acqSettings_.volume().slicesPerView();
         //acqSettings_.volumeSettings().slicesPerView();
         // TODO: channels need to modify panels and need extraChannelOffset_
         boolean changeChannelPerVolumeSoftware = false;
@@ -831,7 +831,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                             return false; // early exit
                         }
                         nrChannelsSoftware = 1;
-                        nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView() * acqSettings_.channels().count();
+                        nrSlicesSoftware = acqSettings_.volume().slicesPerView() * acqSettings_.channels().count();
                     }
                     break;
                 default:
@@ -888,7 +888,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
         }
-        final double exposureTime = acqSettings_.timingSettings().cameraExposure();
+        final double exposureTime = acqSettings_.timing().cameraExposure();
 
         // test acq was here
 
@@ -994,7 +994,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     public void recalculateSliceTiming() {
         // update timing settings if not using advanced timing
         if (!acqSettings_.isUsingAdvancedTiming()) {
-            asb_.timingSettingsBuilder(getTimingFromExposure());
+            asb_.timingBuilder(getTimingFromExposure());
         }
         // Note: sliceDuration is computed automatically when build() is called
         //final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder().build());
@@ -1022,7 +1022,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         final double cameraTotalTime = NumberUtils.ceilToQuarterMs(cameraResetTime + cameraReadoutTime);
         final double laserDuration = NumberUtils.roundToQuarterMs(
-                model_.acquisitions().settings().sliceSettings().sampleExposure());
+                model_.acquisitions().settings().slice().sampleExposure());
         // max of laser on time (for static light sheet) and total camera reset/readout time; will add excess later
         final double slicePeriodMin = Math.max(laserDuration, cameraTotalTime);
         final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriodMin - laserDuration);
@@ -1110,8 +1110,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 .cameraExposure(cameraExposure);
 
         // if a specific slice period was requested, add corresponding delay to scan/laser/camera
-        if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
-            double globalDelay = acqSettings_.sliceSettings().slicePeriod() - tsb.sliceDuration();
+        if (!acqSettings_.slice().isSlicePeriodMinimized()) {
+            double globalDelay = acqSettings_.slice().slicePeriod() - tsb.sliceDuration();
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
@@ -1185,7 +1185,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // we will wait cameraReadoutMax before triggering camera, then wait another cameraResetMax for global exposure
         // this will also be in 0.25ms increment
         final double globalExposureDelayMax = cameraReadoutMax + cameraResetMax;
-        double laserTriggerDuration = NumberUtils.roundToQuarterMs(acqSettings_.sliceSettings().sampleExposure());
+        double laserTriggerDuration = NumberUtils.roundToQuarterMs(acqSettings_.slice().sampleExposure());
         double scanDuration = laserTriggerDuration + 2*scanLaserBufferTime;
         // scan will be longer than laser by 0.25ms at both start and end
 
@@ -1294,8 +1294,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // if a specific slice period was requested, add corresponding delay to scan/laser/camera
-        if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
-            double globalDelay = acqSettings_.sliceSettings().slicePeriod() - tsb.sliceDuration();
+        if (!acqSettings_.slice().isSlicePeriodMinimized()) {
+            double globalDelay = acqSettings_.slice().slicePeriod() - tsb.sliceDuration();
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
@@ -1344,7 +1344,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     private void updateSlicePeriodLabel(final JLabel label) {
-        label.setText(String.format("%.3f ms", acqSettings_.timingSettings().sliceDuration()));
+        label.setText(String.format("%.3f ms", acqSettings_.timing().sliceDuration()));
     }
 
     private void updateVolumeDurationLabel(final JLabel label) {
@@ -1406,17 +1406,17 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
     public double computeVolumeDuration() {
         final ChannelMode channelMode = acqSettings_.channels().mode();
-        final int numViews = acqSettings_.volumeSettings().numViews();
+        final int numViews = acqSettings_.volume().numViews();
         final int numChannels = acqSettings_.channels().count();
-        final double delayBeforeView = acqSettings_.volumeSettings().delayBeforeView();
+        final double delayBeforeView = acqSettings_.volume().delayBeforeView();
 
-        int numCameraTriggers = acqSettings_.volumeSettings().slicesPerView();
+        int numCameraTriggers = acqSettings_.volume().slicesPerView();
         if (acqSettings_.cameraMode() == CameraMode.OVERLAP) {
             numCameraTriggers += 1;
         }
 
         // stackDuration is per-view, per-channel, per-position
-        final double stackDuration = numCameraTriggers * acqSettings_.timingSettings().sliceDuration();
+        final double stackDuration = numCameraTriggers * acqSettings_.timing().sliceDuration();
 
         if (acqSettings_.isUsingStageScanning()) {
             final double rampDuration = 1; //getStageRampDuration(acqSettings);

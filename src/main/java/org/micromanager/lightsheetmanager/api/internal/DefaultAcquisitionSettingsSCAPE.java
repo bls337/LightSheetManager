@@ -215,27 +215,27 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         }
 
         // getters for sub-builders
-        public DefaultChannelSettings.Builder channelSettingsBuilder() {
+        public DefaultChannelSettings.Builder channelBuilder() {
             return csb_;
         }
 
-        public DefaultTimingSettings.Builder timingSettingsBuilder() {
+        public DefaultTimingSettings.Builder timingBuilder() {
             return tsb_;
         }
 
-        public DefaultVolumeSettings.Builder volumeSettingsBuilder() {
+        public DefaultVolumeSettings.Builder volumeBuilder() {
             return vsb_;
         }
 
-        public DefaultSliceSettings.Builder sliceSettingsBuilder() {
+        public DefaultSliceSettings.Builder sliceBuilder() {
             return ssb_;
         }
 
-        public DefaultSliceSettingsLS.Builder sliceSettingsLSBuilder() {
+        public DefaultSliceSettingsLS.Builder sliceLSBuilder() {
             return ssbLS_;
         }
 
-        public DefaultStageScanSettings.Builder scanSettingsBuilder() {
+        public DefaultStageScanSettings.Builder stageScanBuilder() {
             return scsb_;
         }
 
@@ -259,11 +259,11 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             return ssb_;
         }
 
-        public void timingSettingsBuilder(DefaultTimingSettings.Builder tsb) {
+        public void timingBuilder(DefaultTimingSettings.Builder tsb) {
             tsb_ = tsb;
         }
 
-        public void volumeSettingsBuilder(DefaultVolumeSettings.Builder vsb) {
+        public void volumeBuilder(DefaultVolumeSettings.Builder vsb) {
             vsb_ = vsb;
         }
 
@@ -368,7 +368,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return immutable DefaultTimingSettings instance.
      */
     @Override
-    public DefaultTimingSettings timingSettings() {
+    public DefaultTimingSettings timing() {
         return timingSettings_;
     }
 
@@ -378,7 +378,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return immutable DefaultVolumeSettings instance.
      */
     @Override
-    public DefaultVolumeSettings volumeSettings() {
+    public DefaultVolumeSettings volume() {
         return volumeSettings_;
     }
 
@@ -388,7 +388,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return immutable DefaultSliceSettings instance.
      */
     @Override
-    public DefaultSliceSettings sliceSettings() {
+    public DefaultSliceSettings slice() {
         return sliceSettings_;
     }
 
@@ -398,7 +398,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return immutable DefaultSliceSettingsLS instance.
      */
     @Override
-    public DefaultSliceSettingsLS sliceSettingsLS() {
+    public DefaultSliceSettingsLS sliceLS() {
         return sliceSettingsLS_;
     }
 
@@ -408,7 +408,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return immutable DefaultStageScanSettings instance.
      */
     @Override
-    public DefaultStageScanSettings scanSettings() {
+    public DefaultStageScanSettings stageScan() {
         return scanSettings_;
     }
 
