@@ -2,7 +2,9 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
+import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 
 /**
@@ -216,7 +218,14 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
     }
 
     public static <T extends AcquisitionSettings> T fromJson(final String json, final Class<T> cls) {
-        return new Gson().fromJson(json, cls);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(StageScanSettings.class, (com.google.gson.JsonDeserializer<StageScanSettings>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultStageScanSettings.class);
+                        })
+                .create();
+        return gson.fromJson(json, cls);
     }
 
 //    public static DefaultAcquisitionSettingsDISPIM fromJson(final String json) {

@@ -33,6 +33,10 @@ public class DefaultStageScanSettings implements StageScanSettings {
         fromNegativeDirection_ = builder.fromNegativeDirection_;
     }
 
+    private DefaultStageScanSettings() {
+        this(new Builder());
+    }
+
     @Override
     public StageScanSettings.Builder copyBuilder() {
         return new Builder(this);
