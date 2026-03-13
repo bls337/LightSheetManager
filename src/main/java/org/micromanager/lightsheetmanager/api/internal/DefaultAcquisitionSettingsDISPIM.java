@@ -9,6 +9,10 @@ import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 
 public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings implements AcquisitionSettingsDISPIM {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDISPIM.Builder<Builder> {
 
         private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
@@ -40,10 +44,10 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private ChannelSpec[] channels_ = new ChannelSpec[]{};
         private double liveScanPeriod_ = 20.0; // TODO: this could go in user settings since it has to do with the live view
 
-        public Builder() {
+        private Builder() {
             for (int i = 0; i < 2; i++) {
-                shcb_[i] = new DefaultSheetCalibration.Builder();
-                slcb_[i] = new DefaultSliceCalibration.Builder();
+                shcb_[i] = DefaultSheetCalibration.builder();
+                slcb_[i] = DefaultSliceCalibration.builder();
             }
 
         }

@@ -4,12 +4,16 @@ import org.micromanager.lightsheetmanager.api.SliceCalibration;
 
 public class DefaultSliceCalibration implements SliceCalibration {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder implements SliceCalibration.Builder {
 
         private double sliceSlope_ = 0.0;
         private double sliceOffset_ = 0.0;
 
-        public Builder() {
+        private Builder() {
         }
 
         private Builder(final SliceCalibration sliceCalibration) {

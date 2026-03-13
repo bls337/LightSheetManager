@@ -66,7 +66,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         autofocus_ = new AutofocusMM(model_);
 
         // default settings
-        asb_ = new DefaultAcquisitionSettingsSCAPE.Builder();
+        asb_ = DefaultAcquisitionSettingsSCAPE.builder();
         acqSettings_ = asb_.build();
     }
 

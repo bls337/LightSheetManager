@@ -141,7 +141,7 @@ public class AcquisitionTable extends JScrollPane {
             // save current settings in AcquisitionTableData
             if (!currentAcqName_.equals(DEFAULT_ACQ_NAME)) {
                 // TODO: check this
-                data_.updateAcquisitionSettings(currentAcqName_, new DefaultAcquisitionSettingsDISPIM.Builder().build()); //acqPanel_.getCurrentAcquisitionSettings());
+                data_.updateAcquisitionSettings(currentAcqName_, DefaultAcquisitionSettingsDISPIM.builder().build()); //acqPanel_.getCurrentAcquisitionSettings());
                 //System.out.println("SAVING ACQ: " + currentAcqName);
             }
             // set the current acquisition name

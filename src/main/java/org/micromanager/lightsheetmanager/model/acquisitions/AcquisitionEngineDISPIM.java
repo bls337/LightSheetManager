@@ -40,7 +40,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
     public AcquisitionEngineDISPIM(final LightSheetManager model) {
         super(model);
         // TODO: remove this when a more generic method is available and get from base class
-        acqSettings_ = new DefaultAcquisitionSettingsDISPIM.Builder().build();
+        acqSettings_ = DefaultAcquisitionSettingsDISPIM.builder().build();
     }
 
 //    @Override

@@ -140,9 +140,8 @@ public class UserSettings {
      */
     private Optional<JSONObject> validateUserSettings(final String loadedSettings) {
         // create default settings from builder
-        final String defaultSettings =
-                new DefaultAcquisitionSettingsSCAPE.Builder().build().toJson();
-        // validate json strings and count the number of keys
+        final String defaultSettings = DefaultAcquisitionSettingsSCAPE.builder().build().toJson();
+        // validate JSON strings and count the number of keys
         int numLoadedKeys;
         int numDefaultKeys;
         JSONObject loadedJson;

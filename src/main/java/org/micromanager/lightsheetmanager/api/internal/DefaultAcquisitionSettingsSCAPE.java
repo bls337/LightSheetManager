@@ -8,6 +8,10 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings implements AcquisitionSettingsSCAPE {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsSCAPE.Builder<Builder> {
 
         private DefaultChannelSettings.Builder csb_ = DefaultChannelSettings.builder();
@@ -36,10 +40,10 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private double timePointInterval_ = 0.0;
         private int postMoveDelay_ = 0;
 
-        public Builder() {
+        private Builder() {
             for (int i = 0; i < 1; i++) {
-                shcb_[i] = new DefaultSheetCalibration.Builder();
-                slcb_[i] = new DefaultSliceCalibration.Builder();
+                shcb_[i] = DefaultSheetCalibration.builder();
+                slcb_[i] = DefaultSliceCalibration.builder();
             }
         }
 
