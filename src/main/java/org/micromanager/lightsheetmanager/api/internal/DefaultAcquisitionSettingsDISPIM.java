@@ -18,7 +18,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
         private DefaultVolumeSettings.Builder vsb_ = DefaultVolumeSettings.builder();
         private DefaultSliceSettings.Builder ssb_ = DefaultSliceSettings.builder();
-        private DefaultSliceSettingsLS.Builder ssbLS_ = DefaultSliceSettingsLS.builder();
+        private DefaultSliceSettingsLS.Builder ssbLS_ = DefaultSliceSettingsLS.builder(); // maybe this should be LightSheetSliceSettings? replace ssb_?
         private StageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];

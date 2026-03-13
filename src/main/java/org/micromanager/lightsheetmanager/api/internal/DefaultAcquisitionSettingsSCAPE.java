@@ -18,7 +18,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
         private DefaultVolumeSettings.Builder vsb_ = DefaultVolumeSettings.builder();
         private DefaultSliceSettings.Builder ssb_ = DefaultSliceSettings.builder();
-        private DefaultSliceSettingsLS.Builder ssbLS_ = DefaultSliceSettingsLS.builder();
         private StageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[1];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[1];
@@ -52,7 +51,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             tsb_ = settings.timingSettings_.copyBuilder();
             vsb_ = settings.volumeSettings_.copyBuilder();
             ssb_ = settings.sliceSettings_.copyBuilder();
-            ssbLS_ = settings.sliceSettingsLS_.copyBuilder();
             scsb_ = settings.stageScan().copyBuilder();
             for (int i = 0; i < 1; i++) {
                 slcb_[i] = settings.sliceCalibrations_[i].copyBuilder();
@@ -216,10 +214,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             return ssb_;
         }
 
-        public DefaultSliceSettingsLS.Builder sliceLSBuilder() {
-            return ssbLS_;
-        }
-
         public StageScanSettings.Builder stageScanBuilder() {
             return scsb_;
         }
@@ -261,7 +255,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final DefaultChannelSettings channelSettings_;
     private final DefaultTimingSettings timingSettings_;
     private final DefaultVolumeSettings volumeSettings_;
-    private final DefaultSliceSettingsLS sliceSettingsLS_;
     private final DefaultSliceSettings sliceSettings_;
     private final StageScanSettings scanSettings_;
     private final DefaultSheetCalibration[] sheetCalibrations_;
@@ -289,7 +282,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         timingSettings_ = builder.tsb_.build();
         volumeSettings_ = builder.vsb_.build();
         sliceSettings_ = builder.ssb_.build();
-        sliceSettingsLS_ = builder.ssbLS_.build();
         scanSettings_ = builder.stageScanBuilder().build();
         sheetCalibrations_ = new DefaultSheetCalibration[1];
         sliceCalibrations_ = new DefaultSliceCalibration[1]; // TODO: use this object directly
@@ -359,16 +351,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     @Override
     public DefaultSliceSettings slice() {
         return sliceSettings_;
-    }
-
-    /**
-     * Returns the immutable DefaultSliceSettingsLS instance.
-     *
-     * @return immutable DefaultSliceSettingsLS instance.
-     */
-    @Override
-    public DefaultSliceSettingsLS sliceLS() {
-        return sliceSettingsLS_;
     }
 
     /**

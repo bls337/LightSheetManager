@@ -139,13 +139,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
     DefaultSliceSettings slice();
 
     /**
-     * Returns the immutable DefaultSliceSettingsLS instance.
-     *
-     * @return immutable DefaultSliceSettingsLS instance.
-     */
-    DefaultSliceSettingsLS sliceLS();
-
-    /**
      * Returns the immutable DefaultScanSettings instance.
      *
      * @return immutable DefaultScanSettings instance.
