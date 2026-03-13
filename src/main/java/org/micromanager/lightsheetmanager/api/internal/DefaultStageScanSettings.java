@@ -33,6 +33,7 @@ public class DefaultStageScanSettings implements StageScanSettings {
         fromNegativeDirection_ = builder.fromNegativeDirection_;
     }
 
+    // Note: used by GSON library for deserialization
     private DefaultStageScanSettings() {
         this(new Builder());
     }

@@ -4,13 +4,17 @@ import org.micromanager.lightsheetmanager.api.SliceSettings;
 
 public class DefaultSliceSettings implements SliceSettings {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder implements SliceSettings.Builder {
 
         private double slicePeriod_ = 10.0;
         private double sampleExposure_ = 1.0;
         private boolean minimizeSlicePeriod_ = false;
 
-        public Builder() {
+        private Builder() {
         }
 
         private Builder(final DefaultSliceSettings sliceSettings) {

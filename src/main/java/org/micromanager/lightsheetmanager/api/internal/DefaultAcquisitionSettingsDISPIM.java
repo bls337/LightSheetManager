@@ -10,13 +10,15 @@ import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings implements AcquisitionSettingsDISPIM {
 
     public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDISPIM.Builder<Builder> {
-        private DefaultTimingSettings.Builder tsb_ = new DefaultTimingSettings.Builder();
-        private DefaultVolumeSettings.Builder vsb_ = new DefaultVolumeSettings.Builder();
-        private DefaultSliceSettings.Builder ssb_ = new DefaultSliceSettings.Builder();
-        private DefaultSliceSettingsLS.Builder ssbLS_ = new DefaultSliceSettingsLS.Builder();
+
+        private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
+        private DefaultVolumeSettings.Builder vsb_ = DefaultVolumeSettings.builder();
+        private DefaultSliceSettings.Builder ssb_ = DefaultSliceSettings.builder();
+        private DefaultSliceSettingsLS.Builder ssbLS_ = DefaultSliceSettingsLS.builder();
         private StageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
+
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
         private ChannelMode channelMode_ = ChannelMode.VOLUME;
         private CameraMode cameraMode_ = CameraMode.EDGE;

@@ -5,6 +5,10 @@ import org.micromanager.lightsheetmanager.api.VolumeSettings;
 
 public class DefaultVolumeSettings implements VolumeSettings {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder implements VolumeSettings.Builder {
         private int firstView_ = 1;
         private int numViews_ = 1;
@@ -15,7 +19,7 @@ public class DefaultVolumeSettings implements VolumeSettings {
         private double centerPosition_ = 0.0;
         private double endPosition_ = 0.0;
 
-        public Builder() {
+        private Builder() {
         }
 
         /**

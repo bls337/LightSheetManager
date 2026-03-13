@@ -9,6 +9,10 @@ import java.util.HashMap;
 
 public class DefaultChannelSettings implements ChannelSettings {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder implements ChannelSettings.Builder {
 
         private boolean enabled_ = false;
@@ -16,7 +20,7 @@ public class DefaultChannelSettings implements ChannelSettings {
         private ChannelMode mode_ = ChannelMode.VOLUME;
         private HashMap<String, ChannelSpec[]> groups_ = new HashMap<>();
 
-        public Builder() {
+        private Builder() {
         }
 
         public Builder(final DefaultChannelSettings settings) {

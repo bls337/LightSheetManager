@@ -20,7 +20,7 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
         private boolean demoMode_ = false;
         private DataStorage.SaveMode saveMode_ = DataStorage.SaveMode.ND_TIFF;
 
-        private DefaultAutofocusSettings.Builder afsb_ = new DefaultAutofocusSettings.Builder();
+        private DefaultAutofocusSettings.Builder afsb_ = DefaultAutofocusSettings.builder();
 
         public Builder() {
         }

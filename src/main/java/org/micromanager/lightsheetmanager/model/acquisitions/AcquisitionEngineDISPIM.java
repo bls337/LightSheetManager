@@ -710,7 +710,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         CameraBase camera = model_.devices().device("Imaging1Camera"); //.getImagingCamera(0);
         if (camera == null) {
             // just a dummy to test demo mode
-            return new DefaultTimingSettings.Builder();
+            return DefaultTimingSettings.builder();
         }
         // TODO: do this in ui?
         camera.setTriggerMode(acqSettings_.cameraMode());
@@ -719,7 +719,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         CameraMode camMode = camera.getTriggerMode();
         //System.out.println(camMode);
 
-        DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
+        DefaultTimingSettings.Builder tsb = DefaultTimingSettings.builder();
 
         final double scanLaserBufferTime = NumberUtils.roundToQuarterMs(0.25);  // below assumed to be multiple of 0.25ms
 

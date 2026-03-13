@@ -4,6 +4,10 @@ import org.micromanager.lightsheetmanager.api.TimingSettings;
 
 public class DefaultTimingSettings implements TimingSettings {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder implements TimingSettings.Builder {
         private int scansPerSlice_ = 1;
         private double delayBeforeScan_ = 0.0;
@@ -15,7 +19,7 @@ public class DefaultTimingSettings implements TimingSettings {
         private double cameraExposure_ = 1.0;
         private boolean alternateScanDirection_ = false;
 
-        public Builder() {
+        private Builder() {
         }
 
         private Builder(DefaultTimingSettings timingSettings) {

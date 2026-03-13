@@ -10,14 +10,15 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
 
     public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsSCAPE.Builder<Builder> {
 
-        private DefaultChannelSettings.Builder csb_ = new DefaultChannelSettings.Builder();
-        private DefaultTimingSettings.Builder tsb_ = new DefaultTimingSettings.Builder();
-        private DefaultVolumeSettings.Builder vsb_ = new DefaultVolumeSettings.Builder();
-        private DefaultSliceSettings.Builder ssb_ = new DefaultSliceSettings.Builder();
-        private DefaultSliceSettingsLS.Builder ssbLS_ = new DefaultSliceSettingsLS.Builder();
+        private DefaultChannelSettings.Builder csb_ = DefaultChannelSettings.builder();
+        private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
+        private DefaultVolumeSettings.Builder vsb_ = DefaultVolumeSettings.builder();
+        private DefaultSliceSettings.Builder ssb_ = DefaultSliceSettings.builder();
+        private DefaultSliceSettingsLS.Builder ssbLS_ = DefaultSliceSettingsLS.builder();
         private StageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[1];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[1];
+
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
 
         private CameraMode cameraMode_ = CameraMode.EDGE;

@@ -6,6 +6,10 @@ import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 
 public class DefaultAutofocusSettings implements AutofocusSettings {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder implements AutofocusSettings.Builder {
 
         private int numImages_ = 10;
@@ -22,7 +26,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 //        private boolean autoUpdateOffset_ = true;
 //        private double autoUpdateMaxOffset_ = 5.0;
 
-        public Builder() {
+        private Builder() {
         }
 
         private Builder(final DefaultAutofocusSettings autofocusSettings) {

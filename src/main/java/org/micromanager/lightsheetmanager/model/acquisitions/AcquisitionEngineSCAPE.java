@@ -1046,7 +1046,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         double delayBeforeScan = 0.0;
         double cameraExposure = 0.0;
 
-        DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
+        DefaultTimingSettings.Builder tsb = DefaultTimingSettings.builder();
         switch (cameraMode) {
             case PSEUDO_OVERLAP: // e.g. Kinetix
                 scansPerSlice = 1;
@@ -1160,7 +1160,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         CameraBase camera = model_.devices().firstImagingCamera(); //.getDevice("ImagingCamera");
         if (camera == null) {
             // just a dummy to test demo mode
-            return new DefaultTimingSettings.Builder();
+            return DefaultTimingSettings.builder();
         }
 
         // TODO: is this necessary? setTriggerMode is called in doHardwareCalculations too
@@ -1229,7 +1229,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // NOTE: tsb.sliceDuration() is needed in PSEUDO_OVERLAP camera mode.
         // cameraExposure will be modified in the switch, sliceDuration does not depend on it
-        DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
+        DefaultTimingSettings.Builder tsb = DefaultTimingSettings.builder();
         tsb.scansPerSlice(1)
                 .scanDuration(scanDuration)
                 .cameraTriggerDuration(cameraTriggerDuration)

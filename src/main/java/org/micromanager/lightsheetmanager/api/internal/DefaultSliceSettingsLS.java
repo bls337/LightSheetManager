@@ -4,6 +4,9 @@ import org.micromanager.lightsheetmanager.api.SliceSettingsLS;
 
 public class DefaultSliceSettingsLS implements SliceSettingsLS {
 
+    public static Builder builder() {
+        return new Builder();
+    }
 
     public static class Builder implements SliceSettingsLS.Builder {
 
@@ -12,7 +15,7 @@ public class DefaultSliceSettingsLS implements SliceSettingsLS {
         private double shutterWidth_ = 5.0;
         private double shutterSpeedFactor_ = 1.0;
 
-        public Builder() {
+        private Builder() {
         }
 
         private Builder(DefaultSliceSettingsLS sliceSettings) {
