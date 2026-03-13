@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
@@ -13,7 +14,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultVolumeSettings.Builder vsb_ = new DefaultVolumeSettings.Builder();
         private DefaultSliceSettings.Builder ssb_ = new DefaultSliceSettings.Builder();
         private DefaultSliceSettingsLS.Builder ssbLS_ = new DefaultSliceSettingsLS.Builder();
-        private DefaultStageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
+        private StageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
@@ -263,7 +264,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
             return ssbLS_;
         }
 
-        public DefaultStageScanSettings.Builder scanSettingsBuilder() {
+        public StageScanSettings.Builder scanSettingsBuilder() {
             return scsb_;
         }
 
@@ -322,7 +323,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
     private final DefaultVolumeSettings volumeSettings_;
     private final DefaultSliceSettingsLS sliceSettingsLS_;
     private final DefaultSliceSettings sliceSettings_;
-    private final DefaultStageScanSettings scanSettings_;
+    private final StageScanSettings scanSettings_;
     private final DefaultSheetCalibration[] sheetCalibrations_;
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
@@ -462,7 +463,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
      * @return immutable DefaultScanSettings instance.
      */
     @Override
-    public DefaultStageScanSettings scanSettings() {
+    public StageScanSettings scanSettings() {
         return scanSettings_;
     }
 

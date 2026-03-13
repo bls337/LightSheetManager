@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
@@ -14,7 +15,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private DefaultVolumeSettings.Builder vsb_ = new DefaultVolumeSettings.Builder();
         private DefaultSliceSettings.Builder ssb_ = new DefaultSliceSettings.Builder();
         private DefaultSliceSettingsLS.Builder ssbLS_ = new DefaultSliceSettingsLS.Builder();
-        private DefaultStageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
+        private StageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[1];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[1];
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
@@ -48,7 +49,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             vsb_ = settings.volumeSettings_.copyBuilder();
             ssb_ = settings.sliceSettings_.copyBuilder();
             ssbLS_ = settings.sliceSettingsLS_.copyBuilder();
-            scsb_ = settings.scanSettings_.copyBuilder();
+            scsb_ = settings.stageScan().copyBuilder();
             for (int i = 0; i < 1; i++) {
                 slcb_[i] = settings.sliceCalibrations_[i].copyBuilder();
                 shcb_[i] = settings.sheetCalibrations_[i].copyBuilder();
@@ -227,7 +228,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             return ssbLS_;
         }
 
-        public DefaultStageScanSettings.Builder stageScanBuilder() {
+        public StageScanSettings.Builder stageScanBuilder() {
             return scsb_;
         }
 
@@ -282,7 +283,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final DefaultVolumeSettings volumeSettings_;
     private final DefaultSliceSettingsLS sliceSettingsLS_;
     private final DefaultSliceSettings sliceSettings_;
-    private final DefaultStageScanSettings scanSettings_;
+    private final StageScanSettings scanSettings_;
     private final DefaultSheetCalibration[] sheetCalibrations_;
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
@@ -310,7 +311,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         volumeSettings_ = builder.vsb_.build();
         sliceSettings_ = builder.ssb_.build();
         sliceSettingsLS_ = builder.ssbLS_.build();
-        scanSettings_ = builder.scsb_.build();
+        scanSettings_ = builder.stageScanBuilder().build();
         sheetCalibrations_ = new DefaultSheetCalibration[1];
         sliceCalibrations_ = new DefaultSliceCalibration[1]; // TODO: use this object directly
         for (int i = 0; i < 1; i ++) {
@@ -398,7 +399,7 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
      * @return immutable DefaultStageScanSettings instance.
      */
     @Override
-    public DefaultStageScanSettings stageScan() {
+    public StageScanSettings stageScan() {
         return scanSettings_;
     }
 

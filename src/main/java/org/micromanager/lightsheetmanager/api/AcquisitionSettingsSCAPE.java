@@ -158,7 +158,7 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      *
      * @return immutable DefaultScanSettings instance.
      */
-    DefaultStageScanSettings stageScan();
+    StageScanSettings stageScan();
 
     /**
      * Returns the immutable DefaultSheetCalibration instance.

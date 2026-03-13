@@ -35,7 +35,7 @@ public class DefaultStageScanSettings implements StageScanSettings {
 
     @Override
     public StageScanSettings.Builder copyBuilder() {
-        return new DefaultStageScanSettings.Builder(this);
+        return new Builder(this);
     }
 
     @Override
