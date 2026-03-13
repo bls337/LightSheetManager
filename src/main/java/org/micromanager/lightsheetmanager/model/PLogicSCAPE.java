@@ -241,7 +241,7 @@ public class PLogicSCAPE {
 
             // cache how far we scan each pass for later use
             final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
-                    settings.stageScan().scanAngleFirstView(),true);
+                    settings.stageScan().firstViewAngle(),true);
             actualStepSizeUm_ = settings.volume().sliceStepSize() * (actualMotorSpeed / requestedMotorSpeed);
             scanDistance_ = settings.volume().slicesPerView() * actualStepSizeUm_ * speedFactor;
 
@@ -276,7 +276,7 @@ public class PLogicSCAPE {
         }
         final int channelsPerPass = computeScanChannelsPerPass(settings);
         final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
-                settings.stageScan().scanAngleFirstView(), settings.volume().firstView() == 1);
+                settings.stageScan().firstViewAngle(), settings.volume().firstView() == 1);
         return settings.volume().sliceStepSize() * speedFactor / sliceDuration / channelsPerPass;
     }
 
@@ -325,8 +325,8 @@ public class PLogicSCAPE {
     }
 
     public boolean prepareStageScanForAcquisition(final double x, final double y, DefaultAcquisitionSettingsSCAPE settings) {
-        final boolean scanFromCurrent = settings.stageScan().scanFromCurrentPosition();
-        final boolean scanNegative = settings.stageScan().scanFromNegativeDirection();
+        final boolean scanFromCurrent = settings.stageScan().fromCurrentPosition();
+        final boolean scanNegative = settings.stageScan().fromNegativeDirection();
         double xStartUm;
         double xStopUm;
         if (scanFromCurrent) {

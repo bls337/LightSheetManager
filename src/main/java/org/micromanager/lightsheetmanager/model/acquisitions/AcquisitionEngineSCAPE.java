@@ -722,7 +722,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         if (acqSettings_.isUsingStageScanning()) {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
             final boolean returnToOriginalPosition =
-                    acqSettings_.stageScan().scanReturnToOriginalPosition();
+                    acqSettings_.stageScan().returnToStart();
 
             // make sure stage scanning state machine is stopped,
             // otherwise setting speed/position won't take

@@ -18,10 +18,10 @@ public class SettingsTab extends Panel implements ListeningPanel {
     private Spinner spnScanAcceleration_;
     private Spinner spnScanOvershootDist_;
     private Spinner spnScanRetraceSpeed_;
-    private Spinner spnScanAngleFirstView_;
+    private Spinner spnScanFirstViewAngle_;
     private CheckBox cbxScanFromCurrentPosition_;
     private CheckBox cbxScanNegativeDirection_;
-    private CheckBox cbxReturnToOriginalPosition_;
+    private CheckBox cbxReturnToStart_;
 
     // light sheet scanner settings
     private Spinner spnSheetAxisFilterFreq_;
@@ -71,17 +71,17 @@ public class SettingsTab extends Panel implements ListeningPanel {
                 settings.stageScan().retraceSpeed(),
                 0.01, 99.0, 1.0);
 
-        spnScanAngleFirstView_ = Spinner.createDoubleSpinner(
-                settings.stageScan().scanAngleFirstView(),
+        spnScanFirstViewAngle_ = Spinner.createDoubleSpinner(
+                settings.stageScan().firstViewAngle(),
                 1.0, 89.0, 1.0);
 
         // Scan CheckBoxes
         cbxScanFromCurrentPosition_ = new CheckBox("Scan from current position instead of center",
-                settings.stageScan().scanFromCurrentPosition());
+                settings.stageScan().fromCurrentPosition());
         cbxScanNegativeDirection_ = new CheckBox("Scan negative direction",
-                settings.stageScan().scanFromNegativeDirection());
-        cbxReturnToOriginalPosition_ = new CheckBox("Return to original position after scan",
-                settings.stageScan().scanReturnToOriginalPosition());
+                settings.stageScan().fromNegativeDirection());
+        cbxReturnToStart_ = new CheckBox("Return to original position after scan",
+                settings.stageScan().returnToStart());
 
         final Panel pnlLightSheet = new Panel("Light Sheet Scanner");
         pnlLightSheet.setMigLayout(
@@ -108,10 +108,10 @@ public class SettingsTab extends Panel implements ListeningPanel {
             pnlScanSettings.add(lblScanRetraceSpeed, "");
             pnlScanSettings.add(spnScanRetraceSpeed_, "wrap");
             pnlScanSettings.add(lblScanAngleFirstView, "");
-            pnlScanSettings.add(spnScanAngleFirstView_, "wrap");
+            pnlScanSettings.add(spnScanFirstViewAngle_, "wrap");
             pnlScanSettings.add(cbxScanFromCurrentPosition_, "span 2, wrap");
             pnlScanSettings.add(cbxScanNegativeDirection_, "span 2, wrap");
-            pnlScanSettings.add(cbxReturnToOriginalPosition_, "span 2, wrap");
+            pnlScanSettings.add(cbxReturnToStart_, "span 2, wrap");
         } else {
             pnlScanSettings.add(new JLabel("Stage scanning not supported by your firmware."), "");
         }
@@ -149,19 +149,19 @@ public class SettingsTab extends Panel implements ListeningPanel {
             spnScanRetraceSpeed_.registerListener(e ->
                     model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .retraceSpeed(spnScanRetraceSpeed_.getDouble()));
-            spnScanAngleFirstView_.registerListener(e ->
+            spnScanFirstViewAngle_.registerListener(e ->
                     model_.acquisitions().settingsBuilder().stageScanBuilder()
-                            .scanAngleFirstView(spnScanAngleFirstView_.getDouble()));
+                            .firstViewAngle(spnScanFirstViewAngle_.getDouble()));
 
             cbxScanFromCurrentPosition_.registerListener(e ->
                     model_.acquisitions().settingsBuilder().stageScanBuilder()
-                            .scanFromCurrentPosition(cbxScanFromCurrentPosition_.isSelected()));
+                            .fromCurrentPosition(cbxScanFromCurrentPosition_.isSelected()));
             cbxScanNegativeDirection_.registerListener(e ->
                     model_.acquisitions().settingsBuilder().stageScanBuilder()
-                            .scanFromNegativeDirection(cbxScanNegativeDirection_.isSelected()));
-            cbxReturnToOriginalPosition_.registerListener(e ->
+                            .fromNegativeDirection(cbxScanNegativeDirection_.isSelected()));
+            cbxReturnToStart_.registerListener(e ->
                     model_.acquisitions().settingsBuilder().stageScanBuilder()
-                            .scanReturnToOriginalPosition(cbxReturnToOriginalPosition_.isSelected()));
+                            .returnToStart(cbxReturnToStart_.isSelected()));
         }
 
         // ASIScanner Filter Freq

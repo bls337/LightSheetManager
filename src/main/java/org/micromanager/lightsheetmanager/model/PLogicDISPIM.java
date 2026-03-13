@@ -408,8 +408,8 @@ public class PLogicDISPIM {
     }
 
     public boolean prepareStageScanForAcquisition(final double x, final double y, DefaultAcquisitionSettingsDISPIM settings) {
-        final boolean scanFromCurrent = settings.scanSettings().scanFromCurrentPosition();
-        final boolean scanNegative = settings.scanSettings().scanFromNegativeDirection();
+        final boolean scanFromCurrent = settings.scanSettings().fromCurrentPosition();
+        final boolean scanNegative = settings.scanSettings().fromNegativeDirection();
         double xStartUm;
         double xStopUm;
         if (scanFromCurrent) {

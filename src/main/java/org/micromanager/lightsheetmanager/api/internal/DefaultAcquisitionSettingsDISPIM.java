@@ -13,7 +13,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private DefaultVolumeSettings.Builder vsb_ = new DefaultVolumeSettings.Builder();
         private DefaultSliceSettings.Builder ssb_ = new DefaultSliceSettings.Builder();
         private DefaultSliceSettingsLS.Builder ssbLS_ = new DefaultSliceSettingsLS.Builder();
-        private DefaultStageScanSettings.Builder scsb_ = new DefaultStageScanSettings.Builder();
+        private DefaultStageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
@@ -35,7 +35,7 @@ public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings
         private int numChannels_ = 0;
         private String channelGroup_ = "";
         private ChannelSpec[] channels_ = new ChannelSpec[]{};
-        private double liveScanPeriod_ = 20.0;
+        private double liveScanPeriod_ = 20.0; // TODO: this could go in user settings since it has to do with the live view
 
         public Builder() {
             for (int i = 0; i < 2; i++) {

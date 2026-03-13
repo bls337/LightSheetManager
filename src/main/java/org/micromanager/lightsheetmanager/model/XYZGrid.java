@@ -100,7 +100,7 @@ public class XYZGrid {
         if (useX_) {
             // TODO: update GUI with values, aliases for asb and vsb?
             final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
-                    model.acquisitions().settings().stageScan().scanAngleFirstView(),true);
+                    model.acquisitions().settings().stageScan().firstViewAngle(),true);
             model.acquisitions().settingsBuilder().volumeBuilder().sliceStepSize(Math.abs(deltaX_)/speedFactor);
             model.acquisitions().settingsBuilder().volumeBuilder().slicesPerView(numX);
             // move to X center if we aren't generating a position list with it

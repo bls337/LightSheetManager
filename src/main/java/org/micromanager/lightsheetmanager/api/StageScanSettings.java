@@ -1,47 +1,145 @@
 package org.micromanager.lightsheetmanager.api;
 
 /**
- * This interface implements settings for ASI stages with the scan module.
+ * Settings for ASI stage scanning operations.
+ * <p>
+ * This object defines settings for the {@code SCAN MODULE} firmware module.
+ * <p>
+ * <a href="https://asiimaging.com/docs/scan_module">ASI Scan Module Documentation</a>
  */
 public interface StageScanSettings {
 
+    /**
+     * Returns a builder initialized with the current settings.
+     *
+     * @return a builder to create a modified copy of these settings
+     */
+    Builder copyBuilder();
+
+    /**
+     * Returns the acceleration factor.
+     *
+     * @return the acceleration factor
+     */
+    double accelerationFactor();
+
+    /**
+     * Returns the overshoot distance.
+     *
+     * @return the overshoot distance in microns
+     */
+    int overshootDistance();
+
+    /**
+     * Returns stage speed during the retrace move as a percentage of the max speed.
+     *
+     * @return the speed of the retrace move as a percentage of the max speed
+     */
+    double retraceSpeed();
+
+    /**
+     * Returns the scan angle in degrees.
+     *
+     * @return the scan angle in degrees
+     */
+    double firstViewAngle();
+
+    /**
+     * Returns true if the scan should return to the starting position.
+     *
+     * @return true if the scan should return to the starting position
+     */
+    boolean returnToStart();
+
+    /**
+     * Returns true if the scan should start from the current position.
+     *
+     * @return true if the scan should start from the current position
+     */
+    boolean fromCurrentPosition();
+
+    /**
+     * Returns true if the scan should be negative.
+     *
+     * @return true if the scan should be negative
+     */
+    boolean fromNegativeDirection();
+
     interface Builder {
 
+        /**
+         * Sets the acceleration factor.
+         * <p>
+         * The default value is 1.0.
+         *
+         * @param factor the acceleration factor
+         * @return this builder
+         */
         Builder accelerationFactor(final double factor);
 
+        /**
+         * Sets the overshoot distance. // TODO: units
+         * <p>
+         * The default value is 0.
+         *
+         * @param distance the overshoot distance
+         * @return this builder
+         */
         Builder overshootDistance(final int distance);
 
+        /**
+         * Sets the retrace speed as a percentage of the maximum stage speed.
+         * <p>
+         * The default value is 67%.
+         *
+         * @param speed the retrace speed (1-100%)
+         * @return this builder
+         */
         Builder retraceSpeed(final double speed);
 
-        Builder scanAngleFirstView(final double angle);
-
-        Builder scanReturnToOriginalPosition(final boolean state);
-
-        Builder scanFromCurrentPosition(final boolean state);
-
-        Builder scanFromNegativeDirection(final boolean state);
+        /**
+         * Sets the scan angle of the first view.
+         * <p>
+         * The default value is 45 degrees.
+         *
+         * @param angle the angle in degrees
+         * @return this builder
+         */
+        Builder firstViewAngle(final double angle);
 
         /**
-         * Creates an immutable instance of ScanSettings
+         * Sets whether the stage returns to the start position after scanning.
+         * <p>
+         * The default value is false, the stage does not return to the original position.
          *
-         * @return Immutable version of ScanSettings
+         * @param state true to return to start
+         * @return this builder
+         */
+        Builder returnToStart(final boolean state);
+
+        /**
+         * Sets whether the scan starts from the current stage position.
+         * <p>
+         * The default value is false.
+         *
+         * @param state true to start from current position
+         * @return this builder
+         */
+        Builder fromCurrentPosition(final boolean state);
+
+        /**
+         * Sets whether the scan direction is negative or positive.
+         *
+         * @param state true for negative direction, false for positive
+         * @return this builder
+         */
+        Builder fromNegativeDirection(final boolean state);
+
+        /**
+         * Creates a new {@link StageScanSettings} instance based on the current configuration.
+         *
+         * @return a new immutable settings instance
          */
         StageScanSettings build();
     }
-
-    Builder copyBuilder();
-
-    double accelerationFactor();
-
-    int overshootDistance();
-
-    double retraceSpeed();
-
-    double scanAngleFirstView();
-
-    boolean scanReturnToOriginalPosition();
-
-    boolean  scanFromCurrentPosition();
-
-    boolean scanFromNegativeDirection();
 }
