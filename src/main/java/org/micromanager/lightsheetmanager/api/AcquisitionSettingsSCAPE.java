@@ -4,7 +4,6 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultStageScanSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
@@ -39,13 +38,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
          * @param cameraOrder the imaging camera order
          */
         T imagingCameraOrder(final CameraData[] cameraOrder);
-
-        /**
-         * Sets the acquisition to use channels.
-         *
-         * @param state true to use channels.
-         */
-        T useChannels(final boolean state);
 
         /**
          * Sets the acquisition to use time points.
@@ -194,13 +186,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      * @return the imaging camera order
      */
     CameraData[] imagingCameraOrder();
-
-    /**
-     * Returns true if using channels.
-     *
-     * @return true if using channels.
-     */
-    boolean isUsingChannels();
 
     /**
      * Returns true if using time points.

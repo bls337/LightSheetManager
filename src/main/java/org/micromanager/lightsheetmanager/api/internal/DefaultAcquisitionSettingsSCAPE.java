@@ -28,7 +28,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         private CameraMode cameraMode_ = CameraMode.EDGE;
         private CameraData[] imagingCameraOrder_ = {};
 
-        private boolean useChannels_ = false;
         private boolean useTimePoints_ = false;
         private boolean useAutofocus_ = false;
         private boolean useMultiplePositions_ = false;
@@ -62,7 +61,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
             acquisitionMode_ = settings.acquisitionMode_;
             cameraMode_ = settings.cameraMode_;
             imagingCameraOrder_ = settings.imagingCameraOrder_;
-            useChannels_ = settings.useChannels_;
             useTimePoints_ = settings.useTimePoints_;
             useAutofocus_ = settings.useAutofocus_;
             useMultiplePositions_ = settings.useMultiplePositions_;
@@ -110,17 +108,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         @Override
         public Builder imagingCameraOrder(final CameraData[] cameraOrder) {
             imagingCameraOrder_ = cameraOrder;
-            return this;
-        }
-
-        /**
-         * Sets the acquisition to use channels.
-         *
-         * @param state true to use channels.
-         */
-        @Override
-        public Builder useChannels(final boolean state) {
-            useChannels_ = state;
             return this;
         }
 
@@ -285,7 +272,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     private final CameraMode cameraMode_;
     private final CameraData[] imagingCameraOrder_;
 
-    private final boolean useChannels_;
     private final boolean useTimePoints_;
     private final boolean useAutofocus_;
     private final boolean useMultiplePositions_;
@@ -314,7 +300,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
         imagingCameraOrder_ = builder.imagingCameraOrder_;
-        useChannels_ = builder.useChannels_;
         useTimePoints_ = builder.useTimePoints_;
         useAutofocus_ = builder.useAutofocus_;
         useStageScanning_ = builder.useStageScanning_;
@@ -446,16 +431,6 @@ public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings 
     @Override
     public CameraData[] imagingCameraOrder() {
         return imagingCameraOrder_;
-    }
-
-    /**
-     * Returns true if using channels.
-     *
-     * @return true if using channels.
-     */
-    @Override
-    public boolean isUsingChannels() {
-        return useChannels_;
     }
 
     /**
