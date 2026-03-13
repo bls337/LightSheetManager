@@ -60,15 +60,15 @@ public class SettingsTab extends Panel implements ListeningPanel {
 
         // Scan Spinners
         spnScanAcceleration_ = Spinner.createDoubleSpinner(
-                settings.stageScan().scanAccelerationFactor(),
+                settings.stageScan().accelerationFactor(),
                 0.1, 1000.0, 1.0);
 
         spnScanOvershootDist_ = Spinner.createIntegerSpinner(
-                settings.stageScan().scanOvershootDistance(),
+                settings.stageScan().overshootDistance(),
                 0, 1000, 10);
 
         spnScanRetraceSpeed_ = Spinner.createDoubleSpinner(
-                settings.stageScan().scanRetraceSpeed(),
+                settings.stageScan().retraceSpeed(),
                 0.01, 99.0, 1.0);
 
         spnScanAngleFirstView_ = Spinner.createDoubleSpinner(
@@ -142,13 +142,13 @@ public class SettingsTab extends Panel implements ListeningPanel {
         if (isUsingScanSettings_) {
             spnScanAcceleration_.registerListener(e ->
                     model_.acquisitions().settingsBuilder().stageScanBuilder()
-                            .scanAccelerationFactor(spnScanAcceleration_.getDouble()));
+                            .accelerationFactor(spnScanAcceleration_.getDouble()));
             spnScanOvershootDist_.registerListener(e ->
                     model_.acquisitions().settingsBuilder().stageScanBuilder()
-                            .scanOvershootDistance(spnScanOvershootDist_.getInt()));
+                            .overshootDistance(spnScanOvershootDist_.getInt()));
             spnScanRetraceSpeed_.registerListener(e ->
                     model_.acquisitions().settingsBuilder().stageScanBuilder()
-                            .scanRetraceSpeed(spnScanRetraceSpeed_.getDouble()));
+                            .retraceSpeed(spnScanRetraceSpeed_.getDouble()));
             spnScanAngleFirstView_.registerListener(e ->
                     model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .scanAngleFirstView(spnScanAngleFirstView_.getDouble()));

@@ -255,7 +255,7 @@ public class PLogicDISPIM {
 
             // set the acceleration to a reasonable value for the (usually very slow) scan speed
             xyStage_.setAccelerationX(computeScanAcceleration(actualMotorSpeed,
-                    xyStage_.getMaxSpeedX(), settings.scanSettings().scanAccelerationFactor()));
+                    xyStage_.getMaxSpeedX(), settings.scanSettings().accelerationFactor()));
 
             int numLines = settings.volumeSettings().numViews();
             if (isInterleaved) {
@@ -375,7 +375,7 @@ public class PLogicDISPIM {
      * @return
      */
     public double computeScanAcceleration(final double motorSpeed, DefaultAcquisitionSettingsDISPIM settings) {
-        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.scanSettings().scanAccelerationFactor();
+        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.scanSettings().accelerationFactor();
     }
 
     // TODO: scanNum was part of SliceSettings (now TimingSettings)

@@ -6,9 +6,9 @@ public class DefaultStageScanSettings implements StageScanSettings {
 
     public static class Builder implements StageScanSettings.Builder {
 
-        private double scanAccelerationFactor_ = 1;
-        private int scanOvershootDistance_ = 0;
-        private double scanRetraceSpeed_ =  67.0;
+        private double accelerationFactor_ = 1;
+        private int overshootDistance_ = 0;
+        private double retraceSpeed_ =  67.0;
         private double scanAngleFirstView_ = 45.0;
         private boolean scanReturnToOriginalPosition_ = false;
         private boolean scanFromCurrentPosition_ = false;
@@ -17,31 +17,31 @@ public class DefaultStageScanSettings implements StageScanSettings {
         public Builder() {
         }
 
-        private Builder(DefaultStageScanSettings scanSettings) {
-            scanAccelerationFactor_ = scanSettings.scanAccelerationFactor_;
-            scanOvershootDistance_ = scanSettings.scanOvershootDistance_;
-            scanRetraceSpeed_ = scanSettings.scanRetraceSpeed_;
-            scanAngleFirstView_ = scanSettings.scanAngleFirstView_;
-            scanReturnToOriginalPosition_ = scanSettings.scanReturnToOriginalPosition_;
-            scanFromCurrentPosition_ = scanSettings.scanFromCurrentPosition_;
-            scanFromNegativeDirection_ = scanSettings.scanFromNegativeDirection_;
+        private Builder(DefaultStageScanSettings settings) {
+            accelerationFactor_ = settings.accelerationFactor_;
+            overshootDistance_ = settings.overshootDistance_;
+            retraceSpeed_ = settings.retraceSpeed_;
+            scanAngleFirstView_ = settings.scanAngleFirstView_;
+            scanReturnToOriginalPosition_ = settings.scanReturnToOriginalPosition_;
+            scanFromCurrentPosition_ = settings.scanFromCurrentPosition_;
+            scanFromNegativeDirection_ = settings.scanFromNegativeDirection_;
         }
 
         @Override
-        public StageScanSettings.Builder scanAccelerationFactor(final double factor) {
-            scanAccelerationFactor_ = factor;
+        public StageScanSettings.Builder accelerationFactor(final double factor) {
+            accelerationFactor_ = factor;
             return this;
         }
 
         @Override
-        public StageScanSettings.Builder scanOvershootDistance(final int distance) {
-            scanOvershootDistance_ = distance;
+        public StageScanSettings.Builder overshootDistance(final int distance) {
+            overshootDistance_ = distance;
             return this;
         }
 
         @Override
-        public StageScanSettings.Builder scanRetraceSpeed(final double speed) {
-            scanRetraceSpeed_ = speed;
+        public StageScanSettings.Builder retraceSpeed(final double speed) {
+            retraceSpeed_ = speed;
             return this;
         }
 
@@ -76,18 +76,18 @@ public class DefaultStageScanSettings implements StageScanSettings {
 
     }
 
-    private final double scanAccelerationFactor_;
-    private final int scanOvershootDistance_;
-    private final double scanRetraceSpeed_;
+    private final double accelerationFactor_;
+    private final int overshootDistance_;
+    private final double retraceSpeed_;
     private final double scanAngleFirstView_;
     private final boolean scanReturnToOriginalPosition_;
     private final boolean scanFromCurrentPosition_;
     private final boolean scanFromNegativeDirection_;
 
     private DefaultStageScanSettings(Builder builder) {
-        scanAccelerationFactor_ = builder.scanAccelerationFactor_;
-        scanOvershootDistance_ = builder.scanOvershootDistance_;
-        scanRetraceSpeed_ = builder.scanRetraceSpeed_;
+        accelerationFactor_ = builder.accelerationFactor_;
+        overshootDistance_ = builder.overshootDistance_;
+        retraceSpeed_ = builder.retraceSpeed_;
         scanAngleFirstView_ = builder.scanAngleFirstView_;
         scanReturnToOriginalPosition_ = builder.scanReturnToOriginalPosition_;
         scanFromCurrentPosition_ = builder.scanFromCurrentPosition_;
@@ -100,18 +100,23 @@ public class DefaultStageScanSettings implements StageScanSettings {
     }
 
     @Override
-    public double scanAccelerationFactor() {
-        return scanAccelerationFactor_;
+    public double accelerationFactor() {
+        return accelerationFactor_;
     }
 
     @Override
-    public int scanOvershootDistance() {
-        return scanOvershootDistance_;
+    public int overshootDistance() {
+        return overshootDistance_;
     }
 
+    /**
+     * Return the scan retrace speed percent.
+     *
+     * @return the scan retrace speed
+     */
     @Override
-    public double scanRetraceSpeed() {
-        return scanRetraceSpeed_;
+    public double retraceSpeed() {
+        return retraceSpeed_;
     }
 
     @Override
@@ -139,7 +144,7 @@ public class DefaultStageScanSettings implements StageScanSettings {
         return String.format(
                 "%s[scanAccelerationFactor=%s, scanOvershootDistance=%s, scanRetraceSpeed=%s, scanAngleFirstView=%s]",
                 getClass().getSimpleName(),
-                scanAccelerationFactor_, scanOvershootDistance_, scanRetraceSpeed_, scanAngleFirstView_
+                accelerationFactor_, overshootDistance_, retraceSpeed_, scanAngleFirstView_
         );
     }
 

@@ -214,7 +214,7 @@ public class PLogicSCAPE {
 
             // set the acceleration to a reasonable value for the (usually very slow) scan speed
             xyStage_.setAccelerationX(computeScanAcceleration(actualMotorSpeed,
-                    xyStage_.getMaxSpeedX(), settings.stageScan().scanAccelerationFactor()));
+                    xyStage_.getMaxSpeedX(), settings.stageScan().accelerationFactor()));
 
             // set the scan pattern and number of scans appropriately
             int numLines = settings.volume().numViews();
@@ -292,7 +292,7 @@ public class PLogicSCAPE {
      * @return
      */
     public double computeScanAcceleration(final double motorSpeed, DefaultAcquisitionSettingsSCAPE settings) {
-        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().scanAccelerationFactor();
+        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().accelerationFactor();
     }
 
     // TODO: scanNum was part of SliceSettings (now TimingSettings)

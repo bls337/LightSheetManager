@@ -7,11 +7,11 @@ public interface StageScanSettings {
 
     interface Builder {
 
-        Builder scanAccelerationFactor(final double factor);
+        Builder accelerationFactor(final double factor);
 
-        Builder scanOvershootDistance(final int distance);
+        Builder overshootDistance(final int distance);
 
-        Builder scanRetraceSpeed(final double speed);
+        Builder retraceSpeed(final double speed);
 
         Builder scanAngleFirstView(final double angle);
 
@@ -31,11 +31,11 @@ public interface StageScanSettings {
 
     Builder copyBuilder();
 
-    double scanAccelerationFactor();
+    double accelerationFactor();
 
-    int scanOvershootDistance();
+    int overshootDistance();
 
-    double scanRetraceSpeed();
+    double retraceSpeed();
 
     double scanAngleFirstView();
 
