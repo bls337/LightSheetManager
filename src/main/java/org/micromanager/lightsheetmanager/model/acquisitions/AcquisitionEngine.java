@@ -225,7 +225,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             SummaryMetadata.Builder dsmb = new DefaultSummaryMetadata.Builder();
 
             List<String> axesOrdered = dsmb.build().getOrderedAxes();
-            axesOrdered.add(LSMAcquisitionEvents.CAMERA_AXIS);
+            axesOrdered.add(LightSheetAcquisitionEvents.CAMERA_AXIS);
             // convert to JSON array
             JSONArray axes = new JSONArray();
             for (String axis : axesOrdered) {

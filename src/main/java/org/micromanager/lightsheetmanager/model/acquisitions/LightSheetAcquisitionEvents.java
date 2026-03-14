@@ -17,7 +17,7 @@ import java.util.function.Function;
  * This function creates lazy sequences (i.e. iterators) of acquisition events by translating
  * LightSheetManager's AcquisitionSettings into AcquisitionEvents (instructions for AcqEngJ)
  */
-public class LSMAcquisitionEvents {
+public class LightSheetAcquisitionEvents {
 
    public static final String TIME_AXIS = "time";
    public static final String POSITION_AXIS = "position";

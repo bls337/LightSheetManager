@@ -43,8 +43,10 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
-
-public class AcquisitionEngineSCAPE extends AcquisitionEngine {
+/**
+ * Manages the acquisition for SCAPE microscopes.
+ */
+public class AcquisitionEngineScape extends AcquisitionEngine {
 
     PLogicScape controller_;
     ArrayList<Double> savedExposures_;
@@ -57,7 +59,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     private boolean autoShutter_;
     private boolean isPolling_; // true if polling was enabled at the start of an acquisition
 
-    public AcquisitionEngineSCAPE(final LightSheetManager model) {
+    public AcquisitionEngineScape(final LightSheetManager model) {
         super(model);
     }
 
@@ -587,11 +589,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
             if (acqSettings_.channels().enabled()) {
                 currentAcquisition_.submitEventIterator(
-                        LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
+                        LightSheetAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
                                 baseEvent.copy(), acqSettings_, cameraNames, null));
             } else {
                 currentAcquisition_.submitEventIterator(
-                        LSMAcquisitionEvents.createTimelapseVolumeAcqEvents(
+                        LightSheetAcquisitionEvents.createTimelapseVolumeAcqEvents(
                                 baseEvent.copy(), acqSettings_, cameraNames, null));
             }
 
@@ -605,13 +607,13 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 //System.out.println("time index: " + timeIndex);
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
                 if (acqSettings_.isUsingTimePoints()) {
-                    baseEvent.setAxisPosition(LSMAcquisitionEvents.TIME_AXIS, timeIndex);
+                    baseEvent.setAxisPosition(LightSheetAcquisitionEvents.TIME_AXIS, timeIndex);
                 }
                 // Loop 2: XY positions
                 for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
                     //System.out.println("pos index: " + positionIndex);
                     if (acqSettings_.isUsingMultiplePositions()) {
-                        baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
+                        baseEvent.setAxisPosition(LightSheetAcquisitionEvents.POSITION_AXIS, positionIndex);
                         // is this the best way to do stage movements with new acq engine?
                         MultiStagePosition position = pl.getPosition(positionIndex);
                         baseEvent.setX(position.getX());
@@ -623,11 +625,11 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     // Loop 3: Channels; Loop 4: Z slices
                     if (acqSettings_.channels().enabled()) {
                         currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createChannelAcqEvents(
+                                LightSheetAcquisitionEvents.createChannelAcqEvents(
                                         baseEvent.copy(), acqSettings_, cameraNames, null));
                     } else {
                         currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createAcqEvents(
+                                LightSheetAcquisitionEvents.createAcqEvents(
                                         baseEvent.copy(), acqSettings_, cameraNames, null));
                     }
                 }

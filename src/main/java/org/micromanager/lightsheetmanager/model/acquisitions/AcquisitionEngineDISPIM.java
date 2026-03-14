@@ -31,13 +31,16 @@ import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AcquisitionEngineDISPIM extends AcquisitionEngine {
+/**
+ * Manages the acquisition for diSPIM microscopes.
+ */
+public class AcquisitionEngineDispim extends AcquisitionEngine {
 
 //    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
    // TODO: remove this when a more generic method is available and get from base class
     private DefaultAcquisitionSettingsDISPIM acqSettings_;
 
-    public AcquisitionEngineDISPIM(final LightSheetManager model) {
+    public AcquisitionEngineDispim(final LightSheetManager model) {
         super(model);
         // TODO: remove this when a more generic method is available and get from base class
         acqSettings_ = DefaultAcquisitionSettingsDISPIM.builder().build();
