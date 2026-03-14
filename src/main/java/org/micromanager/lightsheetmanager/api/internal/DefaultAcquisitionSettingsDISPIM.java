@@ -7,13 +7,13 @@ import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 
-public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings implements AcquisitionSettingsDispim {
+public class DefaultAcquisitionSettingsDISPIM extends BaseAcquisitionSettings implements AcquisitionSettingsDispim {
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDispim.Builder<Builder> {
+    public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDispim.Builder<Builder> {
 
         private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
         private DefaultVolumeSettings.Builder vsb_ = DefaultVolumeSettings.builder();

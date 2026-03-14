@@ -2,7 +2,6 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
@@ -10,7 +9,7 @@ import org.micromanager.lightsheetmanager.model.DataStorage;
 /**
  * Base acquisition settings for all microscopes.
  */
-public abstract class DefaultAcquisitionSettings implements AcquisitionSettings {
+public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
 
     public abstract static class Builder<T extends Builder<T>> implements AcquisitionSettings.Builder<T> {
 
@@ -25,7 +24,7 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
         public Builder() {
         }
 
-        public Builder(final DefaultAcquisitionSettings acqSettings) {
+        public Builder(final BaseAcquisitionSettings acqSettings) {
             saveDirectory_ = acqSettings.saveDirectory_;
             saveNamePrefix_ = acqSettings.saveNamePrefix_;
             saveDuringAcq_ = acqSettings.saveDuringAcq_;
@@ -131,7 +130,7 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
 //        demoMode_ = false;
 //    }
 
-    protected DefaultAcquisitionSettings(Builder<?> builder) {
+    protected BaseAcquisitionSettings(Builder<?> builder) {
         saveDirectory_ = builder.saveDirectory_;
         saveNamePrefix_ = builder.saveNamePrefix_;
         saveDuringAcq_ = builder.saveDuringAcq_;

@@ -6,13 +6,13 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
-public class DefaultAcquisitionSettingsSCAPE extends DefaultAcquisitionSettings implements AcquisitionSettingsScape {
+public class DefaultAcquisitionSettingsSCAPE extends BaseAcquisitionSettings implements AcquisitionSettingsScape {
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsScape.Builder<Builder> {
+    public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsScape.Builder<Builder> {
 
         private DefaultChannelSettings.Builder csb_ = DefaultChannelSettings.builder();
         private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
