@@ -28,7 +28,7 @@ import java.util.Objects;
 
 // Replacement for ControllerUtils.java
 // TODO: use arrays for piezos etc on diSPIM
-public class PLogicDISPIM {
+public class PLogicDispim {
 
     private Studio studio_;
     private CMMCore core_;
@@ -72,7 +72,7 @@ public class PLogicDISPIM {
 
     private final LightSheetManager model_;
 
-    public PLogicDISPIM(final LightSheetManager model) {
+    public PLogicDispim(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
         devices_ = model_.devices();

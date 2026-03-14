@@ -25,7 +25,7 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.util.Objects;
 
-public class PLogicSCAPE {
+public class PLogicScape {
 
     private Studio studio_;
     private CMMCore core_;
@@ -63,7 +63,7 @@ public class PLogicSCAPE {
 
     private final LightSheetManager model_;
 
-    public PLogicSCAPE(final LightSheetManager model) {
+    public PLogicScape(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
         devices_ = model_.devices();

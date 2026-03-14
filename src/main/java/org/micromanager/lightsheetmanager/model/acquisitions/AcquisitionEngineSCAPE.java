@@ -24,7 +24,7 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.model.PLogicSCAPE;
+import org.micromanager.lightsheetmanager.model.PLogicScape;
 import org.micromanager.lightsheetmanager.model.devices.DeviceAdapter;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
 
 public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
-    PLogicSCAPE controller_;
+    PLogicScape controller_;
     ArrayList<Double> savedExposures_;
     Point2D.Double xyPosUm_;
     private double origSpeedX_;
@@ -186,7 +186,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         if (!demoMode) {
 
             if (isUsingPLC) {
-                controller_ = new PLogicSCAPE(model_);
+                controller_ = new PLogicScape(model_);
 
                 final boolean success = doHardwareCalculations(controller_);
                 if (!success) {
@@ -453,7 +453,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 //        }, Acquisition.AFTER_HARDWARE_HOOK);
 
-        final PLogicSCAPE controllerInstance = controller_;
+        final PLogicScape controllerInstance = controller_;
         // TODO This after camera hook is called after the camera has been readied to acquire a
         //  sequence. I assume we want to tell the Tiger to start sending TTLs etc here
         currentAcquisition_.addHook(new AcquisitionHook() {
@@ -780,7 +780,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         return true;
     }
 
-    private boolean doHardwareCalculations(PLogicSCAPE plc) {
+    private boolean doHardwareCalculations(PLogicScape plc) {
 
         // TODO: find a better place to set the camera trigger mode for SCAPE
         CameraBase[] cameras = model_.devices().imagingCameras();

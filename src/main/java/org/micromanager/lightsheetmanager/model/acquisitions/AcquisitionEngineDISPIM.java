@@ -22,7 +22,7 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSetting
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.model.PLogicDISPIM;
+import org.micromanager.lightsheetmanager.model.PLogicDispim;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -81,7 +81,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
 
-        PLogicDISPIM controller = null;
+        PLogicDispim controller = null;
 
         // Assume demo mode if default camera is DemoCamera
         boolean demoMode = false;
@@ -95,7 +95,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         if (!demoMode) {
 
             if (isUsingPLC) {
-                controller = new PLogicDISPIM(model_);
+                controller = new PLogicDispim(model_);
 
                 final boolean success = doHardwareCalculations(controller);
                 if (!success) {
@@ -356,7 +356,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
 
 
-        final PLogicDISPIM controllerInstance = controller;
+        final PLogicDispim controllerInstance = controller;
         // TODO This after camera hook is called after the camera has been readied to acquire a
         //  sequence. I assume we want to tell the Tiger to start sending TTLs etc here
         currentAcquisition_.addHook(new AcquisitionHook() {
@@ -542,7 +542,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         return true;
     }
 
-    private boolean doHardwareCalculations(PLogicDISPIM plc) {
+    private boolean doHardwareCalculations(PLogicDispim plc) {
 
         // make sure slice timings are up-to-date
         recalculateSliceTiming();
