@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -41,7 +41,7 @@ public class SettingsTab extends Panel implements ListeningPanel {
     }
 
     private void createUserInterface() {
-        final DefaultAcquisitionSettingsSCAPE settings = model_.acquisitions().settings();
+        final ScapeAcquisitionSettings settings = model_.acquisitions().settings();
 
         // check for devices to set up the tab
         isUsingPLogic_ = model_.devices().isUsingPLogic();

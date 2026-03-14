@@ -16,7 +16,7 @@ import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.lightsheetmanager.LightSheetManagerPlugin;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
 import org.micromanager.lightsheetmanager.model.autofocus.AutofocusAdapter;
@@ -36,8 +36,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     protected final Studio studio_;
     protected final CMMCore core_;
 
-    protected DefaultAcquisitionSettingsSCAPE.Builder asb_;
-    protected DefaultAcquisitionSettingsSCAPE acqSettings_;
+    protected ScapeAcquisitionSettings.Builder asb_;
+    protected ScapeAcquisitionSettings acqSettings_;
 
     private final ExecutorService acquisitionExecutor_ = Executors.newSingleThreadExecutor(
             r -> new Thread(r, "Acquisition Thread"));
@@ -66,7 +66,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         autofocus_ = new AutofocusAdapter(model_);
 
         // default settings
-        asb_ = DefaultAcquisitionSettingsSCAPE.builder();
+        asb_ = ScapeAcquisitionSettings.builder();
         acqSettings_ = asb_.build();
     }
 
@@ -99,8 +99,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      *
      * @param acqSettings the {@code DefaultAcquisitionSettingsSCAPE} to use
      */
-    public void setAcquisitionSettingsAndBuilder(final DefaultAcquisitionSettingsSCAPE acqSettings) {
-        asb_ = new DefaultAcquisitionSettingsSCAPE.Builder(acqSettings);
+    public void setAcquisitionSettingsAndBuilder(final ScapeAcquisitionSettings acqSettings) {
+        asb_ = new ScapeAcquisitionSettings.Builder(acqSettings);
         acqSettings_ = acqSettings;
     }
 
@@ -247,11 +247,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         }
     }
 
-    public DefaultAcquisitionSettingsSCAPE settings() {
+    public ScapeAcquisitionSettings settings() {
         return acqSettings_;
     }
 
-    public DefaultAcquisitionSettingsSCAPE.Builder settingsBuilder() {
+    public ScapeAcquisitionSettings.Builder settingsBuilder() {
         return asb_;
     }
 

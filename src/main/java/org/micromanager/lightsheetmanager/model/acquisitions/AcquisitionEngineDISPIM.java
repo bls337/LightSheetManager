@@ -18,7 +18,7 @@ import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DispimAcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
@@ -38,12 +38,12 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
 //    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
    // TODO: remove this when a more generic method is available and get from base class
-    private DefaultAcquisitionSettingsDISPIM acqSettings_;
+    private DispimAcquisitionSettings acqSettings_;
 
     public AcquisitionEngineDispim(final LightSheetManager model) {
         super(model);
         // TODO: remove this when a more generic method is available and get from base class
-        acqSettings_ = DefaultAcquisitionSettingsDISPIM.builder().build();
+        acqSettings_ = DispimAcquisitionSettings.builder().build();
     }
 
 //    @Override
@@ -917,7 +917,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         return volumeDuration;
     }
 
-    private double computeActualVolumeDuration(final DefaultAcquisitionSettingsDISPIM acqSettings) {
+    private double computeActualVolumeDuration(final DispimAcquisitionSettings acqSettings) {
         final ChannelMode channelMode = acqSettings.channelMode();
         final int numChannels = acqSettings.numChannels();
         final int numViews = acqSettings.volumeSettings().numViews();

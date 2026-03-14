@@ -24,7 +24,7 @@ import javax.swing.text.DefaultCaret;
 import org.micromanager.PositionList;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DispimAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionMetadata;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionTableData;
@@ -415,7 +415,7 @@ public class AcquisitionTableFrame extends JFrame {
         } else {
             // TODO: check this
             // FIXME: new way of doing acq settings (was "new AcquisitionSettings()" before builder)
-            acqTable_.addAcquisitionSettings(name, DefaultAcquisitionSettingsDISPIM.builder().build());//acqPanel_.getCurrentAcquisitionSettings());
+            acqTable_.addAcquisitionSettings(name, DispimAcquisitionSettings.builder().build());//acqPanel_.getCurrentAcquisitionSettings());
         }
     }
 
@@ -656,7 +656,7 @@ public class AcquisitionTableFrame extends JFrame {
         if (acqTable_.getSelectedRow() != -1) {
             acqTable_.getTableData().updateAcquisitionSettings(
             // TODO: check this
-            acqTable_.getCurrentAcqName(), DefaultAcquisitionSettingsDISPIM.builder().build());//acqPanel_.getCurrentAcquisitionSettings());
+            acqTable_.getCurrentAcqName(), DispimAcquisitionSettings.builder().build());//acqPanel_.getCurrentAcquisitionSettings());
         }
         if (lstPositions_.getSelectedValue() != null) {
             final String selected = lstPositions_.getSelectedValue().toString();

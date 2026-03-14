@@ -8,7 +8,7 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
@@ -59,7 +59,7 @@ public class PLogicScape {
     private static final int triggerSPIMAddr = 46;  // backplane signal, same as XY card's TTL output
     private static final int laserTriggerAddress = 10;  // this should be set to (42 || 8) = (TTL1 || manual laser on)
 
-    private final DefaultAcquisitionSettingsSCAPE acqSettings_;
+    private final ScapeAcquisitionSettings acqSettings_;
 
     private final LightSheetManager model_;
 
@@ -95,7 +95,7 @@ public class PLogicScape {
      * @return
      */
     public boolean prepareControllerForAcquisitionOffsetOnly(
-            final DefaultAcquisitionSettingsSCAPE settings,
+            final ScapeAcquisitionSettings settings,
             final double channelOffset) {
 
         final int numViews = settings.volume().numViews();
@@ -118,7 +118,7 @@ public class PLogicScape {
     }
 
     public boolean prepareControllerForAcquisition(
-            final DefaultAcquisitionSettingsSCAPE settings,
+            final ScapeAcquisitionSettings settings,
             final double channelOffset) {
         // turn off beam and scan on both sides (they are turned off by SPIM state machine anyway)
         // also ensures that properties match reality at end of acquisition
@@ -265,7 +265,7 @@ public class PLogicScape {
     }
 
     // Compute appropriate motor speed in mm/s for the given stage scanning settings
-    public double computeScanSpeed(DefaultAcquisitionSettingsSCAPE settings, final int numScansPerSlice) {
+    public double computeScanSpeed(ScapeAcquisitionSettings settings, final int numScansPerSlice) {
         //double sliceDuration = settings.timingSettings().sliceDuration();
         // TODO: getSliceDuration only used here, but maybe should be computed elsewhere, and get with method above?
         double sliceDuration = getSliceDuration(settings.timing(), numScansPerSlice);
@@ -281,7 +281,7 @@ public class PLogicScape {
     }
 
     // compute how many channels we do in each one-way scan
-    private int computeScanChannelsPerPass(DefaultAcquisitionSettingsSCAPE settings) {
+    private int computeScanChannelsPerPass(ScapeAcquisitionSettings settings) {
         return settings.channels().mode() == ChannelMode.SLICE_HW ? settings.channels().count() : 1;
     }
 
@@ -291,7 +291,7 @@ public class PLogicScape {
      * @param motorSpeed
      * @return
      */
-    public double computeScanAcceleration(final double motorSpeed, DefaultAcquisitionSettingsSCAPE settings) {
+    public double computeScanAcceleration(final double motorSpeed, ScapeAcquisitionSettings settings) {
         return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().accelerationFactor();
     }
 
@@ -324,7 +324,7 @@ public class PLogicScape {
         return (10 + 100 * (motorSpeed / maxMotorSpeed)) * stageScanAccelFactor;
     }
 
-    public boolean prepareStageScanForAcquisition(final double x, final double y, DefaultAcquisitionSettingsSCAPE settings) {
+    public boolean prepareStageScanForAcquisition(final double x, final double y, ScapeAcquisitionSettings settings) {
         final boolean scanFromCurrent = settings.stageScan().fromCurrentPosition();
         final boolean scanNegative = settings.stageScan().fromNegativeDirection();
         double xStartUm;
@@ -362,7 +362,7 @@ public class PLogicScape {
      * @param centerPiezos true to move piezos to center position
      * @return false if there is a fatal error, true if successful
      */
-    public boolean cleanUpControllerAfterAcquisition(final DefaultAcquisitionSettingsSCAPE settings, final boolean centerPiezos) {
+    public boolean cleanUpControllerAfterAcquisition(final ScapeAcquisitionSettings settings, final boolean centerPiezos) {
         // clear "acquisition running" flag on PLC
         plcCamera_.setPreset(2);
         plcLaser_.setPreset(2);
@@ -394,7 +394,7 @@ public class PLogicScape {
     }
 
     public boolean prepareControllerForAcquisitionSide(
-            final DefaultAcquisitionSettingsSCAPE settings,
+            final ScapeAcquisitionSettings settings,
             final int view,
             final double channelOffset,
             final boolean offsetOnly) {
@@ -635,7 +635,7 @@ public class PLogicScape {
         return true;
     }
 
-    public boolean setupHardwareChannelSwitching(final DefaultAcquisitionSettingsSCAPE settings) {
+    public boolean setupHardwareChannelSwitching(final ScapeAcquisitionSettings settings) {
 
         ChannelMode channelMode = settings.channels().mode();
 

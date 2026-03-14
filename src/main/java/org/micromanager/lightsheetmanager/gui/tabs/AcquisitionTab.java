@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.LightSheetManager;
@@ -90,7 +90,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
      */
     private void createUserInterface() {
 
-        final DefaultAcquisitionSettingsSCAPE settings = model_.acquisitions().settings();
+        final ScapeAcquisitionSettings settings = model_.acquisitions().settings();
 
         setMigLayout(
                 "insets 10 10 10 10, ax center",
