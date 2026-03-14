@@ -589,11 +589,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
             if (acqSettings_.channels().enabled()) {
                 currentAcquisition_.submitEventIterator(
-                        LightSheetAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
+                        LightSheetEventAdapter.createTimelapseMultiChannelVolumeAcqEvents(
                                 baseEvent.copy(), acqSettings_, cameraNames, null));
             } else {
                 currentAcquisition_.submitEventIterator(
-                        LightSheetAcquisitionEvents.createTimelapseVolumeAcqEvents(
+                        LightSheetEventAdapter.createTimelapseVolumeAcqEvents(
                                 baseEvent.copy(), acqSettings_, cameraNames, null));
             }
 
@@ -607,13 +607,13 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 //System.out.println("time index: " + timeIndex);
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
                 if (acqSettings_.isUsingTimePoints()) {
-                    baseEvent.setAxisPosition(LightSheetAcquisitionEvents.TIME_AXIS, timeIndex);
+                    baseEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
                 }
                 // Loop 2: XY positions
                 for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
                     //System.out.println("pos index: " + positionIndex);
                     if (acqSettings_.isUsingMultiplePositions()) {
-                        baseEvent.setAxisPosition(LightSheetAcquisitionEvents.POSITION_AXIS, positionIndex);
+                        baseEvent.setAxisPosition(LightSheetEventAdapter.POSITION_AXIS, positionIndex);
                         // is this the best way to do stage movements with new acq engine?
                         MultiStagePosition position = pl.getPosition(positionIndex);
                         baseEvent.setX(position.getX());
@@ -625,11 +625,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     // Loop 3: Channels; Loop 4: Z slices
                     if (acqSettings_.channels().enabled()) {
                         currentAcquisition_.submitEventIterator(
-                                LightSheetAcquisitionEvents.createChannelAcqEvents(
+                                LightSheetEventAdapter.createChannelAcqEvents(
                                         baseEvent.copy(), acqSettings_, cameraNames, null));
                     } else {
                         currentAcquisition_.submitEventIterator(
-                                LightSheetAcquisitionEvents.createAcqEvents(
+                                LightSheetEventAdapter.createAcqEvents(
                                         baseEvent.copy(), acqSettings_, cameraNames, null));
                     }
                 }
