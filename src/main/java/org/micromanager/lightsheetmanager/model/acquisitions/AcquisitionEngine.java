@@ -19,7 +19,7 @@ import org.micromanager.lightsheetmanager.api.AcquisitionManager;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
-import org.micromanager.lightsheetmanager.model.autofocus.AutofocusMM;
+import org.micromanager.lightsheetmanager.model.autofocus.AutofocusAdapter;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
@@ -43,7 +43,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             r -> new Thread(r, "Acquisition Thread"));
     protected volatile Acquisition currentAcquisition_ = null; // TODO: consider making a getter rather than protected?
 
-    private final AutofocusMM autofocus_;
+    private final AutofocusAdapter autofocus_;
 
     private DataStorage data_; // TODO: use this, has enum that needs moved/deleted?
     protected Datastore curStore_;
@@ -63,7 +63,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         core_ = model.core();
 
         data_ = new DataStorage(studio_);
-        autofocus_ = new AutofocusMM(model_);
+        autofocus_ = new AutofocusAdapter(model_);
 
         // default settings
         asb_ = DefaultAcquisitionSettingsSCAPE.builder();
@@ -255,7 +255,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         return asb_;
     }
 
-    public AutofocusMM autofocus() {
+    public AutofocusAdapter autofocus() {
         return autofocus_;
     }
 

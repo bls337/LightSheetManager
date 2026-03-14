@@ -31,8 +31,8 @@ import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.cameras.DemoCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.HamamatsuCamera;
-import org.micromanager.lightsheetmanager.model.devices.cameras.PCOCamera;
-import org.micromanager.lightsheetmanager.model.devices.cameras.PVCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.PcoCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.PvCamera;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
@@ -864,12 +864,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 break;
             }
             case PVCAM: {
-                PVCamera camera = model_.devices().device(cameraName);
+                PvCamera camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case PCOCAMERA: {
-                PCOCamera camera = model_.devices().device(cameraName);
+                PcoCamera camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
@@ -1032,9 +1032,9 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // TODO: is this getting the correct value?
         final double actualCameraResetTime =
-              camera.getDeviceName().equals(PVCamera.Models.PRIME_95B) ||
-              camera.getDeviceName().equals(PVCamera.Models.KINETIX)
-              ? camera.getPropertyFloat(PVCamera.Properties.READOUT_TIME) / 1e6 : cameraResetTime;
+              camera.getDeviceName().equals(PvCamera.Models.PRIME_95B) ||
+              camera.getDeviceName().equals(PvCamera.Models.KINETIX)
+              ? camera.getPropertyFloat(PvCamera.Properties.READOUT_TIME) / 1e6 : cameraResetTime;
 
         // timing settings
         int scansPerSlice = 0;

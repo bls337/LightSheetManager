@@ -11,7 +11,7 @@ import java.awt.Rectangle;
  * <p>Device Adapter: PVCAM
  * <p>Camera Support: Kinetix, Prime 95B, Prime
  */
-public class PVCamera extends CameraBase implements LightSheetCamera {
+public class PvCamera extends CameraBase implements LightSheetCamera {
 
     public static class Models {
         public static final String PRIME = "CIS2020F";
@@ -39,7 +39,7 @@ public class PVCamera extends CameraBase implements LightSheetCamera {
         public final static String EDGE_TRIGGER = "Edge Trigger";
     }
 
-    public PVCamera(Studio studio, String deviceName) {
+    public PvCamera(Studio studio, String deviceName) {
         super(studio, deviceName);
     }
 

@@ -6,7 +6,7 @@ import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDispim;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.DISPIMDevice;
+import org.micromanager.lightsheetmanager.api.data.DispimDevice;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
@@ -94,14 +94,14 @@ public class PLogicDispim {
         // populate devices
         switch (geometryType) {
             case DISPIM:
-                scanner1_ = devices_.device(DISPIMDevice.getIllumBeam(1));
-                scanner2_ = devices_.device(DISPIMDevice.getIllumBeam(2));
-                piezo1_ = devices_.device(DISPIMDevice.getImagingFocus(1));
-                piezo2_ = devices_.device(DISPIMDevice.getImagingFocus(2));
-                plcCamera_ = devices_.device(DISPIMDevice.TRIGGER_CAMERA);
-                plcLaser_ = devices_.device(DISPIMDevice.TRIGGER_LASER);
-                xyStage_ = devices_.device(DISPIMDevice.SAMPLE_XY);
-                zStage_ = devices_.device(DISPIMDevice.SAMPLE_Z);
+                scanner1_ = devices_.device(DispimDevice.getIllumBeam(1));
+                scanner2_ = devices_.device(DispimDevice.getIllumBeam(2));
+                piezo1_ = devices_.device(DispimDevice.getImagingFocus(1));
+                piezo2_ = devices_.device(DispimDevice.getImagingFocus(2));
+                plcCamera_ = devices_.device(DispimDevice.TRIGGER_CAMERA);
+                plcLaser_ = devices_.device(DispimDevice.TRIGGER_LASER);
+                xyStage_ = devices_.device(DispimDevice.SAMPLE_XY);
+                zStage_ = devices_.device(DispimDevice.SAMPLE_Z);
                 break;
             case SCAPE:
                 scanner_ = devices_.device("IllumSlice");
