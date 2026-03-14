@@ -25,7 +25,7 @@ import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.PLogicSCAPE;
-import org.micromanager.lightsheetmanager.model.devices.LightSheetDeviceManager;
+import org.micromanager.lightsheetmanager.model.devices.DeviceAdapter;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
@@ -549,7 +549,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
             // TODO(Brandon): account for > 2 simultaneous cameras
-            final LightSheetDeviceManager adapter = model_.devices().adapter();
+            final DeviceAdapter adapter = model_.devices().adapter();
             if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
                // multiple simultaneous cameras
                 //if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
