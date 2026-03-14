@@ -5,19 +5,6 @@ import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 public interface ChannelSettings {
 
-    interface Builder {
-
-        Builder enabled(final boolean state);
-
-        Builder group(final String group);
-
-        Builder mode(final ChannelMode mode);
-
-        Builder data(final ChannelSpec[] channels);
-
-        ChannelSettings build();
-    }
-
     boolean enabled();
 
     int count();
@@ -33,5 +20,18 @@ public interface ChannelSettings {
     ChannelSpec[] used();
 
     ChannelSpec[] data();
+
+    interface Builder {
+
+        Builder enabled(final boolean state);
+
+        Builder group(final String group);
+
+        Builder mode(final ChannelMode mode);
+
+        Builder data(final ChannelSpec[] channels);
+
+        ChannelSettings build();
+    }
 
 }

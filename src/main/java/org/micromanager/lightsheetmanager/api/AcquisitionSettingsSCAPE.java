@@ -16,9 +16,9 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 public interface AcquisitionSettingsScape extends AcquisitionSettings {
 
     /**
-     * Creates a Builder populated with settings of this AcquisitionSettingsDISPIM instance.
+     * Returns a builder initialized with the current settings.
      *
-     * @return AcquisitionSettingsDISPIM.Builder pre-populated with settings of this instance.
+     * @return a builder to create a modified copy of these settings
      */
     //Builder copyBuilder();
 

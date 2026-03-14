@@ -4,7 +4,7 @@ import mmcorej.CMMCore;
 import mmcorej.Configuration;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDispim;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.DISPIMDevice;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
@@ -482,7 +482,7 @@ public class PLogicDISPIM {
     }
 
     public boolean prepareControllerForAcquisitionSide(
-            final AcquisitionSettingsDISPIM settings,
+            final AcquisitionSettingsDispim settings,
             final int view,
             final double channelOffset,
             final boolean offsetOnly) {

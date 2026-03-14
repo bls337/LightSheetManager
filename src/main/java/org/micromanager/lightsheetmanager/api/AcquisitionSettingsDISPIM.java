@@ -14,129 +14,12 @@ import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 /**
  * Acquisition settings for diSPIM microscopes.
  */
-public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
-
-    interface Builder<T extends AcquisitionSettings.Builder<T>> extends AcquisitionSettings.Builder<T> {
-
-        /**
-         * Sets the acquisition mode.
-         *
-         * @param acqMode the acquisition mode
-         */
-        T acquisitionMode(final AcquisitionMode acqMode);
-
-        /**
-         * Sets the channel mode.
-         *
-         * @param channelMode the channel mode.
-         */
-        T channelMode(final ChannelMode channelMode);
-
-        /**
-         * Sets the camera mode.
-         *
-         * @param cameraMode the camera mode.
-         */
-        T cameraMode(final CameraMode cameraMode);
-
-        /**
-         * Sets the acquisition to use channels.
-         *
-         * @param state true to use channels.
-         */
-        T useChannels(final boolean state);
-
-        /**
-         * Sets the acquisition to use time points.
-         *
-         * @param state true to use time points.
-         */
-        T useTimePoints(final boolean state);
-
-        /**
-         * Sets the acquisition to use autofocus.
-         *
-         * @param state true to use autofocus.
-         */
-        T useAutofocus(final boolean state);
-
-        /**
-         * Sets the acquisition to use multiple positions.
-         *
-         * @param state true to use multiple positions.
-         */
-        T useMultiplePositions(final boolean state);
-
-        /**
-         * Sets the acquisition to use hardware time points.
-         *
-         * @param state true to use time points.
-         */
-        T useHardwareTimePoints(final boolean state);
-
-        /**
-         * Sets the acquisition to use stage scanning.
-         *
-         * @param state true to use stage scanning.
-         */
-        T useStageScanning(final boolean state);
-
-        /**
-         * Sets the acquisition to use advanced timing settings.
-         *
-         * @param state true to use advanced timing settings
-         */
-        T useAdvancedTiming(final boolean state);
-
-        /**
-         * Sets the number of time points.
-         *
-         * @param numTimePoints the number of time points
-         */
-        T numTimePoints(final int numTimePoints);
-
-        /**
-         * Sets the time point interval between time points in seconds.
-         *
-         * @param timePointInterval the time point interval in seconds.
-         */
-        T timePointInterval(final int timePointInterval);
-
-        /**
-         * Sets the delay after a move when using multiple positions.
-         *
-         * @param postMoveDelay the delay in milliseconds.
-         */
-        T postMoveDelay(final int postMoveDelay);
-
-        /**
-         * Sets the channel group.
-         *
-         * @param channelGroup the channel group.
-         */
-        T channelGroup(final String channelGroup);
-
-        /**
-         * Sets the channels array.
-         *
-         * @param channels the channel array
-         */
-        T channels(final ChannelSpec[] channels);
-
-        T liveScanPeriod(final double liveScanPeriod);
-
-        /**
-         * Creates an immutable instance of AcquisitionSettingsDISPIM
-         *
-         * @return Immutable version of AcquisitionSettingsDISPIM
-         */
-        AcquisitionSettingsDISPIM build();
-    }
+public interface AcquisitionSettingsDispim extends AcquisitionSettings {
 
     /**
-     * Creates a Builder populated with settings of this AcquisitionSettingsDISPIM instance.
+     * Returns a builder initialized with the current settings.
      *
-     * @return AcquisitionSettingsDISPIM.Builder pre-populated with settings of this instance.
+     * @return a builder to create a modified copy of these settings
      */
     //Builder copyBuilder();
 
@@ -303,4 +186,137 @@ public interface AcquisitionSettingsDISPIM extends AcquisitionSettings {
     ChannelSpec[] channels();
 
     double liveScanPeriod();
+
+    interface Builder<T extends AcquisitionSettings.Builder<T>> extends AcquisitionSettings.Builder<T> {
+
+        /**
+         * Sets the acquisition mode.
+         *
+         * @param acqMode the acquisition mode
+         * @return {@code this} builder
+         */
+        T acquisitionMode(final AcquisitionMode acqMode);
+
+        /**
+         * Sets the channel mode.
+         *
+         * @param channelMode the channel mode
+         * @return {@code this} builder
+         */
+        T channelMode(final ChannelMode channelMode);
+
+        /**
+         * Sets the camera mode.
+         *
+         * @param cameraMode the camera mode.
+         * @return {@code this} builder
+         */
+        T cameraMode(final CameraMode cameraMode);
+
+        /**
+         * Sets the acquisition to use channels.
+         *
+         * @param state true to use channels
+         * @return {@code this} builder
+         */
+        T useChannels(final boolean state);
+
+        /**
+         * Sets the acquisition to use time points.
+         *
+         * @param state true to use time points
+         * @return {@code this} builder
+         */
+        T useTimePoints(final boolean state);
+
+        /**
+         * Sets the acquisition to use autofocus.
+         *
+         * @param state true to use autofocus
+         * @return {@code this} builder
+         */
+        T useAutofocus(final boolean state);
+
+        /**
+         * Sets the acquisition to use multiple positions.
+         *
+         * @param state true to use multiple positions
+         * @return {@code this} builder
+         */
+        T useMultiplePositions(final boolean state);
+
+        /**
+         * Sets the acquisition to use hardware time points.
+         *
+         * @param state true to use time points
+         * @return {@code this} builder
+         */
+        T useHardwareTimePoints(final boolean state);
+
+        /**
+         * Sets the acquisition to use stage scanning.
+         *
+         * @param state true to use stage scanning
+         * @return {@code this} builder
+         */
+        T useStageScanning(final boolean state);
+
+        /**
+         * Sets the acquisition to use advanced timing settings.
+         *
+         * @param state true to use advanced timing settings
+         * @return {@code this} builder
+         */
+        T useAdvancedTiming(final boolean state);
+
+        /**
+         * Sets the number of time points.
+         *
+         * @param numTimePoints the number of time points
+         * @return {@code this} builder
+         */
+        T numTimePoints(final int numTimePoints);
+
+        /**
+         * Sets the time point interval between time points in seconds.
+         *
+         * @param timePointInterval the time point interval in seconds
+         * @return {@code this} builder
+         */
+        T timePointInterval(final int timePointInterval);
+
+        /**
+         * Sets the delay after a move when using multiple positions.
+         *
+         * @param postMoveDelay the delay in milliseconds
+         * @return {@code this} builder
+         */
+        T postMoveDelay(final int postMoveDelay);
+
+        /**
+         * Sets the channel group.
+         *
+         * @param channelGroup the channel group
+         * @return {@code this} builder
+         */
+        T channelGroup(final String channelGroup);
+
+        /**
+         * Sets the channels array.
+         *
+         * @param channels the channel array
+         * @return {@code this} builder
+         */
+        T channels(final ChannelSpec[] channels);
+
+        T liveScanPeriod(final double liveScanPeriod);
+
+        /**
+         * Creates a new {@link AcquisitionSettingsDispim} instance based on the current configuration.
+         *
+         * @return a new immutable settings instance
+         */
+        AcquisitionSettingsDispim build();
+    }
+
 }

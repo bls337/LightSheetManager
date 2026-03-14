@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager;
 
 import mmcorej.CMMCore;
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.api.LightSheetManagerAPI;
+import org.micromanager.lightsheetmanager.api.LightSheetManagerApi;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.model.PluginSettings;
@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * This is the container for all the data needed to operate a microscope with light sheet manager.
  */
-public class LightSheetManager implements LightSheetManagerAPI {
+public class LightSheetManager implements LightSheetManagerApi {
 
     private final Studio studio_;
     private final CMMCore core_;

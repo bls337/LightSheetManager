@@ -70,9 +70,9 @@ public interface VolumeSettings {
     }
 
     /**
-     * Creates a Builder populated with settings of this VolumeSettings instance.
+     * Returns a builder initialized with the current settings.
      *
-     * @return VolumeSettings.Builder pre-populated with settings of this instance.
+     * @return a builder to create a modified copy of these settings
      */
     Builder copyBuilder();
 

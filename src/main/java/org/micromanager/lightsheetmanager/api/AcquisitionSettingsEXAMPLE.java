@@ -3,15 +3,15 @@ package org.micromanager.lightsheetmanager.api;
 /**
  * This is an example to reference for creating a new microscope geometry interface.
  */
-public interface AcquisitionSettingsEXAMPLE extends AcquisitionSettings {
+public interface AcquisitionSettingsExample extends AcquisitionSettings {
 
     interface Builder<T extends AcquisitionSettings.Builder<T>> extends AcquisitionSettings.Builder<T> {
 
         /**
-         * Creates an immutable instance of AcquisitionSettingsEXAMPLE
+         * Creates a new {@link AcquisitionSettingsExample} instance based on the current configuration.
          *
-         * @return Immutable version of AcquisitionSettingsEXAMPLE
+         * @return a new immutable settings instance
          */
-        AcquisitionSettingsEXAMPLE build();
+        AcquisitionSettingsExample build();
     }
 }

@@ -1,19 +1,19 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
-import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDispim;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 
-public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings implements AcquisitionSettingsDISPIM {
+public class DefaultAcquisitionSettingsDISPIM extends DefaultAcquisitionSettings implements AcquisitionSettingsDispim {
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDISPIM.Builder<Builder> {
+    public static class Builder extends DefaultAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDispim.Builder<Builder> {
 
         private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
         private DefaultVolumeSettings.Builder vsb_ = DefaultVolumeSettings.builder();
