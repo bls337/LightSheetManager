@@ -73,7 +73,7 @@ public interface StageScanSettings {
          * The default value is 1.0.
          *
          * @param factor the acceleration factor
-         * @return this builder
+         * @return {@code this} builder
          */
         Builder accelerationFactor(final double factor);
 
@@ -83,7 +83,7 @@ public interface StageScanSettings {
          * The default value is 0.
          *
          * @param distance the overshoot distance
-         * @return this builder
+         * @return {@code this} builder
          */
         Builder overshootDistance(final int distance);
 
@@ -93,7 +93,7 @@ public interface StageScanSettings {
          * The default value is 67%.
          *
          * @param speed the retrace speed (1-100%)
-         * @return this builder
+         * @return {@code this} builder
          */
         Builder retraceSpeed(final double speed);
 
@@ -103,7 +103,7 @@ public interface StageScanSettings {
          * The default value is 45 degrees.
          *
          * @param angle the angle in degrees
-         * @return this builder
+         * @return {@code this} builder
          */
         Builder firstViewAngle(final double angle);
 
@@ -113,7 +113,7 @@ public interface StageScanSettings {
          * The default value is false, the stage does not return to the original position.
          *
          * @param state true to return to start
-         * @return this builder
+         * @return {@code this} builder
          */
         Builder returnToStart(final boolean state);
 
@@ -123,7 +123,7 @@ public interface StageScanSettings {
          * The default value is false.
          *
          * @param state true to start from current position
-         * @return this builder
+         * @return {@code this} builder
          */
         Builder fromCurrentPosition(final boolean state);
 
@@ -131,7 +131,7 @@ public interface StageScanSettings {
          * Sets whether the scan direction is negative or positive.
          *
          * @param state true for negative direction, false for positive
-         * @return this builder
+         * @return {@code this} builder
          */
         Builder fromNegativeDirection(final boolean state);
 
