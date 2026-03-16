@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.model.utils;
 import org.apache.commons.math3.util.Precision;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 
 /**
@@ -80,6 +81,11 @@ public final class NumberUtils {
     // Copied from Micro-Manager NumberUtils for displaying strings
     public static String doubleToDisplayString(double number) {
         return format_.format(number);
+    }
+
+    static {
+        format_.setRoundingMode(RoundingMode.HALF_UP);
+        format_.setMaximumFractionDigits(4);
     }
 
 }

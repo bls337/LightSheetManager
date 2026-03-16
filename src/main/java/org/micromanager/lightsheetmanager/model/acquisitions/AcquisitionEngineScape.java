@@ -1352,8 +1352,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     private void updateVolumeDurationLabel(final JLabel label) {
         final double duration = computeVolumeDuration();
         if (duration > 1000) {
+            // round to ms
             label.setText(NumberUtils.doubleToDisplayString(duration / 1000) + " s");
         } else {
+            // round to tenth of ms
             label.setText(NumberUtils.doubleToDisplayString((double)Math.round(10 * duration) / 10) + " ms");
         }
     }
@@ -1362,7 +1364,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     * Update the displayed total time duration.
     */
     private void updateTotalTimeDurationLabel(final JLabel label) {
-        String s = "";
         final double duration = computeTotalTimeDuration();
         if (duration < 60) {  // less than 1 min
             label.setText(NumberUtils.doubleToDisplayString(duration) + " s");
