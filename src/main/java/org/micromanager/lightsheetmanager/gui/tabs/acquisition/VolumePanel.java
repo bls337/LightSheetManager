@@ -10,7 +10,7 @@ import org.micromanager.lightsheetmanager.gui.components.Spinner;
 
 import java.util.Objects;
 
-public class VolumeSettingsPanel extends Panel {
+public class VolumePanel extends Panel {
 
     private ComboBox<Integer> cmbNumViews_;
     private ComboBox<Integer> cmbFirstView_;
@@ -21,7 +21,7 @@ public class VolumeSettingsPanel extends Panel {
 
     private final LightSheetManager model_;
 
-    public VolumeSettingsPanel(final LightSheetManager model) {
+    public VolumePanel(final LightSheetManager model) {
         super("Volume Settings");
         model_ = Objects.requireNonNull(model);
         createUserInterface();

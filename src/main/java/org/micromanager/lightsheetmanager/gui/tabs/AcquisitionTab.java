@@ -15,7 +15,7 @@ import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SavePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SlicePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeSettingsPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.channels.ChannelTablePanel;
 import org.micromanager.lightsheetmanager.gui.playlist.AcquisitionTableFrame;
 import org.micromanager.lightsheetmanager.gui.components.Button;
@@ -66,7 +66,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     private ChannelTablePanel pnlChannelTable_;
 
     // right panel
-    private VolumeSettingsPanel pnlVolumeSettings_;
+    private VolumePanel pnlVolumeSettings_;
     private SlicePanel pnlSliceSettings_;
     private AdvancedTimingPanel pnlAdvancedTiming_;
     private CheckBox cbxUseAdvancedTiming_;
@@ -110,7 +110,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         );
 
         pnlDurations_ = new VolumeDurationPanel(model_);
-        pnlVolumeSettings_ = new VolumeSettingsPanel(model_);
+        pnlVolumeSettings_ = new VolumePanel(model_);
 
         // switch between these two panels
         pnlSliceSettings_ = new SlicePanel(model_);
