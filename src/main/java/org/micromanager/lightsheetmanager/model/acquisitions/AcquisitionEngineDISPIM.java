@@ -817,8 +817,8 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                 // 5. laser turns on 0.25ms before camera trigger and stays on until exposure is ending
                 // TODO revisit this after further experimentation
                 cameraDuration = 1;  // only need to trigger camera
-                final double shutterWidth = acqSettings_.sliceSettingsLS().shutterWidth();
-                final double shutterSpeed = acqSettings_.sliceSettingsLS().shutterSpeedFactor();
+                final double shutterWidth = acqSettings_.sliceLS().shutterWidth();
+                final double shutterSpeed = acqSettings_.sliceLS().shutterSpeedFactor();
                 ///final double shutterWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_WIDTH);
                 //final int shutterSpeed = props_.getPropValueInteger(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_SPEED);
                 double pixelSize = core_.getPixelSizeUm();
@@ -829,8 +829,8 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                 cameraExposure = rowReadoutTime * (int)(shutterWidth/pixelSize) * shutterSpeed;
                 // s.cameraExposure = (rowReadoutTime * shutterWidth / pixelSize * shutterSpeed);
                 final double totalExposureMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime + cameraExposure + 0.05);  // 50-300us extra cushion time
-                final double scanSettle = acqSettings_.sliceSettingsLS().scanSettleTime();
-                final double scanReset = acqSettings_.sliceSettingsLS().scanResetTime();
+                final double scanSettle = acqSettings_.sliceLS().scanSettleTime();
+                final double scanReset = acqSettings_.sliceLS().scanResetTime();
                 delayBeforeScan = scanReset - scanDelayFilter;
                 scanDuration = scanSettle + (totalExposureMax*shutterSpeed) + scanLaserBufferTime;
                 delayBeforeCamera = scanReset + scanSettle;

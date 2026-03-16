@@ -53,34 +53,35 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
         }
 
-        public Builder(final DispimAcquisitionSettings acqSettings) {
-            super(acqSettings);
-            tsb_ = acqSettings.timingSettings_.copyBuilder();
-            vsb_ = acqSettings.volumeSettings_.copyBuilder();
-            ssb_ = acqSettings.sliceSettings_.copyBuilder();
-            ssbLS_ = acqSettings.sliceSettingsLS_.copyBuilder();
-            scsb_ = acqSettings.stageScan_.copyBuilder();
+        public Builder(final DispimAcquisitionSettings settings) {
+            super(settings);
+            csb_ = settings.channelSettings_.copyBuilder();
+            tsb_ = settings.timingSettings_.copyBuilder();
+            vsb_ = settings.volumeSettings_.copyBuilder();
+            ssb_ = settings.sliceSettings_.copyBuilder();
+            ssbLS_ = settings.sliceSettingsLS_.copyBuilder();
+            scsb_ = settings.stageScan().copyBuilder();
             for (int i = 0; i < 2; i++) {
-                slcb_[i] = acqSettings.sliceCalibrations_[i].copyBuilder();
-                shcb_[i] = acqSettings.sheetCalibrations_[i].copyBuilder();
+                slcb_[i] = settings.sliceCalibrations_[i].copyBuilder();
+                shcb_[i] = settings.sheetCalibrations_[i].copyBuilder();
             }
-            acquisitionMode_ = acqSettings.acquisitionMode_;
-            channelMode_ = acqSettings.channelMode_;
-            cameraMode_ = acqSettings.cameraMode_;
-            useChannels_ = acqSettings.useChannels_;
-            useTimePoints_ = acqSettings.useTimePoints_;
-            useAutofocus_ = acqSettings.useAutofocus_;
-            useMultiplePositions_ = acqSettings.useMultiplePositions_;
-            useHardwareTimePoints_ = acqSettings.useHardwareTimePoints_;
-            useStageScanning_ = acqSettings.useStageScanning_;
-            useAdvancedTiming_ =  acqSettings.useAdvancedTiming_;
-            numTimePoints_ = acqSettings.numTimePoints_;
-            timePointInterval_ = acqSettings.timePointInterval_;
-            postMoveDelay_ = acqSettings.postMoveDelay_;
-            numChannels_ = acqSettings.numChannels_;
-            channelGroup_ = acqSettings.channelGroup_;
-            channels_ = acqSettings.channels_;
-            liveScanPeriod_ = acqSettings.liveScanPeriod_;
+            acquisitionMode_ = settings.acquisitionMode_;
+            channelMode_ = settings.channelMode_;
+            cameraMode_ = settings.cameraMode_;
+            useChannels_ = settings.useChannels_;
+            useTimePoints_ = settings.useTimePoints_;
+            useAutofocus_ = settings.useAutofocus_;
+            useMultiplePositions_ = settings.useMultiplePositions_;
+            useHardwareTimePoints_ = settings.useHardwareTimePoints_;
+            useStageScanning_ = settings.useStageScanning_;
+            useAdvancedTiming_ =  settings.useAdvancedTiming_;
+            numTimePoints_ = settings.numTimePoints_;
+            timePointInterval_ = settings.timePointInterval_;
+            postMoveDelay_ = settings.postMoveDelay_;
+            numChannels_ = settings.numChannels_;
+            channelGroup_ = settings.channelGroup_;
+            channels_ = settings.channels_;
+            liveScanPeriod_ = settings.liveScanPeriod_;
         }
 
         /**
@@ -255,6 +256,10 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         }
 
         // getters for sub-builders
+        public DefaultChannelSettings.Builder channelBuilder() {
+            return csb_;
+        }
+
         public DefaultTimingSettings.Builder timingSettingsBuilder() {
             return tsb_;
         }
@@ -314,6 +319,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     }
 
+    private final DefaultChannelSettings channelSettings_;
     private final DefaultTimingSettings timingSettings_;
     private final DefaultVolumeSettings volumeSettings_;
     private final DefaultSliceSettingsLS sliceSettingsLS_;
@@ -346,6 +352,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     private DispimAcquisitionSettings(Builder builder) {
         super(builder);
+        channelSettings_ = builder.csb_.build();
         timingSettings_ = builder.tsb_.build();
         volumeSettings_ = builder.vsb_.build();
         sliceSettings_ = builder.ssb_.build();
@@ -383,33 +390,18 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 //     */
 //    @Override
 //    public DefaultAcquisitionSettingsDISPIM.Builder copyBuilder() {
-//        return new Builder(
-//                timingSettings_.copyBuilder(),
-//                volumeSettings_.copyBuilder(),
-//                sliceSettings_.copyBuilder(),
-//                sliceSettingsLS_.copyBuilder(),
-//                acquisitionMode_,
-//                channelMode_,
-//                cameraMode_,
-//                useChannels_,
-//                useTimePoints_,
-//                useAutofocus_,
-//                useStageScanning_,
-//                useMultiplePositions_,
-//                useHardwareTimePoints_,
-//                useAdvancedTiming_,
-//                numTimePoints_,
-//                timePointInterval_,
-//                postMoveDelay_,
-//                numChannels_,
-//                channelGroup_,
-//                channels_
+//        return new Builder(this);
 //        );
 //    }
 
-//    @Override
-//    public AcquisitionSettingsDISPIM.Builder copyBuilder() {
-//        return null;
+    /**
+     * Returns the immutable DefaultChannelSettings instance.
+     *
+     * @return immutable DefaultChannelSettings instance.
+     */
+    //@Override
+//    public DefaultChannelSettings channels() {
+//        return channelSettings_;
 //    }
 
     /**
@@ -448,7 +440,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      * @return immutable DefaultSliceSettingsLS instance.
      */
     @Override
-    public DefaultSliceSettingsLS sliceSettingsLS() {
+    public DefaultSliceSettingsLS sliceLS() {
         return sliceSettingsLS_;
     }
 

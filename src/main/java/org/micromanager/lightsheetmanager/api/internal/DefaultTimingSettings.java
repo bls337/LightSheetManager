@@ -22,16 +22,16 @@ public class DefaultTimingSettings implements TimingSettings {
         private Builder() {
         }
 
-        private Builder(DefaultTimingSettings timingSettings) {
-            scansPerSlice_ = timingSettings.scansPerSlice_;
-            delayBeforeScan_ = timingSettings.delayBeforeScan_;
-            scanDuration_ = timingSettings.scanDuration_;
-            delayBeforeLaser_ = timingSettings.delayBeforeLaser_;
-            laserTriggerDuration_ = timingSettings.laserTriggerDuration_;
-            delayBeforeCamera_ = timingSettings.delayBeforeCamera_;
-            cameraTriggerDuration_ = timingSettings.cameraTriggerDuration_;
-            cameraExposure_ = timingSettings.cameraExposure_;
-            alternateScanDirection_ = timingSettings.alternateScanDirection_;
+        private Builder(DefaultTimingSettings settings) {
+            scansPerSlice_ = settings.scansPerSlice_;
+            delayBeforeScan_ = settings.delayBeforeScan_;
+            scanDuration_ = settings.scanDuration_;
+            delayBeforeLaser_ = settings.delayBeforeLaser_;
+            laserTriggerDuration_ = settings.laserTriggerDuration_;
+            delayBeforeCamera_ = settings.delayBeforeCamera_;
+            cameraTriggerDuration_ = settings.cameraTriggerDuration_;
+            cameraExposure_ = settings.cameraExposure_;
+            alternateScanDirection_ = settings.alternateScanDirection_;
         }
 
         /**

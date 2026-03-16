@@ -49,7 +49,7 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultSliceSettingsLS instance.
      */
-    DefaultSliceSettingsLS sliceSettingsLS();
+    DefaultSliceSettingsLS sliceLS();
 
     /**
      * Returns the immutable DefaultScanSettings instance.
