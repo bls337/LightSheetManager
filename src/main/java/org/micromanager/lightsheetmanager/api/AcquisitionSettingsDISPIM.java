@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.api;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
+import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
@@ -22,6 +23,13 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      * @return a builder to create a modified copy of these settings
      */
     //Builder copyBuilder();
+
+    /**
+     * Returns the immutable DefaultChannelSettings instance.
+     *
+     * @return immutable DefaultChannelSettings instance.
+     */
+    DefaultChannelSettings channels();
 
     /**
      * Returns the immutable DefaultTimingSettings instance.
@@ -183,7 +191,7 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return the channels as an array.
      */
-    ChannelSpec[] channels();
+    ChannelSpec[] channelData();
 
     double liveScanPeriod();
 
@@ -307,7 +315,7 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
          * @param channels the channel array
          * @return {@code this} builder
          */
-        T channels(final ChannelSpec[] channels);
+        T channelData(final ChannelSpec[] channels);
 
         T liveScanPeriod(final double liveScanPeriod);
 

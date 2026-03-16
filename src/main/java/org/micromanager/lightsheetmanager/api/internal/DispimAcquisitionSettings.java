@@ -244,7 +244,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
          * @param channels the channel array
          */
         @Override
-        public Builder channels(final ChannelSpec[] channels) {
+        public Builder channelData(final ChannelSpec[] channels) {
             channels_ = channels;
             return this;
         }
@@ -399,10 +399,10 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      *
      * @return immutable DefaultChannelSettings instance.
      */
-    //@Override
-//    public DefaultChannelSettings channels() {
-//        return channelSettings_;
-//    }
+    @Override
+    public DefaultChannelSettings channels() {
+        return channelSettings_;
+    }
 
     /**
      * Returns the immutable DefaultTimingSettings instance.
@@ -632,7 +632,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      * @return the channels as an array.
      */
     @Override
-    public ChannelSpec[] channels() {
+    public ChannelSpec[] channelData() {
         return channels_;
     }
 

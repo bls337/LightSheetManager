@@ -833,7 +833,7 @@ public class PLogicDispim {
                 // populate a 3-input lookup table with the combinations of lasers present
                 // the LUT "MSB" is the laserTrigger, then the counter MSB, then the counter LSB
                 for (int channelNum = 0; channelNum < settings.numChannels(); ++channelNum) {
-                    if (doesPLogicChannelIncludeLaser(laserNum, settings.channels()[channelNum], settings.channelGroup())) {
+                    if (doesPLogicChannelIncludeLaser(laserNum, settings.channelData()[channelNum], settings.channelGroup())) {
                         lutValue += (int) Math.pow(2, channelNum + 4);  // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
                     }
                 }
@@ -857,7 +857,7 @@ public class PLogicDispim {
             boolean[] hardwareChannelUsed = new boolean[4]; // initialized to all false
             for (int channelNum = 0; channelNum < settings.numChannels(); channelNum++) {
                 // we already know there are between 1 and 4 channels
-                int outputNum = getPLogicOutputFromChannel(settings.channels()[channelNum], settings.channelGroup());
+                int outputNum = getPLogicOutputFromChannel(settings.channelData()[channelNum], settings.channelGroup());
                 // TODO: handle case where we have multiple simultaneous outputs, e.g. outputs 6/7 together
                 // Note: harsh recently asked about double triggering, but ended up needing to split 1-4
                 if (outputNum < 5) {  // check for error in getPLogicOutputFromChannel()
