@@ -9,7 +9,7 @@ import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.CameraSelectionPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.CameraPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.PositionPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SaveDataPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
@@ -59,7 +59,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     private SaveDataPanel pnlSaveData_;
 
     // cameras
-    private CameraSelectionPanel pnlCameras_;
+    private CameraPanel pnlCameras_;
 
     // channels
     private CheckBox cbxUseChannels_;
@@ -124,7 +124,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlMultiPositions_.setPanelEnabled(settings.isUsingMultiplePositions());
 
         pnlSaveData_ = new SaveDataPanel(model_, frame_);
-        pnlCameras_ = new CameraSelectionPanel(model_);
+        pnlCameras_ = new CameraPanel(model_);
 
         // time points
         cbxUseTimePoints_ = new CheckBox("Time Points", settings.isUsingTimePoints());

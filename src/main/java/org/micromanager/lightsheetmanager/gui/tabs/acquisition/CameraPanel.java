@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CameraSelectionPanel extends Panel {
+public class CameraPanel extends Panel {
 
     private ComboBox<CameraMode> cmbCameraTriggerMode_;
     private RadioButton radPrimaryCamera_;
@@ -24,7 +24,7 @@ public class CameraSelectionPanel extends Panel {
 
     private final LightSheetManager model_;
 
-    public CameraSelectionPanel(final LightSheetManager model) {
+    public CameraPanel(final LightSheetManager model) {
         super("Simultaneous Cameras");
         model_ = Objects.requireNonNull(model);
         createUserInterface();
