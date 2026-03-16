@@ -51,6 +51,8 @@ public class LightSheetManagerFrame extends JFrame {
                         createErrorUserInterface();
                     }
                     createUserInterface();
+                    // update after loading the settings and creating ui
+                    model_.acquisitions().updateDurationLabels();
                     break;
                 default:
                     model_.setErrorText("Microscope geometry type "
