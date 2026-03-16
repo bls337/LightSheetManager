@@ -1023,7 +1023,7 @@ public class PLogicDispim {
 //        sheetWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, widthProp);
         sheetWidth = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetWidth();
 
-        if (cameraName == null || cameraName.equals("")) {
+        if (cameraName == null || cameraName.isEmpty()) {
             studio_.logs().logDebugMessage("Could not get sheet width for invalid device " + cameraName);
             return sheetWidth;
         }

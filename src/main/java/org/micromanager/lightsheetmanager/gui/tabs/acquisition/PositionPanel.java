@@ -20,8 +20,8 @@ public class MultiPositionPanel extends Panel {
     private final XYZGridFrame xyzGridFrame_;
     private final LightSheetManager model_;
 
-    public MultiPositionPanel(final LightSheetManager model, final CheckBox cbxUseMultiPositions) {
-        super(cbxUseMultiPositions);
+    public MultiPositionPanel(final LightSheetManager model, final CheckBox checkBox) {
+        super(checkBox);
         model_ = Objects.requireNonNull(model);
         xyzGridFrame_ = new XYZGridFrame(model_);
         createUserInterface();
