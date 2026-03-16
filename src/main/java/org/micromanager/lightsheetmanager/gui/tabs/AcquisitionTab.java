@@ -251,6 +251,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cbxUseMultiplePositions_.registerListener(e -> {
             final boolean selected = cbxUseMultiplePositions_.isSelected();
             model_.acquisitions().settingsBuilder().useMultiplePositions(selected);
+            model_.acquisitions().updateDurationLabels();
             pnlMultiPositions_.setPanelEnabled(selected);
         });
 
@@ -258,8 +259,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cbxUseTimePoints_.registerListener(e -> {
             final boolean selected = cbxUseTimePoints_.isSelected();
             model_.acquisitions().settingsBuilder().useTimePoints(selected);
+            model_.acquisitions().updateDurationLabels();
             pnlTimePoints_.setPanelEnabled(selected);
-            //updateDurationLabels();
         });
 
         // use channels
@@ -274,7 +275,6 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cmbAcquisitionModes_.registerListener(e ->
                 model_.acquisitions().settingsBuilder().acquisitionMode(cmbAcquisitionModes_.getSelected()));
 
-        // TODO: should timing recalc be part of setting use advanced timing value in model?
         // switches timing panels based on check box
         cbxUseAdvancedTiming_.registerListener(e -> {
             final boolean selected = cbxUseAdvancedTiming_.isSelected();
