@@ -14,7 +14,7 @@ import org.micromanager.lightsheetmanager.gui.tabs.acquisition.PositionPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SavePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SlicePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.DurationPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.channels.ChannelTablePanel;
 import org.micromanager.lightsheetmanager.gui.playlist.AcquisitionTableFrame;
@@ -45,7 +45,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     private Button btnRunOverviewAcq_;
 
     // durations
-    private VolumeDurationPanel pnlDurations_;
+    private DurationPanel pnlDurations_;
 
     // time points
     private TimePointsPanel pnlTimePoints_;
@@ -109,7 +109,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
                 "[]10[]"
         );
 
-        pnlDurations_ = new VolumeDurationPanel(model_);
+        pnlDurations_ = new DurationPanel(model_);
         pnlVolumeSettings_ = new VolumePanel(model_);
 
         // switch between these two panels

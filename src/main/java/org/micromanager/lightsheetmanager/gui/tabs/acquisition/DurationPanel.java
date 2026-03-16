@@ -7,13 +7,13 @@ import org.micromanager.lightsheetmanager.LightSheetManager;
 import javax.swing.JLabel;
 import java.util.Objects;
 
-public class VolumeDurationPanel extends Panel {
+public class DurationPanel extends Panel {
 
     private Label lblSliceTimeValue_;
     private Label lblVolumeTimeValue_;
     private Label lblTotalTimeValue_;
 
-    public VolumeDurationPanel(final LightSheetManager model) {
+    public DurationPanel(final LightSheetManager model) {
         super("Durations");
         Objects.requireNonNull(model)
               .acquisitions().setVolumeDurationPanel(this);
