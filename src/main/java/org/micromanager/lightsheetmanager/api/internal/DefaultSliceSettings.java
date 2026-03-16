@@ -17,10 +17,10 @@ public class DefaultSliceSettings implements SliceSettings {
         private Builder() {
         }
 
-        private Builder(final DefaultSliceSettings sliceSettings) {
-            slicePeriod_ = sliceSettings.slicePeriod();
-            sampleExposure_ = sliceSettings.sampleExposure();
-            minimizeSlicePeriod_ = sliceSettings.isSlicePeriodMinimized();
+        private Builder(final DefaultSliceSettings settings) {
+            slicePeriod_ = settings.slicePeriod();
+            sampleExposure_ = settings.sampleExposure();
+            minimizeSlicePeriod_ = settings.isSlicePeriodMinimized();
         }
 
         @Override

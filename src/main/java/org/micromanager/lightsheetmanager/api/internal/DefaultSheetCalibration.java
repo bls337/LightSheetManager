@@ -21,14 +21,14 @@ public class DefaultSheetCalibration implements SheetCalibration {
         private Builder() {
         }
 
-        private Builder(final DefaultSheetCalibration sheetCalibration) {
-            imagingCenter_ = sheetCalibration.imagingCenter_;
-            sheetWidth_ = sheetCalibration.sheetWidth_;
-            sheetOffset_ = sheetCalibration.sheetOffset_;
-            useAutoSheetWidth_ = sheetCalibration.useAutoSheetWidth_;
-            autoSheetWidthPerPixel_ = sheetCalibration.autoSheetWidthPerPixel_;
-            scanSpeed_ = sheetCalibration.scanSpeed_;
-            scanOffset_ = sheetCalibration.scanOffset_;
+        private Builder(final DefaultSheetCalibration settings) {
+            imagingCenter_ = settings.imagingCenter_;
+            sheetWidth_ = settings.sheetWidth_;
+            sheetOffset_ = settings.sheetOffset_;
+            useAutoSheetWidth_ = settings.useAutoSheetWidth_;
+            autoSheetWidthPerPixel_ = settings.autoSheetWidthPerPixel_;
+            scanSpeed_ = settings.scanSpeed_;
+            scanOffset_ = settings.scanOffset_;
         }
 
         // normal camera modes

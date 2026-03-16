@@ -18,11 +18,11 @@ public class DefaultSliceSettingsLS implements SliceSettingsLightSheet {
         private Builder() {
         }
 
-        private Builder(DefaultSliceSettingsLS sliceSettings) {
-            scanResetTime_ = sliceSettings.scanResetTime();
-            scanSettleTime_ = sliceSettings.scanSettleTime();
-            shutterWidth_ = sliceSettings.shutterWidth();
-            shutterSpeedFactor_ = sliceSettings.shutterSpeedFactor();
+        private Builder(DefaultSliceSettingsLS settings) {
+            scanResetTime_ = settings.scanResetTime();
+            scanSettleTime_ = settings.scanSettleTime();
+            shutterWidth_ = settings.shutterWidth();
+            shutterSpeedFactor_ = settings.shutterSpeedFactor();
         }
 
         @Override

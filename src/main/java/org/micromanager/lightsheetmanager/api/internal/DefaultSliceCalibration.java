@@ -16,9 +16,9 @@ public class DefaultSliceCalibration implements SliceCalibration {
         private Builder() {
         }
 
-        private Builder(final SliceCalibration sliceCalibration) {
-            sliceSlope_ = sliceCalibration.sliceSlope();
-            sliceOffset_ = sliceCalibration.sliceOffset();
+        private Builder(final SliceCalibration settings) {
+            sliceSlope_ = settings.sliceSlope();
+            sliceOffset_ = settings.sliceOffset();
         }
 
         @Override

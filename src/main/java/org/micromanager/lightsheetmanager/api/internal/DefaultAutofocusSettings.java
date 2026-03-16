@@ -29,15 +29,15 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
         private Builder() {
         }
 
-        private Builder(final DefaultAutofocusSettings autofocusSettings) {
-            numImages_ = autofocusSettings.numImages_;
-            stepSizeUm_ = autofocusSettings.stepSizeUm_;
+        private Builder(final DefaultAutofocusSettings settings) {
+            numImages_ = settings.numImages_;
+            stepSizeUm_ = settings.stepSizeUm_;
             //toleranceUm_ = autofocusSettings.toleranceUm_;
-            showImages_ = autofocusSettings.showImages_;
-            showGraph_ = autofocusSettings.showGraph_;
-            mode_ = autofocusSettings.mode_;
-            scoringMethod_ = autofocusSettings.scoringMethod_;
-            channel_ = autofocusSettings.channel_;
+            showImages_ = settings.showImages_;
+            showGraph_ = settings.showGraph_;
+            mode_ = settings.mode_;
+            scoringMethod_ = settings.scoringMethod_;
+            channel_ = settings.channel_;
             //useEveryStagePass_ = autofocusSettings.useEveryStagePass_;
             //useBeforeAcquisition_ = autofocusSettings.useBeforeAcquisition_;
 //            maxOffset_ = autoUpdateMaxOffset_;
