@@ -96,7 +96,11 @@ public class DefaultChannelSettings implements ChannelSettings {
      */
     @Override
     public int count() {
-        return used().length;
+        if (enabled_) {
+            return used().length;
+        } else {
+            return 1;
+        }
     }
 
     /**

@@ -1338,8 +1338,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
     @Override
     public void updateDurationLabels() {
-        model_.acquisitions().recalculateSliceTiming();
-        model_.acquisitions().settingsBuilder().build();
+        model_.acquisitions().updateAcquisitionSettings();
+        // update durations now that settings are current
         updateSlicePeriodLabel(pnlVolumeDurations_.getSliceDurationLabel());
         updateVolumeDurationLabel(pnlVolumeDurations_.getVolumeDurationLabel());
         updateTotalTimeDurationLabel(pnlVolumeDurations_.getTotalDurationLabel());

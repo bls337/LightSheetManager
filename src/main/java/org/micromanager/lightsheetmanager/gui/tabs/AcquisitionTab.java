@@ -266,6 +266,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cbxUseChannels_.registerListener(e -> {
             final boolean selected = cbxUseChannels_.isSelected();
             model_.acquisitions().settingsBuilder().channelBuilder().enabled(selected);
+            model_.acquisitions().updateDurationLabels();
             pnlChannelTable_.setItemsEnabled(selected);
         });
 
