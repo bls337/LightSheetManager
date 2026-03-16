@@ -558,25 +558,25 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 //        }
 
         // setup channels
-        int nrChannelsSoftware = acqSettings_.numChannels();  // how many times we trigger the controller per stack
+        int nrChannelsSoftware = acqSettings_.channels().count();  // how many times we trigger the controller per stack
         int nrSlicesSoftware = acqSettings_.volume().slicesPerView();
         //acqSettings_.volumeSettings().slicesPerView();
         // TODO: channels need to modify panels and need extraChannelOffset_
         boolean changeChannelPerVolumeSoftware = false;
         boolean changeChannelPerVolumeDoneFirst = false;
-        if (acqSettings_.isUsingChannels()) {
-            if (acqSettings_.numChannels() > 1) {
+        if (acqSettings_.channels().enabled()) {
+            if (acqSettings_.channels().count() > 1) {
                 studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
                 return false; // early exit
             }
-            switch (acqSettings_.channelMode()) {
+            switch (acqSettings_.channels().mode()) {
                 case VOLUME:
                     changeChannelPerVolumeSoftware = true;
                     changeChannelPerVolumeDoneFirst = true;
                     break;
                 case VOLUME_HW:
                 case SLICE_HW:
-                    if (acqSettings_.numChannels() == 1) {
+                    if (acqSettings_.channels().count() == 1) {
                         // only 1 channel selected so don't have to really use hardware switching
                     } else {
                         // we have at least 2 channels
@@ -589,11 +589,11 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                         return false; // early exit
                     }
                     nrChannelsSoftware = 1;
-                    nrSlicesSoftware = acqSettings_.volume().slicesPerView() * acqSettings_.numChannels();
+                    nrSlicesSoftware = acqSettings_.volume().slicesPerView() * acqSettings_.channels().count();
                     break;
                 default:
                     studio_.logs().showError(
-                            "Unsupported multichannel mode \"" + acqSettings_.channelMode().toString() + "\"");
+                            "Unsupported multichannel mode \"" + acqSettings_.channels().mode() + "\"");
                     return false; // early exit
             }
         }
@@ -918,8 +918,8 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
     }
 
     private double computeActualVolumeDuration(final DispimAcquisitionSettings acqSettings) {
-        final ChannelMode channelMode = acqSettings.channelMode();
-        final int numChannels = acqSettings.numChannels();
+        final ChannelMode channelMode = acqSettings.channels().mode();
+        final int numChannels = acqSettings.channels().count();
         final int numViews = acqSettings.volume().numViews();
         final double delayBeforeSide = acqSettings.volume().delayBeforeView();
         int numCameraTriggers = acqSettings.volume().slicesPerView();
