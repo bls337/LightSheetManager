@@ -1,9 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -12,7 +10,7 @@ import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
-public class SliceSettingsPanel extends Panel {
+public class SlicePanel extends Panel {
 
     // regular panel
     private CheckBox cbxMinimizeSlicePeriod_;
@@ -33,7 +31,7 @@ public class SliceSettingsPanel extends Panel {
 
     private final LightSheetManager model_;
 
-    public SliceSettingsPanel(final LightSheetManager model) {
+    public SlicePanel(final LightSheetManager model) {
         super("Slice Settings");
         model_ = Objects.requireNonNull(model);
         createUserInterface();

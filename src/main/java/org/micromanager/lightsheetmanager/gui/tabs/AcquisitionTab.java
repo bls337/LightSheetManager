@@ -12,7 +12,7 @@ import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPan
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.CameraPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.PositionPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SavePanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SlicePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeSettingsPanel;
@@ -67,7 +67,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
     // right panel
     private VolumeSettingsPanel pnlVolumeSettings_;
-    private SliceSettingsPanel pnlSliceSettings_;
+    private SlicePanel pnlSliceSettings_;
     private AdvancedTimingPanel pnlAdvancedTiming_;
     private CheckBox cbxUseAdvancedTiming_;
 
@@ -113,7 +113,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlVolumeSettings_ = new VolumeSettingsPanel(model_);
 
         // switch between these two panels
-        pnlSliceSettings_ = new SliceSettingsPanel(model_);
+        pnlSliceSettings_ = new SlicePanel(model_);
         pnlAdvancedTiming_ = new AdvancedTimingPanel(model_);
 
         // multiple positions
@@ -304,7 +304,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlRight_.repaint();
     }
 
-    public SliceSettingsPanel getSliceSettingsPanel() {
+    public SlicePanel getSliceSettingsPanel() {
         return pnlSliceSettings_;
     }
 
