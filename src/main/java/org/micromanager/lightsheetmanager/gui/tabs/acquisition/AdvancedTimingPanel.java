@@ -133,6 +133,7 @@ public class AdvancedTimingPanel extends Panel {
 
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().delayBeforeLaser(rounded);
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnLaserTriggerDuration_.registerListener(e -> {
@@ -145,6 +146,7 @@ public class AdvancedTimingPanel extends Panel {
 
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().laserTriggerDuration(rounded);
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnDelayBeforeCamera_.registerListener(e -> {
@@ -157,6 +159,7 @@ public class AdvancedTimingPanel extends Panel {
 
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().delayBeforeCamera(rounded);
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnCameraTriggerDuration_.registerListener(e -> {
@@ -169,11 +172,13 @@ public class AdvancedTimingPanel extends Panel {
 
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().cameraTriggerDuration(rounded);
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnCameraExposure_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().cameraExposure(spnCameraExposure_.getDouble());
+            model_.acquisitions().updateDurationLabels();
         });
 
         cbxAlternateScanDirection_.registerListener(e -> {
