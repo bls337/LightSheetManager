@@ -3,9 +3,7 @@ package org.micromanager.lightsheetmanager.api.internal;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDispim;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
-import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 
 public class DispimAcquisitionSettings extends BaseAcquisitionSettings implements AcquisitionSettingsDispim {
 
@@ -25,10 +23,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
 
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
-        private ChannelMode channelMode_ = ChannelMode.VOLUME;
         private CameraMode cameraMode_ = CameraMode.EDGE;
 
-        private boolean useChannels_ = false;
         private boolean useTimePoints_ = false;
         private boolean useAutofocus_ = false;
         private boolean useMultiplePositions_ = false;
@@ -40,9 +36,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         private int timePointInterval_ = 0;
         private int postMoveDelay_ = 0;
 
-        private int numChannels_ = 0;
-        private String channelGroup_ = "";
-        private ChannelSpec[] channels_ = new ChannelSpec[]{};
         private double liveScanPeriod_ = 20.0; // TODO: this could go in user settings since it has to do with the live view
 
         private Builder() {
@@ -50,7 +43,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 shcb_[i] = DefaultSheetCalibration.builder();
                 slcb_[i] = DefaultSliceCalibration.builder();
             }
-
         }
 
         public Builder(final DispimAcquisitionSettings settings) {
@@ -66,9 +58,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 shcb_[i] = settings.sheetCalibrations_[i].copyBuilder();
             }
             acquisitionMode_ = settings.acquisitionMode_;
-            channelMode_ = settings.channelMode_;
             cameraMode_ = settings.cameraMode_;
-            useChannels_ = settings.useChannels_;
             useTimePoints_ = settings.useTimePoints_;
             useAutofocus_ = settings.useAutofocus_;
             useMultiplePositions_ = settings.useMultiplePositions_;
@@ -78,9 +68,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             numTimePoints_ = settings.numTimePoints_;
             timePointInterval_ = settings.timePointInterval_;
             postMoveDelay_ = settings.postMoveDelay_;
-            numChannels_ = settings.numChannels_;
-            channelGroup_ = settings.channelGroup_;
-            channels_ = settings.channels_;
             liveScanPeriod_ = settings.liveScanPeriod_;
         }
 
@@ -96,17 +83,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         }
 
         /**
-         * Sets the channel mode.
-         *
-         * @param channelMode the channel mode.
-         */
-        @Override
-        public Builder channelMode(final ChannelMode channelMode) {
-            channelMode_ = channelMode;
-            return this;
-        }
-
-        /**
          * Sets the camera mode.
          *
          * @param cameraMode the camera mode.
@@ -114,17 +90,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         @Override
         public Builder cameraMode(final CameraMode cameraMode) {
             cameraMode_ = cameraMode;
-            return this;
-        }
-
-        /**
-         * Sets the acquisition to use channels.
-         *
-         * @param state true to use channels.
-         */
-        @Override
-        public Builder useChannels(final boolean state) {
-            useChannels_ = state;
             return this;
         }
 
@@ -227,28 +192,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             return this;
         }
 
-        /**
-         * Sets the channel group.
-         *
-         * @param channelGroup the channel group.
-         */
-        @Override
-        public Builder channelGroup(final String channelGroup) {
-            channelGroup_ = channelGroup;
-            return this;
-        }
-
-        /**
-         * Sets the channels array.
-         *
-         * @param channels the channel array
-         */
-        @Override
-        public Builder channelData(final ChannelSpec[] channels) {
-            channels_ = channels;
-            return this;
-        }
-
         @Override
         public Builder liveScanPeriod(double liveScanPeriod) {
             liveScanPeriod_ = liveScanPeriod;
@@ -329,10 +272,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
     private final AcquisitionMode acquisitionMode_;
-    private final ChannelMode channelMode_;
     private final CameraMode cameraMode_;
 
-    private final boolean useChannels_;
     private final boolean useTimePoints_;
     private final boolean useAutofocus_;
     private final boolean useMultiplePositions_;
@@ -343,10 +284,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     private final int numTimePoints_;
     private final int timePointInterval_;
     private final int postMoveDelay_;
-
-    private final int numChannels_;
-    private final String channelGroup_;
-    private final ChannelSpec[] channels_;
 
     private final double liveScanPeriod_;
 
@@ -365,9 +302,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             sliceCalibrations_[i] = builder.slcb_[i].build();
         }
         acquisitionMode_ = builder.acquisitionMode_;
-        channelMode_ = builder.channelMode_;
         cameraMode_ = builder.cameraMode_;
-        useChannels_ = builder.useChannels_;
         useTimePoints_ = builder.useTimePoints_;
         useAutofocus_ = builder.useAutofocus_;
         useStageScanning_ = builder.useStageScanning_;
@@ -377,9 +312,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         numTimePoints_ = builder.numTimePoints_;
         timePointInterval_ = builder.timePointInterval_;
         postMoveDelay_ = builder.postMoveDelay_;
-        numChannels_ = builder.numChannels_;
-        channelGroup_ = builder.channelGroup_;
-        channels_ = builder.channels_;
         liveScanPeriod_= builder.liveScanPeriod_;
     }
 
@@ -487,16 +419,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     }
 
     /**
-     * Returns the channel mode.
-     *
-     * @return the channel mode.
-     */
-    @Override
-    public ChannelMode channelMode() {
-        return channelMode_;
-    }
-
-    /**
      * Returns the camera mode.
      *
      * @return the camera mode.
@@ -504,16 +426,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     @Override
     public CameraMode cameraMode() {
         return cameraMode_;
-    }
-
-    /**
-     * Returns true if using channels.
-     *
-     * @return true if using channels.
-     */
-    @Override
-    public boolean isUsingChannels() {
-        return useChannels_;
     }
 
     /**
@@ -604,36 +516,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     @Override
     public int postMoveDelay() {
         return postMoveDelay_;
-    }
-
-    /**
-     * Returns the number of channels.
-     *
-     * @return the number of channels.
-     */
-    @Override
-    public int numChannels() {
-        return numChannels_;
-    }
-
-    /**
-     * Returns the channel group.
-     *
-     * @return the channel group.
-     */
-    @Override
-    public String channelGroup() {
-        return channelGroup_;
-    }
-
-    /**
-     * Returns the channels as an array.
-     *
-     * @return the channels as an array.
-     */
-    @Override
-    public ChannelSpec[] channelData() {
-        return channels_;
     }
 
     @Override

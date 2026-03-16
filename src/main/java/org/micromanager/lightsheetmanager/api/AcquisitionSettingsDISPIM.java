@@ -8,9 +8,7 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
-import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
-import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 
 /**
  * Acquisition settings for diSPIM microscopes.
@@ -89,25 +87,11 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
     AcquisitionMode acquisitionMode();
 
     /**
-     * Returns the channel mode.
-     *
-     * @return the channel mode.
-     */
-    ChannelMode channelMode();
-
-    /**
      * Returns the camera mode.
      *
      * @return the camera mode.
      */
     CameraMode cameraMode();
-
-    /**
-     * Returns true if using channels.
-     *
-     * @return true if using channels.
-     */
-    boolean isUsingChannels();
 
     /**
      * Returns true if using time points.
@@ -172,27 +156,6 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      */
     int postMoveDelay();
 
-    /**
-     * Returns the number of channels.
-     *
-     * @return the number of channels.
-     */
-    int numChannels();
-
-    /**
-     * Returns the channel group.
-     *
-     * @return the channel group.
-     */
-    String channelGroup();
-
-    /**
-     * Returns the channels as an array.
-     *
-     * @return the channels as an array.
-     */
-    ChannelSpec[] channelData();
-
     double liveScanPeriod();
 
     interface Builder<T extends AcquisitionSettings.Builder<T>> extends AcquisitionSettings.Builder<T> {
@@ -206,28 +169,12 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
         T acquisitionMode(final AcquisitionMode acqMode);
 
         /**
-         * Sets the channel mode.
-         *
-         * @param channelMode the channel mode
-         * @return {@code this} builder
-         */
-        T channelMode(final ChannelMode channelMode);
-
-        /**
          * Sets the camera mode.
          *
          * @param cameraMode the camera mode.
          * @return {@code this} builder
          */
         T cameraMode(final CameraMode cameraMode);
-
-        /**
-         * Sets the acquisition to use channels.
-         *
-         * @param state true to use channels
-         * @return {@code this} builder
-         */
-        T useChannels(final boolean state);
 
         /**
          * Sets the acquisition to use time points.
@@ -300,22 +247,6 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
          * @return {@code this} builder
          */
         T postMoveDelay(final int postMoveDelay);
-
-        /**
-         * Sets the channel group.
-         *
-         * @param channelGroup the channel group
-         * @return {@code this} builder
-         */
-        T channelGroup(final String channelGroup);
-
-        /**
-         * Sets the channels array.
-         *
-         * @param channels the channel array
-         * @return {@code this} builder
-         */
-        T channelData(final ChannelSpec[] channels);
 
         T liveScanPeriod(final double liveScanPeriod);
 
