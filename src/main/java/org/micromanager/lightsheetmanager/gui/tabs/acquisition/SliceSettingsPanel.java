@@ -47,7 +47,7 @@ public class SliceSettingsPanel extends Panel {
                 "[]5[]"
         );
 
-        final DefaultSliceSettings sliceSettings = model_.acquisitions().settings().sliceSettings();
+        final DefaultSliceSettings sliceSettings = model_.acquisitions().settings().slice();
         final boolean isSlicePeriodMinimized = sliceSettings.isSlicePeriodMinimized();
 
         // regular panel
@@ -65,23 +65,24 @@ public class SliceSettingsPanel extends Panel {
             spnSlicePeriod_.setEnabled(false);
         }
 
-        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
-            final DefaultSliceSettingsLS sliceSettingsLS = model_.acquisitions().settings().sliceSettingsLS();
-
-            // virtual slit panel
-            lblScanResetTime_ = new Label("Scan Reset Time [ms]:");
-            lblScanSettleTime_ = new Label("Scan Settle Time [ms]:");
-            lblShutterWidth_ = new Label("Shutter Width [µs]:");
-            lblShutterSpeed_ = new Label("1 / (shutter speed):");
-            spnScanResetTime_ = Spinner.createDoubleSpinner(
-                    sliceSettingsLS.scanResetTime(), 1.0, 100.0, 0.25);
-            spnScanSettleTime_ = Spinner.createDoubleSpinner(
-                    sliceSettingsLS.scanSettleTime(), 0.25, 100.0, 0.25);
-            spnShutterWidth_ = Spinner.createDoubleSpinner(
-                    sliceSettingsLS.shutterWidth(), 0.1, 100.0, 1.0);
-            spnShutterSpeed_ = Spinner.createDoubleSpinner(
-                    sliceSettingsLS.shutterSpeedFactor(), 1.0, 10.0, 1.0);
-        }
+        // TODO: this should added back in for diSPIM
+//        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
+//            final DefaultSliceSettingsLS sliceSettingsLS = model_.acquisitions().settings().sliceLS();
+//
+//            // virtual slit panel
+//            lblScanResetTime_ = new Label("Scan Reset Time [ms]:");
+//            lblScanSettleTime_ = new Label("Scan Settle Time [ms]:");
+//            lblShutterWidth_ = new Label("Shutter Width [µs]:");
+//            lblShutterSpeed_ = new Label("1 / (shutter speed):");
+//            spnScanResetTime_ = Spinner.createDoubleSpinner(
+//                    sliceSettingsLS.scanResetTime(), 1.0, 100.0, 0.25);
+//            spnScanSettleTime_ = Spinner.createDoubleSpinner(
+//                    sliceSettingsLS.scanSettleTime(), 0.25, 100.0, 0.25);
+//            spnShutterWidth_ = Spinner.createDoubleSpinner(
+//                    sliceSettingsLS.shutterWidth(), 0.1, 100.0, 1.0);
+//            spnShutterSpeed_ = Spinner.createDoubleSpinner(
+//                    sliceSettingsLS.shutterSpeedFactor(), 1.0, 10.0, 1.0);
+//        }
 
         // create the ui based on the camera trigger mode
         switchUI(model_.acquisitions().settings().cameraMode());
@@ -98,7 +99,7 @@ public class SliceSettingsPanel extends Panel {
             lblSlicePeriod_.setEnabled(!selected);
             spnSlicePeriod_.setEnabled(!selected);
             model_.acquisitions().settingsBuilder()
-                    .sliceSettingsBuilder().minimizeSlicePeriod(selected);
+                    .sliceBuilder().minimizeSlicePeriod(selected);
             // update slice timing
             model_.acquisitions().updateAcquisitionSettings();
             model_.acquisitions().recalculateSliceTiming();
@@ -106,7 +107,7 @@ public class SliceSettingsPanel extends Panel {
 
         spnSlicePeriod_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
-                    .sliceSettingsBuilder().slicePeriod(spnSlicePeriod_.getDouble());
+                    .sliceBuilder().slicePeriod(spnSlicePeriod_.getDouble());
             // update slice timing
             model_.acquisitions().updateAcquisitionSettings();
             model_.acquisitions().recalculateSliceTiming();
@@ -114,35 +115,35 @@ public class SliceSettingsPanel extends Panel {
 
         spnSampleExposure_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
-                    .sliceSettingsBuilder().sampleExposure(spnSampleExposure_.getDouble());
+                    .sliceBuilder().sampleExposure(spnSampleExposure_.getDouble());
             // update slice timing
             model_.acquisitions().updateAcquisitionSettings();
             model_.acquisitions().recalculateSliceTiming();
         });
 
-        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
-
-            // virtual slit panel
-            spnScanResetTime_.registerListener(e -> {
-                model_.acquisitions().settingsBuilder()
-                        .sliceSettingsLSBuilder().scanResetTime(spnScanResetTime_.getDouble());
-            });
-
-            spnScanSettleTime_.registerListener(e -> {
-                model_.acquisitions().settingsBuilder()
-                        .sliceSettingsLSBuilder().scanSettleTime(spnScanSettleTime_.getDouble());
-            });
-
-            spnShutterWidth_.registerListener(e -> {
-                model_.acquisitions().settingsBuilder()
-                        .sliceSettingsLSBuilder().shutterWidth(spnShutterWidth_.getDouble());
-            });
-
-            spnShutterSpeed_.registerListener(e -> {
-                model_.acquisitions().settingsBuilder()
-                        .sliceSettingsLSBuilder().shutterSpeedFactor(spnShutterSpeed_.getDouble());
-            });
-        }
+//        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
+//
+//            // virtual slit panel
+//            spnScanResetTime_.registerListener(e -> {
+//                model_.acquisitions().settingsBuilder()
+//                        .sliceLSBuilder().scanResetTime(spnScanResetTime_.getDouble());
+//            });
+//
+//            spnScanSettleTime_.registerListener(e -> {
+//                model_.acquisitions().settingsBuilder()
+//                        .sliceLSBuilder().scanSettleTime(spnScanSettleTime_.getDouble());
+//            });
+//
+//            spnShutterWidth_.registerListener(e -> {
+//                model_.acquisitions().settingsBuilder()
+//                        .sliceLSBuilder().shutterWidth(spnShutterWidth_.getDouble());
+//            });
+//
+//            spnShutterSpeed_.registerListener(e -> {
+//                model_.acquisitions().settingsBuilder()
+//                        .sliceLSBuilder().shutterSpeedFactor(spnShutterSpeed_.getDouble());
+//            });
+//        }
     }
 
     /**

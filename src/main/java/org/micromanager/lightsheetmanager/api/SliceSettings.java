@@ -32,6 +32,11 @@ public interface SliceSettings {
         SliceSettings build();
     }
 
+    /**
+     * Returns a builder initialized with the current settings.
+     *
+     * @return a builder to create a modified copy of these settings
+     */
     Builder copyBuilder();
 
     /**

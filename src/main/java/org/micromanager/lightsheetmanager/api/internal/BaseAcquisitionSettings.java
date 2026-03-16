@@ -3,12 +3,13 @@ package org.micromanager.lightsheetmanager.api.internal;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
+import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 
 /**
  * Base acquisition settings for all microscopes.
  */
-public abstract class DefaultAcquisitionSettings implements AcquisitionSettings {
+public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
 
     public abstract static class Builder<T extends Builder<T>> implements AcquisitionSettings.Builder<T> {
 
@@ -18,18 +19,18 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
         private boolean demoMode_ = false;
         private DataStorage.SaveMode saveMode_ = DataStorage.SaveMode.ND_TIFF;
 
-        private DefaultAutofocusSettings.Builder afsb_ = new DefaultAutofocusSettings.Builder();
+        private DefaultAutofocusSettings.Builder afsb_ = DefaultAutofocusSettings.builder();
 
         public Builder() {
         }
 
-        public Builder(final DefaultAcquisitionSettings acqSettings) {
-            saveDirectory_ = acqSettings.saveDirectory_;
-            saveNamePrefix_ = acqSettings.saveNamePrefix_;
-            saveDuringAcq_ = acqSettings.saveDuringAcq_;
-            demoMode_ = acqSettings.demoMode_;
-            saveMode_ = acqSettings.saveMode_;
-            afsb_ = acqSettings.autofocusSettings_.copyBuilder();
+        public Builder(final BaseAcquisitionSettings settings) {
+            saveDirectory_ = settings.saveDirectory_;
+            saveNamePrefix_ = settings.saveNamePrefix_;
+            saveDuringAcq_ = settings.saveDuringAcq_;
+            demoMode_ = settings.demoMode_;
+            saveMode_ = settings.saveMode_;
+            afsb_ = settings.autofocusSettings_.copyBuilder();
         }
 
         /**
@@ -129,7 +130,7 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
 //        demoMode_ = false;
 //    }
 
-    protected DefaultAcquisitionSettings(Builder<?> builder) {
+    protected BaseAcquisitionSettings(Builder<?> builder) {
         saveDirectory_ = builder.saveDirectory_;
         saveNamePrefix_ = builder.saveNamePrefix_;
         saveDuringAcq_ = builder.saveDuringAcq_;
@@ -216,7 +217,14 @@ public abstract class DefaultAcquisitionSettings implements AcquisitionSettings 
     }
 
     public static <T extends AcquisitionSettings> T fromJson(final String json, final Class<T> cls) {
-        return new Gson().fromJson(json, cls);
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(StageScanSettings.class, (com.google.gson.JsonDeserializer<StageScanSettings>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultStageScanSettings.class);
+                        })
+                .create();
+        return gson.fromJson(json, cls);
     }
 
 //    public static DefaultAcquisitionSettingsDISPIM fromJson(final String json) {

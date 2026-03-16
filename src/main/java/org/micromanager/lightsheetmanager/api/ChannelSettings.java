@@ -5,29 +5,33 @@ import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 public interface ChannelSettings {
 
-    interface Builder {
+    boolean enabled();
 
-        Builder channelGroup(final String group);
-
-        Builder channelMode(final ChannelMode mode);
-
-        Builder channels(final ChannelSpec[] channels);
-
-        ChannelSettings build();
-    }
-
-    int numChannels();
+    int count();
 
     int numGroups();
 
-    String channelGroup();
+    String group();
 
-    ChannelMode channelMode();
+    ChannelMode mode();
 
-    String[] channelGroups();
+    String[] groupNames();
 
-    ChannelSpec[] channels();
+    ChannelSpec[] used();
 
-    ChannelSpec[] allChannels();
+    ChannelSpec[] data();
+
+    interface Builder {
+
+        Builder enabled(final boolean state);
+
+        Builder group(final String group);
+
+        Builder mode(final ChannelMode mode);
+
+        Builder data(final ChannelSpec[] channels);
+
+        ChannelSettings build();
+    }
 
 }

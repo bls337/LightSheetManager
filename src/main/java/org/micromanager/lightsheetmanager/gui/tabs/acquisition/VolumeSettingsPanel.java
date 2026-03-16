@@ -41,7 +41,7 @@ public class VolumeSettingsPanel extends Panel {
         final int numImagingPaths = model_.devices().adapter().numImagingPaths();
 
         final DefaultVolumeSettings volumeSettings = model_.acquisitions()
-                .settings().volumeSettings();
+                .settings().volume();
 
         // create labels for combo boxes
         Integer[] viewOptions = new Integer[numImagingPaths];
@@ -105,29 +105,29 @@ public class VolumeSettingsPanel extends Panel {
     private void createEventHandlers() {
 
         cmbNumViews_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+            model_.acquisitions().settingsBuilder().volumeBuilder()
                     .numViews(cmbNumViews_.getSelected());
         });
 
         cmbFirstView_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+            model_.acquisitions().settingsBuilder().volumeBuilder()
                     .firstView(cmbFirstView_.getSelected());
         });
 
         spnViewDelay_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+            model_.acquisitions().settingsBuilder().volumeBuilder()
                     .delayBeforeView(spnViewDelay_.getDouble());
             model_.acquisitions().updateDurationLabels();
         });
 
         spnNumSlices_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+            model_.acquisitions().settingsBuilder().volumeBuilder()
                     .slicesPerView(spnNumSlices_.getInt());
             model_.acquisitions().updateDurationLabels();
         });
 
         spnSliceStepSize_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().volumeSettingsBuilder()
+            model_.acquisitions().settingsBuilder().volumeBuilder()
                     .sliceStepSize(spnSliceStepSize_.getDouble());
         });
     }

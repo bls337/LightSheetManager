@@ -6,7 +6,7 @@ import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import mmcorej.DeviceType;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.model.devices.LightSheetDeviceManager;
+import org.micromanager.lightsheetmanager.model.devices.DeviceAdapter;
 
 import javax.swing.JLabel;
 import javax.swing.border.TitledBorder;
@@ -62,7 +62,7 @@ public class NavigationPanel extends Panel {
         final String imaging = "Imaging";
 
         // use pre-init property settings and Microscope Geometry data from Device Adapter
-        final LightSheetDeviceManager deviceAdapter = devices_.adapter();
+        final DeviceAdapter deviceAdapter = devices_.adapter();
         final int numImagingPaths = deviceAdapter.numImagingPaths();
         final int numIllumPaths = deviceAdapter.numIlluminationPaths();
         final Map<String, String> deviceMap = deviceAdapter.deviceMap();

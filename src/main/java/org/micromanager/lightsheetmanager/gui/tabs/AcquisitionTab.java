@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.LightSheetManager;
@@ -90,7 +90,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
      */
     private void createUserInterface() {
 
-        final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
+        final ScapeAcquisitionSettings settings = model_.acquisitions().settings();
 
         setMigLayout(
                 "insets 10 10 10 10, ax center",
@@ -118,20 +118,19 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
         // multiple positions
         cbxUseMultiplePositions_ = new CheckBox(
-                "Multiple Positions", acqSettings.isUsingMultiplePositions());
+                "Multiple Positions", settings.isUsingMultiplePositions());
         pnlMultiPositions_ = new MultiPositionPanel(model_, cbxUseMultiplePositions_);
-        // disable elements based on acqSettings
-        pnlMultiPositions_.setPanelEnabled(acqSettings.isUsingMultiplePositions());
+        // disable elements based on settings
+        pnlMultiPositions_.setPanelEnabled(settings.isUsingMultiplePositions());
 
         pnlSaveData_ = new SaveDataPanel(model_, frame_);
         pnlCameras_ = new CameraSelectionPanel(model_);
 
         // time points
-        cbxUseTimePoints_ = new CheckBox(
-                "Time Points", acqSettings.isUsingTimePoints());
+        cbxUseTimePoints_ = new CheckBox("Time Points", settings.isUsingTimePoints());
         pnlTimePoints_ = new TimePointsPanel(model_, cbxUseTimePoints_);
-        // disable elements based on acqSettings
-        pnlTimePoints_.setPanelEnabled(acqSettings.isUsingTimePoints());
+        // disable elements based on settings
+        pnlTimePoints_.setPanelEnabled(settings.isUsingTimePoints());
 
         // acquisition buttons
         pnlButtons_ = new Panel();
@@ -160,23 +159,23 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
         btnRunOverviewAcq_ = new Button("Overview Acquisition", 140, 30);
 
-        final boolean isUsingChannels = acqSettings.isUsingChannels();
-        cbxUseChannels_ = new CheckBox("Channels", isUsingChannels);
+        final boolean channelsEnabled = settings.channels().enabled();
+        cbxUseChannels_ = new CheckBox("Channels", channelsEnabled);
         pnlChannelTable_ = new ChannelTablePanel(model_, cbxUseChannels_);
 
-        // disable elements based on acqSettings
-        pnlChannelTable_.setItemsEnabled(isUsingChannels);
+        // disable elements based on settings
+        pnlChannelTable_.setItemsEnabled(channelsEnabled);
 
         // acquisition mode combo box
         cmbAcquisitionModes_ = new ComboBox<>(
                 AcquisitionMode.modesByType(
                         model_.devices().adapter().geometry(),
                         model_.devices().isUsingStageScanning()),
-                acqSettings.acquisitionMode(),
+                settings.acquisitionMode(),
                 180, 24);
 
         cbxUseAdvancedTiming_ = new CheckBox("Use advanced timing settings",
-                12, acqSettings.isUsingAdvancedTiming(), CheckBox.RIGHT);
+                12, settings.isUsingAdvancedTiming(), CheckBox.RIGHT);
 
         btnRunOverviewAcq_.setEnabled(false); // TODO: re-enable when these features are put in
         btnTestAcquisition_.setEnabled(false);
@@ -250,9 +249,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
         // multiple positions
         cbxUseMultiplePositions_.registerListener(e -> {
-            final boolean isSelected = cbxUseMultiplePositions_.isSelected();
-            model_.acquisitions().settingsBuilder().useMultiplePositions(isSelected);
-            pnlMultiPositions_.setPanelEnabled(isSelected);
+            final boolean selected = cbxUseMultiplePositions_.isSelected();
+            model_.acquisitions().settingsBuilder().useMultiplePositions(selected);
+            pnlMultiPositions_.setPanelEnabled(selected);
         });
 
         // time points
@@ -265,9 +264,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
         // use channels
         cbxUseChannels_.registerListener(e -> {
-            final boolean state = cbxUseChannels_.isSelected();
-            model_.acquisitions().settingsBuilder().useChannels(state);
-            pnlChannelTable_.setItemsEnabled(state);
+            final boolean selected = cbxUseChannels_.isSelected();
+            model_.acquisitions().settingsBuilder().channelBuilder().enabled(selected);
+            pnlChannelTable_.setItemsEnabled(selected);
         });
 
         // select the acquisition mode
@@ -277,10 +276,10 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         // TODO: should timing recalc be part of setting use advanced timing value in model?
         // switches timing panels based on check box
         cbxUseAdvancedTiming_.registerListener(e -> {
-            final boolean useAdvTiming = cbxUseAdvancedTiming_.isSelected();
-            model_.acquisitions().settingsBuilder().useAdvancedTiming(useAdvTiming);
-            swapTimingSettingsPanels(useAdvTiming);
-            if (useAdvTiming) {
+            final boolean selected = cbxUseAdvancedTiming_.isSelected();
+            model_.acquisitions().settingsBuilder().useAdvancedTiming(selected);
+            swapTimingSettingsPanels(selected);
+            if (selected) {
                 pnlAdvancedTiming_.updateSpinners();
             } else {
                 model_.acquisitions().updateAcquisitionSettings();

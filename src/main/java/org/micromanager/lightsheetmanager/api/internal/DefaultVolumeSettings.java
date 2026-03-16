@@ -5,6 +5,10 @@ import org.micromanager.lightsheetmanager.api.VolumeSettings;
 
 public class DefaultVolumeSettings implements VolumeSettings {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder implements VolumeSettings.Builder {
         private int firstView_ = 1;
         private int numViews_ = 1;
@@ -15,23 +19,23 @@ public class DefaultVolumeSettings implements VolumeSettings {
         private double centerPosition_ = 0.0;
         private double endPosition_ = 0.0;
 
-        public Builder() {
+        private Builder() {
         }
 
         /**
          * Create a builder with values populated from already existing DefaultVolumeSettings.
          *
-         * @param volumeSettings the settings to copy
+         * @param settings the settings to copy
          */
-        private Builder(DefaultVolumeSettings volumeSettings) {
-            firstView_ = volumeSettings.firstView_;
-            numViews_ = volumeSettings.numViews_;
-            slicesPerView_ = volumeSettings.slicesPerView_;
-            delayBeforeView_ = volumeSettings.delayBeforeView_;
-            sliceStepSize_ = volumeSettings.sliceStepSize_;
-            startPosition_ = volumeSettings.startPosition_;
-            centerPosition_ = volumeSettings.centerPosition_;
-            endPosition_ = volumeSettings.endPosition_;
+        private Builder(DefaultVolumeSettings settings) {
+            firstView_ = settings.firstView_;
+            numViews_ = settings.numViews_;
+            slicesPerView_ = settings.slicesPerView_;
+            delayBeforeView_ = settings.delayBeforeView_;
+            sliceStepSize_ = settings.sliceStepSize_;
+            startPosition_ = settings.startPosition_;
+            centerPosition_ = settings.centerPosition_;
+            endPosition_ = settings.endPosition_;
         }
 
         /**

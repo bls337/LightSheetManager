@@ -2,23 +2,23 @@ package org.micromanager.lightsheetmanager;
 
 import mmcorej.CMMCore;
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.api.LightSheetManagerAPI;
+import org.micromanager.lightsheetmanager.api.LightSheetManagerApi;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.model.PluginSettings;
-import org.micromanager.lightsheetmanager.model.acquisitions.LSMAcquisitionEvents;
+import org.micromanager.lightsheetmanager.model.acquisitions.LightSheetEventAdapter;
 import org.micromanager.lightsheetmanager.model.positions.PositionUpdater;
 import org.micromanager.lightsheetmanager.model.UserSettings;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
-import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineDISPIM;
-import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineSCAPE;
+import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineDispim;
+import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineScape;
 
 import java.util.Objects;
 
 /**
  * This is the container for all the data needed to operate a microscope with light sheet manager.
  */
-public class LightSheetManager implements LightSheetManagerAPI {
+public class LightSheetManager implements LightSheetManagerApi {
 
     private final Studio studio_;
     private final CMMCore core_;
@@ -72,10 +72,10 @@ public class LightSheetManager implements LightSheetManagerAPI {
         final GeometryType geometryType = deviceManager_.adapter().geometry();
         switch (geometryType) {
             case SCAPE:
-                acqEngine_ = new AcquisitionEngineSCAPE(this);
+                acqEngine_ = new AcquisitionEngineScape(this);
                 break;
             case DISPIM:
-                acqEngine_ = new AcquisitionEngineDISPIM(this);
+                acqEngine_ = new AcquisitionEngineDispim(this);
                 break;
             default:
                 final String message = "AcquisitionEngine not implemented for " + geometryType;
@@ -88,7 +88,7 @@ public class LightSheetManager implements LightSheetManagerAPI {
         userSettings_.load();
 
         // TODO: put this somewhere better, need to put this value into LSMAcquisitionEvents for now
-        LSMAcquisitionEvents.isUsingMultipleCameras =
+        LightSheetEventAdapter.isUsingMultipleCameras =
               deviceManager_.adapter().numSimultaneousCameras() > 1;
 
         // if we made it here then everything loaded correctly

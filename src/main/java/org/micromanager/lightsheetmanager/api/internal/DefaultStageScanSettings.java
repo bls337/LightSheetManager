@@ -2,145 +2,194 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 
+import java.util.Objects;
+
 public class DefaultStageScanSettings implements StageScanSettings {
 
-    public static class Builder implements StageScanSettings.Builder {
-
-        private double scanAccelerationFactor_ = 1;
-        private int scanOvershootDistance_ = 0;
-        private double scanRetraceSpeed_ =  67.0;
-        private double scanAngleFirstView_ = 45.0;
-        private boolean scanReturnToOriginalPosition_ = false;
-        private boolean scanFromCurrentPosition_ = false;
-        private boolean scanFromNegativeDirection_ = false;
-
-        public Builder() {
-        }
-
-        private Builder(DefaultStageScanSettings scanSettings) {
-            scanAccelerationFactor_ = scanSettings.scanAccelerationFactor_;
-            scanOvershootDistance_ = scanSettings.scanOvershootDistance_;
-            scanRetraceSpeed_ = scanSettings.scanRetraceSpeed_;
-            scanAngleFirstView_ = scanSettings.scanAngleFirstView_;
-            scanReturnToOriginalPosition_ = scanSettings.scanReturnToOriginalPosition_;
-            scanFromCurrentPosition_ = scanSettings.scanFromCurrentPosition_;
-            scanFromNegativeDirection_ = scanSettings.scanFromNegativeDirection_;
-        }
-
-        @Override
-        public StageScanSettings.Builder scanAccelerationFactor(final double factor) {
-            scanAccelerationFactor_ = factor;
-            return this;
-        }
-
-        @Override
-        public StageScanSettings.Builder scanOvershootDistance(final int distance) {
-            scanOvershootDistance_ = distance;
-            return this;
-        }
-
-        @Override
-        public StageScanSettings.Builder scanRetraceSpeed(final double speed) {
-            scanRetraceSpeed_ = speed;
-            return this;
-        }
-
-        @Override
-        public StageScanSettings.Builder scanAngleFirstView(final double angle) {
-            scanAngleFirstView_ = angle;
-            return this;
-        }
-
-        @Override
-        public StageScanSettings.Builder scanReturnToOriginalPosition(final boolean state) {
-            scanReturnToOriginalPosition_ = state;
-            return this;
-        }
-
-        @Override
-        public StageScanSettings.Builder scanFromCurrentPosition(final boolean state) {
-            scanFromCurrentPosition_ = state;
-            return this;
-        }
-
-        @Override
-        public StageScanSettings.Builder scanFromNegativeDirection(final boolean state) {
-            scanFromNegativeDirection_ = state;
-            return this;
-        }
-
-        @Override
-        public DefaultStageScanSettings build() {
-            return new DefaultStageScanSettings(this);
-        }
-
+    public static Builder builder() {
+        return new Builder();
     }
 
-    private final double scanAccelerationFactor_;
-    private final int scanOvershootDistance_;
-    private final double scanRetraceSpeed_;
-    private final double scanAngleFirstView_;
-    private final boolean scanReturnToOriginalPosition_;
-    private final boolean scanFromCurrentPosition_;
-    private final boolean scanFromNegativeDirection_;
+    public static Builder builder(StageScanSettings settings) {
+        Objects.requireNonNull(settings, "Cannot copy from null settings");
+        return new Builder(settings);
+    }
+
+    private final double accelerationFactor_;
+    private final int overshootDistance_;
+    private final double retraceSpeed_;
+    private final double firstViewAngle_;
+    private final boolean returnToStart_;
+    private final boolean fromCurrentPosition_;
+    private final boolean fromNegativeDirection_;
 
     private DefaultStageScanSettings(Builder builder) {
-        scanAccelerationFactor_ = builder.scanAccelerationFactor_;
-        scanOvershootDistance_ = builder.scanOvershootDistance_;
-        scanRetraceSpeed_ = builder.scanRetraceSpeed_;
-        scanAngleFirstView_ = builder.scanAngleFirstView_;
-        scanReturnToOriginalPosition_ = builder.scanReturnToOriginalPosition_;
-        scanFromCurrentPosition_ = builder.scanFromCurrentPosition_;
-        scanFromNegativeDirection_ = builder.scanFromNegativeDirection_;
+        accelerationFactor_ = builder.accelerationFactor_;
+        overshootDistance_ = builder.overshootDistance_;
+        retraceSpeed_ = builder.retraceSpeed_;
+        firstViewAngle_ = builder.firstViewAngle_;
+        returnToStart_ = builder.returnToStart_;
+        fromCurrentPosition_ = builder.fromCurrentPosition_;
+        fromNegativeDirection_ = builder.fromNegativeDirection_;
+    }
+
+    // Note: used by GSON library for deserialization
+    private DefaultStageScanSettings() {
+        this(new Builder());
     }
 
     @Override
-    public DefaultStageScanSettings.Builder copyBuilder() {
-        return new DefaultStageScanSettings.Builder(this);
+    public StageScanSettings.Builder copyBuilder() {
+        return new Builder(this);
     }
 
     @Override
-    public double scanAccelerationFactor() {
-        return scanAccelerationFactor_;
+    public double accelerationFactor() {
+        return accelerationFactor_;
     }
 
     @Override
-    public int scanOvershootDistance() {
-        return scanOvershootDistance_;
+    public int overshootDistance() {
+        return overshootDistance_;
     }
 
     @Override
-    public double scanRetraceSpeed() {
-        return scanRetraceSpeed_;
+    public double retraceSpeed() {
+        return retraceSpeed_;
     }
 
     @Override
-    public double scanAngleFirstView() {
-        return scanAngleFirstView_;
+    public double firstViewAngle() {
+        return firstViewAngle_;
     }
 
     @Override
-    public boolean scanReturnToOriginalPosition() {
-        return scanReturnToOriginalPosition_;
+    public boolean returnToStart() {
+        return returnToStart_;
     }
 
     @Override
-    public boolean scanFromCurrentPosition() {
-        return scanFromCurrentPosition_;
+    public boolean fromCurrentPosition() {
+        return fromCurrentPosition_;
     }
 
     @Override
-    public boolean scanFromNegativeDirection() {
-        return scanFromNegativeDirection_;
+    public boolean fromNegativeDirection() {
+        return fromNegativeDirection_;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "%s[scanAccelerationFactor=%s, scanOvershootDistance=%s, scanRetraceSpeed=%s, scanAngleFirstView=%s]",
+                "%s[accelerationFactor=%s, overshootDistance=%s, retraceSpeed=%s, firstViewAngle=%s, " +
+                        "returnToStart=%s, fromCurrentPosition=%s, fromNegativeDirection=%s]",
                 getClass().getSimpleName(),
-                scanAccelerationFactor_, scanOvershootDistance_, scanRetraceSpeed_, scanAngleFirstView_
+                accelerationFactor_, overshootDistance_, retraceSpeed_, firstViewAngle_,
+                returnToStart_, fromCurrentPosition_, fromNegativeDirection_
         );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DefaultStageScanSettings other = (DefaultStageScanSettings) obj;
+        return Double.compare(other.accelerationFactor_, accelerationFactor_) == 0 &&
+                overshootDistance_ == other.overshootDistance_ &&
+                Double.compare(other.retraceSpeed_, retraceSpeed_) == 0 &&
+                Double.compare(other.firstViewAngle_, firstViewAngle_) == 0 &&
+                returnToStart_ == other.returnToStart_ &&
+                fromCurrentPosition_ == other.fromCurrentPosition_ &&
+                fromNegativeDirection_ == other.fromNegativeDirection_;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                accelerationFactor_,
+                overshootDistance_,
+                retraceSpeed_,
+                firstViewAngle_,
+                returnToStart_,
+                fromCurrentPosition_,
+                fromNegativeDirection_
+        );
+    }
+
+    public static class Builder implements StageScanSettings.Builder {
+
+        private double accelerationFactor_ = 1.0;
+        private int overshootDistance_ = 0;
+        private double retraceSpeed_ =  67.0;
+        private double firstViewAngle_ = 45.0;
+        private boolean returnToStart_ = false;
+        private boolean fromCurrentPosition_ = false;
+        private boolean fromNegativeDirection_ = false;
+
+        private Builder() {
+        }
+
+        private Builder(StageScanSettings settings) {
+            accelerationFactor_ = settings.accelerationFactor();
+            overshootDistance_ = settings.overshootDistance();
+            retraceSpeed_ = settings.retraceSpeed();
+            firstViewAngle_ = settings.firstViewAngle();
+            returnToStart_ = settings.returnToStart();
+            fromCurrentPosition_ = settings.fromCurrentPosition();
+            fromNegativeDirection_ = settings.fromNegativeDirection();
+        }
+
+        @Override
+        public StageScanSettings.Builder accelerationFactor(final double factor) {
+            accelerationFactor_ = factor;
+            return this;
+        }
+
+        @Override
+        public StageScanSettings.Builder overshootDistance(final int distance) {
+            overshootDistance_ = distance;
+            return this;
+        }
+
+        @Override
+        public StageScanSettings.Builder retraceSpeed(final double speed) {
+            retraceSpeed_ = speed;
+            return this;
+        }
+
+        @Override
+        public StageScanSettings.Builder firstViewAngle(final double angle) {
+            firstViewAngle_ = angle;
+            return this;
+        }
+
+        @Override
+        public StageScanSettings.Builder returnToStart(final boolean state) {
+            returnToStart_ = state;
+            return this;
+        }
+
+        @Override
+        public StageScanSettings.Builder fromCurrentPosition(final boolean state) {
+            fromCurrentPosition_ = state;
+            return this;
+        }
+
+        @Override
+        public StageScanSettings.Builder fromNegativeDirection(final boolean state) {
+            fromNegativeDirection_ = state;
+            return this;
+        }
+
+        @Override
+        public StageScanSettings build() {
+            return new DefaultStageScanSettings(this);
+        }
+
     }
 
 }

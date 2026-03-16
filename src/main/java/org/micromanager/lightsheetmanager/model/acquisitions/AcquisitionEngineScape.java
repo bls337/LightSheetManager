@@ -24,15 +24,15 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.model.PLogicSCAPE;
-import org.micromanager.lightsheetmanager.model.devices.LightSheetDeviceManager;
+import org.micromanager.lightsheetmanager.model.PLogicScape;
+import org.micromanager.lightsheetmanager.model.devices.DeviceAdapter;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.cameras.DemoCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.HamamatsuCamera;
-import org.micromanager.lightsheetmanager.model.devices.cameras.PCOCamera;
-import org.micromanager.lightsheetmanager.model.devices.cameras.PVCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.PcoCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.PvCamera;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
@@ -43,10 +43,12 @@ import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Manages the acquisition for SCAPE microscopes.
+ */
+public class AcquisitionEngineScape extends AcquisitionEngine {
 
-public class AcquisitionEngineSCAPE extends AcquisitionEngine {
-
-    PLogicSCAPE controller_;
+    PLogicScape controller_;
     ArrayList<Double> savedExposures_;
     Point2D.Double xyPosUm_;
     private double origSpeedX_;
@@ -57,7 +59,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     private boolean autoShutter_;
     private boolean isPolling_; // true if polling was enabled at the start of an acquisition
 
-    public AcquisitionEngineSCAPE(final LightSheetManager model) {
+    public AcquisitionEngineScape(final LightSheetManager model) {
         super(model);
     }
 
@@ -151,7 +153,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     return false;
                 }
                 if (acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
-                    if (acqSettings_.volumeSettings().numViews() < 2) {
+                    if (acqSettings_.volume().numViews() < 2) {
                         studio_.logs().showError("Interleaved stage scan requires two sides.");
                     }
                     return false;
@@ -186,7 +188,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         if (!demoMode) {
 
             if (isUsingPLC) {
-                controller_ = new PLogicSCAPE(model_);
+                controller_ = new PLogicScape(model_);
 
                 final boolean success = doHardwareCalculations(controller_);
                 if (!success) {
@@ -263,7 +265,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
         try {
-            summaryMetadata.put("z-um_step", acqSettings_.volumeSettings().sliceStepSize());
+            summaryMetadata.put("z-um_step", acqSettings_.volume().sliceStepSize());
         } catch (JSONException e) {
             studio_.logs().logError("Failed to add z-um_step metadata: " + e.getMessage());
         }
@@ -453,7 +455,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 //        }, Acquisition.AFTER_HARDWARE_HOOK);
 
-        final PLogicSCAPE controllerInstance = controller_;
+        final PLogicScape controllerInstance = controller_;
         // TODO This after camera hook is called after the camera has been readied to acquire a
         //  sequence. I assume we want to tell the Tiger to start sending TTLs etc here
         currentAcquisition_.addHook(new AcquisitionHook() {
@@ -469,7 +471,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                         xyStage.setAccelerationX(scanAccelX_);
                         controllerInstance.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
                         controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(),
-                            acqSettings_.volumeSettings().firstView());
+                            acqSettings_.volume().firstView());
                         return event;
                     }
 
@@ -549,7 +551,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
             // TODO(Brandon): account for > 2 simultaneous cameras
-            final LightSheetDeviceManager adapter = model_.devices().adapter();
+            final DeviceAdapter adapter = model_.devices().adapter();
             if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
                // multiple simultaneous cameras
                 //if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
@@ -570,7 +572,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 }
             } else {
                // standard camera setup
-               if (acqSettings_.volumeSettings().numViews() > 1) {
+               if (acqSettings_.volume().numViews() > 1) {
                   cameraNames = new String[] {
                         model_.devices().device("Imaging1Camera").getDeviceName(),
                         model_.devices().device("Imaging2Camera").getDeviceName()
@@ -585,13 +587,13 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         if (acqSettings_.isUsingHardwareTimePoints()) {
             AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
-            if (acqSettings_.isUsingChannels()) {
+            if (acqSettings_.channels().enabled()) {
                 currentAcquisition_.submitEventIterator(
-                        LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
+                        LightSheetEventAdapter.createTimelapseMultiChannelVolumeAcqEvents(
                                 baseEvent.copy(), acqSettings_, cameraNames, null));
             } else {
                 currentAcquisition_.submitEventIterator(
-                        LSMAcquisitionEvents.createTimelapseVolumeAcqEvents(
+                        LightSheetEventAdapter.createTimelapseVolumeAcqEvents(
                                 baseEvent.copy(), acqSettings_, cameraNames, null));
             }
 
@@ -605,13 +607,13 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 //System.out.println("time index: " + timeIndex);
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
                 if (acqSettings_.isUsingTimePoints()) {
-                    baseEvent.setAxisPosition(LSMAcquisitionEvents.TIME_AXIS, timeIndex);
+                    baseEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
                 }
                 // Loop 2: XY positions
                 for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
                     //System.out.println("pos index: " + positionIndex);
                     if (acqSettings_.isUsingMultiplePositions()) {
-                        baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
+                        baseEvent.setAxisPosition(LightSheetEventAdapter.POSITION_AXIS, positionIndex);
                         // is this the best way to do stage movements with new acq engine?
                         MultiStagePosition position = pl.getPosition(positionIndex);
                         baseEvent.setX(position.getX());
@@ -621,13 +623,13 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                     //  If yes, then nothing more to do here.
 
                     // Loop 3: Channels; Loop 4: Z slices
-                    if (acqSettings_.isUsingChannels()) {
+                    if (acqSettings_.channels().enabled()) {
                         currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createChannelAcqEvents(
+                                LightSheetEventAdapter.createChannelAcqEvents(
                                         baseEvent.copy(), acqSettings_, cameraNames, null));
                     } else {
                         currentAcquisition_.submitEventIterator(
-                                LSMAcquisitionEvents.createAcqEvents(
+                                LightSheetEventAdapter.createAcqEvents(
                                         baseEvent.copy(), acqSettings_, cameraNames, null));
                     }
                 }
@@ -722,7 +724,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         if (acqSettings_.isUsingStageScanning()) {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
             final boolean returnToOriginalPosition =
-                    acqSettings_.scanSettings().scanReturnToOriginalPosition();
+                    acqSettings_.stageScan().returnToStart();
 
             // make sure stage scanning state machine is stopped,
             // otherwise setting speed/position won't take
@@ -780,7 +782,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         return true;
     }
 
-    private boolean doHardwareCalculations(PLogicSCAPE plc) {
+    private boolean doHardwareCalculations(PLogicScape plc) {
 
         // TODO: find a better place to set the camera trigger mode for SCAPE
         CameraBase[] cameras = model_.devices().imagingCameras();
@@ -799,25 +801,25 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //        }
 
         // setup channels
-        int nrChannelsSoftware = acqSettings_.channelSettings().numChannels();  // how many times we trigger the controller per stack
-        int nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView();
+        int nrChannelsSoftware = acqSettings_.channels().count();  // how many times we trigger the controller per stack
+        int nrSlicesSoftware = acqSettings_.volume().slicesPerView();
         //acqSettings_.volumeSettings().slicesPerView();
         // TODO: channels need to modify panels and need extraChannelOffset_
         boolean changeChannelPerVolumeSoftware = false;
         boolean changeChannelPerVolumeDoneFirst = false;
-        if (acqSettings_.isUsingChannels()) {
-            if (acqSettings_.channelSettings().numChannels() == 0) {
+        if (acqSettings_.channels().enabled()) {
+            if (acqSettings_.channels().count() == 0) {
                 studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
                 return false; // early exit
             }
-            switch (acqSettings_.channelSettings().channelMode()) {
+            switch (acqSettings_.channels().mode()) {
                 case VOLUME:
                     changeChannelPerVolumeSoftware = true;
                     changeChannelPerVolumeDoneFirst = true;
                     break;
                 case VOLUME_HW:
                 case SLICE_HW:
-                    if (acqSettings_.channelSettings().numChannels() == 1) {
+                    if (acqSettings_.channels().count() == 1) {
                         // only 1 channel selected so don't have to really use hardware switching
                         //multiChannelPanel_.initializeChannelCycle();
                         //extraChannelOffset_ = multiChannelPanel_.selectNextChannelAndGetOffset();
@@ -831,12 +833,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                             return false; // early exit
                         }
                         nrChannelsSoftware = 1;
-                        nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView() * acqSettings_.channelSettings().numChannels();
+                        nrSlicesSoftware = acqSettings_.volume().slicesPerView() * acqSettings_.channels().count();
                     }
                     break;
                 default:
                     studio_.logs().showError(
-                            "Unsupported multichannel mode \"" + acqSettings_.channelSettings().channelMode().toString() + "\"");
+                            "Unsupported multichannel mode \"" + acqSettings_.channels().mode().toString() + "\"");
                     return false; // early exit
             }
         }
@@ -864,12 +866,12 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 break;
             }
             case PVCAM: {
-                PVCamera camera = model_.devices().device(cameraName);
+                PvCamera camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
             case PCOCAMERA: {
-                PCOCamera camera = model_.devices().device(cameraName);
+                PcoCamera camera = model_.devices().device(cameraName);
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
             }
@@ -888,7 +890,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 cameraReadoutTime = camera.getReadoutTime(acqSettings_.cameraMode());
                 break;
         }
-        final double exposureTime = acqSettings_.timingSettings().cameraExposure();
+        final double exposureTime = acqSettings_.timing().cameraExposure();
 
         // test acq was here
 
@@ -947,7 +949,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 //            }
 //        }
 
-        final double sliceDuration = asb_.tsb().sliceDuration();
+        final double sliceDuration = asb_.timingBuilder().sliceDuration();
         if (exposureTime + cameraReadoutTime > sliceDuration) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
@@ -962,7 +964,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // must use PLogic for channels when using hardware time points
         if (isUsingHardwareTimePoints) {
-            if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().channelMode() == ChannelMode.VOLUME) {
+            if (acqSettings_.channels().enabled() && acqSettings_.channels().mode() == ChannelMode.VOLUME) {
                 studio_.logs().showError("Cannot use hardware time points (small time point interval) " +
                         "with software channels (need to use PLogic channel switching).");
                 return false;
@@ -994,7 +996,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     public void recalculateSliceTiming() {
         // update timing settings if not using advanced timing
         if (!acqSettings_.isUsingAdvancedTiming()) {
-            asb_.timingSettingsBuilder(getTimingFromExposure());
+            asb_.timingBuilder(getTimingFromExposure());
         }
         // Note: sliceDuration is computed automatically when build() is called
         //final double sliceDuration = getSliceDuration(asb_.timingSettingsBuilder().build());
@@ -1022,19 +1024,19 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         final double cameraTotalTime = NumberUtils.ceilToQuarterMs(cameraResetTime + cameraReadoutTime);
         final double laserDuration = NumberUtils.roundToQuarterMs(
-                model_.acquisitions().settings().sliceSettings().sampleExposure());
+                model_.acquisitions().settings().slice().sampleExposure());
         // max of laser on time (for static light sheet) and total camera reset/readout time; will add excess later
         final double slicePeriodMin = Math.max(laserDuration, cameraTotalTime);
         final double sliceDeadTime = NumberUtils.roundToQuarterMs(slicePeriodMin - laserDuration);
         // extra quarter millisecond to make sure interleaved slices works (otherwise laser signal never goes low)
         final double sliceLaserInterleaved =
-                (acqSettings_.channelSettings().channelMode() == ChannelMode.SLICE_HW ? 0.25 : 0.0);
+                (acqSettings_.channels().mode() == ChannelMode.SLICE_HW ? 0.25 : 0.0);
 
         // TODO: is this getting the correct value?
         final double actualCameraResetTime =
-              camera.getDeviceName().equals(PVCamera.Models.PRIME_95B) ||
-              camera.getDeviceName().equals(PVCamera.Models.KINETIX)
-              ? camera.getPropertyFloat(PVCamera.Properties.READOUT_TIME) / 1e6 : cameraResetTime;
+              camera.getDeviceName().equals(PvCamera.Models.PRIME_95B) ||
+              camera.getDeviceName().equals(PvCamera.Models.KINETIX)
+              ? camera.getPropertyFloat(PvCamera.Properties.READOUT_TIME) / 1e6 : cameraResetTime;
 
         // timing settings
         int scansPerSlice = 0;
@@ -1046,7 +1048,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         double delayBeforeScan = 0.0;
         double cameraExposure = 0.0;
 
-        DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
+        DefaultTimingSettings.Builder tsb = DefaultTimingSettings.builder();
         switch (cameraMode) {
             case PSEUDO_OVERLAP: // e.g. Kinetix
                 scansPerSlice = 1;
@@ -1059,8 +1061,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 delayBeforeScan = 0.0;
                 break;
             case OVERLAP: // e.g.
-                if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().numChannels() > 1
-                        && acqSettings_.channelSettings().channelMode() == ChannelMode.SLICE_HW) {
+                if (acqSettings_.channels().enabled() && acqSettings_.channels().count() > 1
+                        && acqSettings_.channels().mode() == ChannelMode.SLICE_HW) {
                     // for interleaved slices we should illuminate during global exposure but not during readout/reset time after each trigger
                     scansPerSlice = 1;
                     scanDuration = 1.0;
@@ -1110,8 +1112,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
                 .cameraExposure(cameraExposure);
 
         // if a specific slice period was requested, add corresponding delay to scan/laser/camera
-        if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
-            double globalDelay = acqSettings_.sliceSettings().slicePeriod() - tsb.sliceDuration();
+        if (!acqSettings_.slice().isSlicePeriodMinimized()) {
+            double globalDelay = acqSettings_.slice().slicePeriod() - tsb.sliceDuration();
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
@@ -1160,7 +1162,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         CameraBase camera = model_.devices().firstImagingCamera(); //.getDevice("ImagingCamera");
         if (camera == null) {
             // just a dummy to test demo mode
-            return new DefaultTimingSettings.Builder();
+            return DefaultTimingSettings.builder();
         }
 
         // TODO: is this necessary? setTriggerMode is called in doHardwareCalculations too
@@ -1185,7 +1187,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         // we will wait cameraReadoutMax before triggering camera, then wait another cameraResetMax for global exposure
         // this will also be in 0.25ms increment
         final double globalExposureDelayMax = cameraReadoutMax + cameraResetMax;
-        double laserTriggerDuration = NumberUtils.roundToQuarterMs(acqSettings_.sliceSettings().sampleExposure());
+        double laserTriggerDuration = NumberUtils.roundToQuarterMs(acqSettings_.slice().sampleExposure());
         double scanDuration = laserTriggerDuration + 2*scanLaserBufferTime;
         // scan will be longer than laser by 0.25ms at both start and end
 
@@ -1229,7 +1231,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
 
         // NOTE: tsb.sliceDuration() is needed in PSEUDO_OVERLAP camera mode.
         // cameraExposure will be modified in the switch, sliceDuration does not depend on it
-        DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
+        DefaultTimingSettings.Builder tsb = DefaultTimingSettings.builder();
         tsb.scansPerSlice(1)
                 .scanDuration(scanDuration)
                 .cameraTriggerDuration(cameraTriggerDuration)
@@ -1294,8 +1296,8 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
         }
 
         // if a specific slice period was requested, add corresponding delay to scan/laser/camera
-        if (!acqSettings_.sliceSettings().isSlicePeriodMinimized()) {
-            double globalDelay = acqSettings_.sliceSettings().slicePeriod() - tsb.sliceDuration();
+        if (!acqSettings_.slice().isSlicePeriodMinimized()) {
+            double globalDelay = acqSettings_.slice().slicePeriod() - tsb.sliceDuration();
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
@@ -1344,7 +1346,7 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     private void updateSlicePeriodLabel(final JLabel label) {
-        label.setText(String.format("%.3f ms", acqSettings_.timingSettings().sliceDuration()));
+        label.setText(String.format("%.3f ms", acqSettings_.timing().sliceDuration()));
     }
 
     private void updateVolumeDurationLabel(final JLabel label) {
@@ -1405,18 +1407,18 @@ public class AcquisitionEngineSCAPE extends AcquisitionEngine {
     }
 
     public double computeVolumeDuration() {
-        final ChannelMode channelMode = acqSettings_.channelSettings().channelMode();
-        final int numViews = acqSettings_.volumeSettings().numViews();
-        final int numChannels = acqSettings_.channelSettings().numChannels();
-        final double delayBeforeView = acqSettings_.volumeSettings().delayBeforeView();
+        final ChannelMode channelMode = acqSettings_.channels().mode();
+        final int numViews = acqSettings_.volume().numViews();
+        final int numChannels = acqSettings_.channels().count();
+        final double delayBeforeView = acqSettings_.volume().delayBeforeView();
 
-        int numCameraTriggers = acqSettings_.volumeSettings().slicesPerView();
+        int numCameraTriggers = acqSettings_.volume().slicesPerView();
         if (acqSettings_.cameraMode() == CameraMode.OVERLAP) {
             numCameraTriggers += 1;
         }
 
         // stackDuration is per-view, per-channel, per-position
-        final double stackDuration = numCameraTriggers * acqSettings_.timingSettings().sliceDuration();
+        final double stackDuration = numCameraTriggers * acqSettings_.timing().sliceDuration();
 
         if (acqSettings_.isUsingStageScanning()) {
             final double rampDuration = 1; //getStageRampDuration(acqSettings);

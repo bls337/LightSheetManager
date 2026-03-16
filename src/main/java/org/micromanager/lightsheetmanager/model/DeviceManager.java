@@ -11,7 +11,7 @@ import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 import org.micromanager.lightsheetmanager.model.devices.Galvo;
-import org.micromanager.lightsheetmanager.model.devices.LightSheetDeviceManager;
+import org.micromanager.lightsheetmanager.model.devices.DeviceAdapter;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.Stage;
 import org.micromanager.lightsheetmanager.model.devices.XYStage;
@@ -19,8 +19,8 @@ import org.micromanager.lightsheetmanager.model.devices.cameras.AndorCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.cameras.DemoCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.HamamatsuCamera;
-import org.micromanager.lightsheetmanager.model.devices.cameras.PCOCamera;
-import org.micromanager.lightsheetmanager.model.devices.cameras.PVCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.PcoCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.PvCamera;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -93,7 +93,7 @@ public class DeviceManager {
         studio_.logs().logMessage("DeviceManager: [Begin Setup]");
 
         // always add an entry for the device adapter
-        final LightSheetDeviceManager lsm = new LightSheetDeviceManager(studio_, deviceAdapterName_);
+        final DeviceAdapter lsm = new DeviceAdapter(studio_, deviceAdapterName_);
         deviceMap_.put("LightSheetDeviceManager", lsm);
 
         // keep track of devices we have already added to the map
@@ -106,7 +106,7 @@ public class DeviceManager {
         for (String propertyName : properties) {
             // skip properties that don't have a device assigned
             final String deviceName = lsm.getProperty(propertyName);
-            if (deviceName.equals(LightSheetDeviceManager.UNDEFINED)) {
+            if (deviceName.equals(DeviceAdapter.UNDEFINED)) {
                 continue;
             }
 
@@ -210,11 +210,11 @@ public class DeviceManager {
                 addDevice(propertyName, deviceName, hamaCamera);
                 break;
             case PCOCAMERA:
-                PCOCamera pcoCamera = new PCOCamera(studio_, deviceName);
+                PcoCamera pcoCamera = new PcoCamera(studio_, deviceName);
                 addDevice(propertyName, deviceName, pcoCamera);
                 break;
             case PVCAM:
-                PVCamera pvCamera = new PVCamera(studio_, deviceName);
+                PvCamera pvCamera = new PvCamera(studio_, deviceName);
                 addDevice(propertyName, deviceName, pvCamera);
                 break;
             case DEMOCAMERA:
@@ -285,7 +285,7 @@ public class DeviceManager {
         if (true) {
             deviceKey =  firstActiveCameraName();
         } else {
-            final LightSheetDeviceManager adapter = model_.devices().adapter();
+            final DeviceAdapter adapter = model_.devices().adapter();
             if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
                 deviceKey = "ImagingCamera1";
             } else if (adapter.numSimultaneousCameras() > 1) {
@@ -311,7 +311,7 @@ public class DeviceManager {
     }
 
     public CameraBase imagingCamera(final int view, final int num) {
-        final LightSheetDeviceManager adapter = model_.devices().adapter();
+        final DeviceAdapter adapter = model_.devices().adapter();
         String cameraName = "Imaging";
         if (adapter.numImagingPaths() > 1) {
             cameraName += String.valueOf(view);
@@ -325,7 +325,7 @@ public class DeviceManager {
 
     public String[] imagingCameraNames() {
         List<String> names = new ArrayList<>();
-        final LightSheetDeviceManager adapter = model_.devices().adapter();
+        final DeviceAdapter adapter = model_.devices().adapter();
         final int numImagingPaths = adapter.numImagingPaths();
         final int numCameras = adapter.numSimultaneousCameras();
         for (int i = 0; i < numImagingPaths; i++) {
@@ -365,8 +365,8 @@ public class DeviceManager {
                 .toArray(CameraBase[]::new);
     }
 
-    public LightSheetDeviceManager adapter() {
-        return (LightSheetDeviceManager)deviceMap_.get("LightSheetDeviceManager");
+    public DeviceAdapter adapter() {
+        return (DeviceAdapter)deviceMap_.get("LightSheetDeviceManager");
     }
 
     public String getDeviceLibrary(final String deviceName) {
@@ -527,7 +527,7 @@ public class DeviceManager {
             if (!config.isPropertyIncluded(deviceAdapterName_, propertyName)) {
                 try {
                     core_.defineConfig(groupName, configName,
-                            deviceAdapterName_, propertyName, LightSheetDeviceManager.UNDEFINED);
+                            deviceAdapterName_, propertyName, DeviceAdapter.UNDEFINED);
                     newProperties.add(propertyName);
                 } catch (Exception e) {
                     studio_.logs().logError("Could not create the \"" + propertyName

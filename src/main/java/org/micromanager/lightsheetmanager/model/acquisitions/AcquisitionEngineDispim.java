@@ -18,11 +18,11 @@ import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DispimAcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.model.PLogicDISPIM;
+import org.micromanager.lightsheetmanager.model.PLogicDispim;
 import org.micromanager.lightsheetmanager.model.devices.NIDAQ;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -31,16 +31,19 @@ import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AcquisitionEngineDISPIM extends AcquisitionEngine {
+/**
+ * Manages the acquisition for diSPIM microscopes.
+ */
+public class AcquisitionEngineDispim extends AcquisitionEngine {
 
 //    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
    // TODO: remove this when a more generic method is available and get from base class
-    private DefaultAcquisitionSettingsDISPIM acqSettings_;
+    private DispimAcquisitionSettings acqSettings_;
 
-    public AcquisitionEngineDISPIM(final LightSheetManager model) {
+    public AcquisitionEngineDispim(final LightSheetManager model) {
         super(model);
         // TODO: remove this when a more generic method is available and get from base class
-        acqSettings_ = new DefaultAcquisitionSettingsDISPIM.Builder().build();
+        acqSettings_ = DispimAcquisitionSettings.builder().build();
     }
 
 //    @Override
@@ -81,7 +84,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
 
-        PLogicDISPIM controller = null;
+        PLogicDispim controller = null;
 
         // Assume demo mode if default camera is DemoCamera
         boolean demoMode = false;
@@ -95,7 +98,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         if (!demoMode) {
 
             if (isUsingPLC) {
-                controller = new PLogicDISPIM(model_);
+                controller = new PLogicDispim(model_);
 
                 final boolean success = doHardwareCalculations(controller);
                 if (!success) {
@@ -356,7 +359,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 
 
 
-        final PLogicDISPIM controllerInstance = controller;
+        final PLogicDispim controllerInstance = controller;
         // TODO This after camera hook is called after the camera has been readied to acquire a
         //  sequence. I assume we want to tell the Tiger to start sending TTLs etc here
         currentAcquisition_.addHook(new AcquisitionHook() {
@@ -438,7 +441,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
             }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
-            if (acqSettings_.volumeSettings().numViews() > 1) {
+            if (acqSettings_.volume().numViews() > 1) {
                 cameraNames = new String[]{
                         model_.devices().device("Imaging1Camera").getDeviceName(),
                         model_.devices().device("Imaging2Camera").getDeviceName()
@@ -542,7 +545,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         return true;
     }
 
-    private boolean doHardwareCalculations(PLogicDISPIM plc) {
+    private boolean doHardwareCalculations(PLogicDispim plc) {
 
         // make sure slice timings are up-to-date
         recalculateSliceTiming();
@@ -555,25 +558,25 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
 //        }
 
         // setup channels
-        int nrChannelsSoftware = acqSettings_.numChannels();  // how many times we trigger the controller per stack
-        int nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView();
+        int nrChannelsSoftware = acqSettings_.channels().count();  // how many times we trigger the controller per stack
+        int nrSlicesSoftware = acqSettings_.volume().slicesPerView();
         //acqSettings_.volumeSettings().slicesPerView();
         // TODO: channels need to modify panels and need extraChannelOffset_
         boolean changeChannelPerVolumeSoftware = false;
         boolean changeChannelPerVolumeDoneFirst = false;
-        if (acqSettings_.isUsingChannels()) {
-            if (acqSettings_.numChannels() > 1) {
+        if (acqSettings_.channels().enabled()) {
+            if (acqSettings_.channels().count() > 1) {
                 studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
                 return false; // early exit
             }
-            switch (acqSettings_.channelMode()) {
+            switch (acqSettings_.channels().mode()) {
                 case VOLUME:
                     changeChannelPerVolumeSoftware = true;
                     changeChannelPerVolumeDoneFirst = true;
                     break;
                 case VOLUME_HW:
                 case SLICE_HW:
-                    if (acqSettings_.numChannels() == 1) {
+                    if (acqSettings_.channels().count() == 1) {
                         // only 1 channel selected so don't have to really use hardware switching
                     } else {
                         // we have at least 2 channels
@@ -586,11 +589,11 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                         return false; // early exit
                     }
                     nrChannelsSoftware = 1;
-                    nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView() * acqSettings_.numChannels();
+                    nrSlicesSoftware = acqSettings_.volume().slicesPerView() * acqSettings_.channels().count();
                     break;
                 default:
                     studio_.logs().showError(
-                            "Unsupported multichannel mode \"" + acqSettings_.channelMode().toString() + "\"");
+                            "Unsupported multichannel mode \"" + acqSettings_.channels().mode() + "\"");
                     return false; // early exit
             }
         }
@@ -599,7 +602,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         CameraBase camera = model_.devices().device("Imaging1Camera");
         CameraMode camMode = camera.getTriggerMode();
         final double cameraReadoutTime = camera.getReadoutTime(camMode);
-        final double exposureTime = acqSettings_.timingSettings().cameraExposure();
+        final double exposureTime = acqSettings_.timing().cameraExposure();
 
         // test acq was here
 
@@ -630,7 +633,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         }
 
 
-        final double sliceDuration = acqSettings_.timingSettings().sliceDuration();
+        final double sliceDuration = acqSettings_.timing().sliceDuration();
         if (exposureTime + cameraReadoutTime > sliceDuration) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
@@ -687,7 +690,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
             return;
         }
         DefaultTimingSettings.Builder tsb = getTimingFromPeriodAndLightExposure();
-        asb_.timingSettingsBuilder(tsb);
+        asb_.timingBuilder(tsb);
         // TODO: update gui (but not in the model)
     }
 
@@ -710,7 +713,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         CameraBase camera = model_.devices().device("Imaging1Camera"); //.getImagingCamera(0);
         if (camera == null) {
             // just a dummy to test demo mode
-            return new DefaultTimingSettings.Builder();
+            return DefaultTimingSettings.builder();
         }
         // TODO: do this in ui?
         camera.setTriggerMode(acqSettings_.cameraMode());
@@ -719,7 +722,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         CameraMode camMode = camera.getTriggerMode();
         //System.out.println(camMode);
 
-        DefaultTimingSettings.Builder tsb = new DefaultTimingSettings.Builder();
+        DefaultTimingSettings.Builder tsb = DefaultTimingSettings.builder();
 
         final double scanLaserBufferTime = NumberUtils.roundToQuarterMs(0.25);  // below assumed to be multiple of 0.25ms
 
@@ -732,7 +735,7 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         // we will wait cameraReadoutMax before triggering camera, then wait another cameraResetMax for global exposure
         // this will also be in 0.25ms increment
         final double globalExposureDelayMax = cameraReadoutMax + cameraResetMax;
-        double laserDuration = NumberUtils.roundToQuarterMs(acqSettings_.sliceSettings().sampleExposure());
+        double laserDuration = NumberUtils.roundToQuarterMs(acqSettings_.slice().sampleExposure());
         double scanDuration = laserDuration + 2*scanLaserBufferTime;
         // scan will be longer than laser by 0.25ms at both start and end
 
@@ -814,8 +817,8 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 // 5. laser turns on 0.25ms before camera trigger and stays on until exposure is ending
                 // TODO revisit this after further experimentation
                 cameraDuration = 1;  // only need to trigger camera
-                final double shutterWidth = acqSettings_.sliceSettingsLS().shutterWidth();
-                final double shutterSpeed = acqSettings_.sliceSettingsLS().shutterSpeedFactor();
+                final double shutterWidth = acqSettings_.sliceLS().shutterWidth();
+                final double shutterSpeed = acqSettings_.sliceLS().shutterSpeedFactor();
                 ///final double shutterWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_WIDTH);
                 //final int shutterSpeed = props_.getPropValueInteger(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_SPEED);
                 double pixelSize = core_.getPixelSizeUm();
@@ -826,8 +829,8 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
                 cameraExposure = rowReadoutTime * (int)(shutterWidth/pixelSize) * shutterSpeed;
                 // s.cameraExposure = (rowReadoutTime * shutterWidth / pixelSize * shutterSpeed);
                 final double totalExposureMax = NumberUtils.ceilToQuarterMs(cameraReadoutTime + cameraExposure + 0.05);  // 50-300us extra cushion time
-                final double scanSettle = acqSettings_.sliceSettingsLS().scanSettleTime();
-                final double scanReset = acqSettings_.sliceSettingsLS().scanResetTime();
+                final double scanSettle = acqSettings_.sliceLS().scanSettleTime();
+                final double scanReset = acqSettings_.sliceLS().scanResetTime();
                 delayBeforeScan = scanReset - scanDelayFilter;
                 scanDuration = scanSettle + (totalExposureMax*shutterSpeed) + scanLaserBufferTime;
                 delayBeforeCamera = scanReset + scanSettle;
@@ -914,18 +917,18 @@ public class AcquisitionEngineDISPIM extends AcquisitionEngine {
         return volumeDuration;
     }
 
-    private double computeActualVolumeDuration(final DefaultAcquisitionSettingsDISPIM acqSettings) {
-        final ChannelMode channelMode = acqSettings.channelMode();
-        final int numChannels = acqSettings.numChannels();
-        final int numViews = acqSettings.volumeSettings().numViews();
-        final double delayBeforeSide = acqSettings.volumeSettings().delayBeforeView();
-        int numCameraTriggers = acqSettings.volumeSettings().slicesPerView();
+    private double computeActualVolumeDuration(final DispimAcquisitionSettings acqSettings) {
+        final ChannelMode channelMode = acqSettings.channels().mode();
+        final int numChannels = acqSettings.channels().count();
+        final int numViews = acqSettings.volume().numViews();
+        final double delayBeforeSide = acqSettings.volume().delayBeforeView();
+        int numCameraTriggers = acqSettings.volume().slicesPerView();
         if (acqSettings.cameraMode() == CameraMode.OVERLAP) {
             numCameraTriggers += 1;
         }
         // stackDuration is per-side, per-channel, per-position
 
-        final double stackDuration = numCameraTriggers * acqSettings.timingSettings().sliceDuration();
+        final double stackDuration = numCameraTriggers * acqSettings.timing().sliceDuration();
         if (acqSettings.isUsingStageScanning()) { // || acqSettings.isStageStepping) {
             // TODO: stage scanning code
             return 0;

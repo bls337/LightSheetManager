@@ -4,11 +4,11 @@ import mmcorej.CMMCore;
 import mmcorej.Configuration;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDispim;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.DISPIMDevice;
+import org.micromanager.lightsheetmanager.api.data.DispimDevice;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DispimAcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
@@ -28,7 +28,7 @@ import java.util.Objects;
 
 // Replacement for ControllerUtils.java
 // TODO: use arrays for piezos etc on diSPIM
-public class PLogicDISPIM {
+public class PLogicDispim {
 
     private Studio studio_;
     private CMMCore core_;
@@ -68,11 +68,11 @@ public class PLogicDISPIM {
     private static final int triggerSPIMAddr = 46;  // backplane signal, same as XY card's TTL output
     private static final int laserTriggerAddress = 10;  // this should be set to (42 || 8) = (TTL1 || manual laser on)
 
-    private final DefaultAcquisitionSettingsDISPIM acqSettings_;
+    private final DispimAcquisitionSettings acqSettings_;
 
     private final LightSheetManager model_;
 
-    public PLogicDISPIM(final LightSheetManager model) {
+    public PLogicDispim(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
         devices_ = model_.devices();
@@ -81,7 +81,7 @@ public class PLogicDISPIM {
 
         // TODO: remove this when a more generic method is available and get from model
         //acqSettings_ = model_.acquisitions().settings();
-        acqSettings_ = new DefaultAcquisitionSettingsDISPIM.Builder().build();
+        acqSettings_ = DispimAcquisitionSettings.builder().build();
 
         scanDistance_ = 0;
         actualStepSizeUm_ = 0;
@@ -94,14 +94,14 @@ public class PLogicDISPIM {
         // populate devices
         switch (geometryType) {
             case DISPIM:
-                scanner1_ = devices_.device(DISPIMDevice.getIllumBeam(1));
-                scanner2_ = devices_.device(DISPIMDevice.getIllumBeam(2));
-                piezo1_ = devices_.device(DISPIMDevice.getImagingFocus(1));
-                piezo2_ = devices_.device(DISPIMDevice.getImagingFocus(2));
-                plcCamera_ = devices_.device(DISPIMDevice.TRIGGER_CAMERA);
-                plcLaser_ = devices_.device(DISPIMDevice.TRIGGER_LASER);
-                xyStage_ = devices_.device(DISPIMDevice.SAMPLE_XY);
-                zStage_ = devices_.device(DISPIMDevice.SAMPLE_Z);
+                scanner1_ = devices_.device(DispimDevice.getIllumBeam(1));
+                scanner2_ = devices_.device(DispimDevice.getIllumBeam(2));
+                piezo1_ = devices_.device(DispimDevice.getImagingFocus(1));
+                piezo2_ = devices_.device(DispimDevice.getImagingFocus(2));
+                plcCamera_ = devices_.device(DispimDevice.TRIGGER_CAMERA);
+                plcLaser_ = devices_.device(DispimDevice.TRIGGER_LASER);
+                xyStage_ = devices_.device(DispimDevice.SAMPLE_XY);
+                zStage_ = devices_.device(DispimDevice.SAMPLE_Z);
                 break;
             case SCAPE:
                 scanner_ = devices_.device("IllumSlice");
@@ -124,11 +124,11 @@ public class PLogicDISPIM {
      * @return
      */
     public boolean prepareControllerForAcquisitionOffsetOnly(
-            final DefaultAcquisitionSettingsDISPIM settings,
+            final DispimAcquisitionSettings settings,
             final double channelOffset) {
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         if (numViews > 1 || firstView == 1) {
             final boolean success = prepareControllerForAcquisitionSide(settings, 1, channelOffset, true);
@@ -156,7 +156,7 @@ public class PLogicDISPIM {
      * @return false if there was some error that should abort acquisition
      */
     public boolean prepareControllerForAcquisition(
-            final DefaultAcquisitionSettingsDISPIM settings,
+            final DispimAcquisitionSettings settings,
             final double channelOffset) {
         // turn off beam and scan on both sides (they are turned off by SPIM state machine anyway)
         // also ensures that properties match reality at end of acquisition
@@ -167,8 +167,8 @@ public class PLogicDISPIM {
         scanner1_.sa().setModeX(SingleAxis.Mode.DISABLED);
         scanner2_.sa().setModeX(SingleAxis.Mode.DISABLED);
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         // set up controller with appropriate SPIM parameters for each active side
         // some of these things only need to be done once if the same micro-mirror
@@ -255,16 +255,16 @@ public class PLogicDISPIM {
 
             // set the acceleration to a reasonable value for the (usually very slow) scan speed
             xyStage_.setAccelerationX(computeScanAcceleration(actualMotorSpeed,
-                    xyStage_.getMaxSpeedX(), settings.scanSettings().scanAccelerationFactor()));
+                    xyStage_.getMaxSpeedX(), settings.stageScan().accelerationFactor()));
 
-            int numLines = settings.volumeSettings().numViews();
+            int numLines = settings.volume().numViews();
             if (isInterleaved) {
                 numLines = 1;  // assure in acquisition code that we can't have single-sided interleaved
             }
-            numLines *= (int)((double) settings.numChannels() / computeScanChannelsPerPass(settings));
+            numLines *= (int)((double) settings.channels().count() / computeScanChannelsPerPass(settings));
             xyStage_.setScanNumLines(numLines);
 
-            final boolean isStageScan2Sided = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN) && settings.volumeSettings().numViews() == 2;
+            final boolean isStageScan2Sided = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN) && settings.volume().numViews() == 2;
             xyStage_.setScanPattern(isStageScan2Sided ? ASIXYStage.ScanPattern.SERPENTINE : ASIXYStage.ScanPattern.RASTER);
 
             if (xyStage_.getAxisPolarityX() != ASIXYStage.AxisPolarity.NORMAL) {
@@ -295,7 +295,7 @@ public class PLogicDISPIM {
     }
 
     public boolean prepareControllerForAcquisitionSCAPE(
-            final DefaultAcquisitionSettingsDISPIM settings,
+            final DispimAcquisitionSettings settings,
             final double channelOffset) {
         // turn off beam and scan on both sides (they are turned off by SPIM state machine anyway)
         // also ensures that properties match reality at end of acquisition
@@ -304,8 +304,8 @@ public class PLogicDISPIM {
         scanner_.setBeamOn(false);
         scanner_.sa().setModeX(SingleAxis.Mode.DISABLED);
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         // set up controller with appropriate SPIM parameters for each active side
         // some of these things only need to be done once if the same micro-mirror
@@ -348,10 +348,10 @@ public class PLogicDISPIM {
     }
 
     // Compute appropriate motor speed in mm/s for the given stage scanning settings
-    public double computeScanSpeed(DefaultAcquisitionSettingsDISPIM settings, final int numScansPerSlice) {
+    public double computeScanSpeed(DispimAcquisitionSettings settings, final int numScansPerSlice) {
         //double sliceDuration = settings.timingSettings().sliceDuration();
         //double sliceDuration = 0.0; // TODO: get from SliceTiming
-        double sliceDuration = getSliceDuration(settings.timingSettings(), numScansPerSlice); // TODO: ???
+        double sliceDuration = getSliceDuration(settings.timing(), numScansPerSlice); // TODO: ???
         if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             // pretend like our slice takes twice as long so that we move the correct speed
             // this has the effect of halving the motor speed
@@ -360,12 +360,12 @@ public class PLogicDISPIM {
         }
         final int channelsPerPass = computeScanChannelsPerPass(settings);
         //return settings.getStepSize() * du.getStageGeometricSpeedFactor(settings.firstSideIsA) / sliceDuration / channelsPerPass;
-        return settings.volumeSettings().sliceStepSize() / sliceDuration / channelsPerPass; // TODO: add getStageGeometricSpeedFactor
+        return settings.volume().sliceStepSize() / sliceDuration / channelsPerPass; // TODO: add getStageGeometricSpeedFactor
     }
 
     // compute how many channels we do in each one-way scan
-    private int computeScanChannelsPerPass(DefaultAcquisitionSettingsDISPIM settings) {
-        return settings.channelMode() == ChannelMode.SLICE_HW ? settings.numChannels() : 1;
+    private int computeScanChannelsPerPass(DispimAcquisitionSettings settings) {
+        return settings.channels().mode() == ChannelMode.SLICE_HW ? settings.channels().count() : 1;
     }
 
     /**
@@ -374,8 +374,8 @@ public class PLogicDISPIM {
      * @param motorSpeed
      * @return
      */
-    public double computeScanAcceleration(final double motorSpeed, DefaultAcquisitionSettingsDISPIM settings) {
-        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.scanSettings().scanAccelerationFactor();
+    public double computeScanAcceleration(final double motorSpeed, DispimAcquisitionSettings settings) {
+        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().accelerationFactor();
     }
 
     // TODO: scanNum was part of SliceSettings (now TimingSettings)
@@ -407,9 +407,9 @@ public class PLogicDISPIM {
         return (10 + 100 * (motorSpeed / maxMotorSpeed)) * stageScanAccelFactor;
     }
 
-    public boolean prepareStageScanForAcquisition(final double x, final double y, DefaultAcquisitionSettingsDISPIM settings) {
-        final boolean scanFromCurrent = settings.scanSettings().scanFromCurrentPosition();
-        final boolean scanNegative = settings.scanSettings().scanFromNegativeDirection();
+    public boolean prepareStageScanForAcquisition(final double x, final double y, DispimAcquisitionSettings settings) {
+        final boolean scanFromCurrent = settings.stageScan().fromCurrentPosition();
+        final boolean scanNegative = settings.stageScan().fromNegativeDirection();
         double xStartUm;
         double xStopUm;
         if (scanFromCurrent) {
@@ -450,13 +450,13 @@ public class PLogicDISPIM {
      * @param centerPiezos true to move piezos to center position
      * @return false if there is a fatal error, true if successful
      */
-    public boolean cleanUpControllerAfterAcquisition(final DefaultAcquisitionSettingsDISPIM settings, final boolean centerPiezos) {
+    public boolean cleanUpControllerAfterAcquisition(final DispimAcquisitionSettings settings, final boolean centerPiezos) {
         // clear "acquisition running" flag on PLC
         plcCamera_.setPreset(2);
         plcLaser_.setPreset(2);
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         if (numViews > 1 || firstView == 1) {
             final boolean success = cleanUpControllerAfterAcquisitionSide(1, centerPiezos, 0.0);
@@ -482,7 +482,7 @@ public class PLogicDISPIM {
     }
 
     public boolean prepareControllerForAcquisitionSide(
-            final AcquisitionSettingsDISPIM settings,
+            final AcquisitionSettingsDispim settings,
             final int view,
             final double channelOffset,
             final boolean offsetOnly) {
@@ -519,8 +519,8 @@ public class PLogicDISPIM {
                 // if we are changing color slice by slice then set controller to do multiple slices per piezo move
                 // otherwise just set to 1 slice per piezo move
                 int numSlicesPerPiezo = 1;
-                if (settings.isUsingChannels() && settings.channelMode() == ChannelMode.SLICE_HW) {
-                    numSlicesPerPiezo = settings.numChannels();
+                if (settings.channels().enabled() && settings.channels().mode() == ChannelMode.SLICE_HW) {
+                    numSlicesPerPiezo = settings.channels().count();
                 }
                 scanner.setSPIMNumSlicesPerPiezo(numSlicesPerPiezo);
 
@@ -529,8 +529,8 @@ public class PLogicDISPIM {
                 // otherwise (no channels, software switching, slice by slice HW switching)
                 //   just do one volume per start trigger
                 int numVolumesPerTrigger = 1;
-                if (settings.isUsingChannels() && settings.channelMode() == ChannelMode.VOLUME_HW) {
-                    numVolumesPerTrigger = settings.numChannels();
+                if (settings.channels().enabled() && settings.channels().mode() == ChannelMode.VOLUME_HW) {
+                    numVolumesPerTrigger = settings.channels().count();
                 }
 
                 // can either trigger controller once for all the time points and
@@ -548,7 +548,7 @@ public class PLogicDISPIM {
 
                 scanner.setSPIMDelayBeforeSide(
                         settings.isUsingStageScanning() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
-                                : settings.volumeSettings().delayBeforeView()); // this is the usual behavior
+                                : settings.volume().delayBeforeView()); // this is the usual behavior
             }
             double piezoCenter;
             if (settings.isUsingStageScanning()) {
@@ -572,12 +572,12 @@ public class PLogicDISPIM {
             if (settings.isUsingStageScanning() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
                 piezoAmplitude = 0.0;
             } else {
-                piezoAmplitude = (settings.volumeSettings().slicesPerView() - 1) * settings.volumeSettings().sliceStepSize();
+                piezoAmplitude = (settings.volume().slicesPerView() - 1) * settings.volume().sliceStepSize();
             }
 
             // use this instead of settings.numSlices from here on out because
             // we modify it if we are taking "extra slice" for synchronous/overlap
-            int numSlicesHW = settings.volumeSettings().slicesPerView();
+            int numSlicesHW = settings.volume().slicesPerView();
 
             // tweak the parameters if we are using synchronous/overlap mode
             // object is to get exact same piezo/scanner positions in first
@@ -622,13 +622,13 @@ public class PLogicDISPIM {
                 final boolean oppositeDirections = false;
 
                 scanner.setSPIMAlternateDirections(oppositeDirections);
-                scanner.setSPIMScanDuration(settings.timingSettings().scanDuration());
+                scanner.setSPIMScanDuration(settings.timing().scanDuration());
                 scanner.sa().setAmplitudeY(sliceAmplitude);
                 scanner.sa().setOffsetY(sliceCenter);
                 scanner.setSPIMNumSlices(numSlicesHW);
-                scanner.setSPIMNumSides(settings.volumeSettings().numViews());
+                scanner.setSPIMNumSides(settings.volume().numViews());
 
-                if (settings.volumeSettings().firstView() == 1) {
+                if (settings.volume().firstView() == 1) {
                     scanner.setSPIMFirstSide(ASIScanner.SPIMSide.A);
                 } else {
                     scanner.setSPIMFirstSide(ASIScanner.SPIMSide.B);
@@ -749,12 +749,12 @@ public class PLogicDISPIM {
         return true;
     }
 
-    public boolean setupHardwareChannelSwitching(final DefaultAcquisitionSettingsDISPIM settings) {
+    public boolean setupHardwareChannelSwitching(final DispimAcquisitionSettings settings) {
 
-        ChannelMode channelMode = settings.channelMode();
+        ChannelMode channelMode = settings.channels().mode();
 
         // PLogic can only handle up to 4 channels
-        if ((settings.numChannels() > 4) &&
+        if ((settings.channels().count() > 4) &&
                 (channelMode == ChannelMode.VOLUME_HW || channelMode == ChannelMode.SLICE_HW)) {
             studio_.logs().showError("PLogic card cannot handle more than 4 channels for hardware switching.");
             return false;
@@ -766,7 +766,7 @@ public class PLogicDISPIM {
                 plcLaser_.setPreset(17);
                 break;
             case VOLUME_HW:
-                if (settings.volumeSettings().firstView() == 1) {
+                if (settings.volume().firstView() == 1) {
                     plcLaser_.setPreset(18); // A first
                 } else {
                     plcLaser_.setPreset(26); // B first
@@ -778,7 +778,7 @@ public class PLogicDISPIM {
         }
 
         // set up hardware counter
-        switch (settings.numChannels()) {
+        switch (settings.channels().count()) {
             case 1:
                 plcLaser_.setPreset(22); // no counter
                 break;
@@ -805,7 +805,7 @@ public class PLogicDISPIM {
         // make sure the counters get reset on the acquisition start flag
         // turns out we can only do this for 2-counter and 4-counter implemented with D-flops
         // TODO: figure out alternative for 3-position counter
-        if (settings.numChannels() != 3) {
+        if (settings.channels().count() != 3) {
             plcLaser_.setPointerPosition(counterLSBAddr);
             plcLaser_.setCellInput(3, acquisitionFlagAddr + ASIPLogic.addrEdge);
             plcLaser_.setPointerPosition(counterMSBAddr);
@@ -832,8 +832,8 @@ public class PLogicDISPIM {
                 int lutValue = 0;
                 // populate a 3-input lookup table with the combinations of lasers present
                 // the LUT "MSB" is the laserTrigger, then the counter MSB, then the counter LSB
-                for (int channelNum = 0; channelNum < settings.numChannels(); ++channelNum) {
-                    if (doesPLogicChannelIncludeLaser(laserNum, settings.channels()[channelNum], settings.channelGroup())) {
+                for (int channelNum = 0; channelNum < settings.channels().count(); ++channelNum) {
+                    if (doesPLogicChannelIncludeLaser(laserNum, settings.channels().used()[channelNum], settings.channels().group())) {
                         lutValue += (int) Math.pow(2, channelNum + 4);  // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
                     }
                 }
@@ -855,9 +855,9 @@ public class PLogicDISPIM {
 
             // identify BNC from the preset and set counter inputs for 13-16 appropriately
             boolean[] hardwareChannelUsed = new boolean[4]; // initialized to all false
-            for (int channelNum = 0; channelNum < settings.numChannels(); channelNum++) {
+            for (int channelNum = 0; channelNum < settings.channels().count(); channelNum++) {
                 // we already know there are between 1 and 4 channels
-                int outputNum = getPLogicOutputFromChannel(settings.channels()[channelNum], settings.channelGroup());
+                int outputNum = getPLogicOutputFromChannel(settings.channels().used()[channelNum], settings.channels().group());
                 // TODO: handle case where we have multiple simultaneous outputs, e.g. outputs 6/7 together
                 // Note: harsh recently asked about double triggering, but ended up needing to split 1-4
                 if (outputNum < 5) {  // check for error in getPLogicOutputFromChannel()
@@ -879,8 +879,8 @@ public class PLogicDISPIM {
                 // if we are doing per-volume switching with side B first then counter will start at 1 instead of 0
                 // the following lines account for this by incrementing the channel number "match" by 1 in this special case
                 int adjustedChannelNum = channelNum;
-                if (channelMode == ChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 1)) {
-                    adjustedChannelNum = (channelNum + 1) % settings.numChannels();
+                if (channelMode == ChannelMode.VOLUME_HW && !(settings.volume().firstView() == 1)) {
+                    adjustedChannelNum = (channelNum + 1) % settings.channels().count();
                 }
                 // map the channel number to the equivalent addresses for the AND4
                 // inputs should be either 3 (for LSB high) or 67 (for LSB low)

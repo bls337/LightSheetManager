@@ -3,7 +3,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 import org.micromanager.internal.utils.FileDialogs;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
@@ -17,7 +17,6 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.util.EventObject;
 import java.util.Objects;
 
 public class SaveDataPanel extends Panel {
@@ -61,7 +60,7 @@ public class SaveDataPanel extends Panel {
                 "[]5[]"
         );
 
-        final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
+        final ScapeAcquisitionSettings acqSettings = model_.acquisitions().settings();
 
         final JLabel lblSaveDirectory = new JLabel("Directory:");
         final JLabel lblSaveFileName = new JLabel("File Name:");

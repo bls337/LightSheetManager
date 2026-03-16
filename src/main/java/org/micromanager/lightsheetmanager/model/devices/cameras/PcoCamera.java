@@ -12,7 +12,7 @@ import java.awt.Rectangle;
  * <p>Device Adapter: PCO_Camera
  * <p>Camera Support: Edge 5.5, Panda
  */
-public class PCOCamera extends CameraBase implements LightSheetCamera {
+public class PcoCamera extends CameraBase implements LightSheetCamera {
 
     public static class Models {
         public static final String EDGE55 =" 5.5";
@@ -34,7 +34,7 @@ public class PCOCamera extends CameraBase implements LightSheetCamera {
         public static final String SLOW_SCAN = "slow scan";
     }
 
-    public PCOCamera(Studio studio, String deviceName) {
+    public PcoCamera(Studio studio, String deviceName) {
         super(studio, deviceName);
     }
 

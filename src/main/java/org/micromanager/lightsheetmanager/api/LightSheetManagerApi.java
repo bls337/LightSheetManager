@@ -4,15 +4,15 @@ import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
 
 /**
- * Root interface to everything related to Light Sheet Microscope
+ * Root interface to everything related to Light Sheet Microscopes.
  *
  */
-public interface LightSheetManagerAPI {
+public interface LightSheetManagerApi {
 
    /**
     * Return the acquisition engine.
     *
-    * @return the acquisition engine.
+    * @return the acquisition engine
     */
    AcquisitionEngine acquisitions();
 
