@@ -10,7 +10,7 @@ import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.CameraSelectionPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.MultiPositionPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.PositionPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SaveDataPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
@@ -52,7 +52,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     private CheckBox cbxUseTimePoints_;
 
     // multiple positions
-    private MultiPositionPanel pnlMultiPositions_;
+    private PositionPanel pnlMultiPositions_;
     private CheckBox cbxUseMultiplePositions_;
 
     // save data
@@ -119,7 +119,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         // multiple positions
         cbxUseMultiplePositions_ = new CheckBox(
                 "Multiple Positions", settings.isUsingMultiplePositions());
-        pnlMultiPositions_ = new MultiPositionPanel(model_, cbxUseMultiplePositions_);
+        pnlMultiPositions_ = new PositionPanel(model_, cbxUseMultiplePositions_);
         // disable elements based on settings
         pnlMultiPositions_.setPanelEnabled(settings.isUsingMultiplePositions());
 
@@ -308,7 +308,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         return pnlSliceSettings_;
     }
 
-    public MultiPositionPanel getMultiPositionPanel() {
+    public PositionPanel getMultiPositionPanel() {
         return pnlMultiPositions_;
     }
 

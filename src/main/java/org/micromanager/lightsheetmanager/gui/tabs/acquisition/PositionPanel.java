@@ -10,7 +10,7 @@ import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
-public class MultiPositionPanel extends Panel {
+public class PositionPanel extends Panel {
 
     private Label lblPostMoveDelay_;
     private Spinner spnPostMoveDelay_;
@@ -20,7 +20,7 @@ public class MultiPositionPanel extends Panel {
     private final XYZGridFrame xyzGridFrame_;
     private final LightSheetManager model_;
 
-    public MultiPositionPanel(final LightSheetManager model, final CheckBox checkBox) {
+    public PositionPanel(final LightSheetManager model, final CheckBox checkBox) {
         super(checkBox);
         model_ = Objects.requireNonNull(model);
         xyzGridFrame_ = new XYZGridFrame(model_);
