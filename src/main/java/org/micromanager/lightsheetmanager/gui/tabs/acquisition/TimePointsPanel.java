@@ -55,13 +55,11 @@ public class TimePointsPanel extends Panel {
         spnNumTimePoints_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().numTimePoints(spnNumTimePoints_.getInt());
             model_.acquisitions().updateDurationLabels();
-            //System.out.println("getNumTimePoints: " + model_.acquisitions().getAcquisitionSettings().getNumTimePoints());
         });
 
         spnTimePointInterval_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().timePointInterval(spnTimePointInterval_.getDouble());
             model_.acquisitions().updateDurationLabels();
-            //System.out.println("getTimePointInterval: " + model_.acquisitions().getAcquisitionSettings().getTimePointInterval());
         });
     }
 

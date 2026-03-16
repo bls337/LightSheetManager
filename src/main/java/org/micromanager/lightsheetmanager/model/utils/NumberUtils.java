@@ -3,11 +3,14 @@ package org.micromanager.lightsheetmanager.model.utils;
 import org.apache.commons.math3.util.Precision;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 
 /**
  * Utilities for dealing with double precision floating point numbers.
  */
 public final class NumberUtils {
+
+    private static final NumberFormat format_ = NumberFormat.getInstance();
 
     /** This class should not be instantiated. */
     private NumberUtils() {
@@ -72,6 +75,11 @@ public final class NumberUtils {
      */
     public static boolean outsideRange(double value, double end1, double end2) {
         return value > Math.max(end1, end2) || value < Math.min(end1, end2);
+    }
+
+    // Copied from Micro-Manager NumberUtils for displaying strings
+    public static String doubleToDisplayString(double number) {
+        return format_.format(number);
     }
 
 }
