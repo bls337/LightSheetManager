@@ -127,8 +127,8 @@ public class PLogicDispim {
             final DispimAcquisitionSettings settings,
             final double channelOffset) {
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         if (numViews > 1 || firstView == 1) {
             final boolean success = prepareControllerForAcquisitionSide(settings, 1, channelOffset, true);
@@ -167,8 +167,8 @@ public class PLogicDispim {
         scanner1_.sa().setModeX(SingleAxis.Mode.DISABLED);
         scanner2_.sa().setModeX(SingleAxis.Mode.DISABLED);
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         // set up controller with appropriate SPIM parameters for each active side
         // some of these things only need to be done once if the same micro-mirror
@@ -257,14 +257,14 @@ public class PLogicDispim {
             xyStage_.setAccelerationX(computeScanAcceleration(actualMotorSpeed,
                     xyStage_.getMaxSpeedX(), settings.stageScan().accelerationFactor()));
 
-            int numLines = settings.volumeSettings().numViews();
+            int numLines = settings.volume().numViews();
             if (isInterleaved) {
                 numLines = 1;  // assure in acquisition code that we can't have single-sided interleaved
             }
             numLines *= (int)((double) settings.numChannels() / computeScanChannelsPerPass(settings));
             xyStage_.setScanNumLines(numLines);
 
-            final boolean isStageScan2Sided = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN) && settings.volumeSettings().numViews() == 2;
+            final boolean isStageScan2Sided = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN) && settings.volume().numViews() == 2;
             xyStage_.setScanPattern(isStageScan2Sided ? ASIXYStage.ScanPattern.SERPENTINE : ASIXYStage.ScanPattern.RASTER);
 
             if (xyStage_.getAxisPolarityX() != ASIXYStage.AxisPolarity.NORMAL) {
@@ -304,8 +304,8 @@ public class PLogicDispim {
         scanner_.setBeamOn(false);
         scanner_.sa().setModeX(SingleAxis.Mode.DISABLED);
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         // set up controller with appropriate SPIM parameters for each active side
         // some of these things only need to be done once if the same micro-mirror
@@ -351,7 +351,7 @@ public class PLogicDispim {
     public double computeScanSpeed(DispimAcquisitionSettings settings, final int numScansPerSlice) {
         //double sliceDuration = settings.timingSettings().sliceDuration();
         //double sliceDuration = 0.0; // TODO: get from SliceTiming
-        double sliceDuration = getSliceDuration(settings.timingSettings(), numScansPerSlice); // TODO: ???
+        double sliceDuration = getSliceDuration(settings.timing(), numScansPerSlice); // TODO: ???
         if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             // pretend like our slice takes twice as long so that we move the correct speed
             // this has the effect of halving the motor speed
@@ -360,7 +360,7 @@ public class PLogicDispim {
         }
         final int channelsPerPass = computeScanChannelsPerPass(settings);
         //return settings.getStepSize() * du.getStageGeometricSpeedFactor(settings.firstSideIsA) / sliceDuration / channelsPerPass;
-        return settings.volumeSettings().sliceStepSize() / sliceDuration / channelsPerPass; // TODO: add getStageGeometricSpeedFactor
+        return settings.volume().sliceStepSize() / sliceDuration / channelsPerPass; // TODO: add getStageGeometricSpeedFactor
     }
 
     // compute how many channels we do in each one-way scan
@@ -455,8 +455,8 @@ public class PLogicDispim {
         plcCamera_.setPreset(2);
         plcLaser_.setPreset(2);
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         if (numViews > 1 || firstView == 1) {
             final boolean success = cleanUpControllerAfterAcquisitionSide(1, centerPiezos, 0.0);
@@ -548,7 +548,7 @@ public class PLogicDispim {
 
                 scanner.setSPIMDelayBeforeSide(
                         settings.isUsingStageScanning() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
-                                : settings.volumeSettings().delayBeforeView()); // this is the usual behavior
+                                : settings.volume().delayBeforeView()); // this is the usual behavior
             }
             double piezoCenter;
             if (settings.isUsingStageScanning()) {
@@ -572,12 +572,12 @@ public class PLogicDispim {
             if (settings.isUsingStageScanning() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
                 piezoAmplitude = 0.0;
             } else {
-                piezoAmplitude = (settings.volumeSettings().slicesPerView() - 1) * settings.volumeSettings().sliceStepSize();
+                piezoAmplitude = (settings.volume().slicesPerView() - 1) * settings.volume().sliceStepSize();
             }
 
             // use this instead of settings.numSlices from here on out because
             // we modify it if we are taking "extra slice" for synchronous/overlap
-            int numSlicesHW = settings.volumeSettings().slicesPerView();
+            int numSlicesHW = settings.volume().slicesPerView();
 
             // tweak the parameters if we are using synchronous/overlap mode
             // object is to get exact same piezo/scanner positions in first
@@ -622,13 +622,13 @@ public class PLogicDispim {
                 final boolean oppositeDirections = false;
 
                 scanner.setSPIMAlternateDirections(oppositeDirections);
-                scanner.setSPIMScanDuration(settings.timingSettings().scanDuration());
+                scanner.setSPIMScanDuration(settings.timing().scanDuration());
                 scanner.sa().setAmplitudeY(sliceAmplitude);
                 scanner.sa().setOffsetY(sliceCenter);
                 scanner.setSPIMNumSlices(numSlicesHW);
-                scanner.setSPIMNumSides(settings.volumeSettings().numViews());
+                scanner.setSPIMNumSides(settings.volume().numViews());
 
-                if (settings.volumeSettings().firstView() == 1) {
+                if (settings.volume().firstView() == 1) {
                     scanner.setSPIMFirstSide(ASIScanner.SPIMSide.A);
                 } else {
                     scanner.setSPIMFirstSide(ASIScanner.SPIMSide.B);
@@ -766,7 +766,7 @@ public class PLogicDispim {
                 plcLaser_.setPreset(17);
                 break;
             case VOLUME_HW:
-                if (settings.volumeSettings().firstView() == 1) {
+                if (settings.volume().firstView() == 1) {
                     plcLaser_.setPreset(18); // A first
                 } else {
                     plcLaser_.setPreset(26); // B first
@@ -879,7 +879,7 @@ public class PLogicDispim {
                 // if we are doing per-volume switching with side B first then counter will start at 1 instead of 0
                 // the following lines account for this by incrementing the channel number "match" by 1 in this special case
                 int adjustedChannelNum = channelNum;
-                if (channelMode == ChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 1)) {
+                if (channelMode == ChannelMode.VOLUME_HW && !(settings.volume().firstView() == 1)) {
                     adjustedChannelNum = (channelNum + 1) % settings.numChannels();
                 }
                 // map the channel number to the equivalent addresses for the AND4

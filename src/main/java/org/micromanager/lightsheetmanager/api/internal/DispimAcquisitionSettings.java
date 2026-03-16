@@ -418,7 +418,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      * @return immutable DefaultTimingSettings instance.
      */
     @Override
-    public DefaultTimingSettings timingSettings() {
+    public DefaultTimingSettings timing() {
         return timingSettings_;
     }
 
@@ -428,7 +428,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      * @return immutable DefaultVolumeSettings instance.
      */
     @Override
-    public DefaultVolumeSettings volumeSettings() {
+    public DefaultVolumeSettings volume() {
         return volumeSettings_;
     }
 
@@ -438,7 +438,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      * @return immutable DefaultSliceSettings instance.
      */
     @Override
-    public DefaultSliceSettings sliceSettings() {
+    public DefaultSliceSettings slice() {
         return sliceSettings_;
     }
 

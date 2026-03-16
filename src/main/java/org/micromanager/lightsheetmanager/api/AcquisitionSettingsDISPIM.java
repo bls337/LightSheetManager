@@ -28,21 +28,21 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultTimingSettings instance.
      */
-    DefaultTimingSettings timingSettings();
+    DefaultTimingSettings timing();
 
     /**
      * Returns the immutable DefaultVolumeSettings instance.
      *
      * @return immutable DefaultVolumeSettings instance.
      */
-    DefaultVolumeSettings volumeSettings();
+    DefaultVolumeSettings volume();
 
     /**
      * Returns the immutable DefaultSliceSettings instance.
      *
      * @return immutable DefaultSliceSettings instance.
      */
-    DefaultSliceSettings sliceSettings();
+    DefaultSliceSettings slice();
 
     /**
      * Returns the immutable DefaultSliceSettingsLS instance.

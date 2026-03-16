@@ -441,7 +441,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
             }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
-            if (acqSettings_.volumeSettings().numViews() > 1) {
+            if (acqSettings_.volume().numViews() > 1) {
                 cameraNames = new String[]{
                         model_.devices().device("Imaging1Camera").getDeviceName(),
                         model_.devices().device("Imaging2Camera").getDeviceName()
@@ -559,7 +559,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
         // setup channels
         int nrChannelsSoftware = acqSettings_.numChannels();  // how many times we trigger the controller per stack
-        int nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView();
+        int nrSlicesSoftware = acqSettings_.volume().slicesPerView();
         //acqSettings_.volumeSettings().slicesPerView();
         // TODO: channels need to modify panels and need extraChannelOffset_
         boolean changeChannelPerVolumeSoftware = false;
@@ -589,7 +589,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                         return false; // early exit
                     }
                     nrChannelsSoftware = 1;
-                    nrSlicesSoftware = acqSettings_.volumeSettings().slicesPerView() * acqSettings_.numChannels();
+                    nrSlicesSoftware = acqSettings_.volume().slicesPerView() * acqSettings_.numChannels();
                     break;
                 default:
                     studio_.logs().showError(
@@ -602,7 +602,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         CameraBase camera = model_.devices().device("Imaging1Camera");
         CameraMode camMode = camera.getTriggerMode();
         final double cameraReadoutTime = camera.getReadoutTime(camMode);
-        final double exposureTime = acqSettings_.timingSettings().cameraExposure();
+        final double exposureTime = acqSettings_.timing().cameraExposure();
 
         // test acq was here
 
@@ -633,7 +633,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         }
 
 
-        final double sliceDuration = acqSettings_.timingSettings().sliceDuration();
+        final double sliceDuration = acqSettings_.timing().sliceDuration();
         if (exposureTime + cameraReadoutTime > sliceDuration) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
@@ -735,7 +735,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         // we will wait cameraReadoutMax before triggering camera, then wait another cameraResetMax for global exposure
         // this will also be in 0.25ms increment
         final double globalExposureDelayMax = cameraReadoutMax + cameraResetMax;
-        double laserDuration = NumberUtils.roundToQuarterMs(acqSettings_.sliceSettings().sampleExposure());
+        double laserDuration = NumberUtils.roundToQuarterMs(acqSettings_.slice().sampleExposure());
         double scanDuration = laserDuration + 2*scanLaserBufferTime;
         // scan will be longer than laser by 0.25ms at both start and end
 
@@ -920,15 +920,15 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
     private double computeActualVolumeDuration(final DispimAcquisitionSettings acqSettings) {
         final ChannelMode channelMode = acqSettings.channelMode();
         final int numChannels = acqSettings.numChannels();
-        final int numViews = acqSettings.volumeSettings().numViews();
-        final double delayBeforeSide = acqSettings.volumeSettings().delayBeforeView();
-        int numCameraTriggers = acqSettings.volumeSettings().slicesPerView();
+        final int numViews = acqSettings.volume().numViews();
+        final double delayBeforeSide = acqSettings.volume().delayBeforeView();
+        int numCameraTriggers = acqSettings.volume().slicesPerView();
         if (acqSettings.cameraMode() == CameraMode.OVERLAP) {
             numCameraTriggers += 1;
         }
         // stackDuration is per-side, per-channel, per-position
 
-        final double stackDuration = numCameraTriggers * acqSettings.timingSettings().sliceDuration();
+        final double stackDuration = numCameraTriggers * acqSettings.timing().sliceDuration();
         if (acqSettings.isUsingStageScanning()) { // || acqSettings.isStageStepping) {
             // TODO: stage scanning code
             return 0;
