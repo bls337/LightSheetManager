@@ -5,7 +5,7 @@ import mmcorej.org.json.JSONObject;
 import org.micromanager.UserProfile;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.propertymap.MutablePropertyMapView;
 
 import java.util.Iterator;
@@ -72,7 +72,7 @@ public class UserSettings {
      * Load user settings.
      */
     public void load() {
-        // get json from settings based on microscope geometry type
+        // get JSON from settings based on microscope geometry type
         final GeometryType geometryType = model_.devices().adapter().geometry();
 
         final String key = SETTINGS_PREFIX + geometryType.toString().toUpperCase();
@@ -87,8 +87,8 @@ public class UserSettings {
             final Optional<JSONObject> loadedJson = validateUserSettings(json);
             if (loadedJson.isPresent()) {
                 // TODO: switch this based on microscope geometry type
-                final DefaultAcquisitionSettingsSCAPE acqSettings = DefaultAcquisitionSettingsSCAPE.fromJson(
-                        loadedJson.get().toString(), DefaultAcquisitionSettingsSCAPE.class);
+                final ScapeAcquisitionSettings acqSettings = ScapeAcquisitionSettings.fromJson(
+                        loadedJson.get().toString(), ScapeAcquisitionSettings.class);
                 // update both the settings and builder
                 model_.acquisitions().setAcquisitionSettingsAndBuilder(acqSettings);
                 model_.studio().logs().logDebugMessage("loaded JSON from " + key + ": "
@@ -140,9 +140,8 @@ public class UserSettings {
      */
     private Optional<JSONObject> validateUserSettings(final String loadedSettings) {
         // create default settings from builder
-        final String defaultSettings =
-                new DefaultAcquisitionSettingsSCAPE.Builder().build().toJson();
-        // validate json strings and count the number of keys
+        final String defaultSettings = ScapeAcquisitionSettings.builder().build().toJson();
+        // validate JSON strings and count the number of keys
         int numLoadedKeys;
         int numDefaultKeys;
         JSONObject loadedJson;

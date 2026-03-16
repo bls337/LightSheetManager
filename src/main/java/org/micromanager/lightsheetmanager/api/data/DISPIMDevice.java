@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.api.data;
 
 // TODO: error handling when out of range (side > numViews)
 
-public class DISPIMDevice {
+public class DispimDevice {
 
     public static final String UNDEFINED = "Undefined";
     public static final String INVERTED_CAMERA = "InvertedCamera";

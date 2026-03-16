@@ -4,7 +4,7 @@ import org.micromanager.AutofocusManager;
 import org.micromanager.AutofocusPlugin;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -24,7 +24,7 @@ public class AutofocusRunner {
     }
 
     public void runAutofocus() {
-        DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
+        ScapeAcquisitionSettings acqSettings = model_.acquisitions().settings();
 
         // TODO: make this work for generic devices
         final ASIPiezo piezo = model_.devices().device("ImagingFocus");

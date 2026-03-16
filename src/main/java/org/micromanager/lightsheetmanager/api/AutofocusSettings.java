@@ -99,11 +99,11 @@ public interface AutofocusSettings {
         AutofocusSettings build();
     }
 
-   /**
-    * Creates a Builder populated with settings of this AutofocusSettings instance.
-    *
-    * @return AutofocusSettings.Builder pre-populated with settings of this instance.
-    */
+    /**
+     * Returns a builder initialized with the current settings.
+     *
+     * @return a builder to create a modified copy of these settings
+     */
     Builder copyBuilder();
 
     /**

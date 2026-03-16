@@ -1,4 +1,4 @@
-package org.micromanager.lightsheetmanager.gui.playlist;//package org.micromanager.lightsheetmanager.table;
+package org.micromanager.lightsheetmanager.gui.playlist;
 
 import java.awt.Dimension;
 import java.awt.Font;
@@ -24,7 +24,7 @@ import javax.swing.text.DefaultCaret;
 import org.micromanager.PositionList;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DispimAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionMetadata;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionTableData;
@@ -238,19 +238,19 @@ public class AcquisitionTableFrame extends JFrame {
         add(bottomPanel, "");
     }
 
-	/**
-	 * Listen to window events and unselect acquisitions
-	 * and position lists if the window closes.
-	 */
-	private void initWindowListener() {
-		addWindowListener(new WindowAdapter() {
-	        @Override
-	        public void windowClosing(WindowEvent event) {
-	        	lstPositions_.clearSelectionAndReset();
-	        	acqTable_.clearSelection();
-	        }
-		});
-	}
+    /**
+     * Listen to window events and unselect acquisitions
+     * and position lists if the window closes.
+     */
+    private void initWindowListener() {
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event) {
+                lstPositions_.clearSelectionAndReset();
+            acqTable_.clearSelection();
+            }
+        });
+    }
 
     /**
      * Connect methods to the user interface.
@@ -322,13 +322,13 @@ public class AcquisitionTableFrame extends JFrame {
      * Open a file browser dialog to set the save directory for playlist metadata.
      */
     public void setSaveDirectory() {
-		if (directoryBrowser_.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-			final String filePath = directoryBrowser_.getSelectedFile().toString();
+        if (directoryBrowser_.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            final String filePath = directoryBrowser_.getSelectedFile().toString();
             //prefs_.putString("Acquisition Playlist", "Playlist Save Directory", filePath);
-			txtSaveDirectory_.setText(filePath);
-			saveDirectory_ = filePath;
-			//System.out.println(saveDirectory_);
-		}
+            txtSaveDirectory_.setText(filePath);
+            saveDirectory_ = filePath;
+            //System.out.println(saveDirectory_);
+        }
     }
 
     /**
@@ -344,14 +344,14 @@ public class AcquisitionTableFrame extends JFrame {
             boolean result = true;
             if (file.exists()) {
                 // TODO: check this
-//            	result = DialogUtils.getConfirmDialogResult(
-//            			"The file already exists, would you like to overwrite it?", JOptionPane.YES_NO_OPTION);
+//              result = DialogUtils.getConfirmDialogResult(
+//                  "The file already exists, would you like to overwrite it?", JOptionPane.YES_NO_OPTION);
             }
-        	if (result) {
-        		saveSettings(); // update position list and acquisition settings before saving
+            if (result) {
+                saveSettings(); // update position list and acquisition settings before saving
                 final String json = acqTable_.getTableData().toJson(true);
                 FileUtils.writeStringToFile(filePath, json);
-        	}
+            }
         }
     }
 
@@ -372,7 +372,7 @@ public class AcquisitionTableFrame extends JFrame {
             // parse the json file into an object
             AcquisitionTableData data = null;
             try {
-            	data = AcquisitionTableData.fromJson(json);
+                data = AcquisitionTableData.fromJson(json);
                 // clear data before loading settings from json
                 acqTable_.clearData();
                 acqTable_.setTableData(data);
@@ -380,7 +380,7 @@ public class AcquisitionTableFrame extends JFrame {
                 lstPositions_.addItems(data.getPositionListNames());
             } catch (JsonSyntaxException e) {
                 // TODO: check this
-            	//ReportingUtils.showError("JsonSyntaxException: unable to parse file: \n" + e.getMessage());
+                //ReportingUtils.showError("JsonSyntaxException: unable to parse file: \n" + e.getMessage());
             }
         }
     }
@@ -401,7 +401,7 @@ public class AcquisitionTableFrame extends JFrame {
         if (acqTable_.getTableData().acqNameExists(name)) {
             DialogUtils.showErrorMessage(this, "Name Error", "Name already exists, enter a unique name.");
             return;
-        } else if (name.length() == 0) {
+        } else if (name.isEmpty()) {
             DialogUtils.showErrorMessage(this, "Name Error", "Name cannot be an empty string.");
             return;
         } else if (!AcquisitionTable.isNameValid(name)) {
@@ -409,13 +409,13 @@ public class AcquisitionTableFrame extends JFrame {
                     "Name can only contain characters, digits, and underscores.");
             return;
         } else if (name.equals(AcquisitionTable.DEFAULT_ACQ_NAME)) {
-        	DialogUtils.showErrorMessage(this, "Name Error", "Name cannot be \""
-        			+ AcquisitionTable.DEFAULT_ACQ_NAME + "\".");
-        	return;
+            DialogUtils.showErrorMessage(this, "Name Error", "Name cannot be \""
+                    + AcquisitionTable.DEFAULT_ACQ_NAME + "\".");
+            return;
         } else {
             // TODO: check this
             // FIXME: new way of doing acq settings (was "new AcquisitionSettings()" before builder)
-            acqTable_.addAcquisitionSettings(name, new DefaultAcquisitionSettingsDISPIM.Builder().build());//acqPanel_.getCurrentAcquisitionSettings());
+            acqTable_.addAcquisitionSettings(name, DispimAcquisitionSettings.builder().build());//acqPanel_.getCurrentAcquisitionSettings());
         }
     }
 
@@ -453,7 +453,7 @@ public class AcquisitionTableFrame extends JFrame {
             final String name = selected.toString();
             if (name.equals(AcquisitionTablePositionList.NO_POSITION_LIST)) {
                 DialogUtils.showErrorMessage(this, "Remove Error", "Unable to remove \""
-                		+ AcquisitionTablePositionList.NO_POSITION_LIST + "\".");
+                        + AcquisitionTablePositionList.NO_POSITION_LIST + "\".");
                 return;
             }
             lstPositions_.removeItem(name); // remove name from JList
@@ -523,7 +523,7 @@ public class AcquisitionTableFrame extends JFrame {
 //     * Acquisition windows are always closed to free memory.
 //     */
 //    public void runSequentialAcquisitions() {
-//    	// check for errors outside of the SwingWorker to update components on the EDT
+//        // check for errors outside of the SwingWorker to update components on the EDT
 //
 //        txtAcqStatusLog_.setText(""); // reset error log
 //
@@ -654,14 +654,14 @@ public class AcquisitionTableFrame extends JFrame {
     private void saveSettings() {
         // save AcquisitionSettings and PositionList to update any settings changes
         if (acqTable_.getSelectedRow() != -1) {
-        	acqTable_.getTableData().updateAcquisitionSettings(
-                    // TODO: check this
-        			acqTable_.getCurrentAcqName(), new DefaultAcquisitionSettingsDISPIM.Builder().build());//acqPanel_.getCurrentAcquisitionSettings());
+            acqTable_.getTableData().updateAcquisitionSettings(
+            // TODO: check this
+            acqTable_.getCurrentAcqName(), DispimAcquisitionSettings.builder().build());//acqPanel_.getCurrentAcquisitionSettings());
         }
         if (lstPositions_.getSelectedValue() != null) {
             final String selected = lstPositions_.getSelectedValue().toString();
             if (!selected.equals(AcquisitionTablePositionList.NO_POSITION_LIST)) {
-            	acqTable_.getTableData().addPositionList(selected, acqTable_.getMMPositionList());
+                acqTable_.getTableData().addPositionList(selected, acqTable_.getMMPositionList());
             }
         }
     }

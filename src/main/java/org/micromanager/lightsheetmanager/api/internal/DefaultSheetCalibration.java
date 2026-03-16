@@ -2,8 +2,11 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.SheetCalibration;
 
-// TODO: put liveScanPeriod_ into main settings? it is not a per-view item
 public class DefaultSheetCalibration implements SheetCalibration {
+
+    public static Builder builder() {
+        return new Builder();
+    }
 
     public static class Builder implements SheetCalibration.Builder {
 
@@ -15,17 +18,17 @@ public class DefaultSheetCalibration implements SheetCalibration {
         private double scanSpeed_ = 0.0;
         private double scanOffset_ = 0.0;
 
-        public Builder() {
+        private Builder() {
         }
 
-        private Builder(final DefaultSheetCalibration sheetCalibration) {
-            imagingCenter_ = sheetCalibration.imagingCenter_;
-            sheetWidth_ = sheetCalibration.sheetWidth_;
-            sheetOffset_ = sheetCalibration.sheetOffset_;
-            useAutoSheetWidth_ = sheetCalibration.useAutoSheetWidth_;
-            autoSheetWidthPerPixel_ = sheetCalibration.autoSheetWidthPerPixel_;
-            scanSpeed_ = sheetCalibration.scanSpeed_;
-            scanOffset_ = sheetCalibration.scanOffset_;
+        private Builder(final DefaultSheetCalibration settings) {
+            imagingCenter_ = settings.imagingCenter_;
+            sheetWidth_ = settings.sheetWidth_;
+            sheetOffset_ = settings.sheetOffset_;
+            useAutoSheetWidth_ = settings.useAutoSheetWidth_;
+            autoSheetWidthPerPixel_ = settings.autoSheetWidthPerPixel_;
+            scanSpeed_ = settings.scanSpeed_;
+            scanOffset_ = settings.scanOffset_;
         }
 
         // normal camera modes

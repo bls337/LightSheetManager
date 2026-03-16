@@ -6,6 +6,10 @@ import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 
 public class DefaultAutofocusSettings implements AutofocusSettings {
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public static class Builder implements AutofocusSettings.Builder {
 
         private int numImages_ = 10;
@@ -22,18 +26,18 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 //        private boolean autoUpdateOffset_ = true;
 //        private double autoUpdateMaxOffset_ = 5.0;
 
-        public Builder() {
+        private Builder() {
         }
 
-        private Builder(final DefaultAutofocusSettings autofocusSettings) {
-            numImages_ = autofocusSettings.numImages_;
-            stepSizeUm_ = autofocusSettings.stepSizeUm_;
+        private Builder(final DefaultAutofocusSettings settings) {
+            numImages_ = settings.numImages_;
+            stepSizeUm_ = settings.stepSizeUm_;
             //toleranceUm_ = autofocusSettings.toleranceUm_;
-            showImages_ = autofocusSettings.showImages_;
-            showGraph_ = autofocusSettings.showGraph_;
-            mode_ = autofocusSettings.mode_;
-            scoringMethod_ = autofocusSettings.scoringMethod_;
-            channel_ = autofocusSettings.channel_;
+            showImages_ = settings.showImages_;
+            showGraph_ = settings.showGraph_;
+            mode_ = settings.mode_;
+            scoringMethod_ = settings.scoringMethod_;
+            channel_ = settings.channel_;
             //useEveryStagePass_ = autofocusSettings.useEveryStagePass_;
             //useBeforeAcquisition_ = autofocusSettings.useBeforeAcquisition_;
 //            maxOffset_ = autoUpdateMaxOffset_;

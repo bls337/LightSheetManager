@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * <p>
  * Contained in the DeviceManager object as "LightSheetDeviceManager".
  */
-public class LightSheetDeviceManager extends DeviceBase {
+public class DeviceAdapter extends DeviceBase {
 
     // used to indicate that the device is not set to any hardware
     public static final String UNDEFINED = "Undefined";
@@ -31,7 +31,7 @@ public class LightSheetDeviceManager extends DeviceBase {
     private int numIlluminationPaths_;
     private int numSimultaneousCameras_;
 
-    public LightSheetDeviceManager(final Studio studio, final String deviceName) {
+    public DeviceAdapter(final Studio studio, final String deviceName) {
         super(studio, deviceName);
         loadPreInitProperties();
     }

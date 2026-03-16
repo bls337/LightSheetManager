@@ -87,7 +87,9 @@ public class CameraSelectionPanel extends Panel {
         // we can only set this after we load the settings
         selectedIndex_ = radPrimaryCamera_.getSelectedIndex();
         // must not disable the primary camera
-        cbxCameras_.get(selectedIndex_).setLocked(true);
+        if (selectedIndex_ != -1) {
+            cbxCameras_.get(selectedIndex_).setLocked(true);
+        }
 
         final Panel pnlCameraSelectionRow = new Panel();
         pnlCameraSelectionRow.add(new JLabel("Select Primary Camera:"), "wrap");

@@ -1,47 +1,50 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
-import org.micromanager.lightsheetmanager.api.SliceSettingsLS;
+import org.micromanager.lightsheetmanager.api.SliceSettingsLightSheet;
 
-public class DefaultSliceSettingsLS implements SliceSettingsLS {
+public class DefaultSliceSettingsLS implements SliceSettingsLightSheet {
 
+    public static Builder builder() {
+        return new Builder();
+    }
 
-    public static class Builder implements SliceSettingsLS.Builder {
+    public static class Builder implements SliceSettingsLightSheet.Builder {
 
         private double scanResetTime_ = 3.0;
         private double scanSettleTime_ = 1.0;
         private double shutterWidth_ = 5.0;
         private double shutterSpeedFactor_ = 1.0;
 
-        public Builder() {
+        private Builder() {
         }
 
-        private Builder(DefaultSliceSettingsLS sliceSettings) {
-            scanResetTime_ = sliceSettings.scanResetTime();
-            scanSettleTime_ = sliceSettings.scanSettleTime();
-            shutterWidth_ = sliceSettings.shutterWidth();
-            shutterSpeedFactor_ = sliceSettings.shutterSpeedFactor();
+        private Builder(DefaultSliceSettingsLS settings) {
+            scanResetTime_ = settings.scanResetTime();
+            scanSettleTime_ = settings.scanSettleTime();
+            shutterWidth_ = settings.shutterWidth();
+            shutterSpeedFactor_ = settings.shutterSpeedFactor();
         }
 
         @Override
-        public SliceSettingsLS.Builder shutterWidth(final double um) {
+        public SliceSettingsLightSheet.Builder shutterWidth(final double um) {
             shutterWidth_ = um;
             return this;
         }
 
         @Override
-        public SliceSettingsLS.Builder shutterSpeedFactor(final double factor) {
+        public SliceSettingsLightSheet.Builder shutterSpeedFactor(final double factor) {
             shutterSpeedFactor_ = factor;
             return this;
         }
 
         @Override
-        public SliceSettingsLS.Builder scanSettleTime(final double ms) {
+        public SliceSettingsLightSheet.Builder scanSettleTime(final double ms) {
             scanSettleTime_ = ms;
             return this;
         }
 
         @Override
-        public SliceSettingsLS.Builder scanResetTime(final double ms) {
+        public SliceSettingsLightSheet.Builder scanResetTime(final double ms) {
             scanResetTime_ = ms;
             return this;
         }

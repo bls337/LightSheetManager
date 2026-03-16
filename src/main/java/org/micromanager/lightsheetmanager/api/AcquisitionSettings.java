@@ -69,9 +69,9 @@ public interface AcquisitionSettings {
 
     // TODO: impl
     /**
-     * Creates a Builder populated with settings of this AcquisitionSettings instance.
+     * Returns a builder initialized with the current settings.
      *
-     * @return AcquisitionSettings.Builder pre-populated with settings of this instance.
+     * @return a builder to create a modified copy of these settings
      */
     //Builder copyBuilder();
 

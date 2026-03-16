@@ -4,124 +4,21 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultStageScanSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 
 /**
- * Acquisition settings for SCAPE microscope geometries.
+ * Acquisition settings for SCAPE microscopes.
  */
-public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
-
-    interface Builder<T extends AcquisitionSettings.Builder<T>> extends AcquisitionSettings.Builder<T> {
-
-        /**
-         * Sets the acquisition mode.
-         *
-         * @param acqMode the acquisition mode
-         */
-        T acquisitionMode(final AcquisitionMode acqMode);
-
-        /**
-         * Sets the camera mode.
-         *
-         * @param cameraMode the camera mode.
-         */
-        T cameraMode(final CameraMode cameraMode);
-
-        /**
-         * Sets the imaging camera order.
-         *
-         * @param cameraOrder the imaging camera order
-         */
-        T imagingCameraOrder(final CameraData[] cameraOrder);
-
-        /**
-         * Sets the acquisition to use channels.
-         *
-         * @param state true to use channels.
-         */
-        T useChannels(final boolean state);
-
-        /**
-         * Sets the acquisition to use time points.
-         *
-         * @param state true to use time points.
-         */
-        T useTimePoints(final boolean state);
-
-        /**
-         * Sets the acquisition to use autofocus.
-         *
-         * @param state true to use autofocus.
-         */
-        T useAutofocus(final boolean state);
-
-        /**
-         * Sets the acquisition to use multiple positions.
-         *
-         * @param state true to use multiple positions.
-         */
-        T useMultiplePositions(final boolean state);
-
-        /**
-         * Sets the acquisition to use hardware time points.
-         *
-         * @param state true to use time points.
-         */
-        T useHardwareTimePoints(final boolean state);
-
-        /**
-         * Sets the acquisition to use advanced timing settings.
-         *
-         * @param state true to use advanced timing settings
-         */
-        T useAdvancedTiming(final boolean state);
-
-        /**
-         * Sets the number of time points.
-         *
-         * @param numTimePoints the number of time points
-         */
-        T numTimePoints(final int numTimePoints);
-
-        /**
-         * Sets the time point interval between time points in seconds.
-         *
-         * @param timePointInterval the time point interval in seconds.
-         */
-        T timePointInterval(final double timePointInterval);
-
-        /**
-         * Sets the delay after a move when using multiple positions.
-         *
-         * @param postMoveDelay the delay in milliseconds.
-         */
-        T postMoveDelay(final int postMoveDelay);
-
-        /**
-         * Sets the live scan period.
-         *
-         * @param liveScanPeriod the channel array
-         */
-        T liveScanPeriod(final double liveScanPeriod);
-
-        /**
-         * Creates an immutable instance of AcquisitionSettingsSCAPE
-         *
-         * @return Immutable version of AcquisitionSettingsSCAPE
-         */
-        AcquisitionSettingsSCAPE build();
-    }
+public interface AcquisitionSettingsScape extends AcquisitionSettings {
 
     /**
-     * Creates a Builder populated with settings of this AcquisitionSettingsDISPIM instance.
+     * Returns a builder initialized with the current settings.
      *
-     * @return AcquisitionSettingsDISPIM.Builder pre-populated with settings of this instance.
+     * @return a builder to create a modified copy of these settings
      */
     //Builder copyBuilder();
 
@@ -130,42 +27,35 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      *
      * @return immutable DefaultChannelSettings instance.
      */
-    DefaultChannelSettings channelSettings();
+    DefaultChannelSettings channels();
 
     /**
      * Returns the immutable DefaultTimingSettings instance.
      *
      * @return immutable DefaultTimingSettings instance.
      */
-    DefaultTimingSettings timingSettings();
+    DefaultTimingSettings timing();
 
     /**
      * Returns the immutable DefaultVolumeSettings instance.
      *
      * @return immutable DefaultVolumeSettings instance.
      */
-    DefaultVolumeSettings volumeSettings();
+    DefaultVolumeSettings volume();
 
     /**
      * Returns the immutable DefaultSliceSettings instance.
      *
      * @return immutable DefaultSliceSettings instance.
      */
-    DefaultSliceSettings sliceSettings();
-
-    /**
-     * Returns the immutable DefaultSliceSettingsLS instance.
-     *
-     * @return immutable DefaultSliceSettingsLS instance.
-     */
-    DefaultSliceSettingsLS sliceSettingsLS();
+    DefaultSliceSettings slice();
 
     /**
      * Returns the immutable DefaultScanSettings instance.
      *
      * @return immutable DefaultScanSettings instance.
      */
-    DefaultStageScanSettings scanSettings();
+    StageScanSettings stageScan();
 
     /**
      * Returns the immutable DefaultSheetCalibration instance.
@@ -201,13 +91,6 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      * @return the imaging camera order
      */
     CameraData[] imagingCameraOrder();
-
-    /**
-     * Returns true if using channels.
-     *
-     * @return true if using channels.
-     */
-    boolean isUsingChannels();
 
     /**
      * Returns true if using time points.
@@ -272,5 +155,102 @@ public interface AcquisitionSettingsSCAPE extends AcquisitionSettings {
      */
     int postMoveDelay();
 
-    double liveScanPeriod();
+    interface Builder<T extends AcquisitionSettings.Builder<T>> extends AcquisitionSettings.Builder<T> {
+
+        /**
+         * Sets the acquisition mode.
+         *
+         * @param acqMode the acquisition mode
+         * @return {@code this} builder
+         */
+        T acquisitionMode(final AcquisitionMode acqMode);
+
+        /**
+         * Sets the camera mode.
+         *
+         * @param cameraMode the camera mode.
+         * @return {@code this} builder
+         */
+        T cameraMode(final CameraMode cameraMode);
+
+        /**
+         * Sets the imaging camera order.
+         *
+         * @param cameraOrder the imaging camera order
+         * @return {@code this} builder
+         */
+        T imagingCameraOrder(final CameraData[] cameraOrder);
+
+        /**
+         * Sets the acquisition to use time points.
+         *
+         * @param state true to use time points
+         * @return {@code this} builder
+         */
+        T useTimePoints(final boolean state);
+
+        /**
+         * Sets the acquisition to use autofocus.
+         *
+         * @param state true to use autofocus
+         * @return {@code this} builder
+         */
+        T useAutofocus(final boolean state);
+
+        /**
+         * Sets the acquisition to use multiple positions.
+         *
+         * @param state true to use multiple positions
+         * @return {@code this} builder
+         */
+        T useMultiplePositions(final boolean state);
+
+        /**
+         * Sets the acquisition to use hardware time points.
+         *
+         * @param state true to use time points
+         * @return {@code this} builder
+         */
+        T useHardwareTimePoints(final boolean state);
+
+        /**
+         * Sets the acquisition to use advanced timing settings.
+         *
+         * @param state true to use advanced timing settings
+         * @return {@code this} builder
+         */
+        T useAdvancedTiming(final boolean state);
+
+        /**
+         * Sets the number of time points.
+         *
+         * @param numTimePoints the number of time points
+         * @return {@code this} builder
+         */
+        T numTimePoints(final int numTimePoints);
+
+        /**
+         * Sets the time point interval between time points in seconds.
+         *
+         * @param timePointInterval the time point interval in seconds
+         * @return {@code this} builder
+         */
+        T timePointInterval(final double timePointInterval);
+
+        /**
+         * Sets the delay after a move when using multiple positions.
+         *
+         * @param postMoveDelay the delay in milliseconds
+         * @return {@code this} builder
+         */
+        T postMoveDelay(final int postMoveDelay);
+
+        /**
+         * Creates a new {@link AcquisitionSettingsScape} instance based on the current configuration.
+         *
+         * @return a new immutable settings instance
+         */
+        AcquisitionSettingsScape build();
+    }
+
 }

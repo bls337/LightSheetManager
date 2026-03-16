@@ -2,7 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -64,7 +64,7 @@ public class BeamSheetControlPanel extends Panel {
     private void createUserInterface() {
         final GeometryType geometryType = model_.devices().adapter().geometry();
 
-        final DefaultAcquisitionSettingsSCAPE acqSettings = model_.acquisitions().settings();
+        final ScapeAcquisitionSettings acqSettings = model_.acquisitions().settings();
 
         //setMigLayout("", "[]10[]", "");
 

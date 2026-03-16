@@ -16,7 +16,7 @@ import javax.swing.table.TableColumn;
 import org.micromanager.PositionList;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsDISPIM;
+import org.micromanager.lightsheetmanager.api.internal.DispimAcquisitionSettings;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionMetadata;
 import org.micromanager.lightsheetmanager.model.playlist.AcquisitionTableData;
 
@@ -141,7 +141,7 @@ public class AcquisitionTable extends JScrollPane {
             // save current settings in AcquisitionTableData
             if (!currentAcqName_.equals(DEFAULT_ACQ_NAME)) {
                 // TODO: check this
-                data_.updateAcquisitionSettings(currentAcqName_, new DefaultAcquisitionSettingsDISPIM.Builder().build()); //acqPanel_.getCurrentAcquisitionSettings());
+                data_.updateAcquisitionSettings(currentAcqName_, DispimAcquisitionSettings.builder().build()); //acqPanel_.getCurrentAcquisitionSettings());
                 //System.out.println("SAVING ACQ: " + currentAcqName);
             }
             // set the current acquisition name

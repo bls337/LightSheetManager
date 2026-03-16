@@ -16,10 +16,10 @@ import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.lightsheetmanager.LightSheetManagerPlugin;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
-import org.micromanager.lightsheetmanager.model.autofocus.AutofocusMM;
+import org.micromanager.lightsheetmanager.model.autofocus.AutofocusAdapter;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
@@ -36,14 +36,14 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     protected final Studio studio_;
     protected final CMMCore core_;
 
-    protected DefaultAcquisitionSettingsSCAPE.Builder asb_;
-    protected DefaultAcquisitionSettingsSCAPE acqSettings_;
+    protected ScapeAcquisitionSettings.Builder asb_;
+    protected ScapeAcquisitionSettings acqSettings_;
 
     private final ExecutorService acquisitionExecutor_ = Executors.newSingleThreadExecutor(
             r -> new Thread(r, "Acquisition Thread"));
     protected volatile Acquisition currentAcquisition_ = null; // TODO: consider making a getter rather than protected?
 
-    private final AutofocusMM autofocus_;
+    private final AutofocusAdapter autofocus_;
 
     private DataStorage data_; // TODO: use this, has enum that needs moved/deleted?
     protected Datastore curStore_;
@@ -63,10 +63,10 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         core_ = model.core();
 
         data_ = new DataStorage(studio_);
-        autofocus_ = new AutofocusMM(model_);
+        autofocus_ = new AutofocusAdapter(model_);
 
         // default settings
-        asb_ = new DefaultAcquisitionSettingsSCAPE.Builder();
+        asb_ = ScapeAcquisitionSettings.builder();
         acqSettings_ = asb_.build();
     }
 
@@ -99,8 +99,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      *
      * @param acqSettings the {@code DefaultAcquisitionSettingsSCAPE} to use
      */
-    public void setAcquisitionSettingsAndBuilder(final DefaultAcquisitionSettingsSCAPE acqSettings) {
-        asb_ = new DefaultAcquisitionSettingsSCAPE.Builder(acqSettings);
+    public void setAcquisitionSettingsAndBuilder(final ScapeAcquisitionSettings acqSettings) {
+        asb_ = new ScapeAcquisitionSettings.Builder(acqSettings);
         acqSettings_ = acqSettings;
     }
 
@@ -188,11 +188,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             // These are the ones from the clojure engine that may yet need to be translated
             //        "Channels" -> {Long@25854} 2
 
-            summaryMetadata.put(PropertyKey.CHANNEL_GROUP.key(), acqSettings_.channelSettings().channelGroup());
+            summaryMetadata.put(PropertyKey.CHANNEL_GROUP.key(), acqSettings_.channels().group());
             JSONArray chNames = new JSONArray();
             JSONArray chColors = new JSONArray();
-            if (acqSettings_.isUsingChannels() && acqSettings_.channelSettings().numChannels() > 0) {
-                for (ChannelSpec c : acqSettings_.channelSettings().channels()) {
+            if (acqSettings_.channels().enabled() && acqSettings_.channels().count() > 0) {
+                for (ChannelSpec c : acqSettings_.channels().used()) {
                     chNames.put(c.getName());
 //                chColors.put(c.getRGB());
                 }
@@ -208,10 +208,10 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                   acqSettings_.numTimePoints() : 1);
 
             summaryMetadata
-                  .put(PropertyKey.SLICES.key(), doProjections ? 1 : acqSettings_.volumeSettings().slicesPerView());
+                  .put(PropertyKey.SLICES.key(), doProjections ? 1 : acqSettings_.volume().slicesPerView());
 
-            summaryMetadata.put(PropertyKey.CHANNELS.key(), acqSettings_.isUsingChannels() ?
-                  acqSettings_.channelSettings().numChannels() : 1);
+            summaryMetadata.put(PropertyKey.CHANNELS.key(), acqSettings_.channels().enabled() ?
+                  acqSettings_.channels().count() : 1);
             summaryMetadata
                   .put(PropertyKey.POSITIONS.key(), acqSettings_.isUsingMultiplePositions() ?
                         studio_.positions().getPositionList().getNumberOfPositions() : 1);
@@ -225,7 +225,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             SummaryMetadata.Builder dsmb = new DefaultSummaryMetadata.Builder();
 
             List<String> axesOrdered = dsmb.build().getOrderedAxes();
-            axesOrdered.add(LSMAcquisitionEvents.CAMERA_AXIS);
+            axesOrdered.add(LightSheetEventAdapter.CAMERA_AXIS);
             // convert to JSON array
             JSONArray axes = new JSONArray();
             for (String axis : axesOrdered) {
@@ -235,7 +235,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
             // add "z-step_um" metadata to the image viewer (used in the deskew plugin)
             DefaultSummaryMetadata dsmd = (DefaultSummaryMetadata) dsmb
-                  .zStepUm(acqSettings_.volumeSettings().sliceStepSize())
+                  .zStepUm(acqSettings_.volume().sliceStepSize())
                   .build();
 
             summaryMetadata.put(PropertyKey.MICRO_MANAGER_VERSION.key(),
@@ -247,15 +247,15 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         }
     }
 
-    public DefaultAcquisitionSettingsSCAPE settings() {
+    public ScapeAcquisitionSettings settings() {
         return acqSettings_;
     }
 
-    public DefaultAcquisitionSettingsSCAPE.Builder settingsBuilder() {
+    public ScapeAcquisitionSettings.Builder settingsBuilder() {
         return asb_;
     }
 
-    public AutofocusMM autofocus() {
+    public AutofocusAdapter autofocus() {
         return autofocus_;
     }
 

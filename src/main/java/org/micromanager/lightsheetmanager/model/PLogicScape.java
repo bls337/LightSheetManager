@@ -8,7 +8,7 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultAcquisitionSettingsSCAPE;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
@@ -25,7 +25,7 @@ import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.util.Objects;
 
-public class PLogicSCAPE {
+public class PLogicScape {
 
     private Studio studio_;
     private CMMCore core_;
@@ -59,11 +59,11 @@ public class PLogicSCAPE {
     private static final int triggerSPIMAddr = 46;  // backplane signal, same as XY card's TTL output
     private static final int laserTriggerAddress = 10;  // this should be set to (42 || 8) = (TTL1 || manual laser on)
 
-    private final DefaultAcquisitionSettingsSCAPE acqSettings_;
+    private final ScapeAcquisitionSettings acqSettings_;
 
     private final LightSheetManager model_;
 
-    public PLogicSCAPE(final LightSheetManager model) {
+    public PLogicScape(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model_.studio();
         devices_ = model_.devices();
@@ -95,11 +95,11 @@ public class PLogicSCAPE {
      * @return
      */
     public boolean prepareControllerForAcquisitionOffsetOnly(
-            final DefaultAcquisitionSettingsSCAPE settings,
+            final ScapeAcquisitionSettings settings,
             final double channelOffset) {
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         if (numViews > 1 || firstView == 1) {
             final boolean success = prepareControllerForAcquisitionSide(settings, 1, channelOffset, true);
@@ -118,7 +118,7 @@ public class PLogicSCAPE {
     }
 
     public boolean prepareControllerForAcquisition(
-            final DefaultAcquisitionSettingsSCAPE settings,
+            final ScapeAcquisitionSettings settings,
             final double channelOffset) {
         // turn off beam and scan on both sides (they are turned off by SPIM state machine anyway)
         // also ensures that properties match reality at end of acquisition
@@ -127,8 +127,8 @@ public class PLogicSCAPE {
         scanner_.setBeamOn(false);
         scanner_.sa().setModeX(SingleAxis.Mode.DISABLED);
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         // set up controller with appropriate SPIM parameters for each active side
         // some of these things only need to be done once if the same micro-mirror
@@ -150,7 +150,7 @@ public class PLogicSCAPE {
 
         if (settings.isUsingStageScanning()
                 && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
-            if (settings.volumeSettings().numViews() != 2) {
+            if (settings.volume().numViews() != 2) {
                 studio_.logs().showError("Interleaved stage scan only possible for 2-sided acquisition.");
                 return false;
             }
@@ -214,24 +214,24 @@ public class PLogicSCAPE {
 
             // set the acceleration to a reasonable value for the (usually very slow) scan speed
             xyStage_.setAccelerationX(computeScanAcceleration(actualMotorSpeed,
-                    xyStage_.getMaxSpeedX(), settings.scanSettings().scanAccelerationFactor()));
+                    xyStage_.getMaxSpeedX(), settings.stageScan().accelerationFactor()));
 
             // set the scan pattern and number of scans appropriately
-            int numLines = settings.volumeSettings().numViews();
+            int numLines = settings.volume().numViews();
             if (isInterleaved) {
                 numLines = 1;  // assure in acquisition code that we can't have single-sided interleaved
             }
-            if (settings.isUsingChannels()) {
-                numLines = numLines * (settings.channelSettings().numChannels() / computeScanChannelsPerPass(settings));
+            if (settings.channels().enabled()) {
+                numLines = numLines * (settings.channels().count() / computeScanChannelsPerPass(settings));
             }
             xyStage_.setScanNumLines(numLines);
 
             final boolean isStageScan2Sided = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN)
-                    && settings.volumeSettings().numViews() == 2;
+                    && settings.volume().numViews() == 2;
 
             xyStage_.setScanPattern(isStageScan2Sided ?
                     ASIXYStage.ScanPattern.SERPENTINE : ASIXYStage.ScanPattern.RASTER);
-            xyStage_.setScanSettlingTime(acqSettings_.volumeSettings().delayBeforeView());
+            xyStage_.setScanSettlingTime(acqSettings_.volume().delayBeforeView());
 
             if (xyStage_.getAxisPolarityX() != ASIXYStage.AxisPolarity.NORMAL) {
                 studio_.logs().showError(
@@ -241,9 +241,9 @@ public class PLogicSCAPE {
 
             // cache how far we scan each pass for later use
             final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
-                    settings.scanSettings().scanAngleFirstView(),true);
-            actualStepSizeUm_ = settings.volumeSettings().sliceStepSize() * (actualMotorSpeed / requestedMotorSpeed);
-            scanDistance_ = settings.volumeSettings().slicesPerView() * actualStepSizeUm_ * speedFactor;
+                    settings.stageScan().firstViewAngle(),true);
+            actualStepSizeUm_ = settings.volume().sliceStepSize() * (actualMotorSpeed / requestedMotorSpeed);
+            scanDistance_ = settings.volume().slicesPerView() * actualStepSizeUm_ * speedFactor;
 
             if (!settings.isUsingMultiplePositions()) {
                 // use current position as center position for stage scanning
@@ -265,10 +265,10 @@ public class PLogicSCAPE {
     }
 
     // Compute appropriate motor speed in mm/s for the given stage scanning settings
-    public double computeScanSpeed(DefaultAcquisitionSettingsSCAPE settings, final int numScansPerSlice) {
+    public double computeScanSpeed(ScapeAcquisitionSettings settings, final int numScansPerSlice) {
         //double sliceDuration = settings.timingSettings().sliceDuration();
         // TODO: getSliceDuration only used here, but maybe should be computed elsewhere, and get with method above?
-        double sliceDuration = getSliceDuration(settings.timingSettings(), numScansPerSlice);
+        double sliceDuration = getSliceDuration(settings.timing(), numScansPerSlice);
         if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             // pretend like our slice takes twice as long so that we move the correct speed
             // this has the effect of halving the motor speed, but keeping the scan distance the same
@@ -276,13 +276,13 @@ public class PLogicSCAPE {
         }
         final int channelsPerPass = computeScanChannelsPerPass(settings);
         final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
-                settings.scanSettings().scanAngleFirstView(), settings.volumeSettings().firstView() == 1);
-        return settings.volumeSettings().sliceStepSize() * speedFactor / sliceDuration / channelsPerPass;
+                settings.stageScan().firstViewAngle(), settings.volume().firstView() == 1);
+        return settings.volume().sliceStepSize() * speedFactor / sliceDuration / channelsPerPass;
     }
 
     // compute how many channels we do in each one-way scan
-    private int computeScanChannelsPerPass(DefaultAcquisitionSettingsSCAPE settings) {
-        return settings.channelSettings().channelMode() == ChannelMode.SLICE_HW ? settings.channelSettings().numChannels() : 1;
+    private int computeScanChannelsPerPass(ScapeAcquisitionSettings settings) {
+        return settings.channels().mode() == ChannelMode.SLICE_HW ? settings.channels().count() : 1;
     }
 
     /**
@@ -291,8 +291,8 @@ public class PLogicSCAPE {
      * @param motorSpeed
      * @return
      */
-    public double computeScanAcceleration(final double motorSpeed, DefaultAcquisitionSettingsSCAPE settings) {
-        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.scanSettings().scanAccelerationFactor();
+    public double computeScanAcceleration(final double motorSpeed, ScapeAcquisitionSettings settings) {
+        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().accelerationFactor();
     }
 
     // TODO: scanNum was part of SliceSettings (now TimingSettings)
@@ -324,9 +324,9 @@ public class PLogicSCAPE {
         return (10 + 100 * (motorSpeed / maxMotorSpeed)) * stageScanAccelFactor;
     }
 
-    public boolean prepareStageScanForAcquisition(final double x, final double y, DefaultAcquisitionSettingsSCAPE settings) {
-        final boolean scanFromCurrent = settings.scanSettings().scanFromCurrentPosition();
-        final boolean scanNegative = settings.scanSettings().scanFromNegativeDirection();
+    public boolean prepareStageScanForAcquisition(final double x, final double y, ScapeAcquisitionSettings settings) {
+        final boolean scanFromCurrent = settings.stageScan().fromCurrentPosition();
+        final boolean scanNegative = settings.stageScan().fromNegativeDirection();
         double xStartUm;
         double xStopUm;
         if (scanFromCurrent) {
@@ -362,13 +362,13 @@ public class PLogicSCAPE {
      * @param centerPiezos true to move piezos to center position
      * @return false if there is a fatal error, true if successful
      */
-    public boolean cleanUpControllerAfterAcquisition(final DefaultAcquisitionSettingsSCAPE settings, final boolean centerPiezos) {
+    public boolean cleanUpControllerAfterAcquisition(final ScapeAcquisitionSettings settings, final boolean centerPiezos) {
         // clear "acquisition running" flag on PLC
         plcCamera_.setPreset(2);
         plcLaser_.setPreset(2);
 
-        final int numViews = settings.volumeSettings().numViews();
-        final int firstView = settings.volumeSettings().firstView();
+        final int numViews = settings.volume().numViews();
+        final int firstView = settings.volume().firstView();
 
         if (numViews > 1 || firstView == 1) {
             final boolean success = cleanUpControllerAfterAcquisitionSide(1, centerPiezos, 0.0);
@@ -394,7 +394,7 @@ public class PLogicSCAPE {
     }
 
     public boolean prepareControllerForAcquisitionSide(
-            final DefaultAcquisitionSettingsSCAPE settings,
+            final ScapeAcquisitionSettings settings,
             final int view,
             final double channelOffset,
             final boolean offsetOnly) {
@@ -405,8 +405,8 @@ public class PLogicSCAPE {
             // if we are changing color slice by slice then set controller to do multiple slices per piezo move
             // otherwise just set to 1 slice per piezo move
             int numSlicesPerPiezo = 1;
-            if (settings.isUsingChannels() && settings.channelSettings().channelMode() == ChannelMode.SLICE_HW) {
-                numSlicesPerPiezo = settings.channelSettings().numChannels();
+            if (settings.channels().enabled() && settings.channels().mode() == ChannelMode.SLICE_HW) {
+                numSlicesPerPiezo = settings.channels().count();
             }
             scanner_.setSPIMNumSlicesPerPiezo(numSlicesPerPiezo);
 
@@ -415,8 +415,8 @@ public class PLogicSCAPE {
             // otherwise (no channels, software switching, slice by slice HW switching)
             //   just do one volume per start trigger
             int numVolumesPerTrigger = 1;
-            if (settings.isUsingChannels() && settings.channelSettings().channelMode() == ChannelMode.VOLUME_HW) {
-                numVolumesPerTrigger = settings.channelSettings().numChannels();
+            if (settings.channels().enabled() && settings.channels().mode() == ChannelMode.VOLUME_HW) {
+                numVolumesPerTrigger = settings.channels().count();
             }
 
             // can either trigger controller once for all the time points and
@@ -434,7 +434,7 @@ public class PLogicSCAPE {
 
             scanner_.setSPIMDelayBeforeSide(
                     settings.isUsingStageScanning() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
-                            : settings.volumeSettings().delayBeforeView()); // this is the usual behavior
+                            : settings.volume().delayBeforeView()); // this is the usual behavior
         }
         double piezoCenter;
         if (settings.isUsingStageScanning()) {
@@ -458,12 +458,12 @@ public class PLogicSCAPE {
         if (settings.isUsingStageScanning() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
             piezoAmplitude = 0.0;
         } else {
-            piezoAmplitude = (settings.volumeSettings().slicesPerView() - 1) * settings.volumeSettings().sliceStepSize();
+            piezoAmplitude = (settings.volume().slicesPerView() - 1) * settings.volume().sliceStepSize();
         }
 
         // use this instead of settings.numSlices from here on out because
         // we modify it if we are taking "extra slice" for synchronous/overlap
-        int numSlicesHW = settings.volumeSettings().slicesPerView();
+        int numSlicesHW = settings.volume().slicesPerView();
 
         // tweak the piezo parameters if we are using synchronous/overlap mode
         // object is to get exact same piezo/scanner positions in first N frames (piezo/scanner will move to N+1st position but no image taken)
@@ -471,11 +471,11 @@ public class PLogicSCAPE {
         // offset shifts by half a step
         final CameraMode cameraMode = settings.cameraMode();
         if (cameraMode == CameraMode.OVERLAP) {
-            if (settings.volumeSettings().slicesPerView() > 1) {
+            if (settings.volume().slicesPerView() > 1) {
                 piezoAmplitude *= numSlicesHW / (numSlicesHW - 1.0);
             }
             // was piezoCenter += piezoAmplitude/(2*numSlicesHW) which isn't quite the same but close enough that nobody probably noticed
-            piezoCenter += settings.volumeSettings().sliceStepSize() / 2;
+            piezoCenter += settings.volume().sliceStepSize() / 2;
             numSlicesHW += 1;
         }
 
@@ -510,13 +510,13 @@ public class PLogicSCAPE {
 
             scanner_.setSPIMAlternateDirections(oppositeDirections);
             scanner_.setSPIMScanDuration(
-                  settings.timingSettings().sliceDuration() - settings.timingSettings().delayBeforeScan());
+                  settings.timing().sliceDuration() - settings.timing().delayBeforeScan());
             scanner_.sa().setAmplitudeY(sliceAmplitude);
             scanner_.sa().setOffsetY(sliceCenter);
             scanner_.setSPIMNumSlices(numSlicesHW);
-            scanner_.setSPIMNumSides(settings.volumeSettings().numViews());
+            scanner_.setSPIMNumSides(settings.volume().numViews());
 
-            if (settings.volumeSettings().firstView() == 1) {
+            if (settings.volume().firstView() == 1) {
                 scanner_.setSPIMFirstSide(ASIScanner.SPIMSide.A);
             } else {
                 scanner_.setSPIMFirstSide(ASIScanner.SPIMSide.B);
@@ -531,7 +531,7 @@ public class PLogicSCAPE {
                 // if we artificially shifted centers due to extra trigger and only moving piezo
                 // then move galvo center back to where it would have been
                 if (settings.cameraMode() == CameraMode.OVERLAP) {
-                    piezoCenter -= settings.volumeSettings().sliceStepSize() / 2;
+                    piezoCenter -= settings.volume().sliceStepSize() / 2;
                 }
                 piezoAmplitude = 0.0;
             }
@@ -635,12 +635,12 @@ public class PLogicSCAPE {
         return true;
     }
 
-    public boolean setupHardwareChannelSwitching(final DefaultAcquisitionSettingsSCAPE settings) {
+    public boolean setupHardwareChannelSwitching(final ScapeAcquisitionSettings settings) {
 
-        ChannelMode channelMode = settings.channelSettings().channelMode();
+        ChannelMode channelMode = settings.channels().mode();
 
         // PLogic can only handle up to 4 channels
-        if ((settings.channelSettings().numChannels() > 4) &&
+        if ((settings.channels().count() > 4) &&
                 (channelMode == ChannelMode.VOLUME_HW || channelMode == ChannelMode.SLICE_HW)) {
             studio_.logs().showError("PLogic card cannot handle more than 4 channels for hardware switching.");
             return false;
@@ -652,7 +652,7 @@ public class PLogicSCAPE {
                 plcLaser_.setPreset(17);
                 break;
             case VOLUME_HW:
-                if (settings.volumeSettings().firstView() == 1) {
+                if (settings.volume().firstView() == 1) {
                     plcLaser_.setPreset(18); // A first
                 } else {
                     plcLaser_.setPreset(26); // B first
@@ -664,7 +664,7 @@ public class PLogicSCAPE {
         }
 
         // set up hardware counter
-        switch (settings.channelSettings().numChannels()) {
+        switch (settings.channels().count()) {
             case 1:
                 plcLaser_.setPreset(22); // no counter
                 break;
@@ -691,7 +691,7 @@ public class PLogicSCAPE {
         // make sure the counters get reset on the acquisition start flag
         // turns out we can only do this for 2-counter and 4-counter implemented with D-flops
         // TODO: figure out alternative for 3-position counter
-        if (settings.channelSettings().numChannels() != 3) {
+        if (settings.channels().count() != 3) {
             plcLaser_.setPointerPosition(counterLSBAddr);
             plcLaser_.setCellInput(3, acquisitionFlagAddr + ASIPLogic.addrEdge);
             plcLaser_.setPointerPosition(counterMSBAddr);
@@ -724,8 +724,8 @@ public class PLogicSCAPE {
                 int lutValue = 0;
                 // populate a 3-input lookup table with the combinations of lasers present
                 // the LUT "MSB" is the laserTrigger, then the counter MSB, then the counter LSB
-                for (int channelNum = 0; channelNum < settings.channelSettings().numChannels(); ++channelNum) {
-                    if (doesPLogicChannelIncludeLaser(laserNum, settings.channelSettings().channels()[channelNum], settings.channelSettings().channelGroup())) {
+                for (int channelNum = 0; channelNum < settings.channels().count(); ++channelNum) {
+                    if (doesPLogicChannelIncludeLaser(laserNum, settings.channels().used()[channelNum], settings.channels().group())) {
                         lutValue += (int) Math.pow(2, channelNum + 4);  // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
                     }
                 }
@@ -758,10 +758,10 @@ public class PLogicSCAPE {
                 int lutValue = 0;
                 // populate a 3-input lookup table with the combinations of lasers present
                 // the LUT "MSB" is the laserTrigger, then the counter MSB, then the counter LSB
-                for (int channelNum = 0; channelNum < settings.channelSettings().numChannels(); ++channelNum) {
+                for (int channelNum = 0; channelNum < settings.channels().count(); ++channelNum) {
                     if (doesPLogicChannelIncludeLaser(laserNum,
-                          settings.channelSettings().channels()[channelNum],
-                          settings.channelSettings().channelGroup())) {
+                          settings.channels().used()[channelNum],
+                          settings.channels().group())) {
                         // LUT adds 2^(code in decimal) for each setting, but trigger is MSB of this code
                         lutValue += (int) Math.pow(2, channelNum + 4);
                     }
@@ -784,9 +784,9 @@ public class PLogicSCAPE {
 
             // identify BNC from the preset and set counter inputs for 13-16 appropriately
             boolean[] hardwareChannelUsed = new boolean[4]; // initialized to all false
-            for (int channelNum = 0; channelNum < settings.channelSettings().numChannels(); channelNum++) {
+            for (int channelNum = 0; channelNum < settings.channels().count(); channelNum++) {
                 // we already know there are between 1 and 4 channels
-                int outputNum = getPLogicOutputFromChannel(settings.channelSettings().channels()[channelNum], settings.channelSettings().channelGroup());
+                int outputNum = getPLogicOutputFromChannel(settings.channels().used()[channelNum], settings.channels().group());
                 // TODO: handle case where we have multiple simultaneous outputs, e.g. outputs 6/7 together
                 // Note: harsh recently asked about double triggering, but ended up needing to split 1-4
                 if (outputNum < 5) {  // check for error in getPLogicOutputFromChannel()
@@ -808,8 +808,8 @@ public class PLogicSCAPE {
                 // if we are doing per-volume switching with side B first then counter will start at 1 instead of 0
                 // the following lines account for this by incrementing the channel number "match" by 1 in this special case
                 int adjustedChannelNum = channelNum;
-                if (channelMode == ChannelMode.VOLUME_HW && !(settings.volumeSettings().firstView() == 1)) {
-                    adjustedChannelNum = (channelNum + 1) % settings.channelSettings().numChannels();
+                if (channelMode == ChannelMode.VOLUME_HW && !(settings.volume().firstView() == 1)) {
+                    adjustedChannelNum = (channelNum + 1) % settings.channels().count();
                 }
                 // map the channel number to the equivalent addresses for the AND4
                 // inputs should be either 3 (for LSB high) or 67 (for LSB low)

@@ -10,13 +10,13 @@ import java.util.Objects;
 /**
  * Use Micro-Manager's built in autofocus method "OughtaFocus".
  */
-public class AutofocusMM {
+public class AutofocusAdapter {
 
     private static final String AF_METHOD = "OughtaFocus";
 
     private final LightSheetManager model_;
 
-    public AutofocusMM(final LightSheetManager model) {
+    public AutofocusAdapter(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
     }
 
@@ -52,7 +52,7 @@ public class AutofocusMM {
 
         // TODO: is this correct?
         final double exposure = model_.acquisitions()
-                .settingsBuilder().timingSettingsBuilder().build()
+                .settingsBuilder().timingBuilder().build()
                 .cameraExposure();
 
         // convert numImages and stepSizeUm to OughtaFocus plugin
