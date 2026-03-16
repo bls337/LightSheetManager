@@ -256,7 +256,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     private final DefaultTimingSettings timingSettings_;
     private final DefaultVolumeSettings volumeSettings_;
     private final DefaultSliceSettings sliceSettings_;
-    private final StageScanSettings scanSettings_;
+    private final StageScanSettings stageScan_;
     private final DefaultSheetCalibration[] sheetCalibrations_;
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
@@ -282,7 +282,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         timingSettings_ = builder.tsb_.build();
         volumeSettings_ = builder.vsb_.build();
         sliceSettings_ = builder.ssb_.build();
-        scanSettings_ = builder.stageScanBuilder().build();
+        stageScan_ = builder.stageScanBuilder().build();
         sheetCalibrations_ = new DefaultSheetCalibration[1];
         sliceCalibrations_ = new DefaultSliceCalibration[1]; // TODO: use this object directly
         for (int i = 0; i < 1; i ++) {
@@ -360,7 +360,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      */
     @Override
     public StageScanSettings stageScan() {
-        return scanSettings_;
+        return stageScan_;
     }
 
     /**

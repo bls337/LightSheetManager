@@ -15,6 +15,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDispim.Builder<Builder> {
 
+        private DefaultChannelSettings.Builder csb_ = DefaultChannelSettings.builder();
         private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
         private DefaultVolumeSettings.Builder vsb_ = DefaultVolumeSettings.builder();
         private DefaultSliceSettings.Builder ssb_ = DefaultSliceSettings.builder();
@@ -58,7 +59,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             vsb_ = acqSettings.volumeSettings_.copyBuilder();
             ssb_ = acqSettings.sliceSettings_.copyBuilder();
             ssbLS_ = acqSettings.sliceSettingsLS_.copyBuilder();
-            scsb_ = acqSettings.scanSettings_.copyBuilder();
+            scsb_ = acqSettings.stageScan_.copyBuilder();
             for (int i = 0; i < 2; i++) {
                 slcb_[i] = acqSettings.sliceCalibrations_[i].copyBuilder();
                 shcb_[i] = acqSettings.sheetCalibrations_[i].copyBuilder();
@@ -317,7 +318,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     private final DefaultVolumeSettings volumeSettings_;
     private final DefaultSliceSettingsLS sliceSettingsLS_;
     private final DefaultSliceSettings sliceSettings_;
-    private final StageScanSettings scanSettings_;
+    private final StageScanSettings stageScan_;
     private final DefaultSheetCalibration[] sheetCalibrations_;
     private final DefaultSliceCalibration[] sliceCalibrations_;
 
@@ -349,7 +350,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         volumeSettings_ = builder.vsb_.build();
         sliceSettings_ = builder.ssb_.build();
         sliceSettingsLS_ = builder.ssbLS_.build();
-        scanSettings_ = builder.scsb_.build();
+        stageScan_ = builder.scsb_.build();
         sheetCalibrations_ = new DefaultSheetCalibration[2];
         sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
         for (int i = 0; i < 2; i++) {
@@ -457,8 +458,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      * @return immutable DefaultScanSettings instance.
      */
     @Override
-    public StageScanSettings scanSettings() {
-        return scanSettings_;
+    public StageScanSettings stageScan() {
+        return stageScan_;
     }
 
     /**

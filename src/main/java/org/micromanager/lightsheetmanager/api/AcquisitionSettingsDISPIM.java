@@ -56,7 +56,7 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultScanSettings instance.
      */
-    StageScanSettings scanSettings();
+    StageScanSettings stageScan();
 
     /**
      * Returns the immutable DefaultSheetCalibration instance.

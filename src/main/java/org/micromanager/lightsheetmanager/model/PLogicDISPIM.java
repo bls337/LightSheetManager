@@ -255,7 +255,7 @@ public class PLogicDispim {
 
             // set the acceleration to a reasonable value for the (usually very slow) scan speed
             xyStage_.setAccelerationX(computeScanAcceleration(actualMotorSpeed,
-                    xyStage_.getMaxSpeedX(), settings.scanSettings().accelerationFactor()));
+                    xyStage_.getMaxSpeedX(), settings.stageScan().accelerationFactor()));
 
             int numLines = settings.volumeSettings().numViews();
             if (isInterleaved) {
@@ -375,7 +375,7 @@ public class PLogicDispim {
      * @return
      */
     public double computeScanAcceleration(final double motorSpeed, DispimAcquisitionSettings settings) {
-        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.scanSettings().accelerationFactor();
+        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().accelerationFactor();
     }
 
     // TODO: scanNum was part of SliceSettings (now TimingSettings)
@@ -408,8 +408,8 @@ public class PLogicDispim {
     }
 
     public boolean prepareStageScanForAcquisition(final double x, final double y, DispimAcquisitionSettings settings) {
-        final boolean scanFromCurrent = settings.scanSettings().fromCurrentPosition();
-        final boolean scanNegative = settings.scanSettings().fromNegativeDirection();
+        final boolean scanFromCurrent = settings.stageScan().fromCurrentPosition();
+        final boolean scanNegative = settings.stageScan().fromNegativeDirection();
         double xStartUm;
         double xStopUm;
         if (scanFromCurrent) {
