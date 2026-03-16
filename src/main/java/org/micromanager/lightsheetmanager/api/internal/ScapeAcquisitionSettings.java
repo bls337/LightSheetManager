@@ -14,13 +14,13 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsScape.Builder<Builder> {
 
-        private DefaultChannelSettings.Builder csb_ = DefaultChannelSettings.builder();
-        private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
-        private DefaultVolumeSettings.Builder vsb_ = DefaultVolumeSettings.builder();
-        private DefaultSliceSettings.Builder ssb_ = DefaultSliceSettings.builder();
-        private StageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
-        private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[1];
-        private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[1];
+        private DefaultChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
+        private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
+        private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
+        private DefaultSliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
+        private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
+        private DefaultSheetCalibration.Builder[] sheetCalibBuilder_ = new DefaultSheetCalibration.Builder[1];
+        private DefaultSliceCalibration.Builder[] sliceCalibBuilder_ = new DefaultSliceCalibration.Builder[1];
 
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
 
@@ -40,21 +40,21 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
         private Builder() {
             for (int i = 0; i < 1; i++) {
-                shcb_[i] = DefaultSheetCalibration.builder();
-                slcb_[i] = DefaultSliceCalibration.builder();
+                sheetCalibBuilder_[i] = DefaultSheetCalibration.builder();
+                sliceCalibBuilder_[i] = DefaultSliceCalibration.builder();
             }
         }
 
         public Builder(final ScapeAcquisitionSettings settings) {
             super(settings);
-            csb_ = settings.channelSettings_.copyBuilder();
-            tsb_ = settings.timingSettings_.copyBuilder();
-            vsb_ = settings.volumeSettings_.copyBuilder();
-            ssb_ = settings.sliceSettings_.copyBuilder();
-            scsb_ = settings.stageScan().copyBuilder();
+            channelBuilder_ = settings.channelSettings_.copyBuilder();
+            timingBuilder_ = settings.timingSettings_.copyBuilder();
+            volumeBuilder_ = settings.volumeSettings_.copyBuilder();
+            sliceBuilder_ = settings.sliceSettings_.copyBuilder();
+            stageScanBuilder_ = settings.stageScan().copyBuilder();
             for (int i = 0; i < 1; i++) {
-                slcb_[i] = settings.sliceCalibrations_[i].copyBuilder();
-                shcb_[i] = settings.sheetCalibrations_[i].copyBuilder();
+                sliceCalibBuilder_[i] = settings.sliceCalibrations_[i].copyBuilder();
+                sheetCalibBuilder_[i] = settings.sheetCalibrations_[i].copyBuilder();
             }
             acquisitionMode_ = settings.acquisitionMode_;
             cameraMode_ = settings.cameraMode_;
@@ -199,39 +199,39 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
         // getters for sub-builders
         public DefaultChannelSettings.Builder channelBuilder() {
-            return csb_;
+            return channelBuilder_;
         }
 
         public DefaultTimingSettings.Builder timingBuilder() {
-            return tsb_;
+            return timingBuilder_;
         }
 
         public DefaultVolumeSettings.Builder volumeBuilder() {
-            return vsb_;
+            return volumeBuilder_;
         }
 
         public DefaultSliceSettings.Builder sliceBuilder() {
-            return ssb_;
+            return sliceBuilder_;
         }
 
         public StageScanSettings.Builder stageScanBuilder() {
-            return scsb_;
+            return stageScanBuilder_;
         }
 
         public DefaultSheetCalibration.Builder sheetCalibrationBuilder(final int view) {
-            return shcb_[view-1];
+            return sheetCalibBuilder_[view-1];
         }
 
         public DefaultSliceCalibration.Builder sliceCalibrationBuilder(final int view) {
-            return slcb_[view-1];
+            return sliceCalibBuilder_[view-1];
         }
 
-        public void timingBuilder(DefaultTimingSettings.Builder tsb) {
-            tsb_ = tsb;
+        public void timingBuilder(DefaultTimingSettings.Builder builder) {
+            timingBuilder_ = builder;
         }
 
-        public void volumeBuilder(DefaultVolumeSettings.Builder vsb) {
-            vsb_ = vsb;
+        public void volumeBuilder(DefaultVolumeSettings.Builder builder) {
+            volumeBuilder_ = builder;
         }
 
         @Override
@@ -247,7 +247,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         // TODO: finish toString with rest of properties
         @Override
         public String toString() {
-            return String.format("[tsb_=%s]", tsb_);
+            return String.format("[tsb_=%s]", timingBuilder_);
         }
 
     }
@@ -278,16 +278,16 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     private ScapeAcquisitionSettings(Builder builder) {
         super(builder);
-        channelSettings_ = builder.csb_.build();
-        timingSettings_ = builder.tsb_.build();
-        volumeSettings_ = builder.vsb_.build();
-        sliceSettings_ = builder.ssb_.build();
+        channelSettings_ = builder.channelBuilder_.build();
+        timingSettings_ = builder.timingBuilder_.build();
+        volumeSettings_ = builder.volumeBuilder_.build();
+        sliceSettings_ = builder.sliceBuilder_.build();
         stageScan_ = builder.stageScanBuilder().build();
         sheetCalibrations_ = new DefaultSheetCalibration[1];
         sliceCalibrations_ = new DefaultSliceCalibration[1]; // TODO: use this object directly
         for (int i = 0; i < 1; i ++) {
-            sheetCalibrations_[i] = builder.shcb_[i].build();
-            sliceCalibrations_[i] = builder.slcb_[i].build();
+            sheetCalibrations_[i] = builder.sheetCalibBuilder_[i].build();
+            sliceCalibrations_[i] = builder.sliceCalibBuilder_[i].build();
         }
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;

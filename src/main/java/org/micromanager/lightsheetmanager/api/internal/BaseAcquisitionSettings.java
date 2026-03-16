@@ -19,7 +19,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         private boolean demoMode_ = false;
         private DataStorage.SaveMode saveMode_ = DataStorage.SaveMode.ND_TIFF;
 
-        private DefaultAutofocusSettings.Builder afsb_ = DefaultAutofocusSettings.builder();
+        private DefaultAutofocusSettings.Builder afBuilder_ = DefaultAutofocusSettings.builder();
 
         public Builder() {
         }
@@ -30,7 +30,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
             saveDuringAcq_ = settings.saveDuringAcq_;
             demoMode_ = settings.demoMode_;
             saveMode_ = settings.saveMode_;
-            afsb_ = settings.autofocusSettings_.copyBuilder();
+            afBuilder_ = settings.autofocusSettings_.copyBuilder();
         }
 
         /**
@@ -90,7 +90,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
 
         @Override
         public DefaultAutofocusSettings.Builder autofocusSettingsBuilder() {
-            return afsb_;
+            return afBuilder_;
         }
 
         /**
@@ -136,7 +136,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         saveDuringAcq_ = builder.saveDuringAcq_;
         demoMode_ = builder.demoMode_;
         saveMode_ = builder.saveMode_;
-        autofocusSettings_ = builder.afsb_.build();
+        autofocusSettings_ = builder.afBuilder_.build();
     }
 
     /**
