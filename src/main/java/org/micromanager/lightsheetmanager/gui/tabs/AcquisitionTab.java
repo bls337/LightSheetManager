@@ -9,9 +9,9 @@ import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.CameraSelectionPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.MultiPositionPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SaveDataPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.CameraPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.PositionPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SavePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
@@ -52,14 +52,14 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     private CheckBox cbxUseTimePoints_;
 
     // multiple positions
-    private MultiPositionPanel pnlMultiPositions_;
+    private PositionPanel pnlMultiPositions_;
     private CheckBox cbxUseMultiplePositions_;
 
     // save data
-    private SaveDataPanel pnlSaveData_;
+    private SavePanel pnlSaveData_;
 
     // cameras
-    private CameraSelectionPanel pnlCameras_;
+    private CameraPanel pnlCameras_;
 
     // channels
     private CheckBox cbxUseChannels_;
@@ -119,12 +119,12 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         // multiple positions
         cbxUseMultiplePositions_ = new CheckBox(
                 "Multiple Positions", settings.isUsingMultiplePositions());
-        pnlMultiPositions_ = new MultiPositionPanel(model_, cbxUseMultiplePositions_);
+        pnlMultiPositions_ = new PositionPanel(model_, cbxUseMultiplePositions_);
         // disable elements based on settings
         pnlMultiPositions_.setPanelEnabled(settings.isUsingMultiplePositions());
 
-        pnlSaveData_ = new SaveDataPanel(model_, frame_);
-        pnlCameras_ = new CameraSelectionPanel(model_);
+        pnlSaveData_ = new SavePanel(model_, frame_);
+        pnlCameras_ = new CameraPanel(model_);
 
         // time points
         cbxUseTimePoints_ = new CheckBox("Time Points", settings.isUsingTimePoints());
@@ -266,6 +266,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cbxUseChannels_.registerListener(e -> {
             final boolean selected = cbxUseChannels_.isSelected();
             model_.acquisitions().settingsBuilder().channelBuilder().enabled(selected);
+            model_.acquisitions().updateDurationLabels();
             pnlChannelTable_.setItemsEnabled(selected);
         });
 
@@ -307,7 +308,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         return pnlSliceSettings_;
     }
 
-    public MultiPositionPanel getMultiPositionPanel() {
+    public PositionPanel getMultiPositionPanel() {
         return pnlMultiPositions_;
     }
 

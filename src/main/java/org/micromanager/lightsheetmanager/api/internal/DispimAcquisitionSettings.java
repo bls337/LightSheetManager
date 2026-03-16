@@ -13,12 +13,12 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDispim.Builder<Builder> {
 
-        private DefaultChannelSettings.Builder csb_ = DefaultChannelSettings.builder();
-        private DefaultTimingSettings.Builder tsb_ = DefaultTimingSettings.builder();
-        private DefaultVolumeSettings.Builder vsb_ = DefaultVolumeSettings.builder();
-        private DefaultSliceSettings.Builder ssb_ = DefaultSliceSettings.builder();
+        private DefaultChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
+        private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
+        private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
+        private DefaultSliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
         private DefaultSliceSettingsLS.Builder ssbLS_ = DefaultSliceSettingsLS.builder(); // maybe this should be LightSheetSliceSettings? replace ssb_?
-        private StageScanSettings.Builder scsb_ = DefaultStageScanSettings.builder();
+        private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
         private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
         private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
 
@@ -47,12 +47,12 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
         public Builder(final DispimAcquisitionSettings settings) {
             super(settings);
-            csb_ = settings.channelSettings_.copyBuilder();
-            tsb_ = settings.timingSettings_.copyBuilder();
-            vsb_ = settings.volumeSettings_.copyBuilder();
-            ssb_ = settings.sliceSettings_.copyBuilder();
+            channelBuilder_ = settings.channelSettings_.copyBuilder();
+            timingBuilder_ = settings.timingSettings_.copyBuilder();
+            volumeBuilder_ = settings.volumeSettings_.copyBuilder();
+            sliceBuilder_ = settings.sliceSettings_.copyBuilder();
             ssbLS_ = settings.sliceSettingsLS_.copyBuilder();
-            scsb_ = settings.stageScan().copyBuilder();
+            stageScanBuilder_ = settings.stageScan().copyBuilder();
             for (int i = 0; i < 2; i++) {
                 slcb_[i] = settings.sliceCalibrations_[i].copyBuilder();
                 shcb_[i] = settings.sheetCalibrations_[i].copyBuilder();
@@ -200,19 +200,19 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
         // getters for sub-builders
         public DefaultChannelSettings.Builder channelBuilder() {
-            return csb_;
+            return channelBuilder_;
         }
 
         public DefaultTimingSettings.Builder timingSettingsBuilder() {
-            return tsb_;
+            return timingBuilder_;
         }
 
         public DefaultVolumeSettings.Builder volumeSettingsBuilder() {
-            return vsb_;
+            return volumeBuilder_;
         }
 
         public DefaultSliceSettings.Builder sliceSettingsBuilder() {
-            return ssb_;
+            return sliceBuilder_;
         }
 
         public DefaultSliceSettingsLS.Builder sliceSettingsLSBuilder() {
@@ -220,7 +220,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         }
 
         public StageScanSettings.Builder scanSettingsBuilder() {
-            return scsb_;
+            return stageScanBuilder_;
         }
 
         public DefaultSheetCalibration.Builder sheetCalibrationBuilder(final int view) {
@@ -231,12 +231,12 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             return slcb_[view-1];
         }
 
-        public void timingSettingsBuilder(DefaultTimingSettings.Builder tsb) {
-            tsb_ = tsb;
+        public void timingSettingsBuilder(DefaultTimingSettings.Builder builder) {
+            timingBuilder_ = builder;
         }
 
-        public void volumeSettingsBuilder(DefaultVolumeSettings.Builder vsb) {
-            vsb_ = vsb;
+        public void volumeSettingsBuilder(DefaultVolumeSettings.Builder builder) {
+            volumeBuilder_ = builder;
         }
 
         /**
@@ -257,7 +257,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         // TODO: finish toString with rest of properties
         @Override
         public String toString() {
-            return String.format("[tsb_=%s]", tsb_);
+            return String.format("[tsb_=%s]", timingBuilder_);
         }
 
     }
@@ -289,12 +289,12 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     private DispimAcquisitionSettings(Builder builder) {
         super(builder);
-        channelSettings_ = builder.csb_.build();
-        timingSettings_ = builder.tsb_.build();
-        volumeSettings_ = builder.vsb_.build();
-        sliceSettings_ = builder.ssb_.build();
+        channelSettings_ = builder.channelBuilder_.build();
+        timingSettings_ = builder.timingBuilder_.build();
+        volumeSettings_ = builder.volumeBuilder_.build();
+        sliceSettings_ = builder.sliceBuilder_.build();
         sliceSettingsLS_ = builder.ssbLS_.build();
-        stageScan_ = builder.scsb_.build();
+        stageScan_ = builder.stageScanBuilder_.build();
         sheetCalibrations_ = new DefaultSheetCalibration[2];
         sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
         for (int i = 0; i < 2; i++) {

@@ -1339,41 +1339,42 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     @Override
     public void updateDurationLabels() {
         model_.acquisitions().recalculateSliceTiming();
-        model_.acquisitions().settingsBuilder().build();
+        model_.acquisitions().updateAcquisitionSettings();
+        // update durations now that settings are current
         updateSlicePeriodLabel(pnlVolumeDurations_.getSliceDurationLabel());
         updateVolumeDurationLabel(pnlVolumeDurations_.getVolumeDurationLabel());
         updateTotalTimeDurationLabel(pnlVolumeDurations_.getTotalDurationLabel());
     }
 
     private void updateSlicePeriodLabel(final JLabel label) {
-        label.setText(String.format("%.3f ms", acqSettings_.timing().sliceDuration()));
+        label.setText(NumberUtils.doubleToDisplayString(acqSettings_.timing().sliceDuration()) + " ms");
     }
 
     private void updateVolumeDurationLabel(final JLabel label) {
         final double duration = computeVolumeDuration();
         if (duration > 1000) {
-           label.setText(String.format("%.3f s", duration / 1000)); // round to ms
+            // round to ms
+            label.setText(NumberUtils.doubleToDisplayString(duration / 1000) + " s");
         } else {
-           label.setText(String.format("%.3f ms", (double)Math.round(10 * duration) / 10)); // round to tenth of ms
+            // round to tenth of ms
+            label.setText(NumberUtils.doubleToDisplayString((double)Math.round(10 * duration) / 10) + " ms");
         }
     }
 
-   /**
-    * Update the displayed total time duration.
-    */
+    /**
+     * Update the displayed total time duration.
+     */
     private void updateTotalTimeDurationLabel(final JLabel label) {
-        String s = "";
         final double duration = computeTotalTimeDuration();
         if (duration < 60) {  // less than 1 min
-            s += String.format("%.3f s", duration);
+            label.setText(NumberUtils.doubleToDisplayString(duration) + " s");
         } else if (duration < (60*60)) { // between 1 min and 1 hour
-            s += String.format("%.3f min", Math.floor(duration/60));
-            s += String.format("%.3f s", (double)Math.round(duration % 60));
+            label.setText(NumberUtils.doubleToDisplayString(Math.floor(duration/60)) + " min");
+            label.setText(NumberUtils.doubleToDisplayString((double)Math.round(duration % 60)) + " s");
         } else { // longer than 1 hour
-            s += String.format("%.3f hr", Math.floor(duration/(60*60)));
-            s += String.format("%.3f min", (double)Math.round((duration % (60*60))/60));
+            label.setText(NumberUtils.doubleToDisplayString(Math.floor(duration/(60*60))) + " hr");
+            label.setText(NumberUtils.doubleToDisplayString((double)Math.round((duration % (60*60))/60)) + " min");
         }
-        label.setText(s);
     }
 
     private double computeTotalTimeDuration() {
@@ -1381,11 +1382,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 + computeTimePointDuration() / 1000.0;
     }
 
-   /**
-    * Compute the time point duration in ms. Only difference from computeVolumeDuration()
-    * is that it also takes into account the multiple positions, if any.
-    * @return duration in ms
-    */
+    /**
+     * Compute the time point duration in ms. Only difference from computeVolumeDuration()
+     * is that it also takes into account the multiple positions, if any.
+     *
+     * @return duration in ms
+     */
     private double computeTimePointDuration() {
         final double volumeDuration = computeVolumeDuration();
         if (acqSettings_.isUsingMultiplePositions()) {

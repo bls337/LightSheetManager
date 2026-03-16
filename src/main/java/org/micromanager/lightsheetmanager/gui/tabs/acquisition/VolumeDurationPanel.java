@@ -9,10 +9,6 @@ import java.util.Objects;
 
 public class VolumeDurationPanel extends Panel {
 
-    private Label lblSliceTime_;
-    private Label lblVolumeTime_;
-    private Label lblTotalTime_;
-
     private Label lblSliceTimeValue_;
     private Label lblVolumeTimeValue_;
     private Label lblTotalTimeValue_;
@@ -25,26 +21,19 @@ public class VolumeDurationPanel extends Panel {
     }
 
     private void createUserInterface() {
-        lblSliceTime_ = new Label("Slice:");
-        lblVolumeTime_ = new Label("Volume:");
-        lblTotalTime_ = new Label("Total:");
+        // prevent panel from moving when values change
+        setAbsoluteSize(120, 95);
 
-        lblSliceTimeValue_ = new Label("0.000 ms");
-        lblVolumeTimeValue_ = new Label("0.000 ms");
-        lblTotalTimeValue_ = new Label("0.000 s");
+        lblSliceTimeValue_ = new Label("0.0 ms");
+        lblVolumeTimeValue_ = new Label("0.0 ms");
+        lblTotalTimeValue_ = new Label("0.0 s");
 
-        add(lblSliceTime_, "");
+        add(new Label("Slice:"), "");
         add(lblSliceTimeValue_, "wrap");
-        add(lblVolumeTime_, "");
+        add(new Label("Volume:"), "");
         add(lblVolumeTimeValue_, "wrap");
-        add(lblTotalTime_, "");
+        add(new Label("Total:"), "");
         add(lblTotalTimeValue_, "");
-    }
-
-    public void setDurationText(final String sliceTime, final String volumeTime, final String totalTime) {
-        lblSliceTimeValue_.setText(sliceTime);
-        lblVolumeTimeValue_.setText(volumeTime);
-        lblTotalTimeValue_.setText(totalTime);
     }
 
     public JLabel getSliceDurationLabel() {
@@ -58,4 +47,5 @@ public class VolumeDurationPanel extends Panel {
     public JLabel getTotalDurationLabel() {
         return lblTotalTimeValue_;
     }
+
 }

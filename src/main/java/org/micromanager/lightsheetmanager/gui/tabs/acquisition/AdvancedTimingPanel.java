@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import java.util.Objects;
 
@@ -91,38 +92,83 @@ public class AdvancedTimingPanel extends Panel {
     private void createEventHandlers() {
 
         spnDelayBeforeScan_.registerListener(e -> {
+            final double value = spnDelayBeforeScan_.getDouble();
+            final double rounded = NumberUtils.roundToQuarterMs(value);
+            if (Math.abs(value - rounded) > 1e-6) {
+                spnDelayBeforeScan_.setDouble(rounded);
+                return; // early exit => setDouble will handle model update
+            }
+
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().delayBeforeScan(spnDelayBeforeScan_.getDouble());
+                    .timingBuilder().delayBeforeScan(rounded);
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnScansPerSlice_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().scansPerSlice(spnScansPerSlice_.getInt());
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnScanDuration_.registerListener(e -> {
+            final double value = spnScanDuration_.getDouble();
+            final double rounded = NumberUtils.roundToQuarterMs(value);
+            if (Math.abs(value - rounded) > 1e-6) {
+                spnScanDuration_.setDouble(rounded);
+                return; // early exit => setDouble will handle model update
+            }
+
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().scanDuration(spnScanDuration_.getDouble());
+                    .timingBuilder().scanDuration(rounded);
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnDelayBeforeLaser_.registerListener(e -> {
+            final double value = spnDelayBeforeLaser_.getDouble();
+            final double rounded = NumberUtils.roundToQuarterMs(value);
+            if (Math.abs(value - rounded) > 1e-6) {
+                spnDelayBeforeLaser_.setDouble(rounded);
+                return; // early exit => setDouble will handle model update
+            }
+
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().delayBeforeLaser(spnDelayBeforeLaser_.getDouble());
+                    .timingBuilder().delayBeforeLaser(rounded);
         });
 
         spnLaserTriggerDuration_.registerListener(e -> {
+            final double value = spnLaserTriggerDuration_.getDouble();
+            final double rounded = NumberUtils.roundToQuarterMs(value);
+            if (Math.abs(value - rounded) > 1e-6) {
+                spnLaserTriggerDuration_.setDouble(rounded);
+                return; // early exit => setDouble will handle model update
+            }
+
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().laserTriggerDuration(spnLaserTriggerDuration_.getDouble());
+                    .timingBuilder().laserTriggerDuration(rounded);
         });
 
         spnDelayBeforeCamera_.registerListener(e -> {
+            final double value = spnDelayBeforeCamera_.getDouble();
+            final double rounded = NumberUtils.roundToQuarterMs(value);
+            if (Math.abs(value - rounded) > 1e-6) {
+                spnDelayBeforeCamera_.setDouble(rounded);
+                return; // early exit => setDouble will handle model update
+            }
+
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().delayBeforeCamera(spnDelayBeforeCamera_.getDouble());
+                    .timingBuilder().delayBeforeCamera(rounded);
         });
 
         spnCameraTriggerDuration_.registerListener(e -> {
+            final double value = spnCameraTriggerDuration_.getDouble();
+            final double rounded = NumberUtils.roundToQuarterMs(value);
+            if (Math.abs(value - rounded) > 1e-6) {
+                spnCameraTriggerDuration_.setDouble(rounded);
+                return; // early exit => setDouble will handle model update
+            }
+
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().cameraTriggerDuration(spnCameraTriggerDuration_.getDouble());
+                    .timingBuilder().cameraTriggerDuration(rounded);
         });
 
         spnCameraExposure_.registerListener(e -> {

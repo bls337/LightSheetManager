@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-public class SaveDataPanel extends Panel {
+public class SavePanel extends Panel {
 
     private TextField txtSaveDirectory_;
     private TextField txtSaveFileName_;
@@ -35,7 +35,7 @@ public class SaveDataPanel extends Panel {
     private final LightSheetManager model_;
     private final LightSheetManagerFrame frame_;
 
-    public SaveDataPanel(final LightSheetManager model, final LightSheetManagerFrame frame) {
+    public SavePanel(final LightSheetManager model, final LightSheetManagerFrame frame) {
         super("Save Data");
         model_ = Objects.requireNonNull(model);
         frame_ = Objects.requireNonNull(frame);
