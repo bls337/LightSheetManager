@@ -1338,6 +1338,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
     @Override
     public void updateDurationLabels() {
+        model_.acquisitions().recalculateSliceTiming();
         model_.acquisitions().updateAcquisitionSettings();
         // update durations now that settings are current
         updateSlicePeriodLabel(pnlVolumeDurations_.getSliceDurationLabel());
@@ -1360,9 +1361,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
     }
 
-   /**
-    * Update the displayed total time duration.
-    */
+    /**
+     * Update the displayed total time duration.
+     */
     private void updateTotalTimeDurationLabel(final JLabel label) {
         final double duration = computeTotalTimeDuration();
         if (duration < 60) {  // less than 1 min
@@ -1381,11 +1382,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 + computeTimePointDuration() / 1000.0;
     }
 
-   /**
-    * Compute the time point duration in ms. Only difference from computeVolumeDuration()
-    * is that it also takes into account the multiple positions, if any.
-    * @return duration in ms
-    */
+    /**
+     * Compute the time point duration in ms. Only difference from computeVolumeDuration()
+     * is that it also takes into account the multiple positions, if any.
+     *
+     * @return duration in ms
+     */
     private double computeTimePointDuration() {
         final double volumeDuration = computeVolumeDuration();
         if (acqSettings_.isUsingMultiplePositions()) {
