@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsScape;
+import org.micromanager.lightsheetmanager.api.ChannelSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
@@ -14,7 +15,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsScape.Builder<Builder> {
 
-        private DefaultChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
+        private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
         private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
         private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
         private DefaultSliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
@@ -43,25 +44,25 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
         public Builder(final ScapeAcquisitionSettings settings) {
             super(settings);
-            channelBuilder_ = settings.channelSettings_.copyBuilder();
-            timingBuilder_ = settings.timingSettings_.copyBuilder();
-            volumeBuilder_ = settings.volumeSettings_.copyBuilder();
-            sliceBuilder_ = settings.sliceSettings_.copyBuilder();
+            channelBuilder_ = settings.channels().copyBuilder();
+            timingBuilder_ = settings.timing().copyBuilder();
+            volumeBuilder_ = settings.volume().copyBuilder();
+            sliceBuilder_ = settings.slice().copyBuilder();
             stageScanBuilder_ = settings.stageScan().copyBuilder();
-            sheetCalibBuilder_ = settings.sheetCalibrations_.copyBuilder();
-            sliceCalibBuilder_ = settings.sliceCalibrations_.copyBuilder();
-            acquisitionMode_ = settings.acquisitionMode_;
-            cameraMode_ = settings.cameraMode_;
-            imagingCameraOrder_ = settings.imagingCameraOrder_;
-            useTimePoints_ = settings.useTimePoints_;
-            useAutofocus_ = settings.useAutofocus_;
-            useMultiplePositions_ = settings.useMultiplePositions_;
-            useHardwareTimePoints_ = settings.useHardwareTimePoints_;
-            useStageScanning_ = settings.useStageScanning_;
-            useAdvancedTiming_ =  settings.useAdvancedTiming_;
-            numTimePoints_ = settings.numTimePoints_;
-            timePointInterval_ = settings.timePointInterval_;
-            postMoveDelay_ = settings.postMoveDelay_;
+            sheetCalibBuilder_ = settings.sheetCalibration().copyBuilder();
+            sliceCalibBuilder_ = settings.sliceCalibration().copyBuilder();
+            acquisitionMode_ = settings.acquisitionMode();
+            cameraMode_ = settings.cameraMode();
+            imagingCameraOrder_ = settings.imagingCameraOrder();
+            useTimePoints_ = settings.isUsingTimePoints();
+            useAutofocus_ = settings.isUsingAutofocus();
+            useMultiplePositions_ = settings.isUsingMultiplePositions();
+            useHardwareTimePoints_ = settings.isUsingHardwareTimePoints();
+            useStageScanning_ = settings.isUsingStageScanning();
+            useAdvancedTiming_ =  settings.isUsingAdvancedTiming();
+            numTimePoints_ = settings.numTimePoints();
+            timePointInterval_ = settings.timePointInterval();
+            postMoveDelay_ = settings.postMoveDelay();
         }
 
         /**
@@ -192,7 +193,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         }
 
         // getters for sub-builders
-        public DefaultChannelSettings.Builder channelBuilder() {
+        public ChannelSettings.Builder channelBuilder() {
             return channelBuilder_;
         }
 
@@ -246,13 +247,13 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     }
 
-    private final DefaultChannelSettings channelSettings_;
-    private final DefaultTimingSettings timingSettings_;
-    private final DefaultVolumeSettings volumeSettings_;
-    private final DefaultSliceSettings sliceSettings_;
+    private final ChannelSettings channels_;
+    private final DefaultTimingSettings timing_;
+    private final DefaultVolumeSettings volume_;
+    private final DefaultSliceSettings slice_;
     private final StageScanSettings stageScan_;
-    private final DefaultSheetCalibration sheetCalibrations_;
-    private final DefaultSliceCalibration sliceCalibrations_;
+    private final DefaultSheetCalibration sheetCalibration_;
+    private final DefaultSliceCalibration sliceCalibration_;
 
     private final AcquisitionMode acquisitionMode_;
 
@@ -272,13 +273,13 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     private ScapeAcquisitionSettings(Builder builder) {
         super(builder);
-        channelSettings_ = builder.channelBuilder_.build();
-        timingSettings_ = builder.timingBuilder_.build();
-        volumeSettings_ = builder.volumeBuilder_.build();
-        sliceSettings_ = builder.sliceBuilder_.build();
+        channels_ = builder.channelBuilder().build();
+        timing_ = builder.timingBuilder_.build();
+        volume_ = builder.volumeBuilder_.build();
+        slice_ = builder.sliceBuilder_.build();
         stageScan_ = builder.stageScanBuilder().build();
-        sheetCalibrations_ = builder.sheetCalibBuilder_.build();
-        sliceCalibrations_ = builder.sliceCalibBuilder_.build();
+        sheetCalibration_ = builder.sheetCalibBuilder_.build();
+        sliceCalibration_ = builder.sliceCalibBuilder_.build();
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
         imagingCameraOrder_ = builder.imagingCameraOrder_;
@@ -309,8 +310,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      * @return immutable DefaultChannelSettings instance.
      */
     @Override
-    public DefaultChannelSettings channels() {
-        return channelSettings_;
+    public ChannelSettings channels() {
+        return channels_;
     }
 
     /**
@@ -320,7 +321,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      */
     @Override
     public DefaultTimingSettings timing() {
-        return timingSettings_;
+        return timing_;
     }
 
     /**
@@ -330,7 +331,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      */
     @Override
     public DefaultVolumeSettings volume() {
-        return volumeSettings_;
+        return volume_;
     }
 
     /**
@@ -340,7 +341,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      */
     @Override
     public DefaultSliceSettings slice() {
-        return sliceSettings_;
+        return slice_;
     }
 
     /**
@@ -360,7 +361,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      */
     @Override
     public DefaultSheetCalibration sheetCalibration() {
-        return sheetCalibrations_;
+        return sheetCalibration_;
     }
 
     /**
@@ -372,7 +373,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      */
     @Override
     public DefaultSliceCalibration sliceCalibration() {
-        return sliceCalibrations_;
+        return sliceCalibration_;
     }
 
     /**
@@ -498,7 +499,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
     @Override
     public String toString() {
-        return String.format("[timingSettings_=%s]", timingSettings_);
+        return String.format("[timingSettings_=%s]", timing_);
     }
 
 //    public String toJson() {

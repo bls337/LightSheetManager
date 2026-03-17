@@ -3,7 +3,11 @@ package org.micromanager.lightsheetmanager.api;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
+import java.util.Map;
+
 public interface ChannelSettings {
+
+    Builder copyBuilder();
 
     boolean enabled();
 
@@ -20,6 +24,13 @@ public interface ChannelSettings {
     ChannelSpec[] used();
 
     ChannelSpec[] data();
+
+    /**
+     * Returns an immutable shallow copy of the map.
+     *
+     * @return an immutable shallow copy of the map
+     */
+    Map<String, ChannelSpec[]> groups();
 
     interface Builder {
 

@@ -264,13 +264,19 @@ public class DeviceManager {
 
     public <T extends DeviceBase> Optional<T> device2(final String deviceName, final Class<T> type) {
         final DeviceBase device = deviceMap_.get(deviceName);
+        // is the device in the map?
         if (device == null) {
+            studio_.logs().logError("Device '" + deviceName + "' not found.");
             return Optional.empty();
         }
+        // are both types the same?
         if (!type.isInstance(device)) {
-            throw new DeviceTypeMismatchException(
-                    deviceName, device.getClass().getSimpleName(), type.getSimpleName());
+            model_.studio().logs().logError(String.format(
+                    "Device '%s' is a %s, but you requested a %s.",
+                    deviceName, device.getClass().getSimpleName(), type.getSimpleName()));
+            return Optional.empty();
         }
+        // cast at runtime
         return Optional.of(type.cast(device));
     }
 

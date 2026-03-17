@@ -1010,7 +1010,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * @return a builder for DefaultTimingSettings
      */
     public DefaultTimingSettings.Builder getTimingFromExposure() {
-
         // temporary measure: use diSPIM-like settings unless we are doing stage scanning
         if (!acqSettings_.isUsingStageScanning()) {
            return getTimingFromPeriodAndLightExposure();
@@ -1156,8 +1155,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // 4. start scan 0.25ms before camera global exposure and shifted up in time to account for delay introduced by Bessel filter
         // 5. turn on laser as soon as camera global exposure, leave laser on for desired light exposure time
         // 7. end camera exposure in final 0.25ms, post-filter scan waveform also ends now
-        ASIScanner scanner = model_.devices().device("IllumSlice"); //.getDevice("IllumBeam");
-        // ASIScanner scanner2 = model_.devices().getDevice("Illum2Beam");
 
         CameraBase camera = model_.devices().firstImagingCamera(); //.getDevice("ImagingCamera");
         if (camera == null) {
@@ -1196,8 +1193,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // delay to start is (empirically) 0.07ms + 0.25/(freq in kHz)
         // delay to midpoint is empirically 0.38/(freq in kHz)
         // group delay for 5th-order Bessel filter ~0.39/freq from theory and ~0.4/freq from IC datasheet
-        //final double scanFilterFreq = Math.max(scanner1.getFilterFreqX(), scanner2.getFilterFreqX());
-        final double scanFilterFreq = (scanner == null) ? 0.4 : scanner.getFilterFreqX(); // default to 0.4 if no scanner
+        final double scanFilterFreq = model_.devices()
+                .device2("IllumSlice", ASIScanner.class)
+                .map(ASIScanner::getFilterFreqX)
+                .orElse(0.4); // default value
+
         double scanDelayFilter = 0;
         if (scanFilterFreq != 0) {
             scanDelayFilter = NumberUtils.roundToQuarterMs(0.39 / scanFilterFreq);
