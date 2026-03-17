@@ -271,7 +271,7 @@ public class DeviceManager {
         }
         // are both types the same?
         if (!type.isInstance(device)) {
-            model_.studio().logs().logError(String.format(
+            studio_.logs().logError(String.format(
                     "Device '%s' is a %s, but you requested a %s.",
                     deviceName, device.getClass().getSimpleName(), type.getSimpleName()));
             return Optional.empty();

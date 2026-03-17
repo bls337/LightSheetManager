@@ -137,6 +137,33 @@ public class DefaultChannelSettings implements ChannelSettings {
         return Collections.unmodifiableMap(groups_);
     }
 
+    // TODO: add groups_ to toString, equals, and hashCode methods
+
+    @Override
+    public String toString() {
+        return String.format("%s[enabled=%s, group=%s, mode=%s]",
+                getClass().getSimpleName(), enabled_, group_, mode_);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DefaultChannelSettings other = (DefaultChannelSettings) obj;
+        return enabled_ == other.enabled_
+                && group_.equals(other.group_)
+                && mode_ == other.mode_;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(enabled_, group_, mode_);
+    }
+
     public static class Builder implements ChannelSettings.Builder {
 
         private boolean enabled_ = false;
