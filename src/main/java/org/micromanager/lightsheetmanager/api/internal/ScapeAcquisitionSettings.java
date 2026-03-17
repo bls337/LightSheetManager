@@ -70,36 +70,36 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
          * If the mode is a stage scanning mode,
          * set internal stage scanning flag.
          *
-         * @param acqMode the acquisition mode
+         * @param mode the acquisition mode
          */
         @Override
-        public Builder acquisitionMode(final AcquisitionMode acqMode) {
-            acquisitionMode_ = acqMode;
-            useStageScanning_ = acqMode == AcquisitionMode.STAGE_SCAN
-                    || acqMode == AcquisitionMode.STAGE_SCAN_INTERLEAVED
-                    || acqMode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL;
+        public Builder acquisitionMode(final AcquisitionMode mode) {
+            acquisitionMode_ = mode;
+            useStageScanning_ = mode == AcquisitionMode.STAGE_SCAN
+                    || mode == AcquisitionMode.STAGE_SCAN_INTERLEAVED
+                    || mode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL;
             return this;
         }
 
         /**
          * Sets the camera mode.
          *
-         * @param cameraMode the camera mode.
+         * @param mode the camera mode.
          */
         @Override
-        public Builder cameraMode(final CameraMode cameraMode) {
-            cameraMode_ = cameraMode;
+        public Builder cameraMode(final CameraMode mode) {
+            cameraMode_ = mode;
             return this;
         }
 
         /**
          * Sets the imaging camera order.
          *
-         * @param cameraOrder the imaging camera order
+         * @param order the imaging camera order
          */
         @Override
-        public Builder imagingCameraOrder(final CameraData[] cameraOrder) {
-            imagingCameraOrder_ = cameraOrder;
+        public Builder imagingCameraOrder(final CameraData[] order) {
+            imagingCameraOrder_ = order;
             return this;
         }
 
@@ -359,7 +359,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      * @return immutable DefaultSheetCalibration instance.
      */
     @Override
-    public DefaultSheetCalibration sheetCalibration(final int view) {
+    public DefaultSheetCalibration sheetCalibration() {
         return sheetCalibrations_;
     }
 
@@ -371,7 +371,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      * @return immutable DefaultSliceCalibration instance.
      */
     @Override
-    public DefaultSliceCalibration sliceCalibration(final int view) {
+    public DefaultSliceCalibration sliceCalibration() {
         return sliceCalibrations_;
     }
 

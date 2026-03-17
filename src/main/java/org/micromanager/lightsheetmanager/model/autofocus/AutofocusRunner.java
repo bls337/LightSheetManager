@@ -73,7 +73,7 @@ public class AutofocusRunner {
         //final double minimumRSquared = acqSettings.autofocusSettings().toleranceUm();
 
         // TODO: view 1?
-        final double imagingCenter = acqSettings.sheetCalibration(1).imagingCenter();
+        final double imagingCenter = acqSettings.sheetCalibration().imagingCenter();
 
         final boolean isBeamOff = !scanner.isBeamOn();
         scanner.setBeamOn(true);

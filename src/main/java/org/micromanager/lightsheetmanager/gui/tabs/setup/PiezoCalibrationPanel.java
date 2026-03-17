@@ -86,8 +86,8 @@ public class PiezoCalibrationPanel extends Panel {
         txtOffset_ = new TextField(7);
         txtStepSize_ = new TextField();
 
-        final double sliceSlope = acqSettings.sliceCalibration(pathNum_).sliceSlope();
-        final double sliceOffset = acqSettings.sliceCalibration(pathNum_).sliceOffset();
+        final double sliceSlope = acqSettings.sliceCalibration().sliceSlope();
+        final double sliceOffset = acqSettings.sliceCalibration().sliceOffset();
 
         txtSlope_.setText("0");
         txtOffset_.setText("0");
@@ -157,7 +157,7 @@ public class PiezoCalibrationPanel extends Panel {
             btnUpdate_.registerListener(e -> {
                 if (scanner.isBeamOn()) {
                     final double rate = model_.acquisitions().settings()
-                            .sliceCalibration(pathNum_).sliceSlope();
+                            .sliceCalibration().sliceSlope();
                     final double piezoPosition = piezo.getPosition();
                     final double scannerPosition = scanner.getPosition().y;
                     double channelOffset = 0.0;

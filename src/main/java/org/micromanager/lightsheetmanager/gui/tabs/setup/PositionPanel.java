@@ -59,7 +59,7 @@ public class PositionPanel extends Panel implements Subscriber {
 
         final JLabel lblImagingCenter = new JLabel("Imaging Center:");
         final double imagingCenter = model_.acquisitions().settings()
-                .sheetCalibration(pathNum_).imagingCenter();
+                .sheetCalibration().imagingCenter();
         lblImagingCenterValue_ = new JLabel(imagingCenter + " μm");
 
         setMigLayout(
@@ -194,7 +194,7 @@ public class PositionPanel extends Panel implements Subscriber {
             btnImagingCenterGo_.registerListener(e -> {
                 // FIXME: make sure this is the same as original plugin, diSPIM also moves Scanner with computeGalvoFromPiezo
                 final double imagingCenter = model_.acquisitions().settingsBuilder().build()
-                        .sheetCalibration(pathNum_).imagingCenter();
+                        .sheetCalibration().imagingCenter();
                 piezo.setPosition(imagingCenter);
                 lblImagingPositionValue_.setText(String.format("%.3f μm", piezo.getPosition()));
             });

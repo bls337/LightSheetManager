@@ -448,8 +448,7 @@ public class PLogicScape {
             if (centerAtCurrentZ) {
                 piezoCenter = piezo_.getPosition(); //positions_.getUpdatedPosition(piezoDevice, Joystick.Directions.NONE);
             } else {
-                piezoCenter = model_.acquisitions().settings()
-                        .sheetCalibration(view).imagingCenter();
+                piezoCenter = model_.acquisitions().settings().sheetCalibration().imagingCenter();
             }
         }
 
@@ -486,14 +485,14 @@ public class PLogicScape {
         // FIXME: more light sheet setup
         //final double slope1 = settings.sliceCalibration(1).sliceSlope();
         //final double slope2 = settings.sliceCalibration(2).sliceSlope();
-        double sliceRate = settings.sliceCalibration(1).sliceSlope();//(view == 1) ? slope1 : slope2;
+        double sliceRate = settings.sliceCalibration().sliceSlope();//(view == 1) ? slope1 : slope2;
         if (NumberUtils.doublesEqual(sliceRate, 0.0)) {
             studio_.logs().showError("Calibration slope for view " + view + " cannot be zero. Re-do calibration on Setup tab.");
             return false;
         }
         //final double offset1 = settings.sliceCalibration(1).sliceOffset() + channelOffset;
         //final double offset2 = settings.sliceCalibration(2).sliceOffset() + channelOffset;
-        double sliceOffset = settings.sliceCalibration(1).sliceOffset() + channelOffset; //(view == 1) ? offset1 : offset2;
+        double sliceOffset = settings.sliceCalibration().sliceOffset() + channelOffset; //(view == 1) ? offset1 : offset2;
         double sliceAmplitude = piezoAmplitude / sliceRate;
         double sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
 
@@ -919,7 +918,7 @@ public class PLogicScape {
 //        final Properties.Keys widthProp = (side == Devices.Sides.A) ?
 //                Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_A : Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_B;
 //        sheetWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, widthProp);
-        sheetWidth = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetWidth();
+        sheetWidth = model_.getAcquisitionEngine().settings().sheetCalibration().sheetWidth();
 
         if (cameraName == null || cameraName.isEmpty()) {
             studio_.logs().logDebugMessage("Could not get sheet width for invalid device " + cameraName);
@@ -938,13 +937,13 @@ public class PLogicScape {
 //            final float slopePolarity = (side == Devices.Sides.B) ? -1 : 1;
 //            sheetWidth = roi.height * sheetSlope * slopePolarity / 1e6;  // in microdegrees per pixel, convert to degrees
         } else {
-            final boolean autoSheet = model_.getAcquisitionEngine().settings().sheetCalibration(view).isUsingAutoSheetWidth();
+            final boolean autoSheet = model_.getAcquisitionEngine().settings().sheetCalibration().isUsingAutoSheetWidth();
             if (autoSheet) {
                 Rectangle roi = camera.getROI();
                 if (roi == null || roi.height == 0) {
                     studio_.logs().logDebugMessage("Could not get camera ROI for auto sheet mode");
                 }
-                final double sheetSlope = model_.getAcquisitionEngine().settings().sheetCalibration(view).autoSheetWidthPerPixel();
+                final double sheetSlope = model_.getAcquisitionEngine().settings().sheetCalibration().autoSheetWidthPerPixel();
                 sheetWidth = roi.height *  sheetSlope / 1000.0;  // in millidegrees per pixel, convert to degrees
                 sheetWidth *= 1.1;  // 10% extra width just to be sure
             }
@@ -973,12 +972,12 @@ public class PLogicScape {
         if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             // in millidegrees, convert to degrees
             // TODO: is this correct?
-            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetOffset() / 1000.0;
+            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration().sheetOffset() / 1000.0;
             //sheetOffset = prefs_.getFloat(
             //MyStrings.PanelNames.SETUP.toString() + side.toString(),
             //Properties.Keys.PLUGIN_LIGHTSHEET_OFFSET, 0) / 1000;  // in millidegrees, convert to degrees
         } else {
-            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetOffset();
+            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration().sheetOffset();
             //final Properties.Keys offsetProp = (side == Devices.Sides.A) ?
             // Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_A : Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_B;
             // sheetOffset = props_.getPropValueFloat(Devices.Keys.PLUGIN, offsetProp);

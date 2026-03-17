@@ -62,14 +62,14 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return immutable DefaultSheetCalibration instance.
      */
-    DefaultSheetCalibration sheetCalibration(final int view);
+    DefaultSheetCalibration sheetCalibration();
 
     /**
      * Returns the immutable DefaultSliceCalibration instance.
      *
      * @return immutable DefaultSliceCalibration instance.
      */
-    DefaultSliceCalibration sliceCalibration(final int view);
+    DefaultSliceCalibration sliceCalibration();
 
     /**
      * Returns the acquisition mode.
@@ -160,26 +160,26 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
         /**
          * Sets the acquisition mode.
          *
-         * @param acqMode the acquisition mode
+         * @param mode the acquisition mode
          * @return {@code this} builder
          */
-        T acquisitionMode(final AcquisitionMode acqMode);
+        T acquisitionMode(final AcquisitionMode mode);
 
         /**
          * Sets the camera mode.
          *
-         * @param cameraMode the camera mode.
+         * @param mode the camera mode.
          * @return {@code this} builder
          */
-        T cameraMode(final CameraMode cameraMode);
+        T cameraMode(final CameraMode mode);
 
         /**
          * Sets the imaging camera order.
          *
-         * @param cameraOrder the imaging camera order
+         * @param order the imaging camera order
          * @return {@code this} builder
          */
-        T imagingCameraOrder(final CameraData[] cameraOrder);
+        T imagingCameraOrder(final CameraData[] order);
 
         /**
          * Sets the acquisition to use time points.
