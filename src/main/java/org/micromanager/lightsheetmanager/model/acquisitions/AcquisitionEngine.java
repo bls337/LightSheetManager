@@ -18,7 +18,7 @@ import org.micromanager.lightsheetmanager.LightSheetManagerPlugin;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.DurationPanel;
 import org.micromanager.lightsheetmanager.model.autofocus.AutofocusAdapter;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
@@ -50,7 +50,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     protected Pipeline curPipeline_;
     protected long nextWakeTime_ = -1;
 
-    protected VolumeDurationPanel pnlVolumeDurations_;
+    protected DurationPanel pnlVolumeDurations_;
 
     // TODO: remove later, hacky method to stop position updater for now
     protected LightSheetManagerFrame frame_;
@@ -84,7 +84,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     public abstract void updateDurationLabels();
 
-    public void setVolumeDurationPanel(final VolumeDurationPanel panel) {
+    public void setVolumeDurationPanel(final DurationPanel panel) {
         pnlVolumeDurations_ = panel;
     }
 

@@ -12,10 +12,10 @@ import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPan
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.CameraPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.PositionPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SavePanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SliceSettingsPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.SlicePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.TimePointsPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeDurationPanel;
-import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumeSettingsPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.DurationPanel;
+import org.micromanager.lightsheetmanager.gui.tabs.acquisition.VolumePanel;
 import org.micromanager.lightsheetmanager.gui.tabs.channels.ChannelTablePanel;
 import org.micromanager.lightsheetmanager.gui.playlist.AcquisitionTableFrame;
 import org.micromanager.lightsheetmanager.gui.components.Button;
@@ -45,7 +45,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     private Button btnRunOverviewAcq_;
 
     // durations
-    private VolumeDurationPanel pnlDurations_;
+    private DurationPanel pnlDurations_;
 
     // time points
     private TimePointsPanel pnlTimePoints_;
@@ -66,8 +66,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     private ChannelTablePanel pnlChannelTable_;
 
     // right panel
-    private VolumeSettingsPanel pnlVolumeSettings_;
-    private SliceSettingsPanel pnlSliceSettings_;
+    private VolumePanel pnlVolumeSettings_;
+    private SlicePanel pnlSliceSettings_;
     private AdvancedTimingPanel pnlAdvancedTiming_;
     private CheckBox cbxUseAdvancedTiming_;
 
@@ -109,11 +109,11 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
                 "[]10[]"
         );
 
-        pnlDurations_ = new VolumeDurationPanel(model_);
-        pnlVolumeSettings_ = new VolumeSettingsPanel(model_);
+        pnlDurations_ = new DurationPanel(model_);
+        pnlVolumeSettings_ = new VolumePanel(model_);
 
         // switch between these two panels
-        pnlSliceSettings_ = new SliceSettingsPanel(model_);
+        pnlSliceSettings_ = new SlicePanel(model_);
         pnlAdvancedTiming_ = new AdvancedTimingPanel(model_);
 
         // multiple positions
@@ -251,6 +251,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cbxUseMultiplePositions_.registerListener(e -> {
             final boolean selected = cbxUseMultiplePositions_.isSelected();
             model_.acquisitions().settingsBuilder().useMultiplePositions(selected);
+            model_.acquisitions().updateDurationLabels();
             pnlMultiPositions_.setPanelEnabled(selected);
         });
 
@@ -258,8 +259,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cbxUseTimePoints_.registerListener(e -> {
             final boolean selected = cbxUseTimePoints_.isSelected();
             model_.acquisitions().settingsBuilder().useTimePoints(selected);
+            model_.acquisitions().updateDurationLabels();
             pnlTimePoints_.setPanelEnabled(selected);
-            //updateDurationLabels();
         });
 
         // use channels
@@ -274,7 +275,6 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cmbAcquisitionModes_.registerListener(e ->
                 model_.acquisitions().settingsBuilder().acquisitionMode(cmbAcquisitionModes_.getSelected()));
 
-        // TODO: should timing recalc be part of setting use advanced timing value in model?
         // switches timing panels based on check box
         cbxUseAdvancedTiming_.registerListener(e -> {
             final boolean selected = cbxUseAdvancedTiming_.isSelected();
@@ -304,7 +304,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlRight_.repaint();
     }
 
-    public SliceSettingsPanel getSliceSettingsPanel() {
+    public SlicePanel getSliceSettingsPanel() {
         return pnlSliceSettings_;
     }
 
