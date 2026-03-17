@@ -1341,9 +1341,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         model_.acquisitions().recalculateSliceTiming();
         model_.acquisitions().updateAcquisitionSettings();
         // update durations now that settings are current
-        updateSlicePeriodLabel(pnlVolumeDurations_.getSliceDurationLabel());
-        updateVolumeDurationLabel(pnlVolumeDurations_.getVolumeDurationLabel());
-        updateTotalTimeDurationLabel(pnlVolumeDurations_.getTotalDurationLabel());
+        updateSlicePeriodLabel(pnlDuration_.getSliceDurationLabel());
+        updateVolumeDurationLabel(pnlDuration_.getVolumeDurationLabel());
+        updateTotalTimeDurationLabel(pnlDuration_.getTotalDurationLabel());
     }
 
     private void updateSlicePeriodLabel(final JLabel label) {
