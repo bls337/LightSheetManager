@@ -194,7 +194,7 @@ public class BeamSheetControlPanel extends Panel {
             final double value = Double.parseDouble(txtSheetOffset_.getText());
             //final double total = Math.max(-1.0, Math.min(1.0, value));
             model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+                    .sheetCalibrationBuilder().sheetOffset(value);
            // currentOffset_ = total;
 //            EventQueue.invokeLater(() -> {
 //                lblSlopeOffset_.setText(String.format("%.3f", total));

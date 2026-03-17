@@ -168,9 +168,9 @@ public class PiezoCalibrationPanel extends Panel {
                     lblOffsetValue_.setText(String.format("%.3f μm", newOffset));
                     panel_.setImagingCenterValue(newOffset);
                     model_.acquisitions().settingsBuilder()
-                          .sheetCalibrationBuilder(pathNum_).imagingCenter(newOffset);
+                          .sheetCalibrationBuilder().imagingCenter(newOffset);
                     model_.acquisitions().settingsBuilder()
-                          .sliceCalibrationBuilder(pathNum_).sliceOffset(newOffset);
+                          .sliceCalibrationBuilder().sliceOffset(newOffset);
                     model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
                             newOffset + " (with channel offset of " + channelOffset + ")");
                 }
@@ -187,19 +187,19 @@ public class PiezoCalibrationPanel extends Panel {
         txtSlope_.registerListener(e -> {
             final double slope = Double.parseDouble(txtSlope_.getText());
             model_.acquisitions().settingsBuilder()
-                    .sliceCalibrationBuilder(pathNum_).sliceSlope(slope);
+                    .sliceCalibrationBuilder().sliceSlope(slope);
             lblSlopeValue_.setText(String.format("%.3f μm/°", slope));
         });
 
         txtOffset_.registerListener(e -> {
             final double offset = Double.parseDouble(txtOffset_.getText());
             model_.acquisitions().settingsBuilder()
-                    .sliceCalibrationBuilder(pathNum_).sliceOffset(offset);
+                    .sliceCalibrationBuilder().sliceOffset(offset);
             lblOffsetValue_.setText(String.format("%.3f μm", offset));
             // also update the imaging center on the position panel
             panel_.setImagingCenterValue(offset);
             model_.acquisitions().settingsBuilder()
-                  .sheetCalibrationBuilder(pathNum_).imagingCenter(offset);
+                  .sheetCalibrationBuilder().imagingCenter(offset);
         });
 
         btnRunAutofocus_.registerListener(e -> {

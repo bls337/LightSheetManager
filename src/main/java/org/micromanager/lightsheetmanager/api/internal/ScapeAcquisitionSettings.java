@@ -212,11 +212,11 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             return stageScanBuilder_;
         }
 
-        public DefaultSheetCalibration.Builder sheetCalibrationBuilder(final int view) {
+        public DefaultSheetCalibration.Builder sheetCalibrationBuilder() {
             return sheetCalibBuilder_;
         }
 
-        public DefaultSliceCalibration.Builder sliceCalibrationBuilder(final int view) {
+        public DefaultSliceCalibration.Builder sliceCalibrationBuilder() {
             return sliceCalibBuilder_;
         }
 

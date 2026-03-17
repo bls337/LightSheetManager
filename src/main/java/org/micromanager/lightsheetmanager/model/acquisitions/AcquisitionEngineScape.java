@@ -72,8 +72,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             studio_.logs().logMessage("stopped position polling");
         }
 
-        asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
-        asb_.sheetCalibrationBuilder(1).autoSheetWidthPerPixel(0.0);
+        asb_.sheetCalibrationBuilder().useAutoSheetWidth(true);
+        asb_.sheetCalibrationBuilder().autoSheetWidthPerPixel(0.0);
 
         // make settings current
         updateAcquisitionSettings();

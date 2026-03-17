@@ -187,7 +187,7 @@ public class PositionPanel extends Panel implements Subscriber {
                 // FIXME: check for piezo limits!
                 final double piezoPosition = piezo.getPosition();
                 model_.acquisitions().settingsBuilder()
-                        .sheetCalibrationBuilder(pathNum_).imagingCenter(piezoPosition);
+                        .sheetCalibrationBuilder().imagingCenter(piezoPosition);
                 lblImagingCenterValue_.setText(String.format("%.3f μm", piezoPosition));
             });
 
