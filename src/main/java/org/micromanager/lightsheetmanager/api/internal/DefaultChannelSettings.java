@@ -12,15 +12,6 @@ import java.util.Objects;
 
 public class DefaultChannelSettings implements ChannelSettings {
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static Builder builder(ChannelSettings settings) {
-        Objects.requireNonNull(settings, "Cannot copy from null settings");
-        return new Builder(settings);
-    }
-
     private final boolean enabled_;
     private final String group_;
     private final ChannelMode mode_;
@@ -39,6 +30,15 @@ public class DefaultChannelSettings implements ChannelSettings {
     // Note: used by GSON library for deserialization
     private DefaultChannelSettings() {
         this(new Builder());
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static Builder builder(ChannelSettings settings) {
+        Objects.requireNonNull(settings, "Cannot copy from null settings");
+        return new Builder(settings);
     }
 
     @Override

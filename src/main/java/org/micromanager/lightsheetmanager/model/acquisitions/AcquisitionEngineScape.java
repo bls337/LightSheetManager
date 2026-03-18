@@ -1111,8 +1111,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 .cameraExposure(cameraExposure);
 
         // if a specific slice period was requested, add corresponding delay to scan/laser/camera
-        if (!acqSettings_.slice().isSlicePeriodMinimized()) {
-            double globalDelay = acqSettings_.slice().slicePeriod() - tsb.sliceDuration();
+        if (!acqSettings_.slice().periodMinimized()) {
+            double globalDelay = acqSettings_.slice().period() - tsb.sliceDuration();
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
@@ -1296,8 +1296,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         // if a specific slice period was requested, add corresponding delay to scan/laser/camera
-        if (!acqSettings_.slice().isSlicePeriodMinimized()) {
-            double globalDelay = acqSettings_.slice().slicePeriod() - tsb.sliceDuration();
+        if (!acqSettings_.slice().periodMinimized()) {
+            double globalDelay = acqSettings_.slice().period() - tsb.sliceDuration();
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;

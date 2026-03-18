@@ -26,13 +26,13 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         public Builder() {
         }
 
-        public Builder(final BaseAcquisitionSettings settings) {
-            saveDirectory_ = settings.saveDirectory_;
-            saveNamePrefix_ = settings.saveNamePrefix_;
-            saveDuringAcq_ = settings.saveDuringAcq_;
-            demoMode_ = settings.demoMode_;
-            saveMode_ = settings.saveMode_;
-            afBuilder_ = settings.autofocus_.copyBuilder();
+        public Builder(final AcquisitionSettings settings) {
+            saveDirectory_ = settings.saveDirectory();
+            saveNamePrefix_ = settings.saveNamePrefix();
+            saveDuringAcq_ = settings.isSavingImagesDuringAcquisition();
+            demoMode_ = settings.demoMode();
+            saveMode_ = settings.saveMode();
+            afBuilder_ = settings.autofocus().copyBuilder();
         }
 
         /**

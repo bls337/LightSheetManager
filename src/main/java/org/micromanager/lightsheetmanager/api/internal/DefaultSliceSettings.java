@@ -2,69 +2,37 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.SliceSettings;
 
+import java.util.Objects;
+
 public class DefaultSliceSettings implements SliceSettings {
+
+    private final double period_;
+    private final double sampleExposure_;
+    private final boolean periodMinimized_;
+
+    private DefaultSliceSettings(Builder builder) {
+        period_ = builder.period_;
+        sampleExposure_ = builder.sampleExposure_;
+        periodMinimized_ = builder.periodMinimized_;
+    }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder implements SliceSettings.Builder {
-
-        private double slicePeriod_ = 10.0;
-        private double sampleExposure_ = 1.0;
-        private boolean minimizeSlicePeriod_ = false;
-
-        private Builder() {
-        }
-
-        private Builder(final DefaultSliceSettings settings) {
-            slicePeriod_ = settings.slicePeriod();
-            sampleExposure_ = settings.sampleExposure();
-            minimizeSlicePeriod_ = settings.isSlicePeriodMinimized();
-        }
-
-        @Override
-        public SliceSettings.Builder slicePeriod(double slicePeriodMs) {
-            slicePeriod_ = slicePeriodMs;
-            return this;
-        }
-
-        @Override
-        public SliceSettings.Builder sampleExposure(double exposureMs) {
-            sampleExposure_ = exposureMs;
-            return this;
-        }
-
-        @Override
-        public SliceSettings.Builder minimizeSlicePeriod(boolean state) {
-            minimizeSlicePeriod_ = state;
-            return this;
-        }
-
-        @Override
-        public DefaultSliceSettings build() {
-            return new DefaultSliceSettings(this);
-        }
-    }
-
-    private final double slicePeriod_;
-    private final double sampleExposure_;
-    private final boolean minimizeSlicePeriod_;
-
-    private DefaultSliceSettings(Builder builder) {
-        slicePeriod_ = builder.slicePeriod_;
-        sampleExposure_ = builder.sampleExposure_;
-        minimizeSlicePeriod_ = builder.minimizeSlicePeriod_;
+    public static Builder builder(SliceSettings settings) {
+        Objects.requireNonNull(settings, "Cannot copy from null settings");
+        return new Builder(settings);
     }
 
     @Override
-    public DefaultSliceSettings.Builder copyBuilder() {
+    public Builder copyBuilder() {
         return new Builder(this);
     }
 
     @Override
-    public double slicePeriod() {
-        return slicePeriod_;
+    public double period() {
+        return period_;
     }
 
     @Override
@@ -73,16 +41,76 @@ public class DefaultSliceSettings implements SliceSettings {
     }
 
     @Override
-    public boolean isSlicePeriodMinimized() {
-        return minimizeSlicePeriod_;
+    public boolean periodMinimized() {
+        return periodMinimized_;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DefaultSliceSettings other = (DefaultSliceSettings) obj;
+        return Double.compare(period_, other.period_) == 0 &&
+                Double.compare(sampleExposure_, other.sampleExposure_) == 0 &&
+                periodMinimized_ == other.periodMinimized_;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(period_, sampleExposure_, periodMinimized_);
     }
 
     @Override
     public String toString() {
         return String.format(
-                "%s[slicePeriod_=%s, sampleExposure_=%s, minimizeSlicePeriod_=%s]",
+                "%s[period=%s, sampleExposure=%s, periodMinimized=%s]",
                 getClass().getSimpleName(),
-                slicePeriod_, sampleExposure_, minimizeSlicePeriod_
+                period_, sampleExposure_, periodMinimized_
         );
     }
+
+    public static class Builder implements SliceSettings.Builder {
+
+        private double period_ = 10.0;
+        private double sampleExposure_ = 1.0;
+        private boolean periodMinimized_ = false;
+
+        private Builder() {
+        }
+
+        private Builder(final SliceSettings settings) {
+            period_ = settings.period();
+            sampleExposure_ = settings.sampleExposure();
+            periodMinimized_ = settings.periodMinimized();
+        }
+
+        @Override
+        public Builder period(double periodMs) {
+            period_ = periodMs;
+            return this;
+        }
+
+        @Override
+        public Builder sampleExposure(double exposureMs) {
+            sampleExposure_ = exposureMs;
+            return this;
+        }
+
+        @Override
+        public Builder minimizePeriod(boolean state) {
+            periodMinimized_ = state;
+            return this;
+        }
+
+        @Override
+        public DefaultSliceSettings build() {
+            return new DefaultSliceSettings(this);
+        }
+
+    }
+
 }

@@ -46,7 +46,7 @@ public class SlicePanel extends Panel {
         );
 
         final DefaultSliceSettings sliceSettings = model_.acquisitions().settings().slice();
-        final boolean isSlicePeriodMinimized = sliceSettings.isSlicePeriodMinimized();
+        final boolean isSlicePeriodMinimized = sliceSettings.periodMinimized();
 
         // regular panel
         lblSlicePeriod_ = new Label("Slice period [ms]:");
@@ -54,7 +54,7 @@ public class SlicePanel extends Panel {
         cbxMinimizeSlicePeriod_ = new CheckBox(
                 "Minimize slice period", 12, isSlicePeriodMinimized, CheckBox.RIGHT);
         spnSlicePeriod_ = Spinner.createDoubleSpinner(
-                sliceSettings.slicePeriod(), 0.0, Double.MAX_VALUE, 0.25);
+                sliceSettings.period(), 0.0, Double.MAX_VALUE, 0.25);
         spnSampleExposure_ = Spinner.createDoubleSpinner(
                 sliceSettings.sampleExposure(), 0.0, Double.MAX_VALUE, 0.25);
 
@@ -97,7 +97,7 @@ public class SlicePanel extends Panel {
             lblSlicePeriod_.setEnabled(!selected);
             spnSlicePeriod_.setEnabled(!selected);
             model_.acquisitions().settingsBuilder()
-                    .sliceBuilder().minimizeSlicePeriod(selected);
+                    .sliceBuilder().minimizePeriod(selected);
             // update slice timing
             model_.acquisitions().updateAcquisitionSettings();
             model_.acquisitions().recalculateSliceTiming();
@@ -105,7 +105,7 @@ public class SlicePanel extends Panel {
 
         spnSlicePeriod_.registerListener(e -> {
             model_.acquisitions().settingsBuilder()
-                    .sliceBuilder().slicePeriod(spnSlicePeriod_.getDouble());
+                    .sliceBuilder().period(spnSlicePeriod_.getDouble());
             // update slice timing
             model_.acquisitions().updateAcquisitionSettings();
             model_.acquisitions().recalculateSliceTiming();

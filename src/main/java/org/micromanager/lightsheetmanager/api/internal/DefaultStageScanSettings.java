@@ -6,15 +6,6 @@ import java.util.Objects;
 
 public class DefaultStageScanSettings implements StageScanSettings {
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static Builder builder(StageScanSettings settings) {
-        Objects.requireNonNull(settings, "Cannot copy from null settings");
-        return new Builder(settings);
-    }
-
     private final boolean enabled_;
     private final double accelerationFactor_;
     private final int overshootDistance_;
@@ -38,6 +29,15 @@ public class DefaultStageScanSettings implements StageScanSettings {
     // Note: used by GSON library for deserialization
     private DefaultStageScanSettings() {
         this(new Builder());
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static Builder builder(StageScanSettings settings) {
+        Objects.requireNonNull(settings, "Cannot copy from null settings");
+        return new Builder(settings);
     }
 
     @Override

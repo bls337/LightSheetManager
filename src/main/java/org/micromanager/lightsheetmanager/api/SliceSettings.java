@@ -8,7 +8,7 @@ public interface SliceSettings {
          *
          * @param slicePeriodMs the slice period in milliseconds
          */
-        Builder slicePeriod(final double slicePeriodMs);
+        Builder period(final double slicePeriodMs);
 
         /**
          * Sets the sample exposure time in milliseconds.
@@ -22,7 +22,7 @@ public interface SliceSettings {
          *
          * @param state true to minimize the slice period
          */
-        Builder minimizeSlicePeriod(final boolean state);
+        Builder minimizePeriod(final boolean state);
 
         /**
          * Creates an immutable instance of SliceSettings
@@ -44,7 +44,7 @@ public interface SliceSettings {
      *
      * @return the slice period in milliseconds
      */
-    double slicePeriod();
+    double period();
 
     /**
      * Returns the sample exposure time in milliseconds.
@@ -58,5 +58,5 @@ public interface SliceSettings {
      *
      * @return true if slice period is minimized
      */
-    boolean isSlicePeriodMinimized();
+    boolean periodMinimized();
 }
