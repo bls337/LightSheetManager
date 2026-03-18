@@ -8,6 +8,59 @@ import org.micromanager.lightsheetmanager.api.data.AutofocusType;
  */
 public interface AutofocusSettings {
 
+    /**
+     * Returns a builder initialized with the current settings.
+     *
+     * @return a builder to create a modified copy of these settings
+     */
+    Builder copyBuilder();
+
+    /**
+     * Return true if channels are enabled.
+     *
+     * @return true if channels are enabled
+     */
+    boolean enabled();
+
+    /**
+     * Returns the number of images used in for autofocus routine.
+     *
+     * @return the number of images
+     */
+    int numImages();
+
+    /**
+     * Returns the step size between images in microns.
+     *
+     * @return the step size in microns
+     */
+    double stepSizeUm();
+
+    /**
+     * Returns the autofocus mode being used.
+     *
+     * @return the autofocus mode
+     */
+    AutofocusMode mode();
+
+    /**
+     * Returns the type of scoring algorithm used for autofocus.
+     *
+     * @return the type of scoring algorithm
+     */
+    AutofocusType scoringMethod();
+
+    /**
+     * Returns the channel autofocus is being run on.
+     *
+     * @return the autofocus channel
+     */
+    String channel();
+
+    boolean showGraph();
+
+    boolean showImages();
+
     interface Builder {
 
         /**
@@ -73,58 +126,5 @@ public interface AutofocusSettings {
          */
         AutofocusSettings build();
     }
-
-    /**
-     * Returns a builder initialized with the current settings.
-     *
-     * @return a builder to create a modified copy of these settings
-     */
-    Builder copyBuilder();
-
-    /**
-     * Return true if channels are enabled.
-     *
-     * @return true if channels are enabled
-     */
-    boolean enabled();
-
-    /**
-     * Returns the number of images used in for autofocus routine.
-     *
-     * @return the number of images
-     */
-    int numImages();
-
-    /**
-     * Returns the step size between images in microns.
-     *
-     * @return the step size in microns
-     */
-    double stepSizeUm();
-
-    /**
-     * Returns the autofocus mode being used.
-     *
-     * @return the autofocus mode
-     */
-    AutofocusMode mode();
-
-    /**
-     * Returns the type of scoring algorithm used for autofocus.
-     *
-     * @return the type of scoring algorithm
-     */
-    AutofocusType scoringMethod();
-
-    /**
-     * Returns the channel autofocus is being run on.
-     *
-     * @return the autofocus channel
-     */
-    String channel();
-
-    boolean showGraph();
-
-    boolean showImages();
 
 }

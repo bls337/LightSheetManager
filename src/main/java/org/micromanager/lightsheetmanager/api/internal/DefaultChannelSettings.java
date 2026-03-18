@@ -13,8 +13,8 @@ import java.util.Objects;
 public class DefaultChannelSettings implements ChannelSettings {
 
     private final boolean enabled_;
-    private final String group_;
     private final ChannelMode mode_;
+    private final String group_;
     private final HashMap<String, ChannelSpec[]> groups_;
 
     // default value for when the channel group key is not found
@@ -22,8 +22,8 @@ public class DefaultChannelSettings implements ChannelSettings {
 
     private DefaultChannelSettings(Builder builder) {
         enabled_ = builder.enabled_;
-        group_ = builder.group_;
         mode_ = builder.mode_;
+        group_ = builder.group_;
         groups_ = builder.groups_;
     }
 
@@ -167,8 +167,8 @@ public class DefaultChannelSettings implements ChannelSettings {
     public static class Builder implements ChannelSettings.Builder {
 
         private boolean enabled_ = false;
-        private String group_ = "";
         private ChannelMode mode_ = ChannelMode.VOLUME;
+        private String group_ = "";
         private HashMap<String, ChannelSpec[]> groups_ = new HashMap<>();
 
         private Builder() {
@@ -176,8 +176,8 @@ public class DefaultChannelSettings implements ChannelSettings {
 
         public Builder(final ChannelSettings settings) {
             enabled_ = settings.enabled();
-            group_ = settings.group();
             mode_ = settings.mode();
+            group_ = settings.group();
             groups_ = new HashMap<>();
             // deep copy
             settings.groups().forEach((name, channels) -> {
