@@ -332,10 +332,10 @@ public class DefaultTimingSettings implements TimingSettings {
 
         @Override
         public String toString() {
-            return String.format("%s[scansPerSlice=%s, delayBeforeScan=%s, scanDuration=%s, "
-                            + "delayBeforeLaser=%s, laserTriggerDuration=%s, delayBeforeCamera=%s, "
-                            + "cameraTriggerDuration=%s, cameraExposure=%s, "
-                            + "sliceDuration=%s, alternateScanDirection=%s]",
+            return String.format("%s[scansPerSlice=%s, delayBeforeScan=%s, scanDuration=%s, " +
+                            "delayBeforeLaser=%s, laserTriggerDuration=%s, delayBeforeCamera=%s, " +
+                            "cameraTriggerDuration=%s, cameraExposure=%s, " +
+                            "sliceDuration=%s, alternateScanDirection=%s]",
                     getClass().getSimpleName(),
                     scansPerSlice_, delayBeforeScan_, scanDuration_, delayBeforeLaser_, laserTriggerDuration_,
                     delayBeforeCamera_, cameraTriggerDuration_, cameraExposure_,
