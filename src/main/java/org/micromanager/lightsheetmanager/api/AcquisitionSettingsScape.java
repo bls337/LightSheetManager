@@ -3,7 +3,6 @@ package org.micromanager.lightsheetmanager.api;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
@@ -27,7 +26,7 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return immutable DefaultChannelSettings instance.
      */
-    DefaultChannelSettings channels();
+    ChannelSettings channels();
 
     /**
      * Returns the immutable DefaultTimingSettings instance.
@@ -62,14 +61,14 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return immutable DefaultSheetCalibration instance.
      */
-    DefaultSheetCalibration sheetCalibration(final int view);
+    DefaultSheetCalibration sheetCalibration();
 
     /**
      * Returns the immutable DefaultSliceCalibration instance.
      *
      * @return immutable DefaultSliceCalibration instance.
      */
-    DefaultSliceCalibration sliceCalibration(final int view);
+    DefaultSliceCalibration sliceCalibration();
 
     /**
      * Returns the acquisition mode.
@@ -100,13 +99,6 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
     boolean isUsingTimePoints();
 
     /**
-     * Returns true if using autofocus.
-     *
-     * @return true if using autofocus.
-     */
-    boolean isUsingAutofocus();
-
-    /**
      * Returns true if using multiple positions.
      *
      * @return true if using multiple positions.
@@ -119,13 +111,6 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      * @return true if using hardware time points.
      */
     boolean isUsingHardwareTimePoints();
-
-    /**
-     * Returns true if using stage scanning.
-     *
-     * @return true if using stage scanning.
-     */
-    boolean isUsingStageScanning();
 
     /**
      * Returns true if using advanced timing settings.
@@ -160,26 +145,26 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
         /**
          * Sets the acquisition mode.
          *
-         * @param acqMode the acquisition mode
+         * @param mode the acquisition mode
          * @return {@code this} builder
          */
-        T acquisitionMode(final AcquisitionMode acqMode);
+        T acquisitionMode(final AcquisitionMode mode);
 
         /**
          * Sets the camera mode.
          *
-         * @param cameraMode the camera mode.
+         * @param mode the camera mode.
          * @return {@code this} builder
          */
-        T cameraMode(final CameraMode cameraMode);
+        T cameraMode(final CameraMode mode);
 
         /**
          * Sets the imaging camera order.
          *
-         * @param cameraOrder the imaging camera order
+         * @param order the imaging camera order
          * @return {@code this} builder
          */
-        T imagingCameraOrder(final CameraData[] cameraOrder);
+        T imagingCameraOrder(final CameraData[] order);
 
         /**
          * Sets the acquisition to use time points.
@@ -188,14 +173,6 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
          * @return {@code this} builder
          */
         T useTimePoints(final boolean state);
-
-        /**
-         * Sets the acquisition to use autofocus.
-         *
-         * @param state true to use autofocus
-         * @return {@code this} builder
-         */
-        T useAutofocus(final boolean state);
 
         /**
          * Sets the acquisition to use multiple positions.

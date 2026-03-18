@@ -2,7 +2,9 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializer;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
+import org.micromanager.lightsheetmanager.api.ChannelSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 
@@ -24,13 +26,13 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         public Builder() {
         }
 
-        public Builder(final BaseAcquisitionSettings settings) {
-            saveDirectory_ = settings.saveDirectory_;
-            saveNamePrefix_ = settings.saveNamePrefix_;
-            saveDuringAcq_ = settings.saveDuringAcq_;
-            demoMode_ = settings.demoMode_;
-            saveMode_ = settings.saveMode_;
-            afBuilder_ = settings.autofocusSettings_.copyBuilder();
+        public Builder(final AcquisitionSettings settings) {
+            saveDirectory_ = settings.saveDirectory();
+            saveNamePrefix_ = settings.saveNamePrefix();
+            saveDuringAcq_ = settings.isSavingImagesDuringAcquisition();
+            demoMode_ = settings.demoMode();
+            saveMode_ = settings.saveMode();
+            afBuilder_ = settings.autofocus().copyBuilder();
         }
 
         /**
@@ -122,7 +124,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
     private final boolean demoMode_;
     private final DataStorage.SaveMode saveMode_;
 
-    private final DefaultAutofocusSettings autofocusSettings_;
+    private final DefaultAutofocusSettings autofocus_;
 
 //    public DefaultAcquisitionSettings() {
 //        saveNamePrefix_ = "";
@@ -136,7 +138,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         saveDuringAcq_ = builder.saveDuringAcq_;
         demoMode_ = builder.demoMode_;
         saveMode_ = builder.saveMode_;
-        autofocusSettings_ = builder.afBuilder_.build();
+        autofocus_ = builder.afBuilder_.build();
     }
 
     /**
@@ -195,8 +197,8 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      * @return the autofocus settings
      */
     @Override
-    public DefaultAutofocusSettings autofocusSettings() {
-        return autofocusSettings_;
+    public DefaultAutofocusSettings autofocus() {
+        return autofocus_;
     }
 
     @Override
@@ -218,10 +220,15 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
 
     public static <T extends AcquisitionSettings> T fromJson(final String json, final Class<T> cls) {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(StageScanSettings.class, (com.google.gson.JsonDeserializer<StageScanSettings>)
+                .registerTypeAdapter(StageScanSettings.class, (JsonDeserializer<StageScanSettings>)
                         (jsonElement, typeOfT, context) -> {
                             // This forces Gson to use the concrete implementation class
                             return context.deserialize(jsonElement, DefaultStageScanSettings.class);
+                        })
+                .registerTypeAdapter(ChannelSettings.class, (JsonDeserializer<ChannelSettings>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultChannelSettings.class);
                         })
                 .create();
         return gson.fromJson(json, cls);

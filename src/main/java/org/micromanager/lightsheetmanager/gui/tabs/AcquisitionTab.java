@@ -170,7 +170,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         cmbAcquisitionModes_ = new ComboBox<>(
                 AcquisitionMode.modesByType(
                         model_.devices().adapter().geometry(),
-                        model_.devices().isUsingStageScanning()),
+                        model_.devices().hasStageScanning()),
                 settings.acquisitionMode(),
                 180, 24);
 

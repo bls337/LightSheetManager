@@ -50,7 +50,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     protected Pipeline curPipeline_;
     protected long nextWakeTime_ = -1;
 
-    protected DurationPanel pnlVolumeDurations_;
+    protected DurationPanel pnlDuration_;
 
     // TODO: remove later, hacky method to stop position updater for now
     protected LightSheetManagerFrame frame_;
@@ -84,8 +84,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     public abstract void updateDurationLabels();
 
-    public void setVolumeDurationPanel(final DurationPanel panel) {
-        pnlVolumeDurations_ = panel;
+    public void setDurationPanel(final DurationPanel panel) {
+        pnlDuration_ = Objects.requireNonNull(panel);;
     }
 
     public void setFrame(final LightSheetManagerFrame frame) {

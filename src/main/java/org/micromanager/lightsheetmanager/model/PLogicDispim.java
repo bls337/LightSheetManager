@@ -188,7 +188,7 @@ public class PLogicDispim {
             }
         }
 
-        if (settings.isUsingStageScanning()
+        if (settings.stageScan().enabled()
                 && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             if (numViews != 2) {
                 studio_.logs().showError("Interleaved stage scan only possible for 2-sided acquisition.");
@@ -211,7 +211,7 @@ public class PLogicDispim {
             studio_.logs().showError("could not set shutter to " + plcLaser_.getDeviceName());
         }
 
-        if (settings.isUsingStageScanning()) {
+        if (settings.stageScan().enabled()) {
             // scanning with ASI stage
             // algorithm is as follows:
             // use the # of slices and slice spacing that the user specifies
@@ -547,11 +547,11 @@ public class PLogicDispim {
                 scanner.setSPIMNumRepeats(numVolumesPerTrigger);
 
                 scanner.setSPIMDelayBeforeSide(
-                        settings.isUsingStageScanning() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
+                        settings.stageScan().enabled() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
                                 : settings.volume().delayBeforeView()); // this is the usual behavior
             }
             double piezoCenter;
-            if (settings.isUsingStageScanning()) {
+            if (settings.stageScan().enabled()) {
                 // for stage scanning we define the piezo position to be the home position (normally 0)
                 // this is basically required for interleaved mode (otherwise piezo would be moving every slice)
                 //    and by convention we'll do it for all stage scanning
@@ -562,14 +562,13 @@ public class PLogicDispim {
                 if (centerAtCurrentZ) {
                     piezoCenter = piezo.getPosition(); //positions_.getUpdatedPosition(piezoDevice, Joystick.Directions.NONE);
                 } else {
-                    piezoCenter = model_.acquisitions().settings()
-                            .sheetCalibration(view).imagingCenter();
+                    piezoCenter = model_.acquisitions().settings().sheetCalibration().imagingCenter();
                 }
             }
 
             // if we set piezoAmplitude to 0 here then sliceAmplitude will also be 0
             double piezoAmplitude;
-            if (settings.isUsingStageScanning() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
+            if (settings.stageScan().enabled() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
                 piezoAmplitude = 0.0;
             } else {
                 piezoAmplitude = (settings.volume().slicesPerView() - 1) * settings.volume().sliceStepSize();
@@ -664,14 +663,14 @@ public class PLogicDispim {
                 piezo.sa().setAmplitude(piezoAmplitude);
                 piezo.sa().setOffset(piezoCenter);
 
-                if (!settings.isUsingStageScanning()) {
+                if (!settings.stageScan().enabled()) {
                     piezo.setSPIMNumSlices(numSlicesHW);
                     piezo.setSPIMState(ASIPiezo.SPIMState.ARMED);
                 }
 
                 // TODO figure out what we should do with piezo illumination/center position during stage scan
                 // set up stage scan parameters if necessary
-                if (settings.isUsingStageScanning()) {
+                if (settings.stageScan().enabled()) {
                     // TODO update UI to hide image center control for stage scanning
                     // for interleaved stage scanning there will never be "home" pulse and for normal stage scanning
                     //   the first side piezo will never get moved into position either so do both manually (for
@@ -679,8 +678,8 @@ public class PLogicDispim {
                     piezo.home();
                 }
 
-                final boolean isInterleaved = (settings.isUsingStageScanning()
-                        && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
+                final boolean isInterleaved = settings.stageScan().enabled()
+                        && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED;
 
                 // even though we have moved piezos to home position let's still tell firmware
                 //    not to move piezos anywhere (i.e. maybe setting "home disable" to true doesn't have any really effect)
@@ -1021,7 +1020,7 @@ public class PLogicDispim {
 //        final Properties.Keys widthProp = (side == Devices.Sides.A) ?
 //                Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_A : Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_B;
 //        sheetWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, widthProp);
-        sheetWidth = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetWidth();
+        sheetWidth = model_.getAcquisitionEngine().settings().sheetCalibration().sheetWidth();
 
         if (cameraName == null || cameraName.isEmpty()) {
             studio_.logs().logDebugMessage("Could not get sheet width for invalid device " + cameraName);
@@ -1040,13 +1039,13 @@ public class PLogicDispim {
 //            final float slopePolarity = (side == Devices.Sides.B) ? -1 : 1;
 //            sheetWidth = roi.height * sheetSlope * slopePolarity / 1e6;  // in microdegrees per pixel, convert to degrees
         } else {
-            final boolean autoSheet = model_.getAcquisitionEngine().settings().sheetCalibration(view).isUsingAutoSheetWidth();
+            final boolean autoSheet = model_.getAcquisitionEngine().settings().sheetCalibration().isUsingAutoSheetWidth();
             if (autoSheet) {
                 Rectangle roi = camera.getROI();
                 if (roi == null || roi.height == 0) {
                     studio_.logs().logDebugMessage("Could not get camera ROI for auto sheet mode");
                 }
-                final double sheetSlope = model_.getAcquisitionEngine().settings().sheetCalibration(view).autoSheetWidthPerPixel();
+                final double sheetSlope = model_.getAcquisitionEngine().settings().sheetCalibration().autoSheetWidthPerPixel();
                 sheetWidth = roi.height *  sheetSlope / 1000.0;  // in millidegrees per pixel, convert to degrees
                 sheetWidth *= 1.1;  // 10% extra width just to be sure
             }
@@ -1075,12 +1074,12 @@ public class PLogicDispim {
         if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             // in millidegrees, convert to degrees
             // TODO: is this correct?
-            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetOffset() / 1000.0;
+            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration().sheetOffset() / 1000.0;
             //sheetOffset = prefs_.getFloat(
                     //MyStrings.PanelNames.SETUP.toString() + side.toString(),
                     //Properties.Keys.PLUGIN_LIGHTSHEET_OFFSET, 0) / 1000;  // in millidegrees, convert to degrees
         } else {
-            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration(view).sheetOffset();
+            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration().sheetOffset();
             //final Properties.Keys offsetProp = (side == Devices.Sides.A) ?
                    // Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_A : Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_B;
            // sheetOffset = props_.getPropValueFloat(Devices.Keys.PLUGIN, offsetProp);

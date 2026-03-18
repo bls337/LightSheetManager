@@ -6,15 +6,7 @@ import java.util.Objects;
 
 public class DefaultStageScanSettings implements StageScanSettings {
 
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static Builder builder(StageScanSettings settings) {
-        Objects.requireNonNull(settings, "Cannot copy from null settings");
-        return new Builder(settings);
-    }
-
+    private final boolean enabled_;
     private final double accelerationFactor_;
     private final int overshootDistance_;
     private final double retraceSpeed_;
@@ -24,6 +16,7 @@ public class DefaultStageScanSettings implements StageScanSettings {
     private final boolean fromNegativeDirection_;
 
     private DefaultStageScanSettings(Builder builder) {
+        enabled_ = builder.enabled_;
         accelerationFactor_ = builder.accelerationFactor_;
         overshootDistance_ = builder.overshootDistance_;
         retraceSpeed_ = builder.retraceSpeed_;
@@ -38,9 +31,23 @@ public class DefaultStageScanSettings implements StageScanSettings {
         this(new Builder());
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static Builder builder(StageScanSettings settings) {
+        Objects.requireNonNull(settings, "Cannot copy from null settings");
+        return new Builder(settings);
+    }
+
     @Override
     public StageScanSettings.Builder copyBuilder() {
         return new Builder(this);
+    }
+
+    @Override
+    public boolean enabled() {
+        return enabled_;
     }
 
     @Override
@@ -79,17 +86,6 @@ public class DefaultStageScanSettings implements StageScanSettings {
     }
 
     @Override
-    public String toString() {
-        return String.format(
-                "%s[accelerationFactor=%s, overshootDistance=%s, retraceSpeed=%s, firstViewAngle=%s, " +
-                        "returnToStart=%s, fromCurrentPosition=%s, fromNegativeDirection=%s]",
-                getClass().getSimpleName(),
-                accelerationFactor_, overshootDistance_, retraceSpeed_, firstViewAngle_,
-                returnToStart_, fromCurrentPosition_, fromNegativeDirection_
-        );
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -98,7 +94,8 @@ public class DefaultStageScanSettings implements StageScanSettings {
             return false;
         }
         DefaultStageScanSettings other = (DefaultStageScanSettings) obj;
-        return Double.compare(other.accelerationFactor_, accelerationFactor_) == 0 &&
+        return enabled_ == other.enabled_ &&
+                Double.compare(other.accelerationFactor_, accelerationFactor_) == 0 &&
                 overshootDistance_ == other.overshootDistance_ &&
                 Double.compare(other.retraceSpeed_, retraceSpeed_) == 0 &&
                 Double.compare(other.firstViewAngle_, firstViewAngle_) == 0 &&
@@ -110,6 +107,7 @@ public class DefaultStageScanSettings implements StageScanSettings {
     @Override
     public int hashCode() {
         return Objects.hash(
+                enabled_,
                 accelerationFactor_,
                 overshootDistance_,
                 retraceSpeed_,
@@ -120,8 +118,20 @@ public class DefaultStageScanSettings implements StageScanSettings {
         );
     }
 
+    @Override
+    public String toString() {
+        return String.format(
+                "%s[enabled=%s, accelerationFactor=%s, overshootDistance=%s, retraceSpeed=%s, firstViewAngle=%s, " +
+                        "returnToStart=%s, fromCurrentPosition=%s, fromNegativeDirection=%s]",
+                getClass().getSimpleName(),
+                enabled_, accelerationFactor_, overshootDistance_, retraceSpeed_, firstViewAngle_,
+                returnToStart_, fromCurrentPosition_, fromNegativeDirection_
+        );
+    }
+
     public static class Builder implements StageScanSettings.Builder {
 
+        private boolean enabled_ = false;
         private double accelerationFactor_ = 1.0;
         private int overshootDistance_ = 0;
         private double retraceSpeed_ =  67.0;
@@ -134,6 +144,7 @@ public class DefaultStageScanSettings implements StageScanSettings {
         }
 
         private Builder(StageScanSettings settings) {
+            enabled_ = settings.enabled();
             accelerationFactor_ = settings.accelerationFactor();
             overshootDistance_ = settings.overshootDistance();
             retraceSpeed_ = settings.retraceSpeed();
@@ -144,43 +155,49 @@ public class DefaultStageScanSettings implements StageScanSettings {
         }
 
         @Override
-        public StageScanSettings.Builder accelerationFactor(final double factor) {
+        public Builder enabled(final boolean state) {
+            enabled_ = state;
+            return this;
+        }
+
+        @Override
+        public Builder accelerationFactor(final double factor) {
             accelerationFactor_ = factor;
             return this;
         }
 
         @Override
-        public StageScanSettings.Builder overshootDistance(final int distance) {
+        public Builder overshootDistance(final int distance) {
             overshootDistance_ = distance;
             return this;
         }
 
         @Override
-        public StageScanSettings.Builder retraceSpeed(final double speed) {
+        public Builder retraceSpeed(final double speed) {
             retraceSpeed_ = speed;
             return this;
         }
 
         @Override
-        public StageScanSettings.Builder firstViewAngle(final double angle) {
+        public Builder firstViewAngle(final double angle) {
             firstViewAngle_ = angle;
             return this;
         }
 
         @Override
-        public StageScanSettings.Builder returnToStart(final boolean state) {
+        public Builder returnToStart(final boolean state) {
             returnToStart_ = state;
             return this;
         }
 
         @Override
-        public StageScanSettings.Builder fromCurrentPosition(final boolean state) {
+        public Builder fromCurrentPosition(final boolean state) {
             fromCurrentPosition_ = state;
             return this;
         }
 
         @Override
-        public StageScanSettings.Builder fromNegativeDirection(final boolean state) {
+        public Builder fromNegativeDirection(final boolean state) {
             fromNegativeDirection_ = state;
             return this;
         }

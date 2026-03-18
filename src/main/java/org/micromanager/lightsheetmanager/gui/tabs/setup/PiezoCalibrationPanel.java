@@ -86,8 +86,8 @@ public class PiezoCalibrationPanel extends Panel {
         txtOffset_ = new TextField(7);
         txtStepSize_ = new TextField();
 
-        final double sliceSlope = acqSettings.sliceCalibration(pathNum_).sliceSlope();
-        final double sliceOffset = acqSettings.sliceCalibration(pathNum_).sliceOffset();
+        final double sliceSlope = acqSettings.sliceCalibration().sliceSlope();
+        final double sliceOffset = acqSettings.sliceCalibration().sliceOffset();
 
         txtSlope_.setText("0");
         txtOffset_.setText("0");
@@ -157,7 +157,7 @@ public class PiezoCalibrationPanel extends Panel {
             btnUpdate_.registerListener(e -> {
                 if (scanner.isBeamOn()) {
                     final double rate = model_.acquisitions().settings()
-                            .sliceCalibration(pathNum_).sliceSlope();
+                            .sliceCalibration().sliceSlope();
                     final double piezoPosition = piezo.getPosition();
                     final double scannerPosition = scanner.getPosition().y;
                     double channelOffset = 0.0;
@@ -168,9 +168,9 @@ public class PiezoCalibrationPanel extends Panel {
                     lblOffsetValue_.setText(String.format("%.3f μm", newOffset));
                     panel_.setImagingCenterValue(newOffset);
                     model_.acquisitions().settingsBuilder()
-                          .sheetCalibrationBuilder(pathNum_).imagingCenter(newOffset);
+                          .sheetCalibrationBuilder().imagingCenter(newOffset);
                     model_.acquisitions().settingsBuilder()
-                          .sliceCalibrationBuilder(pathNum_).sliceOffset(newOffset);
+                          .sliceCalibrationBuilder().sliceOffset(newOffset);
                     model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
                             newOffset + " (with channel offset of " + channelOffset + ")");
                 }
@@ -187,19 +187,19 @@ public class PiezoCalibrationPanel extends Panel {
         txtSlope_.registerListener(e -> {
             final double slope = Double.parseDouble(txtSlope_.getText());
             model_.acquisitions().settingsBuilder()
-                    .sliceCalibrationBuilder(pathNum_).sliceSlope(slope);
+                    .sliceCalibrationBuilder().sliceSlope(slope);
             lblSlopeValue_.setText(String.format("%.3f μm/°", slope));
         });
 
         txtOffset_.registerListener(e -> {
             final double offset = Double.parseDouble(txtOffset_.getText());
             model_.acquisitions().settingsBuilder()
-                    .sliceCalibrationBuilder(pathNum_).sliceOffset(offset);
+                    .sliceCalibrationBuilder().sliceOffset(offset);
             lblOffsetValue_.setText(String.format("%.3f μm", offset));
             // also update the imaging center on the position panel
             panel_.setImagingCenterValue(offset);
             model_.acquisitions().settingsBuilder()
-                  .sheetCalibrationBuilder(pathNum_).imagingCenter(offset);
+                  .sheetCalibrationBuilder().imagingCenter(offset);
         });
 
         btnRunAutofocus_.registerListener(e -> {

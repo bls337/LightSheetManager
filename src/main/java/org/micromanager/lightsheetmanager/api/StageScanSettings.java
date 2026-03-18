@@ -17,6 +17,13 @@ public interface StageScanSettings {
     Builder copyBuilder();
 
     /**
+     * Returns true if the autofocus settings are enabled.
+     *
+     * @return true if the autofocus settings are enabled
+     */
+    boolean enabled();
+
+    /**
      * Returns the acceleration factor.
      *
      * @return the acceleration factor
@@ -66,6 +73,14 @@ public interface StageScanSettings {
     boolean fromNegativeDirection();
 
     interface Builder {
+
+        /**
+         * Enable or disable the autofocus settings.
+         *
+         * @param state true to enable stage scanning
+         * @return {@code this} builder
+         */
+        Builder enabled(final boolean state);
 
         /**
          * Sets the acceleration factor.

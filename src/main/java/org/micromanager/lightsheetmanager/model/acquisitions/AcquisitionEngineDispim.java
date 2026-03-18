@@ -299,7 +299,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
                 // TODO: where should these come from? In diSPIM they appear to come from preferences,
                 //  not settings...
-                boolean doAutofocus = acqSettings_.isUsingAutofocus();
+                boolean doAutofocus = acqSettings_.autofocus().enabled();
 
                 boolean autofocusAtT0 = false;
                 // TODO: this is where they come from in diSPIM?
@@ -311,7 +311,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
                 // TODO: this is the diSPIM plugin's autofocus code, which needs to be reimplemented
                 //   and translated. There are also currently no autofocus related things in the acqSettings_
-//                if (acqSettings_.isUsingAutofocus()) {
+//                if (acqSettings_.autofocus().enabled()) {
 //                    // (Copied from diSPIM): Note that we will not autofocus as expected when using hardware
 //                    // timing.  Seems OK, since hardware timing will result in short
 //                    // acquisition times that do not need autofocus.
@@ -617,7 +617,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         if (acqSettings_.isUsingTimePoints()
                 && acqSettings_.numTimePoints() > 1
                 && timepointIntervalMs < (timepointDuration + 750)
-                && !acqSettings_.isUsingStageScanning()) {
+                && !acqSettings_.stageScan().enabled()) {
             // acqSettings_.useHardwareTimesPoints(true);
             asb_.useHardwareTimePoints(true);
         }
@@ -929,7 +929,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         // stackDuration is per-side, per-channel, per-position
 
         final double stackDuration = numCameraTriggers * acqSettings.timing().sliceDuration();
-        if (acqSettings.isUsingStageScanning()) { // || acqSettings.isStageStepping) {
+        if (acqSettings.stageScan().enabled()) { // || acqSettings.isStageStepping) {
             // TODO: stage scanning code
             return 0;
         } else {

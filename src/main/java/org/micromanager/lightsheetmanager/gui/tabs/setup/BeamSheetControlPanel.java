@@ -58,7 +58,7 @@ public class BeamSheetControlPanel extends Panel {
         createEventHandlers();
 
         currentOffset_ = model_.acquisitions().settings()
-                .sheetCalibration(pathNum_).sheetOffset();
+                .sheetCalibration().sheetOffset();
     }
 
     private void createUserInterface() {
@@ -101,8 +101,8 @@ public class BeamSheetControlPanel extends Panel {
         sldSheetWidth_ = new Slider(0, 8, 1000);
         sldSheetOffset_ = new Slider(-1, 1, 1000);
 
-        sldSheetWidth_.setDouble(acqSettings.sheetCalibration(pathNum_).sheetWidth());
-        sldSheetOffset_.setDouble(acqSettings.sheetCalibration(pathNum_).sheetOffset());
+        sldSheetWidth_.setDouble(acqSettings.sheetCalibration().sheetWidth());
+        sldSheetOffset_.setDouble(acqSettings.sheetCalibration().sheetOffset());
 
         // virtual slit trigger mode
         pnlFirst_.add(lblSlope, "");
@@ -132,7 +132,7 @@ public class BeamSheetControlPanel extends Panel {
             case SCAPE:
                 txtSheetOffset_ = new TextField(6);
                 final double value = model_.acquisitions().settings()
-                        .sheetCalibration(pathNum_).sheetOffset();
+                        .sheetCalibration().sheetOffset();
                 txtSheetOffset_.setText(String.valueOf(value));
                 //lblSlopeOffset_ = new JLabel(strValue);
                 pnlSecond_.add(lblSheetOffset, "");
@@ -194,7 +194,7 @@ public class BeamSheetControlPanel extends Panel {
             final double value = Double.parseDouble(txtSheetOffset_.getText());
             //final double total = Math.max(-1.0, Math.min(1.0, value));
             model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
+                    .sheetCalibrationBuilder().sheetOffset(value);
            // currentOffset_ = total;
 //            EventQueue.invokeLater(() -> {
 //                lblSlopeOffset_.setText(String.format("%.3f", total));

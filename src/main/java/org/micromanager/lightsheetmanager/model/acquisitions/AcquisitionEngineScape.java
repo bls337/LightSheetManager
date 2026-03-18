@@ -72,8 +72,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             studio_.logs().logMessage("stopped position polling");
         }
 
-        asb_.sheetCalibrationBuilder(1).useAutoSheetWidth(true);
-        asb_.sheetCalibrationBuilder(1).autoSheetWidthPerPixel(0.0);
+        asb_.sheetCalibrationBuilder().useAutoSheetWidth(true);
+        asb_.sheetCalibrationBuilder().autoSheetWidthPerPixel(0.0);
 
         // make settings current
         updateAcquisitionSettings();
@@ -145,7 +145,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         origAccelX_ = 1.0; // don't want 0 in case something goes wrong
 
         // make sure stage scan is supported if selected
-        if (acqSettings_.isUsingStageScanning()) {
+        if (acqSettings_.stageScan().enabled()) {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
             if (xyStage != null) {
                 if (!xyStage.hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES)) {
@@ -358,7 +358,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
                 // TODO: where should these come from? In diSPIM they appear to come from preferences,
                 //  not settings...
-                boolean doAutofocus = acqSettings_.isUsingAutofocus();
+                boolean doAutofocus = acqSettings_.autofocus().enabled();
 
                 boolean autofocusAtT0 = false;
                 // TODO: this is where they come from in diSPIM?
@@ -370,7 +370,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
                 // TODO: this is the diSPIM plugin's autofocus code, which needs to be reimplemented
                 //   and translated.
-//                if (acqSettings_.isUsingAutofocus()) {
+//                if (acqSettings_.autofocus().enabled()) {
 //                    // (Copied from diSPIM): Note that we will not autofocus as expected when using hardware
 //                    // timing.  Seems OK, since hardware timing will result in short
 //                    // acquisition times that do not need autofocus.
@@ -411,7 +411,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     // move between positions fast
                     scanSpeedX_ = 1.0;
                     scanAccelX_ = 1.0;
-                    if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
+                    if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
                         final ASIXYStage xyStage = model_.devices().device("SampleXY");
                         scanSpeedX_ = xyStage.getSpeedX();
                         scanAccelX_ = xyStage.getAccelerationX();
@@ -436,7 +436,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 //                System.out.println("After hardware hook");
 //                // for stage scanning: restore speed and set up scan at new position
 //                // non-multi-position situation is handled in prepareControllerForAcquisition instead
-////                if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
+////                if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
 ////                    final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
 ////                    final Point2D.Double pos = xyStage.getXYPosition();
 ////                    xyStage.setSpeedX(scanSpeedX_);
@@ -464,7 +464,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 // TODO: Cameras are now ready to receive triggers, so we can send (software) trigger
                 //  to the tiger to tell it to start outputting TTLs
                 if (isUsingPLC) {
-                    if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
+                    if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
                         final ASIXYStage xyStage = model_.devices().device("SampleXY");
                         final Point2D.Double pos = xyStage.getXYPosition();
                         xyStage.setSpeedX(scanSpeedX_);
@@ -721,7 +721,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         // if we did stage scanning restore the original position and speed
-        if (acqSettings_.isUsingStageScanning()) {
+        if (acqSettings_.stageScan().enabled()) {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
             final boolean returnToOriginalPosition =
                     acqSettings_.stageScan().returnToStart();
@@ -906,7 +906,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         if (acqSettings_.isUsingTimePoints()
                 && acqSettings_.numTimePoints() > 1
                 && timepointIntervalMs < (timepointDuration + 750)
-                && !acqSettings_.isUsingStageScanning()) {
+                && !acqSettings_.stageScan().enabled()) {
             asb_.useHardwareTimePoints(true);
             isUsingHardwareTimePoints = true;
         }
@@ -969,7 +969,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         "with software channels (need to use PLogic channel switching).");
                 return false;
             }
-            if (acqSettings_.isUsingStageScanning()) {
+            if (acqSettings_.stageScan().enabled()) {
                 // stage scanning needs to be triggered for each time point
                 studio_.logs().showError("Cannot use hardware time points (small time point interval) "
                         + "with stage scanning.");
@@ -1010,9 +1010,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * @return a builder for DefaultTimingSettings
      */
     public DefaultTimingSettings.Builder getTimingFromExposure() {
-
         // temporary measure: use diSPIM-like settings unless we are doing stage scanning
-        if (!acqSettings_.isUsingStageScanning()) {
+        if (!acqSettings_.stageScan().enabled()) {
            return getTimingFromPeriodAndLightExposure();
         }
 
@@ -1112,8 +1111,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 .cameraExposure(cameraExposure);
 
         // if a specific slice period was requested, add corresponding delay to scan/laser/camera
-        if (!acqSettings_.slice().isSlicePeriodMinimized()) {
-            double globalDelay = acqSettings_.slice().slicePeriod() - tsb.sliceDuration();
+        if (!acqSettings_.slice().periodMinimized()) {
+            double globalDelay = acqSettings_.slice().period() - tsb.sliceDuration();
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
@@ -1156,8 +1155,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // 4. start scan 0.25ms before camera global exposure and shifted up in time to account for delay introduced by Bessel filter
         // 5. turn on laser as soon as camera global exposure, leave laser on for desired light exposure time
         // 7. end camera exposure in final 0.25ms, post-filter scan waveform also ends now
-        ASIScanner scanner = model_.devices().device("IllumSlice"); //.getDevice("IllumBeam");
-        // ASIScanner scanner2 = model_.devices().getDevice("Illum2Beam");
 
         CameraBase camera = model_.devices().firstImagingCamera(); //.getDevice("ImagingCamera");
         if (camera == null) {
@@ -1196,8 +1193,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // delay to start is (empirically) 0.07ms + 0.25/(freq in kHz)
         // delay to midpoint is empirically 0.38/(freq in kHz)
         // group delay for 5th-order Bessel filter ~0.39/freq from theory and ~0.4/freq from IC datasheet
-        //final double scanFilterFreq = Math.max(scanner1.getFilterFreqX(), scanner2.getFilterFreqX());
-        final double scanFilterFreq = (scanner == null) ? 0.4 : scanner.getFilterFreqX(); // default to 0.4 if no scanner
+        final double scanFilterFreq = model_.devices()
+                .device2("IllumSlice", ASIScanner.class)
+                .map(ASIScanner::getFilterFreqX)
+                .orElse(0.4); // default value
+
         double scanDelayFilter = 0;
         if (scanFilterFreq != 0) {
             scanDelayFilter = NumberUtils.roundToQuarterMs(0.39 / scanFilterFreq);
@@ -1296,8 +1296,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         // if a specific slice period was requested, add corresponding delay to scan/laser/camera
-        if (!acqSettings_.slice().isSlicePeriodMinimized()) {
-            double globalDelay = acqSettings_.slice().slicePeriod() - tsb.sliceDuration();
+        if (!acqSettings_.slice().periodMinimized()) {
+            double globalDelay = acqSettings_.slice().period() - tsb.sliceDuration();
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
@@ -1341,9 +1341,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         model_.acquisitions().recalculateSliceTiming();
         model_.acquisitions().updateAcquisitionSettings();
         // update durations now that settings are current
-        updateSlicePeriodLabel(pnlVolumeDurations_.getSliceDurationLabel());
-        updateVolumeDurationLabel(pnlVolumeDurations_.getVolumeDurationLabel());
-        updateTotalTimeDurationLabel(pnlVolumeDurations_.getTotalDurationLabel());
+        updateSlicePeriodLabel(pnlDuration_.getSliceDurationLabel());
+        updateVolumeDurationLabel(pnlDuration_.getVolumeDurationLabel());
+        updateTotalTimeDurationLabel(pnlDuration_.getTotalDurationLabel());
     }
 
     private void updateSlicePeriodLabel(final JLabel label) {
@@ -1422,7 +1422,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // stackDuration is per-view, per-channel, per-position
         final double stackDuration = numCameraTriggers * acqSettings_.timing().sliceDuration();
 
-        if (acqSettings_.isUsingStageScanning()) {
+        if (acqSettings_.stageScan().enabled()) {
             final double rampDuration = 1; //getStageRampDuration(acqSettings);
             final double retraceTime = 1; //getStageRetraceDuration(acqSettings);
             // TODO(Jon): double-check these calculations below, at least they are better than before ;-)

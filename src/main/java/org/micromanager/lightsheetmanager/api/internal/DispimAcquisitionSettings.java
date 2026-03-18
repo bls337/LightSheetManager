@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDispim;
+import org.micromanager.lightsheetmanager.api.ChannelSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
@@ -13,7 +14,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDispim.Builder<Builder> {
 
-        private DefaultChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
+        private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
         private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
         private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
         private DefaultSliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
@@ -26,10 +27,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         private CameraMode cameraMode_ = CameraMode.EDGE;
 
         private boolean useTimePoints_ = false;
-        private boolean useAutofocus_ = false;
         private boolean useMultiplePositions_ = false;
         private boolean useHardwareTimePoints_ = false;
-        private boolean useStageScanning_ = false;
         private boolean useAdvancedTiming_ = false;
 
         private int numTimePoints_ = 1;
@@ -47,11 +46,11 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
         public Builder(final DispimAcquisitionSettings settings) {
             super(settings);
-            channelBuilder_ = settings.channelSettings_.copyBuilder();
-            timingBuilder_ = settings.timingSettings_.copyBuilder();
-            volumeBuilder_ = settings.volumeSettings_.copyBuilder();
-            sliceBuilder_ = settings.sliceSettings_.copyBuilder();
-            ssbLS_ = settings.sliceSettingsLS_.copyBuilder();
+            channelBuilder_ = settings.channels().copyBuilder();
+            timingBuilder_ = settings.timing_.copyBuilder();
+            volumeBuilder_ = settings.volume_.copyBuilder();
+            sliceBuilder_ = settings.slice_.copyBuilder();
+            ssbLS_ = settings.sliceLS_.copyBuilder();
             stageScanBuilder_ = settings.stageScan().copyBuilder();
             for (int i = 0; i < 2; i++) {
                 slcb_[i] = settings.sliceCalibrations_[i].copyBuilder();
@@ -60,10 +59,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             acquisitionMode_ = settings.acquisitionMode_;
             cameraMode_ = settings.cameraMode_;
             useTimePoints_ = settings.useTimePoints_;
-            useAutofocus_ = settings.useAutofocus_;
             useMultiplePositions_ = settings.useMultiplePositions_;
             useHardwareTimePoints_ = settings.useHardwareTimePoints_;
-            useStageScanning_ = settings.useStageScanning_;
             useAdvancedTiming_ =  settings.useAdvancedTiming_;
             numTimePoints_ = settings.numTimePoints_;
             timePointInterval_ = settings.timePointInterval_;
@@ -105,17 +102,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         }
 
         /**
-         * Sets the acquisition to use autofocus.
-         *
-         * @param state true to use autofocus.
-         */
-        @Override
-        public Builder useAutofocus(final boolean state) {
-            useAutofocus_ = state;
-            return this;
-        }
-
-        /**
          * Sets the acquisition to use multiple positions.
          *
          * @param state true to use multiple positions.
@@ -134,17 +120,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         @Override
         public Builder useHardwareTimePoints(final boolean state) {
             useHardwareTimePoints_ = state;
-            return this;
-        }
-
-        /**
-         * Sets the acquisition to use stage scanning.
-         *
-         * @param state true to use stage scanning.
-         */
-        @Override
-        public Builder useStageScanning(final boolean state) {
-            useStageScanning_ = state;
             return this;
         }
 
@@ -199,7 +174,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         }
 
         // getters for sub-builders
-        public DefaultChannelSettings.Builder channelBuilder() {
+        public ChannelSettings.Builder channelBuilder() {
             return channelBuilder_;
         }
 
@@ -240,9 +215,9 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         }
 
         /**
-         * Creates an immutable instance of DefaultAcquisitionSettingsDISPIM
+         * Creates an immutable instance of DispimAcquisitionSettings
          *
-         * @return Immutable version of DefaultAcquisitionSettingsDISPIM
+         * @return Immutable version of DispimAcquisitionSettings
          */
         @Override
         public DispimAcquisitionSettings build() {
@@ -262,11 +237,11 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     }
 
-    private final DefaultChannelSettings channelSettings_;
-    private final DefaultTimingSettings timingSettings_;
-    private final DefaultVolumeSettings volumeSettings_;
-    private final DefaultSliceSettingsLS sliceSettingsLS_;
-    private final DefaultSliceSettings sliceSettings_;
+    private final ChannelSettings channels_;
+    private final DefaultTimingSettings timing_;
+    private final DefaultVolumeSettings volume_;
+    private final DefaultSliceSettingsLS sliceLS_;
+    private final DefaultSliceSettings slice_;
     private final StageScanSettings stageScan_;
     private final DefaultSheetCalibration[] sheetCalibrations_;
     private final DefaultSliceCalibration[] sliceCalibrations_;
@@ -275,10 +250,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     private final CameraMode cameraMode_;
 
     private final boolean useTimePoints_;
-    private final boolean useAutofocus_;
     private final boolean useMultiplePositions_;
     private final boolean useHardwareTimePoints_;
-    private final boolean useStageScanning_;
     private final boolean useAdvancedTiming_;
 
     private final int numTimePoints_;
@@ -289,11 +262,11 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     private DispimAcquisitionSettings(Builder builder) {
         super(builder);
-        channelSettings_ = builder.channelBuilder_.build();
-        timingSettings_ = builder.timingBuilder_.build();
-        volumeSettings_ = builder.volumeBuilder_.build();
-        sliceSettings_ = builder.sliceBuilder_.build();
-        sliceSettingsLS_ = builder.ssbLS_.build();
+        channels_ = builder.channelBuilder_.build();
+        timing_ = builder.timingBuilder_.build();
+        volume_ = builder.volumeBuilder_.build();
+        slice_ = builder.sliceBuilder_.build();
+        sliceLS_ = builder.ssbLS_.build();
         stageScan_ = builder.stageScanBuilder_.build();
         sheetCalibrations_ = new DefaultSheetCalibration[2];
         sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
@@ -304,8 +277,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
         useTimePoints_ = builder.useTimePoints_;
-        useAutofocus_ = builder.useAutofocus_;
-        useStageScanning_ = builder.useStageScanning_;
         useMultiplePositions_ = builder.useMultiplePositions_;
         useHardwareTimePoints_ = builder.useHardwareTimePoints_;
         useAdvancedTiming_ = builder.useAdvancedTiming_;
@@ -332,8 +303,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      * @return immutable DefaultChannelSettings instance.
      */
     @Override
-    public DefaultChannelSettings channels() {
-        return channelSettings_;
+    public ChannelSettings channels() {
+        return channels_;
     }
 
     /**
@@ -343,7 +314,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      */
     @Override
     public DefaultTimingSettings timing() {
-        return timingSettings_;
+        return timing_;
     }
 
     /**
@@ -353,7 +324,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      */
     @Override
     public DefaultVolumeSettings volume() {
-        return volumeSettings_;
+        return volume_;
     }
 
     /**
@@ -363,7 +334,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      */
     @Override
     public DefaultSliceSettings slice() {
-        return sliceSettings_;
+        return slice_;
     }
 
     /**
@@ -373,7 +344,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
      */
     @Override
     public DefaultSliceSettingsLS sliceLS() {
-        return sliceSettingsLS_;
+        return sliceLS_;
     }
 
     /**
@@ -439,16 +410,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     }
 
     /**
-     * Returns true if using autofocus.
-     *
-     * @return true if using autofocus.
-     */
-    @Override
-    public boolean isUsingAutofocus() {
-        return useAutofocus_;
-    }
-
-    /**
      * Returns true if using multiple positions.
      *
      * @return true if using multiple positions.
@@ -466,16 +427,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     @Override
     public boolean isUsingHardwareTimePoints() {
         return useHardwareTimePoints_;
-    }
-
-    /**
-     * Returns true if using stage scanning.
-     *
-     * @return true if using stage scanning.
-     */
-    @Override
-    public boolean isUsingStageScanning() {
-        return useStageScanning_;
     }
 
     /**
@@ -526,7 +477,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
     @Override
     public String toString() {
-        return String.format("[timingSettings_=%s]", timingSettings_);
+        return String.format("[timing=%s]", timing_);
     }
 //    public String toJson() {
 //        return new Gson().toJson(this);

@@ -1,16 +1,21 @@
 package org.micromanager.lightsheetmanager.api;
 
-
 import org.micromanager.lightsheetmanager.api.data.AutofocusMode;
 import org.micromanager.lightsheetmanager.api.data.AutofocusType;
 
 /**
  * Autofocus settings.
- *
  */
 public interface AutofocusSettings {
 
     interface Builder {
+
+        /**
+         * Return true if channels are enabled.
+         *
+         * @param state true if channels are enabled
+         */
+        Builder enabled(final boolean state);
 
         /**
          * Sets the number of images to capture in the autofocus routine.
@@ -105,6 +110,13 @@ public interface AutofocusSettings {
      * @return a builder to create a modified copy of these settings
      */
     Builder copyBuilder();
+
+    /**
+     * Return true if channels are enabled.
+     *
+     * @return true if channels are enabled
+     */
+    boolean enabled();
 
     /**
      * Returns the number of images used in for autofocus routine.

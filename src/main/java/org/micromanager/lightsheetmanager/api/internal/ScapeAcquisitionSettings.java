@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsScape;
+import org.micromanager.lightsheetmanager.api.ChannelSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
@@ -14,13 +15,13 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsScape.Builder<Builder> {
 
-        private DefaultChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
+        private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
         private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
         private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
         private DefaultSliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
         private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
-        private DefaultSheetCalibration.Builder[] sheetCalibBuilder_ = new DefaultSheetCalibration.Builder[1];
-        private DefaultSliceCalibration.Builder[] sliceCalibBuilder_ = new DefaultSliceCalibration.Builder[1];
+        private DefaultSheetCalibration.Builder sheetCalibBuilder_ = DefaultSheetCalibration.builder();
+        private DefaultSliceCalibration.Builder sliceCalibBuilder_ = DefaultSliceCalibration.builder();
 
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
 
@@ -28,10 +29,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         private CameraData[] imagingCameraOrder_ = {};
 
         private boolean useTimePoints_ = false;
-        private boolean useAutofocus_ = false;
         private boolean useMultiplePositions_ = false;
         private boolean useHardwareTimePoints_ = false;
-        private boolean useStageScanning_ = false;
         private boolean useAdvancedTiming_ = false;
 
         private int numTimePoints_ = 1;
@@ -39,35 +38,27 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         private int postMoveDelay_ = 0;
 
         private Builder() {
-            for (int i = 0; i < 1; i++) {
-                sheetCalibBuilder_[i] = DefaultSheetCalibration.builder();
-                sliceCalibBuilder_[i] = DefaultSliceCalibration.builder();
-            }
         }
 
         public Builder(final ScapeAcquisitionSettings settings) {
             super(settings);
-            channelBuilder_ = settings.channelSettings_.copyBuilder();
-            timingBuilder_ = settings.timingSettings_.copyBuilder();
-            volumeBuilder_ = settings.volumeSettings_.copyBuilder();
-            sliceBuilder_ = settings.sliceSettings_.copyBuilder();
+            channelBuilder_ = settings.channels().copyBuilder();
+            timingBuilder_ = settings.timing().copyBuilder();
+            volumeBuilder_ = settings.volume().copyBuilder();
+            sliceBuilder_ = settings.slice().copyBuilder();
             stageScanBuilder_ = settings.stageScan().copyBuilder();
-            for (int i = 0; i < 1; i++) {
-                sliceCalibBuilder_[i] = settings.sliceCalibrations_[i].copyBuilder();
-                sheetCalibBuilder_[i] = settings.sheetCalibrations_[i].copyBuilder();
-            }
-            acquisitionMode_ = settings.acquisitionMode_;
-            cameraMode_ = settings.cameraMode_;
-            imagingCameraOrder_ = settings.imagingCameraOrder_;
-            useTimePoints_ = settings.useTimePoints_;
-            useAutofocus_ = settings.useAutofocus_;
-            useMultiplePositions_ = settings.useMultiplePositions_;
-            useHardwareTimePoints_ = settings.useHardwareTimePoints_;
-            useStageScanning_ = settings.useStageScanning_;
-            useAdvancedTiming_ =  settings.useAdvancedTiming_;
-            numTimePoints_ = settings.numTimePoints_;
-            timePointInterval_ = settings.timePointInterval_;
-            postMoveDelay_ = settings.postMoveDelay_;
+            sheetCalibBuilder_ = settings.sheetCalibration().copyBuilder();
+            sliceCalibBuilder_ = settings.sliceCalibration().copyBuilder();
+            acquisitionMode_ = settings.acquisitionMode();
+            cameraMode_ = settings.cameraMode();
+            imagingCameraOrder_ = settings.imagingCameraOrder();
+            useTimePoints_ = settings.isUsingTimePoints();
+            useMultiplePositions_ = settings.isUsingMultiplePositions();
+            useHardwareTimePoints_ = settings.isUsingHardwareTimePoints();
+            useAdvancedTiming_ =  settings.isUsingAdvancedTiming();
+            numTimePoints_ = settings.numTimePoints();
+            timePointInterval_ = settings.timePointInterval();
+            postMoveDelay_ = settings.postMoveDelay();
         }
 
         /**
@@ -76,36 +67,37 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
          * If the mode is a stage scanning mode,
          * set internal stage scanning flag.
          *
-         * @param acqMode the acquisition mode
+         * @param mode the acquisition mode
          */
         @Override
-        public Builder acquisitionMode(final AcquisitionMode acqMode) {
-            acquisitionMode_ = acqMode;
-            useStageScanning_ = acqMode == AcquisitionMode.STAGE_SCAN
-                    || acqMode == AcquisitionMode.STAGE_SCAN_INTERLEAVED
-                    || acqMode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL;
+        public Builder acquisitionMode(final AcquisitionMode mode) {
+            acquisitionMode_ = mode;
+            final boolean scanEnabled = (mode == AcquisitionMode.STAGE_SCAN
+                    || mode == AcquisitionMode.STAGE_SCAN_INTERLEAVED
+                    || mode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL);
+            stageScanBuilder_.enabled(scanEnabled);
             return this;
         }
 
         /**
          * Sets the camera mode.
          *
-         * @param cameraMode the camera mode.
+         * @param mode the camera mode.
          */
         @Override
-        public Builder cameraMode(final CameraMode cameraMode) {
-            cameraMode_ = cameraMode;
+        public Builder cameraMode(final CameraMode mode) {
+            cameraMode_ = mode;
             return this;
         }
 
         /**
          * Sets the imaging camera order.
          *
-         * @param cameraOrder the imaging camera order
+         * @param order the imaging camera order
          */
         @Override
-        public Builder imagingCameraOrder(final CameraData[] cameraOrder) {
-            imagingCameraOrder_ = cameraOrder;
+        public Builder imagingCameraOrder(final CameraData[] order) {
+            imagingCameraOrder_ = order;
             return this;
         }
 
@@ -117,17 +109,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         @Override
         public Builder useTimePoints(final boolean state) {
             useTimePoints_ = state;
-            return this;
-        }
-
-        /**
-         * Sets the acquisition to use autofocus.
-         *
-         * @param state true to use autofocus.
-         */
-        @Override
-        public Builder useAutofocus(final boolean state) {
-            useAutofocus_ = state;
             return this;
         }
 
@@ -198,7 +179,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         }
 
         // getters for sub-builders
-        public DefaultChannelSettings.Builder channelBuilder() {
+        public ChannelSettings.Builder channelBuilder() {
             return channelBuilder_;
         }
 
@@ -218,12 +199,12 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             return stageScanBuilder_;
         }
 
-        public DefaultSheetCalibration.Builder sheetCalibrationBuilder(final int view) {
-            return sheetCalibBuilder_[view-1];
+        public DefaultSheetCalibration.Builder sheetCalibrationBuilder() {
+            return sheetCalibBuilder_;
         }
 
-        public DefaultSliceCalibration.Builder sliceCalibrationBuilder(final int view) {
-            return sliceCalibBuilder_[view-1];
+        public DefaultSliceCalibration.Builder sliceCalibrationBuilder() {
+            return sliceCalibBuilder_;
         }
 
         public void timingBuilder(DefaultTimingSettings.Builder builder) {
@@ -252,13 +233,13 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     }
 
-    private final DefaultChannelSettings channelSettings_;
-    private final DefaultTimingSettings timingSettings_;
-    private final DefaultVolumeSettings volumeSettings_;
-    private final DefaultSliceSettings sliceSettings_;
+    private final ChannelSettings channels_;
+    private final DefaultTimingSettings timing_;
+    private final DefaultVolumeSettings volume_;
+    private final DefaultSliceSettings slice_;
     private final StageScanSettings stageScan_;
-    private final DefaultSheetCalibration[] sheetCalibrations_;
-    private final DefaultSliceCalibration[] sliceCalibrations_;
+    private final DefaultSheetCalibration sheetCalibration_;
+    private final DefaultSliceCalibration sliceCalibration_;
 
     private final AcquisitionMode acquisitionMode_;
 
@@ -266,10 +247,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     private final CameraData[] imagingCameraOrder_;
 
     private final boolean useTimePoints_;
-    private final boolean useAutofocus_;
     private final boolean useMultiplePositions_;
     private final boolean useHardwareTimePoints_;
-    private final boolean useStageScanning_;
     private final boolean useAdvancedTiming_;
 
     private final int numTimePoints_;
@@ -278,23 +257,17 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     private ScapeAcquisitionSettings(Builder builder) {
         super(builder);
-        channelSettings_ = builder.channelBuilder_.build();
-        timingSettings_ = builder.timingBuilder_.build();
-        volumeSettings_ = builder.volumeBuilder_.build();
-        sliceSettings_ = builder.sliceBuilder_.build();
+        channels_ = builder.channelBuilder().build();
+        timing_ = builder.timingBuilder_.build();
+        volume_ = builder.volumeBuilder_.build();
+        slice_ = builder.sliceBuilder_.build();
         stageScan_ = builder.stageScanBuilder().build();
-        sheetCalibrations_ = new DefaultSheetCalibration[1];
-        sliceCalibrations_ = new DefaultSliceCalibration[1]; // TODO: use this object directly
-        for (int i = 0; i < 1; i ++) {
-            sheetCalibrations_[i] = builder.sheetCalibBuilder_[i].build();
-            sliceCalibrations_[i] = builder.sliceCalibBuilder_[i].build();
-        }
+        sheetCalibration_ = builder.sheetCalibBuilder_.build();
+        sliceCalibration_ = builder.sliceCalibBuilder_.build();
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
         imagingCameraOrder_ = builder.imagingCameraOrder_;
         useTimePoints_ = builder.useTimePoints_;
-        useAutofocus_ = builder.useAutofocus_;
-        useStageScanning_ = builder.useStageScanning_;
         useMultiplePositions_ = builder.useMultiplePositions_;
         useHardwareTimePoints_ = builder.useHardwareTimePoints_;
         useAdvancedTiming_ = builder.useAdvancedTiming_;
@@ -319,8 +292,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      * @return immutable DefaultChannelSettings instance.
      */
     @Override
-    public DefaultChannelSettings channels() {
-        return channelSettings_;
+    public ChannelSettings channels() {
+        return channels_;
     }
 
     /**
@@ -330,7 +303,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      */
     @Override
     public DefaultTimingSettings timing() {
-        return timingSettings_;
+        return timing_;
     }
 
     /**
@@ -340,7 +313,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      */
     @Override
     public DefaultVolumeSettings volume() {
-        return volumeSettings_;
+        return volume_;
     }
 
     /**
@@ -350,7 +323,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      */
     @Override
     public DefaultSliceSettings slice() {
-        return sliceSettings_;
+        return slice_;
     }
 
     /**
@@ -369,8 +342,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      * @return immutable DefaultSheetCalibration instance.
      */
     @Override
-    public DefaultSheetCalibration sheetCalibration(final int view) {
-        return sheetCalibrations_[view-1];
+    public DefaultSheetCalibration sheetCalibration() {
+        return sheetCalibration_;
     }
 
     /**
@@ -381,8 +354,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      * @return immutable DefaultSliceCalibration instance.
      */
     @Override
-    public DefaultSliceCalibration sliceCalibration(final int view) {
-        return sliceCalibrations_[view-1];
+    public DefaultSliceCalibration sliceCalibration() {
+        return sliceCalibration_;
     }
 
     /**
@@ -426,16 +399,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     }
 
     /**
-     * Returns true if using autofocus.
-     *
-     * @return true if using autofocus.
-     */
-    @Override
-    public boolean isUsingAutofocus() {
-        return useAutofocus_;
-    }
-
-    /**
      * Returns true if using multiple positions.
      *
      * @return true if using multiple positions.
@@ -453,16 +416,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     @Override
     public boolean isUsingHardwareTimePoints() {
         return useHardwareTimePoints_;
-    }
-
-    /**
-     * Returns true if using stage scanning.
-     *
-     * @return true if using stage scanning.
-     */
-    @Override
-    public boolean isUsingStageScanning() {
-        return useStageScanning_;
     }
 
     /**
@@ -508,7 +461,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
     @Override
     public String toString() {
-        return String.format("[timingSettings_=%s]", timingSettings_);
+        return String.format("[timingSettings_=%s]", timing_);
     }
 
 //    public String toJson() {

@@ -36,7 +36,7 @@ public class SavePanel extends Panel {
     private final LightSheetManagerFrame frame_;
 
     public SavePanel(final LightSheetManager model, final LightSheetManagerFrame frame) {
-        super("Save Data");
+        super("Save Settings");
         model_ = Objects.requireNonNull(model);
         frame_ = Objects.requireNonNull(frame);
 

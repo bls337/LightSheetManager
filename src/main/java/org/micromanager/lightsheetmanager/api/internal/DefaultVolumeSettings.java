@@ -1,151 +1,10 @@
 package org.micromanager.lightsheetmanager.api.internal;
 
-
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
 
+import java.util.Objects;
+
 public class DefaultVolumeSettings implements VolumeSettings {
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder implements VolumeSettings.Builder {
-        private int firstView_ = 1;
-        private int numViews_ = 1;
-        private int slicesPerView_ = 10;
-        private double delayBeforeView_ = 50;
-        private double sliceStepSize_ = 0.5;
-        private double startPosition_ = 0.0;
-        private double centerPosition_ = 0.0;
-        private double endPosition_ = 0.0;
-
-        private Builder() {
-        }
-
-        /**
-         * Create a builder with values populated from already existing DefaultVolumeSettings.
-         *
-         * @param settings the settings to copy
-         */
-        private Builder(DefaultVolumeSettings settings) {
-            firstView_ = settings.firstView_;
-            numViews_ = settings.numViews_;
-            slicesPerView_ = settings.slicesPerView_;
-            delayBeforeView_ = settings.delayBeforeView_;
-            sliceStepSize_ = settings.sliceStepSize_;
-            startPosition_ = settings.startPosition_;
-            centerPosition_ = settings.centerPosition_;
-            endPosition_ = settings.endPosition_;
-        }
-
-        /**
-         * Sets the number of views to use during an acquisition.
-         *
-         * @param numViews the number of view
-         */
-        @Override
-        public VolumeSettings.Builder numViews(final int numViews) {
-            numViews_ = numViews;
-            return this;
-        }
-
-        /**
-         * Sets the imaging path to start the acquisition with.
-         *
-         * @param firstView the first view
-         */
-        @Override
-        public VolumeSettings.Builder firstView(final int firstView) {
-            firstView_ = firstView;
-            return this;
-        }
-
-        /**
-         * Sets the delay between switching imaging paths in an acquisition.
-         *
-         * @param viewDelayMs the delay in milliseconds
-         */
-        @Override
-        public VolumeSettings.Builder delayBeforeView(final double viewDelayMs) {
-            delayBeforeView_ = viewDelayMs;
-            return this;
-        }
-
-        @Override
-        public VolumeSettings.Builder slicesPerView(final int n) {
-            slicesPerView_ = n;
-            return this;
-        }
-
-        @Override
-        public VolumeSettings.Builder sliceStepSize(final double um) {
-            sliceStepSize_ = um;
-            return this;
-        }
-
-        // TODO: what happens when stepSize is not evenly divided by range? maybe just remove?
-        /**
-         * Sets the volume bounds, automatically computing numSlices and centerPosition.
-         *
-         * @param startPosition the start position
-         * @param endPosition the end position
-         * @param stepSizeUm the step size in micron
-         */
-        @Override
-        public VolumeSettings.Builder volumeBounds(final double startPosition, final double endPosition, final double stepSizeUm) {
-            startPosition_ = startPosition;
-            endPosition_ = endPosition;
-            sliceStepSize_ = stepSizeUm;
-            centerPosition_ = (startPosition + endPosition) / 2.0;
-            slicesPerView_ = (int)Math.floor((Math.abs(startPosition) + Math.abs(endPosition)) / stepSizeUm);
-            return this;
-        }
-
-        /**
-         * Sets the volume bounds, automatically computing stepSizeUm and centerPosition.
-         *
-         * @param startPosition the start position
-         * @param endPosition the end position
-         * @param numSlices the number of slices
-         */
-        @Override
-        public VolumeSettings.Builder volumeBounds(final double startPosition, final double endPosition, final int numSlices) {
-            startPosition_ = startPosition;
-            endPosition_ = endPosition;
-            slicesPerView_ = numSlices;
-            centerPosition_ = (startPosition + endPosition) / 2.0;
-            sliceStepSize_ = (Math.abs(startPosition) + Math.abs(endPosition)) / numSlices;
-            return this;
-        }
-
-        /**
-         * Sets the volume bounds, automatically computing startPosition and endPosition.
-         *
-         * @param centerPosition the center position
-         * @param numSlices the number of slices
-         * @param stepSizeUm the step size in microns
-         */
-        @Override
-        public VolumeSettings.Builder volumeBounds(final double centerPosition, final int numSlices, final double stepSizeUm) {
-            final double halfDistance = (stepSizeUm * numSlices) / 2.0;
-            centerPosition_ = centerPosition;
-            sliceStepSize_ = stepSizeUm;
-            slicesPerView_ = numSlices;
-            startPosition_ = centerPosition - halfDistance;
-            endPosition_ = centerPosition + halfDistance;
-            return this;
-        }
-
-        /**
-         * Creates an immutable instance of VolumeSettings
-         *
-         * @return Immutable version of VolumeSettings
-         */
-        @Override
-        public DefaultVolumeSettings build() {
-            return new DefaultVolumeSettings(this);
-        }
-    }
 
     private final int firstView_;
     private final int numViews_;
@@ -167,6 +26,16 @@ public class DefaultVolumeSettings implements VolumeSettings {
         endPosition_ = builder.endPosition_;
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static Builder builder(VolumeSettings settings) {
+        Objects.requireNonNull(settings, "Cannot copy from null settings");
+        return new Builder(settings);
+    }
+
+    @Override
     public Builder copyBuilder() {
         return new Builder(this);
     }
@@ -176,6 +45,7 @@ public class DefaultVolumeSettings implements VolumeSettings {
      *
      * @return the first view
      */
+    @Override
     public int firstView() {
         return firstView_;
     }
@@ -185,7 +55,7 @@ public class DefaultVolumeSettings implements VolumeSettings {
      *
      * @return the number of views
      */
-
+    @Override
     public int numViews() {
         return numViews_;
     }
@@ -195,6 +65,7 @@ public class DefaultVolumeSettings implements VolumeSettings {
      *
      * @return the number of slices
      */
+    @Override
     public int slicesPerView() {
         return slicesPerView_;
     }
@@ -204,6 +75,7 @@ public class DefaultVolumeSettings implements VolumeSettings {
      *
      * @return the delay in milliseconds
      */
+    @Override
     public double delayBeforeView() {
         return delayBeforeView_;
     }
@@ -213,6 +85,7 @@ public class DefaultVolumeSettings implements VolumeSettings {
      *
      * @return the step size in microns
      */
+    @Override
     public double sliceStepSize() {
         return sliceStepSize_;
     }
@@ -222,6 +95,7 @@ public class DefaultVolumeSettings implements VolumeSettings {
      *
      * @return the start position
      */
+    @Override
     public double startPosition() {
         return startPosition_;
     }
@@ -231,6 +105,7 @@ public class DefaultVolumeSettings implements VolumeSettings {
      *
      * @return the center position
      */
+    @Override
     public double centerPosition() {
         return centerPosition_;
     }
@@ -240,8 +115,34 @@ public class DefaultVolumeSettings implements VolumeSettings {
      *
      * @return the end position
      */
+    @Override
     public double endPosition() {
         return endPosition_;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DefaultVolumeSettings other = (DefaultVolumeSettings) obj;
+        return firstView_ == other.firstView_ &&
+                numViews_ == other.numViews_ &&
+                slicesPerView_ == other.slicesPerView_ &&
+                Double.compare(delayBeforeView_, other.delayBeforeView_) == 0 &&
+                Double.compare(sliceStepSize_, other.sliceStepSize_) == 0 &&
+                Double.compare(startPosition_, other.startPosition_) == 0 &&
+                Double.compare(centerPosition_, other.centerPosition_) == 0 &&
+                Double.compare(endPosition_, other.endPosition_) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstView_, numViews_, slicesPerView_, delayBeforeView_, sliceStepSize_,
+                startPosition_, centerPosition_, endPosition_);
     }
 
     @Override
@@ -253,6 +154,145 @@ public class DefaultVolumeSettings implements VolumeSettings {
                 firstView_, numViews_, slicesPerView_, delayBeforeView_, sliceStepSize_,
                 startPosition_, centerPosition_, endPosition_
         );
+    }
+
+    public static class Builder implements VolumeSettings.Builder {
+
+        private int firstView_ = 1;
+        private int numViews_ = 1;
+        private int slicesPerView_ = 10;
+        private double delayBeforeView_ = 50;
+        private double sliceStepSize_ = 0.5;
+        private double startPosition_ = 0.0;
+        private double centerPosition_ = 0.0;
+        private double endPosition_ = 0.0;
+
+        private Builder() {
+        }
+
+        /**
+         * Create a builder with values populated from already existing DefaultVolumeSettings.
+         *
+         * @param settings the settings to copy
+         */
+        private Builder(final VolumeSettings settings) {
+            firstView_ = settings.firstView();
+            numViews_ = settings.numViews();
+            slicesPerView_ = settings.slicesPerView();
+            delayBeforeView_ = settings.delayBeforeView();
+            sliceStepSize_ = settings.sliceStepSize();
+            startPosition_ = settings.startPosition();
+            centerPosition_ = settings.centerPosition();
+            endPosition_ = settings.endPosition();
+        }
+
+        /**
+         * Sets the number of views to use during an acquisition.
+         *
+         * @param numViews the number of view
+         */
+        @Override
+        public Builder numViews(final int numViews) {
+            numViews_ = numViews;
+            return this;
+        }
+
+        /**
+         * Sets the imaging path to start the acquisition with.
+         *
+         * @param firstView the first view
+         */
+        @Override
+        public Builder firstView(final int firstView) {
+            firstView_ = firstView;
+            return this;
+        }
+
+        /**
+         * Sets the delay between switching imaging paths in an acquisition.
+         *
+         * @param viewDelayMs the delay in milliseconds
+         */
+        @Override
+        public Builder delayBeforeView(final double viewDelayMs) {
+            delayBeforeView_ = viewDelayMs;
+            return this;
+        }
+
+        @Override
+        public Builder slicesPerView(final int n) {
+            slicesPerView_ = n;
+            return this;
+        }
+
+        @Override
+        public Builder sliceStepSize(final double um) {
+            sliceStepSize_ = um;
+            return this;
+        }
+
+        // TODO: what happens when stepSize is not evenly divided by range? maybe just remove?
+        /**
+         * Sets the volume bounds, automatically computing numSlices and centerPosition.
+         *
+         * @param startPosition the start position
+         * @param endPosition the end position
+         * @param stepSizeUm the step size in micron
+         */
+        @Override
+        public Builder volumeBounds(final double startPosition, final double endPosition, final double stepSizeUm) {
+            startPosition_ = startPosition;
+            endPosition_ = endPosition;
+            sliceStepSize_ = stepSizeUm;
+            centerPosition_ = (startPosition + endPosition) / 2.0;
+            slicesPerView_ = (int)Math.floor((Math.abs(startPosition) + Math.abs(endPosition)) / stepSizeUm);
+            return this;
+        }
+
+        /**
+         * Sets the volume bounds, automatically computing stepSizeUm and centerPosition.
+         *
+         * @param startPosition the start position
+         * @param endPosition the end position
+         * @param numSlices the number of slices
+         */
+        @Override
+        public Builder volumeBounds(final double startPosition, final double endPosition, final int numSlices) {
+            startPosition_ = startPosition;
+            endPosition_ = endPosition;
+            slicesPerView_ = numSlices;
+            centerPosition_ = (startPosition + endPosition) / 2.0;
+            sliceStepSize_ = (Math.abs(startPosition) + Math.abs(endPosition)) / numSlices;
+            return this;
+        }
+
+        /**
+         * Sets the volume bounds, automatically computing startPosition and endPosition.
+         *
+         * @param centerPosition the center position
+         * @param numSlices the number of slices
+         * @param stepSizeUm the step size in microns
+         */
+        @Override
+        public Builder volumeBounds(final double centerPosition, final int numSlices, final double stepSizeUm) {
+            final double halfDistance = (stepSizeUm * numSlices) / 2.0;
+            centerPosition_ = centerPosition;
+            sliceStepSize_ = stepSizeUm;
+            slicesPerView_ = numSlices;
+            startPosition_ = centerPosition - halfDistance;
+            endPosition_ = centerPosition + halfDistance;
+            return this;
+        }
+
+        /**
+         * Creates an immutable instance of VolumeSettings
+         *
+         * @return Immutable version of VolumeSettings
+         */
+        @Override
+        public DefaultVolumeSettings build() {
+            return new DefaultVolumeSettings(this);
+        }
     }
 
 }

@@ -12,6 +12,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 
     public static class Builder implements AutofocusSettings.Builder {
 
+        private boolean enabled_ = false;
         private int numImages_ = 10;
         private double stepSizeUm_ = 1.0;
         //private double toleranceUm_ = 1.0;
@@ -30,6 +31,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
         }
 
         private Builder(final DefaultAutofocusSettings settings) {
+            enabled_ = settings.enabled_;
             numImages_ = settings.numImages_;
             stepSizeUm_ = settings.stepSizeUm_;
             //toleranceUm_ = autofocusSettings.toleranceUm_;
@@ -45,13 +47,19 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 //            autoUpdateMaxOffset_ = autofocusSettings.autoUpdateMaxOffset_;
         }
 
+        @Override
+        public Builder enabled(final boolean state) {
+            enabled_ = state;
+            return this;
+        }
+
         /**
          * Sets the number of images to capture in the autofocus routine.
          *
          * @param numImages the number of images
          */
         @Override
-        public AutofocusSettings.Builder numImages(int numImages) {
+        public Builder numImages(final int numImages) {
             numImages_ = numImages;
             return this;
         }
@@ -62,7 +70,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          * @param stepSize the step size in microns
          */
         @Override
-        public AutofocusSettings.Builder stepSizeUm(final double stepSize) {
+        public Builder stepSizeUm(final double stepSize) {
             stepSizeUm_ = stepSize;
             return this;
         }
@@ -73,7 +81,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 //         * @param value the tolerance in microns
 //         */
 //        @Override
-//        public AutofocusSettings.Builder toleranceUm(final double value) {
+//        public Builder toleranceUm(final double value) {
 //            toleranceUm_ = value;
 //            return this;
 //        }
@@ -84,7 +92,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          * @param state {@code true} to show images
          */
         @Override
-        public AutofocusSettings.Builder showImages(boolean state) {
+        public Builder showImages(boolean state) {
             showImages_ = state;
             return this;
         }
@@ -95,7 +103,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          * @param state {@code true} to show the graph
          */
         @Override
-        public AutofocusSettings.Builder showGraph(boolean state) {
+        public Builder showGraph(boolean state) {
             showGraph_ = state;
             return this;
         }
@@ -106,7 +114,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          * @param mode the autofocus mode
          */
         @Override
-        public AutofocusSettings.Builder mode(final AutofocusMode mode) {
+        public Builder mode(final AutofocusMode mode) {
             mode_ = mode;
             return this;
         }
@@ -117,7 +125,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          * @param type the scoring algorithm
          */
         @Override
-        public AutofocusSettings.Builder scoringMethod(final AutofocusType type) {
+        public Builder scoringMethod(final AutofocusType type) {
             scoringMethod_ = type;
             return this;
         }
@@ -128,7 +136,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          * @param channel the channel to run autofocus on
          */
         @Override
-        public AutofocusSettings.Builder channel(final String channel) {
+        public Builder channel(final String channel) {
             channel_ = channel;
             return this;
         }
@@ -139,7 +147,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 //         * @param state true to enable autofocus every stage pass
 //         */
 //        @Override
-//        public AutofocusSettings.Builder useEveryStagePass(final boolean state) {
+//        public Builder useEveryStagePass(final boolean state) {
 //            useEveryStagePass_ = state;
 //            return this;
 //        }
@@ -150,25 +158,25 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 //         * @param state true or false
 //         */
 //        @Override
-//        public AutofocusSettings.Builder useBeforeAcquisition(final boolean state) {
+//        public Builder useBeforeAcquisition(final boolean state) {
 //            useBeforeAcquisition_ = state;
 //            return this;
 //        }
 
 //        @Override
-//        public AutofocusSettings.Builder maxOffset(final double maxOffset) {
+//        public Builder maxOffset(final double maxOffset) {
 //            maxOffset_ = maxOffset;
 //            return this;
 //        }
 //
 //        @Override
-//        public AutofocusSettings.Builder autoUpdateOffset(final boolean state) {
+//        public Builder autoUpdateOffset(final boolean state) {
 //            autoUpdateOffset_ = state;
 //            return this;
 //        }
 //
 //        @Override
-//        public AutofocusSettings.Builder autoUpdateMaxOffset(final double um) {
+//        public Builder autoUpdateMaxOffset(final double um) {
 //            autoUpdateMaxOffset_ = um;
 //            return this;
 //        }
@@ -185,6 +193,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
     }
 
 
+    private final boolean enabled_;
     private final int numImages_;
     private final double stepSizeUm_;
 //    private final double toleranceUm_;
@@ -200,6 +209,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 //    private final double autoUpdateMaxOffset_;
 
     private DefaultAutofocusSettings(Builder builder) {
+        enabled_ =  builder.enabled_;
         numImages_ = builder.numImages_;
         stepSizeUm_ = builder.stepSizeUm_;
        // toleranceUm_ = builder.toleranceUm_;
@@ -217,6 +227,11 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 
     public Builder copyBuilder() {
         return new Builder(this);
+    }
+
+    @Override
+    public boolean enabled() {
+        return enabled_;
     }
 
     /**

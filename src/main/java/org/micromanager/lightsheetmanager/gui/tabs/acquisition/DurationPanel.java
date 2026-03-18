@@ -16,7 +16,7 @@ public class DurationPanel extends Panel {
     public DurationPanel(final LightSheetManager model) {
         super("Durations");
         Objects.requireNonNull(model)
-              .acquisitions().setVolumeDurationPanel(this);
+              .acquisitions().setDurationPanel(this);
         createUserInterface();
     }
 
