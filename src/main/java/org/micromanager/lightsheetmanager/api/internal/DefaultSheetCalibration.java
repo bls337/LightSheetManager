@@ -9,7 +9,7 @@ public class DefaultSheetCalibration implements SheetCalibration {
     private final double imagingCenter_;
     private final double sheetWidth_;
     private final double sheetOffset_;
-    private final boolean useAutoSheetWidth_;
+    private final boolean autoSheetWidthEnabled_;
     private final double autoSheetWidthPerPixel_;
     private final double scanSpeed_;
     private final double scanOffset_;
@@ -18,7 +18,7 @@ public class DefaultSheetCalibration implements SheetCalibration {
         imagingCenter_ = builder.imagingCenter_;
         sheetWidth_ = builder.sheetWidth_;
         sheetOffset_ = builder.sheetOffset_;
-        useAutoSheetWidth_ = builder.useAutoSheetWidth_;
+        autoSheetWidthEnabled_ = builder.autoSheetWidthEnabled_;
         autoSheetWidthPerPixel_ = builder.autoSheetWidthPerPixel_;
         scanSpeed_ = builder.scanSpeed_;
         scanOffset_ = builder.scanOffset_;
@@ -56,8 +56,8 @@ public class DefaultSheetCalibration implements SheetCalibration {
     }
 
     @Override
-    public boolean isUsingAutoSheetWidth() {
-        return useAutoSheetWidth_;
+    public boolean autoSheetWidthEnabled() {
+        return autoSheetWidthEnabled_;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class DefaultSheetCalibration implements SheetCalibration {
         return Double.compare(imagingCenter_, other.imagingCenter_) == 0 &&
                 Double.compare(sheetWidth_, other.sheetWidth_) == 0 &&
                 Double.compare(sheetOffset_, other.sheetOffset_) == 0 &&
-                useAutoSheetWidth_ == other.useAutoSheetWidth_ &&
+                autoSheetWidthEnabled_ == other.autoSheetWidthEnabled_ &&
                 Double.compare(autoSheetWidthPerPixel_, other.autoSheetWidthPerPixel_) == 0 &&
                 Double.compare(scanSpeed_, other.scanSpeed_) == 0 &&
                 Double.compare(scanOffset_, other.scanOffset_) == 0;
@@ -98,16 +98,16 @@ public class DefaultSheetCalibration implements SheetCalibration {
     @Override
     public int hashCode() {
         return Objects.hash(imagingCenter_, sheetWidth_, sheetOffset_,
-                useAutoSheetWidth_, autoSheetWidthPerPixel_, scanSpeed_, scanOffset_);
+                autoSheetWidthEnabled_, autoSheetWidthPerPixel_, scanSpeed_, scanOffset_);
     }
 
     @Override
     public String toString() {
         return String.format("%s[imagingCenter=%s, sheetWidth=%s, sheetOffset=%s, " +
-                        "useAutoSheetWidth=%s, autoSheetWidthPerPixel=%s, scanSpeed=%s, scanOffset=%s]",
+                        "autoSheetWidthEnabled=%s, autoSheetWidthPerPixel=%s, scanSpeed=%s, scanOffset=%s]",
                 getClass().getSimpleName(),
                 imagingCenter_, sheetWidth_, sheetOffset_,
-                useAutoSheetWidth_, autoSheetWidthPerPixel_, scanSpeed_, scanOffset_);
+                autoSheetWidthEnabled_, autoSheetWidthPerPixel_, scanSpeed_, scanOffset_);
     }
 
     public static class Builder implements SheetCalibration.Builder {
@@ -115,7 +115,7 @@ public class DefaultSheetCalibration implements SheetCalibration {
         private double imagingCenter_ = 0.0;
         private double sheetWidth_ = 0.0;
         private double sheetOffset_ = 0.0;
-        private boolean useAutoSheetWidth_ = false;
+        private boolean autoSheetWidthEnabled_ = false;
         private double autoSheetWidthPerPixel_ = 0.0;
         private double scanSpeed_ = 0.0;
         private double scanOffset_ = 0.0;
@@ -127,7 +127,7 @@ public class DefaultSheetCalibration implements SheetCalibration {
             imagingCenter_ = settings.imagingCenter();
             sheetWidth_ = settings.sheetWidth();
             sheetOffset_ = settings.sheetOffset();
-            useAutoSheetWidth_ = settings.isUsingAutoSheetWidth();
+            autoSheetWidthEnabled_ = settings.autoSheetWidthEnabled();
             autoSheetWidthPerPixel_ = settings.autoSheetWidthPerPixel();
             scanSpeed_ = settings.scanSpeed();
             scanOffset_ = settings.scanOffset();
@@ -154,8 +154,8 @@ public class DefaultSheetCalibration implements SheetCalibration {
         }
 
         @Override
-        public Builder useAutoSheetWidth(boolean state) {
-            useAutoSheetWidth_ = state;
+        public Builder autoSheetWidthEnabled(boolean state) {
+            autoSheetWidthEnabled_ = state;
             return this;
         }
 

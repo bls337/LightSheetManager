@@ -97,7 +97,7 @@ public class SlicePanel extends Panel {
             lblSlicePeriod_.setEnabled(!selected);
             spnSlicePeriod_.setEnabled(!selected);
             model_.acquisitions().settingsBuilder()
-                    .sliceBuilder().minimizePeriod(selected);
+                    .sliceBuilder().periodMinimized(selected);
             // update slice timing
             model_.acquisitions().updateAcquisitionSettings();
             model_.acquisitions().recalculateSliceTiming();

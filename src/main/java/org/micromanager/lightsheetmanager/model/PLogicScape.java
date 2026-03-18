@@ -485,14 +485,14 @@ public class PLogicScape {
         // FIXME: more light sheet setup
         //final double slope1 = settings.sliceCalibration(1).sliceSlope();
         //final double slope2 = settings.sliceCalibration(2).sliceSlope();
-        double sliceRate = settings.sliceCalibration().sliceSlope();//(view == 1) ? slope1 : slope2;
+        double sliceRate = settings.sliceCalibration().slope();//(view == 1) ? slope1 : slope2;
         if (NumberUtils.doublesEqual(sliceRate, 0.0)) {
             studio_.logs().showError("Calibration slope for view " + view + " cannot be zero. Re-do calibration on Setup tab.");
             return false;
         }
         //final double offset1 = settings.sliceCalibration(1).sliceOffset() + channelOffset;
         //final double offset2 = settings.sliceCalibration(2).sliceOffset() + channelOffset;
-        double sliceOffset = settings.sliceCalibration().sliceOffset() + channelOffset; //(view == 1) ? offset1 : offset2;
+        double sliceOffset = settings.sliceCalibration().offset() + channelOffset; //(view == 1) ? offset1 : offset2;
         double sliceAmplitude = piezoAmplitude / sliceRate;
         double sliceCenter = (piezoCenter - sliceOffset) / sliceRate;
 
@@ -937,7 +937,7 @@ public class PLogicScape {
 //            final float slopePolarity = (side == Devices.Sides.B) ? -1 : 1;
 //            sheetWidth = roi.height * sheetSlope * slopePolarity / 1e6;  // in microdegrees per pixel, convert to degrees
         } else {
-            final boolean autoSheet = model_.getAcquisitionEngine().settings().sheetCalibration().isUsingAutoSheetWidth();
+            final boolean autoSheet = model_.getAcquisitionEngine().settings().sheetCalibration().autoSheetWidthEnabled();
             if (autoSheet) {
                 Rectangle roi = camera.getROI();
                 if (roi == null || roi.height == 0) {

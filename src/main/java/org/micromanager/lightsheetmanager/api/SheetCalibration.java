@@ -1,11 +1,22 @@
 package org.micromanager.lightsheetmanager.api;
 
-import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
-
 /**
  * Light Sheet Synchronization on "Setup Path #" tabs.
  */
 public interface SheetCalibration {
+
+    Builder copyBuilder();
+
+    // normal camera trigger modes
+    double imagingCenter();
+    double sheetWidth();
+    double sheetOffset();
+    boolean autoSheetWidthEnabled();
+    double autoSheetWidthPerPixel();
+
+    // virtual slit camera trigger mode
+    double scanSpeed();
+    double scanOffset();
 
     interface Builder {
 
@@ -30,7 +41,7 @@ public interface SheetCalibration {
          *
          * @param state true to automatically set sheet width
          */
-        Builder useAutoSheetWidth(final boolean state);
+        Builder autoSheetWidthEnabled(final boolean state);
 
         /**
          * Sets the width per pixel when isUsingAutoSheetWidth is true.
@@ -61,18 +72,5 @@ public interface SheetCalibration {
         SheetCalibration build();
 
     }
-
-    Builder copyBuilder();
-
-    // normal camera trigger modes
-    double imagingCenter();
-    double sheetWidth();
-    double sheetOffset();
-    boolean isUsingAutoSheetWidth();
-    double autoSheetWidthPerPixel();
-
-    // virtual slit camera trigger mode
-    double scanSpeed();
-    double scanOffset();
 
 }
