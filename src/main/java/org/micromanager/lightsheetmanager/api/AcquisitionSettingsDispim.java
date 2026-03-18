@@ -27,7 +27,7 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultChannelSettings instance.
      */
-    DefaultChannelSettings channels();
+    ChannelSettings channels();
 
     /**
      * Returns the immutable DefaultTimingSettings instance.
@@ -101,13 +101,6 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
     boolean isUsingTimePoints();
 
     /**
-     * Returns true if using autofocus.
-     *
-     * @return true if using autofocus.
-     */
-    boolean isUsingAutofocus();
-
-    /**
      * Returns true if using multiple positions.
      *
      * @return true if using multiple positions.
@@ -120,13 +113,6 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      * @return true if using hardware time points.
      */
     boolean isUsingHardwareTimePoints();
-
-    /**
-     * Returns true if using stage scanning.
-     *
-     * @return true if using stage scanning.
-     */
-    boolean isUsingStageScanning();
 
     /**
      * Returns true if using advanced timing settings.
@@ -185,14 +171,6 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
         T useTimePoints(final boolean state);
 
         /**
-         * Sets the acquisition to use autofocus.
-         *
-         * @param state true to use autofocus
-         * @return {@code this} builder
-         */
-        T useAutofocus(final boolean state);
-
-        /**
          * Sets the acquisition to use multiple positions.
          *
          * @param state true to use multiple positions
@@ -207,14 +185,6 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
          * @return {@code this} builder
          */
         T useHardwareTimePoints(final boolean state);
-
-        /**
-         * Sets the acquisition to use stage scanning.
-         *
-         * @param state true to use stage scanning
-         * @return {@code this} builder
-         */
-        T useStageScanning(final boolean state);
 
         /**
          * Sets the acquisition to use advanced timing settings.
