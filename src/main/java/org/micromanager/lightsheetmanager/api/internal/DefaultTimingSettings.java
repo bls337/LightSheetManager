@@ -34,7 +34,7 @@ public class DefaultTimingSettings implements TimingSettings {
         return new Builder();
     }
 
-    public static Builder builder(DefaultTimingSettings settings) {
+    public static Builder builder(TimingSettings settings) {
         Objects.requireNonNull(settings, "Cannot copy from null settings");
         return new Builder(settings);
     }
@@ -332,10 +332,10 @@ public class DefaultTimingSettings implements TimingSettings {
 
         @Override
         public String toString() {
-            return String.format("%s[scansPerSlice_=%s, delayBeforeScan_=%s, scanDuration_=%s, "
-                            + "delayBeforeLaser_=%s, laserTriggerDuration_=%s, delayBeforeCamera_=%s, "
-                            + "cameraTriggerDuration_=%s, cameraExposure_=%s, "
-                            + "sliceDuration=%s, alternateScanDirection_=%s]",
+            return String.format("%s[scansPerSlice=%s, delayBeforeScan=%s, scanDuration=%s, "
+                            + "delayBeforeLaser=%s, laserTriggerDuration=%s, delayBeforeCamera=%s, "
+                            + "cameraTriggerDuration=%s, cameraExposure=%s, "
+                            + "sliceDuration=%s, alternateScanDirection=%s]",
                     getClass().getSimpleName(),
                     scansPerSlice_, delayBeforeScan_, scanDuration_, delayBeforeLaser_, laserTriggerDuration_,
                     delayBeforeCamera_, cameraTriggerDuration_, cameraExposure_,
