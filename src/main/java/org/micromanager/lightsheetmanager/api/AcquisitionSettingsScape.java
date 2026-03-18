@@ -3,7 +3,6 @@ package org.micromanager.lightsheetmanager.api;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
 import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
@@ -100,13 +99,6 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
     boolean isUsingTimePoints();
 
     /**
-     * Returns true if using autofocus.
-     *
-     * @return true if using autofocus.
-     */
-    boolean isUsingAutofocus();
-
-    /**
      * Returns true if using multiple positions.
      *
      * @return true if using multiple positions.
@@ -188,14 +180,6 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
          * @return {@code this} builder
          */
         T useTimePoints(final boolean state);
-
-        /**
-         * Sets the acquisition to use autofocus.
-         *
-         * @param state true to use autofocus
-         * @return {@code this} builder
-         */
-        T useAutofocus(final boolean state);
 
         /**
          * Sets the acquisition to use multiple positions.

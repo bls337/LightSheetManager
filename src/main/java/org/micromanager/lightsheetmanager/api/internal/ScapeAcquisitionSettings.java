@@ -55,7 +55,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             cameraMode_ = settings.cameraMode();
             imagingCameraOrder_ = settings.imagingCameraOrder();
             useTimePoints_ = settings.isUsingTimePoints();
-            useAutofocus_ = settings.isUsingAutofocus();
             useMultiplePositions_ = settings.isUsingMultiplePositions();
             useHardwareTimePoints_ = settings.isUsingHardwareTimePoints();
             useStageScanning_ = settings.isUsingStageScanning();
@@ -112,17 +111,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         @Override
         public Builder useTimePoints(final boolean state) {
             useTimePoints_ = state;
-            return this;
-        }
-
-        /**
-         * Sets the acquisition to use autofocus.
-         *
-         * @param state true to use autofocus.
-         */
-        @Override
-        public Builder useAutofocus(final boolean state) {
-            useAutofocus_ = state;
             return this;
         }
 
@@ -261,7 +249,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     private final CameraData[] imagingCameraOrder_;
 
     private final boolean useTimePoints_;
-    private final boolean useAutofocus_;
     private final boolean useMultiplePositions_;
     private final boolean useHardwareTimePoints_;
     private final boolean useStageScanning_;
@@ -284,7 +271,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         cameraMode_ = builder.cameraMode_;
         imagingCameraOrder_ = builder.imagingCameraOrder_;
         useTimePoints_ = builder.useTimePoints_;
-        useAutofocus_ = builder.useAutofocus_;
         useStageScanning_ = builder.useStageScanning_;
         useMultiplePositions_ = builder.useMultiplePositions_;
         useHardwareTimePoints_ = builder.useHardwareTimePoints_;
@@ -414,16 +400,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     @Override
     public boolean isUsingTimePoints() {
         return useTimePoints_;
-    }
-
-    /**
-     * Returns true if using autofocus.
-     *
-     * @return true if using autofocus.
-     */
-    @Override
-    public boolean isUsingAutofocus() {
-        return useAutofocus_;
     }
 
     /**

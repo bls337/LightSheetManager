@@ -45,7 +45,7 @@ public class AutofocusRunner {
             return; // early exit
         }
 
-        final String scoringAlgorithmName = acqSettings.autofocusSettings()
+        final String scoringAlgorithmName = acqSettings.autofocus()
                 .scoringMethod().toString();
 
         // set scoring algorithm
@@ -62,14 +62,14 @@ public class AutofocusRunner {
         // TODO: get fit function?
         //final AutofocusFitter.FunctionType function = AutofocusFitter.getFunctionTypeAsType();
 
-        final AutofocusMode afMode = acqSettings.autofocusSettings().mode();
+        final AutofocusMode afMode = acqSettings.autofocus().mode();
         final boolean isPiezoScan = afMode == AutofocusMode.FIXED_SLICE_SWEEP_PIEZO;
 
         studio_.logs().logDebugMessage("Autofocus getting ready using \""
                 + scoringAlgorithmName + "\" algorithm, mode \"" + afMode + "\"");
 
-        final int numImages = acqSettings.autofocusSettings().numImages();
-        final double stepSize = acqSettings.autofocusSettings().stepSizeUm();
+        final int numImages = acqSettings.autofocus().numImages();
+        final double stepSize = acqSettings.autofocus().stepSizeUm();
         //final double minimumRSquared = acqSettings.autofocusSettings().toleranceUm();
 
         // TODO: view 1?

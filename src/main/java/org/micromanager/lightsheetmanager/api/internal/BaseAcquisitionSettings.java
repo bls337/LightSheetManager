@@ -197,7 +197,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      * @return the autofocus settings
      */
     @Override
-    public DefaultAutofocusSettings autofocusSettings() {
+    public DefaultAutofocusSettings autofocus() {
         return autofocus_;
     }
 

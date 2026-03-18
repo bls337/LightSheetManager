@@ -115,5 +115,5 @@ public interface AcquisitionSettings {
      *
      * @return the autofocus settings
      */
-    DefaultAutofocusSettings autofocusSettings();
+    DefaultAutofocusSettings autofocus();
 }

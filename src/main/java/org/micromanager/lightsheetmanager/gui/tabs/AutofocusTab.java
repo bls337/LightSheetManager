@@ -78,21 +78,21 @@ public class AutofocusTab extends Panel implements ListeningPanel {
        // final Label lblToleranceUm = new Label("Tolerance [µm]");
 
         cbxShowImages_ = new CheckBox("Show Images", 12,
-                acqSettings.autofocusSettings().showImages(), CheckBox.RIGHT);
+                acqSettings.autofocus().showImages(), CheckBox.RIGHT);
         cbxShowGraph_ = new CheckBox("Show Graph", 12,
-                acqSettings.autofocusSettings().showGraph(), CheckBox.RIGHT);
+                acqSettings.autofocus().showGraph(), CheckBox.RIGHT);
 
         spnNumImages_ = Spinner.createIntegerSpinner(
-                acqSettings.autofocusSettings().numImages(), 0, Integer.MAX_VALUE, 1);
+                acqSettings.autofocus().numImages(), 0, Integer.MAX_VALUE, 1);
         spnStepSize_ = Spinner.createDoubleSpinner(
-                acqSettings.autofocusSettings().stepSizeUm(), 0.0, 100.0, 1.0);
+                acqSettings.autofocus().stepSizeUm(), 0.0, 100.0, 1.0);
 //        spnToleranceUm_ = Spinner.createDoubleSpinner(
 //                acqSettings.autofocusSettings().toleranceUm(), 0.0, 1.0, 0.01);
 
         cmbScoringMethod_ = new ComboBox<>(AutofocusType.values(),
-                acqSettings.autofocusSettings().scoringMethod(), 120, 20);
+                acqSettings.autofocus().scoringMethod(), 120, 20);
         cmbAutofocusMode_ = new ComboBox<>(AutofocusMode.values(),
-                acqSettings.autofocusSettings().mode(), 140, 20);
+                acqSettings.autofocus().mode(), 140, 20);
 
         btnRunAutofocus_ = new Button("Run Autofocus", 120, 30);
         btnRunAutofocus_.setEnabled(false); // FIXME: impl autofocus
