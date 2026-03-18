@@ -58,7 +58,7 @@ public class DefaultSliceCalibration implements SliceCalibration {
 
     @Override
     public String toString() {
-        return String.format("%s[sliceSlope=%s, sliceOffset=%s]",
+        return String.format("%s[slope=%s, offset=%s]",
                 getClass().getSimpleName(), slope_, offset_);
     }
 

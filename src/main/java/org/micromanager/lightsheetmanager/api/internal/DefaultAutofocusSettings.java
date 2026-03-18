@@ -15,17 +15,11 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
         private boolean enabled_ = false;
         private int numImages_ = 10;
         private double stepSizeUm_ = 1.0;
-        //private double toleranceUm_ = 1.0;
         private boolean showImages_ = false;
         private boolean showGraph_ = false;
         private AutofocusMode mode_ = AutofocusMode.FIXED_PIEZO_SWEEP_SLICE;
         private AutofocusType scoringMethod_ = AutofocusType.VOLATH5;
         private String channel_ = "";
-//        private boolean useEveryStagePass_ = false;
-//        private boolean useBeforeAcquisition_ = false;
-//        private double maxOffset_ = 1.0;
-//        private boolean autoUpdateOffset_ = true;
-//        private double autoUpdateMaxOffset_ = 5.0;
 
         private Builder() {
         }
@@ -34,17 +28,11 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
             enabled_ = settings.enabled_;
             numImages_ = settings.numImages_;
             stepSizeUm_ = settings.stepSizeUm_;
-            //toleranceUm_ = autofocusSettings.toleranceUm_;
             showImages_ = settings.showImages_;
             showGraph_ = settings.showGraph_;
             mode_ = settings.mode_;
             scoringMethod_ = settings.scoringMethod_;
             channel_ = settings.channel_;
-            //useEveryStagePass_ = autofocusSettings.useEveryStagePass_;
-            //useBeforeAcquisition_ = autofocusSettings.useBeforeAcquisition_;
-//            maxOffset_ = autoUpdateMaxOffset_;
-//            autoUpdateOffset_ = autofocusSettings.autoUpdateOffset_;
-//            autoUpdateMaxOffset_ = autofocusSettings.autoUpdateMaxOffset_;
         }
 
         @Override
@@ -74,17 +62,6 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
             stepSizeUm_ = stepSize;
             return this;
         }
-
-//        /**
-//         * Sets the tolerance in microns for the autofocus algorithm.
-//         *
-//         * @param value the tolerance in microns
-//         */
-//        @Override
-//        public Builder toleranceUm(final double value) {
-//            toleranceUm_ = value;
-//            return this;
-//        }
 
         /**
          * Set to {@code true} to show the images in the live view window.
@@ -141,46 +118,6 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
             return this;
         }
 
-//        /**
-//         * Run autofocus every time we move to the next channel during an acquisition.
-//         *
-//         * @param state true to enable autofocus every stage pass
-//         */
-//        @Override
-//        public Builder useEveryStagePass(final boolean state) {
-//            useEveryStagePass_ = state;
-//            return this;
-//        }
-//
-//        /**
-//         * Run an autofocus routine before starting the acquisition.
-//         *
-//         * @param state true or false
-//         */
-//        @Override
-//        public Builder useBeforeAcquisition(final boolean state) {
-//            useBeforeAcquisition_ = state;
-//            return this;
-//        }
-
-//        @Override
-//        public Builder maxOffset(final double maxOffset) {
-//            maxOffset_ = maxOffset;
-//            return this;
-//        }
-//
-//        @Override
-//        public Builder autoUpdateOffset(final boolean state) {
-//            autoUpdateOffset_ = state;
-//            return this;
-//        }
-//
-//        @Override
-//        public Builder autoUpdateMaxOffset(final double um) {
-//            autoUpdateMaxOffset_ = um;
-//            return this;
-//        }
-
         /**
          * Creates an immutable instance of AutofocusSettings
          *
@@ -192,37 +129,24 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
         }
     }
 
-
     private final boolean enabled_;
     private final int numImages_;
     private final double stepSizeUm_;
-//    private final double toleranceUm_;
     private final boolean showImages_;
     private final boolean showGraph_;
     private final AutofocusMode mode_;
     private final AutofocusType scoringMethod_;
     private final String channel_;
-//    private final boolean useEveryStagePass_;
-//    private final boolean useBeforeAcquisition_;
-//    private final double maxOffset_;
-//    private final boolean autoUpdateOffset_;
-//    private final double autoUpdateMaxOffset_;
 
     private DefaultAutofocusSettings(Builder builder) {
         enabled_ =  builder.enabled_;
         numImages_ = builder.numImages_;
         stepSizeUm_ = builder.stepSizeUm_;
-       // toleranceUm_ = builder.toleranceUm_;
         showImages_ = builder.showImages_;
         showGraph_ = builder.showGraph_;
         mode_ = builder.mode_;
         scoringMethod_ = builder.scoringMethod_;
         channel_ = builder.channel_;
-//        useEveryStagePass_ = builder.useEveryStagePass_;
-//        useBeforeAcquisition_ = builder.useBeforeAcquisition_;
-//        maxOffset_ = builder.maxOffset_;
-//        autoUpdateOffset_ = builder.autoUpdateOffset_;
-//        autoUpdateMaxOffset_ = builder.autoUpdateMaxOffset_;
     }
 
     public Builder copyBuilder() {
@@ -264,16 +188,6 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
         return mode_;
     }
 
-//    /**
-//     * Returns the tolerance in microns used in the autofocus routine.
-//     *
-//     * @return the coefficient of determination
-//     */
-//    @Override
-//    public double toleranceUm() {
-//        return toleranceUm_;
-//    }
-
     /**
      * Returns {@code true} if showing images in the live view window.
      *
@@ -302,7 +216,6 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
         return scoringMethod_;
     }
 
-
     /**
      * Returns the channel autofocus is being run on.
      *
@@ -312,45 +225,5 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
     public String channel() {
         return channel_;
     }
-
-//    /**
-//     * Returns true if autofocus is run every stage pass.
-//     *
-//     * @return true if autofocus is run every stage pass
-//     */
-//    @Override
-//    public boolean useEveryStagePass() {
-//        return useEveryStagePass_;
-//    }
-//
-//    /**
-//     * Returns true if we run an autofocus routine before starting an acquisition.
-//     *
-//     * @return true if enabled
-//     */
-//    @Override
-//    public boolean useBeforeAcquisition() {
-//        return useBeforeAcquisition_;
-//    }
-
-//    /**
-//     * What is this?
-//     *
-//     * @return
-//     */
-//    @Override
-//    public double maxOffset() {
-//        return maxOffset_;
-//    }
-//
-//    @Override
-//    public boolean autoUpdateOffset() {
-//        return autoUpdateOffset_;
-//    }
-//
-//    @Override
-//    public double autoUpdateMaxOffset() {
-//        return autoUpdateMaxOffset_;
-//    }
 
 }
