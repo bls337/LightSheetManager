@@ -29,10 +29,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         private CameraData[] imagingCameraOrder_ = {};
 
         private boolean useTimePoints_ = false;
-        private boolean useAutofocus_ = false;
         private boolean useMultiplePositions_ = false;
         private boolean useHardwareTimePoints_ = false;
-        private boolean useStageScanning_ = false;
         private boolean useAdvancedTiming_ = false;
 
         private int numTimePoints_ = 1;
@@ -57,7 +55,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             useTimePoints_ = settings.isUsingTimePoints();
             useMultiplePositions_ = settings.isUsingMultiplePositions();
             useHardwareTimePoints_ = settings.isUsingHardwareTimePoints();
-            useStageScanning_ = settings.isUsingStageScanning();
             useAdvancedTiming_ =  settings.isUsingAdvancedTiming();
             numTimePoints_ = settings.numTimePoints();
             timePointInterval_ = settings.timePointInterval();
@@ -75,9 +72,10 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         @Override
         public Builder acquisitionMode(final AcquisitionMode mode) {
             acquisitionMode_ = mode;
-            useStageScanning_ = mode == AcquisitionMode.STAGE_SCAN
+            final boolean scanEnabled = (mode == AcquisitionMode.STAGE_SCAN
                     || mode == AcquisitionMode.STAGE_SCAN_INTERLEAVED
-                    || mode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL;
+                    || mode == AcquisitionMode.STAGE_SCAN_UNIDIRECTIONAL);
+            stageScanBuilder_.enabled(scanEnabled);
             return this;
         }
 
@@ -251,7 +249,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     private final boolean useTimePoints_;
     private final boolean useMultiplePositions_;
     private final boolean useHardwareTimePoints_;
-    private final boolean useStageScanning_;
     private final boolean useAdvancedTiming_;
 
     private final int numTimePoints_;
@@ -271,7 +268,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         cameraMode_ = builder.cameraMode_;
         imagingCameraOrder_ = builder.imagingCameraOrder_;
         useTimePoints_ = builder.useTimePoints_;
-        useStageScanning_ = builder.useStageScanning_;
         useMultiplePositions_ = builder.useMultiplePositions_;
         useHardwareTimePoints_ = builder.useHardwareTimePoints_;
         useAdvancedTiming_ = builder.useAdvancedTiming_;
@@ -420,16 +416,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     @Override
     public boolean isUsingHardwareTimePoints() {
         return useHardwareTimePoints_;
-    }
-
-    /**
-     * Returns true if using stage scanning.
-     *
-     * @return true if using stage scanning.
-     */
-    @Override
-    public boolean isUsingStageScanning() {
-        return useStageScanning_;
     }
 
     /**

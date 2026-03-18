@@ -458,7 +458,7 @@ public class DeviceManager {
     }
 
     // check for ASI stage scanning
-    public boolean isUsingStageScanning() {
+    public boolean hasStageScanning() {
         if (deviceMap_.get("SampleXY") == null) {
             return false; // early exit => device not set
         }

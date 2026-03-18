@@ -148,7 +148,7 @@ public class PLogicScape {
 //            }
 //        }
 
-        if (settings.isUsingStageScanning()
+        if (settings.stageScan().enabled()
                 && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             if (settings.volume().numViews() != 2) {
                 studio_.logs().showError("Interleaved stage scan only possible for 2-sided acquisition.");
@@ -171,7 +171,7 @@ public class PLogicScape {
             studio_.logs().showError("could not set shutter to " + plcLaser_.getDeviceName());
         }
 
-        if (!acqSettings_.isUsingStageScanning()) {
+        if (!acqSettings_.stageScan().enabled()) {
             scanDistance_ = 0;
         } else {
             // stage scanning with ASI stage
@@ -433,11 +433,11 @@ public class PLogicScape {
             scanner_.setSPIMNumRepeats(numVolumesPerTrigger);
 
             scanner_.setSPIMDelayBeforeSide(
-                    settings.isUsingStageScanning() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
+                    settings.stageScan().enabled() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
                             : settings.volume().delayBeforeView()); // this is the usual behavior
         }
         double piezoCenter;
-        if (settings.isUsingStageScanning()) {
+        if (settings.stageScan().enabled()) {
             // for stage scanning we define the piezo position to be the home position (normally 0)
             // this is basically required for interleaved mode (otherwise piezo would be moving every slice)
             //    and by convention we'll do it for all stage scanning
@@ -454,7 +454,7 @@ public class PLogicScape {
 
         // if we set piezoAmplitude to 0 here then sliceAmplitude will also be 0
         double piezoAmplitude;
-        if (settings.isUsingStageScanning() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
+        if (settings.stageScan().enabled() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
             piezoAmplitude = 0.0;
         } else {
             piezoAmplitude = (settings.volume().slicesPerView() - 1) * settings.volume().sliceStepSize();
@@ -551,14 +551,14 @@ public class PLogicScape {
             piezo_.sa().setAmplitude(piezoAmplitude);
             piezo_.sa().setOffset(piezoCenter);
 
-            if (!settings.isUsingStageScanning()) {
+            if (!settings.stageScan().enabled()) {
                 piezo_.setSPIMNumSlices(numSlicesHW);
                 piezo_.setSPIMState(ASIPiezo.SPIMState.ARMED);
             }
 
             // TODO figure out what we should do with piezo illumination/center position during stage scan
             // set up stage scan parameters if necessary
-            if (settings.isUsingStageScanning()) {
+            if (settings.stageScan().enabled()) {
                 // TODO update UI to hide image center control for stage scanning
                 // for interleaved stage scanning there will never be "home" pulse and for normal stage scanning
                 //   the first side piezo will never get moved into position either so do both manually (for
@@ -566,8 +566,8 @@ public class PLogicScape {
                 piezo_.home();
             }
 
-            final boolean isInterleaved = (settings.isUsingStageScanning()
-                    && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
+            final boolean isInterleaved = settings.stageScan().enabled()
+                    && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED;
 
             // even though we have moved piezos to home position let's still tell firmware
             //    not to move piezos anywhere (i.e. maybe setting "home disable" to true doesn't have any really effect)
@@ -1028,7 +1028,7 @@ public class PLogicScape {
 
     public void stopSPIMStateMachines() {
         scanner_.setSPIMState(ASIScanner.SPIMState.IDLE);
-        if (acqSettings_.isUsingStageScanning()) {
+        if (acqSettings_.stageScan().enabled()) {
             // give the stage scan 5 seconds to clean itself up, after which we stop it
             // once all images come in there is still a time when stage is moving back to its start/center position
             final int timeoutStageScanCleanupMs = 5000;

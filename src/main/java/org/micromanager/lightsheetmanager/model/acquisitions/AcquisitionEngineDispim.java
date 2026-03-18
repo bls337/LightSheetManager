@@ -617,7 +617,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         if (acqSettings_.isUsingTimePoints()
                 && acqSettings_.numTimePoints() > 1
                 && timepointIntervalMs < (timepointDuration + 750)
-                && !acqSettings_.isUsingStageScanning()) {
+                && !acqSettings_.stageScan().enabled()) {
             // acqSettings_.useHardwareTimesPoints(true);
             asb_.useHardwareTimePoints(true);
         }
@@ -929,7 +929,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         // stackDuration is per-side, per-channel, per-position
 
         final double stackDuration = numCameraTriggers * acqSettings.timing().sliceDuration();
-        if (acqSettings.isUsingStageScanning()) { // || acqSettings.isStageStepping) {
+        if (acqSettings.stageScan().enabled()) { // || acqSettings.isStageStepping) {
             // TODO: stage scanning code
             return 0;
         } else {

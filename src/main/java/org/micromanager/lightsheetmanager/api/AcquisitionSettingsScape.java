@@ -113,13 +113,6 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
     boolean isUsingHardwareTimePoints();
 
     /**
-     * Returns true if using stage scanning.
-     *
-     * @return true if using stage scanning.
-     */
-    boolean isUsingStageScanning();
-
-    /**
      * Returns true if using advanced timing settings.
      *
      * @return true if using advanced timing settings.

@@ -188,7 +188,7 @@ public class PLogicDispim {
             }
         }
 
-        if (settings.isUsingStageScanning()
+        if (settings.stageScan().enabled()
                 && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             if (numViews != 2) {
                 studio_.logs().showError("Interleaved stage scan only possible for 2-sided acquisition.");
@@ -211,7 +211,7 @@ public class PLogicDispim {
             studio_.logs().showError("could not set shutter to " + plcLaser_.getDeviceName());
         }
 
-        if (settings.isUsingStageScanning()) {
+        if (settings.stageScan().enabled()) {
             // scanning with ASI stage
             // algorithm is as follows:
             // use the # of slices and slice spacing that the user specifies
@@ -547,11 +547,11 @@ public class PLogicDispim {
                 scanner.setSPIMNumRepeats(numVolumesPerTrigger);
 
                 scanner.setSPIMDelayBeforeSide(
-                        settings.isUsingStageScanning() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
+                        settings.stageScan().enabled() ? 0  // minimal delay on micro-mirror card for stage scanning (can't actually be less than 2ms but this will get as small as possible)
                                 : settings.volume().delayBeforeView()); // this is the usual behavior
             }
             double piezoCenter;
-            if (settings.isUsingStageScanning()) {
+            if (settings.stageScan().enabled()) {
                 // for stage scanning we define the piezo position to be the home position (normally 0)
                 // this is basically required for interleaved mode (otherwise piezo would be moving every slice)
                 //    and by convention we'll do it for all stage scanning
@@ -568,7 +568,7 @@ public class PLogicDispim {
 
             // if we set piezoAmplitude to 0 here then sliceAmplitude will also be 0
             double piezoAmplitude;
-            if (settings.isUsingStageScanning() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
+            if (settings.stageScan().enabled() || settings.acquisitionMode() == AcquisitionMode.NO_SCAN) {
                 piezoAmplitude = 0.0;
             } else {
                 piezoAmplitude = (settings.volume().slicesPerView() - 1) * settings.volume().sliceStepSize();
@@ -663,14 +663,14 @@ public class PLogicDispim {
                 piezo.sa().setAmplitude(piezoAmplitude);
                 piezo.sa().setOffset(piezoCenter);
 
-                if (!settings.isUsingStageScanning()) {
+                if (!settings.stageScan().enabled()) {
                     piezo.setSPIMNumSlices(numSlicesHW);
                     piezo.setSPIMState(ASIPiezo.SPIMState.ARMED);
                 }
 
                 // TODO figure out what we should do with piezo illumination/center position during stage scan
                 // set up stage scan parameters if necessary
-                if (settings.isUsingStageScanning()) {
+                if (settings.stageScan().enabled()) {
                     // TODO update UI to hide image center control for stage scanning
                     // for interleaved stage scanning there will never be "home" pulse and for normal stage scanning
                     //   the first side piezo will never get moved into position either so do both manually (for
@@ -678,8 +678,8 @@ public class PLogicDispim {
                     piezo.home();
                 }
 
-                final boolean isInterleaved = (settings.isUsingStageScanning()
-                        && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
+                final boolean isInterleaved = settings.stageScan().enabled()
+                        && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED;
 
                 // even though we have moved piezos to home position let's still tell firmware
                 //    not to move piezos anywhere (i.e. maybe setting "home disable" to true doesn't have any really effect)

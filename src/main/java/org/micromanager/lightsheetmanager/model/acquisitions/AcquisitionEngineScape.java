@@ -145,7 +145,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         origAccelX_ = 1.0; // don't want 0 in case something goes wrong
 
         // make sure stage scan is supported if selected
-        if (acqSettings_.isUsingStageScanning()) {
+        if (acqSettings_.stageScan().enabled()) {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
             if (xyStage != null) {
                 if (!xyStage.hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES)) {
@@ -411,7 +411,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     // move between positions fast
                     scanSpeedX_ = 1.0;
                     scanAccelX_ = 1.0;
-                    if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
+                    if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
                         final ASIXYStage xyStage = model_.devices().device("SampleXY");
                         scanSpeedX_ = xyStage.getSpeedX();
                         scanAccelX_ = xyStage.getAccelerationX();
@@ -436,7 +436,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 //                System.out.println("After hardware hook");
 //                // for stage scanning: restore speed and set up scan at new position
 //                // non-multi-position situation is handled in prepareControllerForAcquisition instead
-////                if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
+////                if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
 ////                    final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
 ////                    final Point2D.Double pos = xyStage.getXYPosition();
 ////                    xyStage.setSpeedX(scanSpeedX_);
@@ -464,7 +464,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 // TODO: Cameras are now ready to receive triggers, so we can send (software) trigger
                 //  to the tiger to tell it to start outputting TTLs
                 if (isUsingPLC) {
-                    if (acqSettings_.isUsingStageScanning() && acqSettings_.isUsingMultiplePositions()) {
+                    if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
                         final ASIXYStage xyStage = model_.devices().device("SampleXY");
                         final Point2D.Double pos = xyStage.getXYPosition();
                         xyStage.setSpeedX(scanSpeedX_);
@@ -721,7 +721,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         // if we did stage scanning restore the original position and speed
-        if (acqSettings_.isUsingStageScanning()) {
+        if (acqSettings_.stageScan().enabled()) {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
             final boolean returnToOriginalPosition =
                     acqSettings_.stageScan().returnToStart();
@@ -906,7 +906,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         if (acqSettings_.isUsingTimePoints()
                 && acqSettings_.numTimePoints() > 1
                 && timepointIntervalMs < (timepointDuration + 750)
-                && !acqSettings_.isUsingStageScanning()) {
+                && !acqSettings_.stageScan().enabled()) {
             asb_.useHardwareTimePoints(true);
             isUsingHardwareTimePoints = true;
         }
@@ -969,7 +969,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         "with software channels (need to use PLogic channel switching).");
                 return false;
             }
-            if (acqSettings_.isUsingStageScanning()) {
+            if (acqSettings_.stageScan().enabled()) {
                 // stage scanning needs to be triggered for each time point
                 studio_.logs().showError("Cannot use hardware time points (small time point interval) "
                         + "with stage scanning.");
@@ -1011,7 +1011,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      */
     public DefaultTimingSettings.Builder getTimingFromExposure() {
         // temporary measure: use diSPIM-like settings unless we are doing stage scanning
-        if (!acqSettings_.isUsingStageScanning()) {
+        if (!acqSettings_.stageScan().enabled()) {
            return getTimingFromPeriodAndLightExposure();
         }
 
@@ -1422,7 +1422,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // stackDuration is per-view, per-channel, per-position
         final double stackDuration = numCameraTriggers * acqSettings_.timing().sliceDuration();
 
-        if (acqSettings_.isUsingStageScanning()) {
+        if (acqSettings_.stageScan().enabled()) {
             final double rampDuration = 1; //getStageRampDuration(acqSettings);
             final double retraceTime = 1; //getStageRetraceDuration(acqSettings);
             // TODO(Jon): double-check these calculations below, at least they are better than before ;-)
