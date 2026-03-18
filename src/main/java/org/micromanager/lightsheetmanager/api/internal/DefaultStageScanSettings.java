@@ -86,17 +86,6 @@ public class DefaultStageScanSettings implements StageScanSettings {
     }
 
     @Override
-    public String toString() {
-        return String.format(
-                "%s[enabled=%s, accelerationFactor=%s, overshootDistance=%s, retraceSpeed=%s, firstViewAngle=%s, " +
-                        "returnToStart=%s, fromCurrentPosition=%s, fromNegativeDirection=%s]",
-                getClass().getSimpleName(),
-                enabled_, accelerationFactor_, overshootDistance_, retraceSpeed_, firstViewAngle_,
-                returnToStart_, fromCurrentPosition_, fromNegativeDirection_
-        );
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -126,6 +115,17 @@ public class DefaultStageScanSettings implements StageScanSettings {
                 returnToStart_,
                 fromCurrentPosition_,
                 fromNegativeDirection_
+        );
+    }
+
+    @Override
+    public String toString() {
+        return String.format(
+                "%s[enabled=%s, accelerationFactor=%s, overshootDistance=%s, retraceSpeed=%s, firstViewAngle=%s, " +
+                        "returnToStart=%s, fromCurrentPosition=%s, fromNegativeDirection=%s]",
+                getClass().getSimpleName(),
+                enabled_, accelerationFactor_, overshootDistance_, retraceSpeed_, firstViewAngle_,
+                returnToStart_, fromCurrentPosition_, fromNegativeDirection_
         );
     }
 
