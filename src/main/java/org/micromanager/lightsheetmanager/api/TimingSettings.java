@@ -2,84 +2,6 @@ package org.micromanager.lightsheetmanager.api;
 
 public interface TimingSettings {
 
-    interface Builder {
-
-        /**
-         * Sets the delay time before scanning.
-         *
-         * @param delayMs the delay time in milliseconds
-         */
-        Builder delayBeforeScan(final double delayMs);
-
-        /**
-         * Sets the number of one way beam scans per slice
-         *
-         * @param numLineScans the number of scans
-         */
-        Builder scansPerSlice(final int numLineScans);
-
-        /**
-         * Sets the duration of a one way scan.
-         *
-         * @param durationMs the duration in milliseconds
-         */
-        Builder scanDuration(final double durationMs);
-
-        /**
-         * Sets the delay time before the laser trigger.
-         *
-         * @param delayMs the delay in milliseconds
-         */
-        Builder delayBeforeLaser(final double delayMs);
-
-        /**
-         * Sets the duration of the laser trigger.
-         *
-         * @param durationMs the duration in milliseconds
-         */
-        Builder laserTriggerDuration(final double durationMs);
-
-        /**
-         * Sets the delay before the camera trigger is fired.
-         *
-         * @param delayMs the delay in milliseconds
-         */
-        Builder delayBeforeCamera(final double delayMs);
-
-        /**
-         * Sets the duration of the camera trigger.
-         *
-         * @param durationMs the duration in milliseconds
-         */
-        Builder cameraTriggerDuration(final double durationMs);
-
-        /**
-         * Sets the camera exposure time.
-         *
-         * @param exposureMs the exposure time in milliseconds
-         */
-        Builder cameraExposure(final double exposureMs);
-
-        /**
-         * Sets the scan direction.
-         *
-         * @param state true to invert the scan direction
-         */
-        Builder useAlternateScanDirection(final boolean state);
-
-        /**
-         * Computes the slice duration from the other timing settings.
-         */
-        double sliceDuration();
-
-        /**
-         * Creates an immutable instance of TimingSettings
-         *
-         * @return Immutable version of TimingSettings
-         */
-        TimingSettings build();
-    }
-
     /**
      * Returns a builder initialized with the current settings.
      *
@@ -156,4 +78,84 @@ public interface TimingSettings {
      * @return true if the scan direction is inverted
      */
     boolean useAlternateScanDirection();
+
+    interface Builder {
+
+        /**
+         * Sets the delay time before scanning.
+         *
+         * @param delayMs the delay time in milliseconds
+         */
+        Builder delayBeforeScan(final double delayMs);
+
+        /**
+         * Sets the number of one way beam scans per slice
+         *
+         * @param numLineScans the number of scans
+         */
+        Builder scansPerSlice(final int numLineScans);
+
+        /**
+         * Sets the duration of a one way scan.
+         *
+         * @param durationMs the duration in milliseconds
+         */
+        Builder scanDuration(final double durationMs);
+
+        /**
+         * Sets the delay time before the laser trigger.
+         *
+         * @param delayMs the delay in milliseconds
+         */
+        Builder delayBeforeLaser(final double delayMs);
+
+        /**
+         * Sets the duration of the laser trigger.
+         *
+         * @param durationMs the duration in milliseconds
+         */
+        Builder laserTriggerDuration(final double durationMs);
+
+        /**
+         * Sets the delay before the camera trigger is fired.
+         *
+         * @param delayMs the delay in milliseconds
+         */
+        Builder delayBeforeCamera(final double delayMs);
+
+        /**
+         * Sets the duration of the camera trigger.
+         *
+         * @param durationMs the duration in milliseconds
+         */
+        Builder cameraTriggerDuration(final double durationMs);
+
+        /**
+         * Sets the camera exposure time.
+         *
+         * @param exposureMs the exposure time in milliseconds
+         */
+        Builder cameraExposure(final double exposureMs);
+
+        /**
+         * Sets the scan direction.
+         *
+         * @param state true to invert the scan direction
+         */
+        Builder useAlternateScanDirection(final boolean state);
+
+        /**
+         * Computes the slice duration from the other timing settings.
+         */
+        double sliceDuration();
+
+        /**
+         * Creates an immutable instance of TimingSettings
+         *
+         * @return Immutable version of TimingSettings
+         */
+        TimingSettings build();
+
+    }
+
 }

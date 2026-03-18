@@ -5,6 +5,19 @@ package org.micromanager.lightsheetmanager.api;
  */
 public interface SheetCalibration {
 
+    Builder copyBuilder();
+
+    // normal camera trigger modes
+    double imagingCenter();
+    double sheetWidth();
+    double sheetOffset();
+    boolean autoSheetWidthEnabled();
+    double autoSheetWidthPerPixel();
+
+    // virtual slit camera trigger mode
+    double scanSpeed();
+    double scanOffset();
+
     interface Builder {
 
         Builder imagingCenter(final double center);
@@ -59,18 +72,5 @@ public interface SheetCalibration {
         SheetCalibration build();
 
     }
-
-    Builder copyBuilder();
-
-    // normal camera trigger modes
-    double imagingCenter();
-    double sheetWidth();
-    double sheetOffset();
-    boolean autoSheetWidthEnabled();
-    double autoSheetWidthPerPixel();
-
-    // virtual slit camera trigger mode
-    double scanSpeed();
-    double scanOffset();
 
 }

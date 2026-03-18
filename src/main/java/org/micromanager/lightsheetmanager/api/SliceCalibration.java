@@ -9,6 +9,11 @@ import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
  */
 public interface SliceCalibration {
 
+    Builder copyBuilder();
+
+    double slope();
+    double offset();
+
     interface Builder {
 
         Builder slope(final double slope);
@@ -22,11 +27,5 @@ public interface SliceCalibration {
          */
         DefaultSliceCalibration build();
     }
-
-    Builder copyBuilder();
-
-    double slope();
-    double offset();
-
 
 }
