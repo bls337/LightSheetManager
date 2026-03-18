@@ -589,15 +589,15 @@ public class PLogicDispim {
             }
 
             // FIXME: more light sheet setup
-            final double slope1 = settings.sliceCalibration(1).sliceSlope();
-            final double slope2 = settings.sliceCalibration(2).sliceSlope();
+            final double slope1 = settings.sliceCalibration(1).slope();
+            final double slope2 = settings.sliceCalibration(2).slope();
             double sliceRate = (view == 1) ? slope1 : slope2;
             if (NumberUtils.doublesEqual(sliceRate, 0.0)) {
                 studio_.logs().showError("Calibration slope for view " + view + " cannot be zero. Re-do calibration on Setup tab.");
                 return false;
             }
-            final double offset1 = settings.sliceCalibration(1).sliceOffset() + channelOffset;
-            final double offset2 = settings.sliceCalibration(2).sliceOffset() + channelOffset;
+            final double offset1 = settings.sliceCalibration(1).offset() + channelOffset;
+            final double offset2 = settings.sliceCalibration(2).offset() + channelOffset;
             double sliceOffset = (view == 1) ? offset1 : offset2;
             double sliceAmplitude = piezoAmplitude / sliceRate;
             double sliceCenter = (piezoCenter - sliceOffset) / sliceRate;

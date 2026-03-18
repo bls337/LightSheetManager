@@ -86,8 +86,8 @@ public class PiezoCalibrationPanel extends Panel {
         txtOffset_ = new TextField(7);
         txtStepSize_ = new TextField();
 
-        final double sliceSlope = acqSettings.sliceCalibration().sliceSlope();
-        final double sliceOffset = acqSettings.sliceCalibration().sliceOffset();
+        final double sliceSlope = acqSettings.sliceCalibration().slope();
+        final double sliceOffset = acqSettings.sliceCalibration().offset();
 
         txtSlope_.setText("0");
         txtOffset_.setText("0");
@@ -157,7 +157,7 @@ public class PiezoCalibrationPanel extends Panel {
             btnUpdate_.registerListener(e -> {
                 if (scanner.isBeamOn()) {
                     final double rate = model_.acquisitions().settings()
-                            .sliceCalibration().sliceSlope();
+                            .sliceCalibration().slope();
                     final double piezoPosition = piezo.getPosition();
                     final double scannerPosition = scanner.getPosition().y;
                     double channelOffset = 0.0;
@@ -170,7 +170,7 @@ public class PiezoCalibrationPanel extends Panel {
                     model_.acquisitions().settingsBuilder()
                           .sheetCalibrationBuilder().imagingCenter(newOffset);
                     model_.acquisitions().settingsBuilder()
-                          .sliceCalibrationBuilder().sliceOffset(newOffset);
+                          .sliceCalibrationBuilder().offset(newOffset);
                     model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
                             newOffset + " (with channel offset of " + channelOffset + ")");
                 }
@@ -187,14 +187,14 @@ public class PiezoCalibrationPanel extends Panel {
         txtSlope_.registerListener(e -> {
             final double slope = Double.parseDouble(txtSlope_.getText());
             model_.acquisitions().settingsBuilder()
-                    .sliceCalibrationBuilder().sliceSlope(slope);
+                    .sliceCalibrationBuilder().slope(slope);
             lblSlopeValue_.setText(String.format("%.3f μm/°", slope));
         });
 
         txtOffset_.registerListener(e -> {
             final double offset = Double.parseDouble(txtOffset_.getText());
             model_.acquisitions().settingsBuilder()
-                    .sliceCalibrationBuilder().sliceOffset(offset);
+                    .sliceCalibrationBuilder().offset(offset);
             lblOffsetValue_.setText(String.format("%.3f μm", offset));
             // also update the imaging center on the position panel
             panel_.setImagingCenterValue(offset);

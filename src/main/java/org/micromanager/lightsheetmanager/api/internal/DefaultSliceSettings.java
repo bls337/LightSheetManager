@@ -101,7 +101,7 @@ public class DefaultSliceSettings implements SliceSettings {
         }
 
         @Override
-        public Builder minimizePeriod(boolean state) {
+        public Builder periodMinimized(boolean state) {
             periodMinimized_ = state;
             return this;
         }

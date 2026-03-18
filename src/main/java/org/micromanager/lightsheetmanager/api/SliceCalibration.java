@@ -11,9 +11,9 @@ public interface SliceCalibration {
 
     interface Builder {
 
-        Builder sliceSlope(final double slope);
+        Builder slope(final double slope);
 
-        Builder sliceOffset(final double offset);
+        Builder offset(final double offset);
 
         /**
          * Creates an immutable instance of DefaultSliceCalibration
@@ -25,8 +25,8 @@ public interface SliceCalibration {
 
     Builder copyBuilder();
 
-    double sliceSlope();
-    double sliceOffset();
+    double slope();
+    double offset();
 
 
 }

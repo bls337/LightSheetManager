@@ -6,12 +6,12 @@ import java.util.Objects;
 
 public class DefaultSliceCalibration implements SliceCalibration {
 
-    private final double sliceSlope_;
-    private final double sliceOffset_;
+    private final double slope_;
+    private final double offset_;
 
     private DefaultSliceCalibration(Builder builder) {
-        sliceSlope_ = builder.sliceSlope_;
-        sliceOffset_ = builder.sliceOffset_;
+        slope_ = builder.slope_;
+        offset_ = builder.offset_;
     }
 
     public static Builder builder() {
@@ -29,13 +29,13 @@ public class DefaultSliceCalibration implements SliceCalibration {
     }
 
     @Override
-    public double sliceSlope() {
-        return sliceSlope_;
+    public double slope() {
+        return slope_;
     }
 
     @Override
-    public double sliceOffset() {
-        return sliceOffset_;
+    public double offset() {
+        return offset_;
     }
 
     @Override
@@ -47,43 +47,42 @@ public class DefaultSliceCalibration implements SliceCalibration {
             return false;
         }
         DefaultSliceCalibration other = (DefaultSliceCalibration) obj;
-        return Double.compare(sliceSlope_, other.sliceSlope_) == 0 &&
-                Double.compare(sliceOffset_, other.sliceOffset_) == 0;
+        return Double.compare(slope_, other.slope_) == 0 &&
+                Double.compare(offset_, other.offset_) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(sliceSlope_, sliceOffset_);
+        return Objects.hash(slope_, offset_);
     }
 
     @Override
     public String toString() {
         return String.format("%s[sliceSlope=%s, sliceOffset=%s]",
-                getClass().getSimpleName(), sliceSlope_, sliceOffset_);
+                getClass().getSimpleName(), slope_, offset_);
     }
 
     public static class Builder implements SliceCalibration.Builder {
-
-        private double sliceSlope_ = 0.0;
-        private double sliceOffset_ = 0.0;
+        private double slope_ = 0.0;
+        private double offset_ = 0.0;
 
         private Builder() {
         }
 
         private Builder(final SliceCalibration settings) {
-            sliceSlope_ = settings.sliceSlope();
-            sliceOffset_ = settings.sliceOffset();
+            slope_ = settings.slope();
+            offset_ = settings.offset();
         }
 
         @Override
-        public Builder sliceSlope(final double slope) {
-            sliceSlope_ = slope;
+        public Builder slope(final double slope) {
+            slope_ = slope;
             return this;
         }
 
         @Override
-        public Builder sliceOffset(final double offset) {
-            sliceOffset_ = offset;
+        public Builder offset(final double offset) {
+            offset_ = offset;
             return this;
         }
 

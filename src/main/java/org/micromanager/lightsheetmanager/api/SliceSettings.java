@@ -22,7 +22,7 @@ public interface SliceSettings {
          *
          * @param state true to minimize the slice period
          */
-        Builder minimizePeriod(final boolean state);
+        Builder periodMinimized(final boolean state);
 
         /**
          * Creates an immutable instance of SliceSettings
