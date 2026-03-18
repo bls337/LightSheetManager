@@ -31,13 +31,6 @@ public interface AutofocusSettings {
          */
         Builder stepSizeUm(final double stepSize);
 
-//        /**
-//         * Sets the tolerance in microns for the autofocus algorithm.
-//         *
-//         * @param value the tolerance in microns
-//         */
-//        Builder toleranceUm(final double value);
-
         /**
          * Set to {@code true} to show the images in the live view window.
          *
@@ -72,29 +65,6 @@ public interface AutofocusSettings {
          * @param channel the channel to run autofocus on
          */
         Builder channel(final String channel);
-
-        // TODO: maybe denote that these are related to acquisitions
-
-//        /**
-//         * Run autofocus every time we move to the next channel during an acquisition.
-//         *
-//         * @param state true to enable autofocus every stage pass
-//         */
-//        Builder useEveryStagePass(final boolean state);
-//
-//        /**
-//         * Run an autofocus routine before starting the acquisition.
-//         *
-//         * @param state true or false
-//         */
-//        Builder useBeforeAcquisition(final boolean state);
-
-
-//        Builder maxOffset(final double maxOffset); // +/- um
-//
-//        Builder autoUpdateOffset(final boolean state);
-//
-//        Builder autoUpdateMaxOffset(final double um);
 
         /**
          * Creates an immutable instance of AutofocusSettings
@@ -132,13 +102,6 @@ public interface AutofocusSettings {
      */
     double stepSizeUm();
 
-//    /**
-//     * Returns the coefficient of determination used in the autofocus routine.
-//     *
-//     * @return the coefficient of determination
-//     */
-//    double toleranceUm();
-
     /**
      * Returns the autofocus mode being used.
      *
@@ -160,29 +123,8 @@ public interface AutofocusSettings {
      */
     String channel();
 
-//    /**
-//     * Returns true if autofocus is run every stage pass.
-//     *
-//     * @return true if autofocus is run every stage pass
-//     */
-//    boolean useEveryStagePass();
-//
-//    /**
-//     * Returns true if we run an autofocus routine before starting an acquisition.
-//     *
-//     * @return true if enabled
-//     */
-//    boolean useBeforeAcquisition();
+    boolean showGraph();
 
-   /**
-    * What is this?
-    *
-    * @return
-    */
-//    double maxOffset(); // used during acquisitions
-//
-//    boolean autoUpdateOffset();
-//
-//    double autoUpdateMaxOffset();
+    boolean showImages();
 
 }

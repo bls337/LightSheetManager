@@ -7,7 +7,7 @@ package org.micromanager.lightsheetmanager.api;
  */
 public interface AutofocusManager {
 
-    CalibrationSettings calibrate(AutofocusSettings settings);
+    //CalibrationSettings calibrate(AutofocusSettings settings);
 }
 
 // TODO: moved from AutofocusSettings
