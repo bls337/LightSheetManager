@@ -203,7 +203,7 @@ public class DefaultStageScanSettings implements StageScanSettings {
         }
 
         @Override
-        public StageScanSettings build() {
+        public DefaultStageScanSettings build() {
             return new DefaultStageScanSettings(this);
         }
 
