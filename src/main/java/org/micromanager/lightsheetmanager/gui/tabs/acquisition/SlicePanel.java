@@ -1,7 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
+import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -45,7 +45,7 @@ public class SlicePanel extends Panel {
                 "[]5[]"
         );
 
-        final DefaultSliceSettings sliceSettings = model_.acquisitions().settings().slice();
+        final SliceSettings sliceSettings = model_.acquisitions().settings().slice();
         final boolean isSlicePeriodMinimized = sliceSettings.periodMinimized();
 
         // regular panel

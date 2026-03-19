@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsScape;
 import org.micromanager.lightsheetmanager.api.ChannelSettings;
+import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
@@ -18,7 +19,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
         private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
         private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
-        private DefaultSliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
+        private SliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
         private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
         private DefaultSheetCalibration.Builder sheetCalibBuilder_ = DefaultSheetCalibration.builder();
         private DefaultSliceCalibration.Builder sliceCalibBuilder_ = DefaultSliceCalibration.builder();
@@ -191,7 +192,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             return volumeBuilder_;
         }
 
-        public DefaultSliceSettings.Builder sliceBuilder() {
+        public SliceSettings.Builder sliceBuilder() {
             return sliceBuilder_;
         }
 
@@ -236,7 +237,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     private final ChannelSettings channels_;
     private final DefaultTimingSettings timing_;
     private final DefaultVolumeSettings volume_;
-    private final DefaultSliceSettings slice_;
+    private final SliceSettings slice_;
     private final StageScanSettings stageScan_;
     private final DefaultSheetCalibration sheetCalibration_;
     private final DefaultSliceCalibration sliceCalibration_;
@@ -260,7 +261,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         channels_ = builder.channelBuilder().build();
         timing_ = builder.timingBuilder_.build();
         volume_ = builder.volumeBuilder_.build();
-        slice_ = builder.sliceBuilder_.build();
+        slice_ = builder.sliceBuilder().build();
         stageScan_ = builder.stageScanBuilder().build();
         sheetCalibration_ = builder.sheetCalibBuilder_.build();
         sliceCalibration_ = builder.sliceCalibBuilder_.build();
@@ -322,7 +323,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
      * @return immutable DefaultSliceSettings instance.
      */
     @Override
-    public DefaultSliceSettings slice() {
+    public SliceSettings slice() {
         return slice_;
     }
 

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.ChannelSettings;
+import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 
@@ -229,6 +230,11 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
                         (jsonElement, typeOfT, context) -> {
                             // This forces Gson to use the concrete implementation class
                             return context.deserialize(jsonElement, DefaultChannelSettings.class);
+                        })
+                .registerTypeAdapter(SliceSettings.class, (JsonDeserializer<SliceSettings>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultSliceSettings.class);
                         })
                 .create();
         return gson.fromJson(json, cls);

@@ -16,6 +16,11 @@ public class DefaultSliceSettings implements SliceSettings {
         periodMinimized_ = builder.periodMinimized_;
     }
 
+    // Note: used by GSON library for deserialization
+    private DefaultSliceSettings() {
+        this(new Builder());
+    }
+
     public static Builder builder() {
         return new Builder();
     }
