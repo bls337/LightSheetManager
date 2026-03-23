@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.api.internal;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDispim;
 import org.micromanager.lightsheetmanager.api.ChannelSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
+import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 
@@ -13,7 +14,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     private final ChannelSettings channels_;
     private final DefaultTimingSettings timing_;
-    private final DefaultVolumeSettings volume_;
+    private final VolumeSettings volume_;
     private final DefaultSliceSettings slice_;
     private final DefaultSliceSettingsLS sliceLS_;
     private final StageScanSettings stageScan_;
@@ -86,7 +87,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     }
 
     @Override
-    public DefaultVolumeSettings volume() {
+    public VolumeSettings volume() {
         return volume_;
     }
 
@@ -233,7 +234,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
         private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
         private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
-        private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
+        private VolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
         private DefaultSliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
         private DefaultSliceSettingsLS.Builder ssbLS_ = DefaultSliceSettingsLS.builder(); // maybe this should be LightSheetSliceSettings? replace ssb_?
         private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
@@ -264,9 +265,9 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         public Builder(final DispimAcquisitionSettings settings) {
             super(settings);
             channelBuilder_ = settings.channels().copyBuilder();
-            timingBuilder_ = settings.timing_.copyBuilder();
-            volumeBuilder_ = settings.volume_.copyBuilder();
-            sliceBuilder_ = settings.slice_.copyBuilder();
+            timingBuilder_ = settings.timing().copyBuilder();
+            volumeBuilder_ = settings.volume().copyBuilder();
+            sliceBuilder_ = settings.slice().copyBuilder();
             ssbLS_ = settings.sliceLS_.copyBuilder();
             stageScanBuilder_ = settings.stageScan().copyBuilder();
             for (int i = 0; i < 2; i++) {
@@ -354,7 +355,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             return timingBuilder_;
         }
 
-        public DefaultVolumeSettings.Builder volumeBuilder() {
+        public VolumeSettings.Builder volumeBuilder() {
             return volumeBuilder_;
         }
 

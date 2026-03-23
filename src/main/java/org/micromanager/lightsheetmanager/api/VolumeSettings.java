@@ -92,9 +92,9 @@ public interface VolumeSettings {
          */
         Builder delayBeforeView(final double viewDelayMs);
 
-        Builder slicesPerView(final int n);
+        Builder slicesPerView(final int numSlices);
 
-        Builder sliceStepSize(final double um);
+        Builder sliceStepSize(final double stepSizeUm);
 
         /**
          * Sets the volume bounds, automatically computing numSlices and centerPosition.

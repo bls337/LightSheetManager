@@ -41,7 +41,7 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultVolumeSettings instance.
      */
-    DefaultVolumeSettings volume();
+    VolumeSettings volume();
 
     /**
      * Returns the immutable DefaultSliceSettings instance.
