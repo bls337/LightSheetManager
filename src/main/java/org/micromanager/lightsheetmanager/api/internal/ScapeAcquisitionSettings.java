@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.api.SheetCalibration;
 import org.micromanager.lightsheetmanager.api.SliceCalibration;
 import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
+import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
@@ -17,7 +18,7 @@ import java.util.Objects;
 public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements AcquisitionSettingsScape {
 
     private final ChannelSettings channels_;
-    private final DefaultTimingSettings timing_;
+    private final TimingSettings timing_;
     private final VolumeSettings volume_;
     private final SliceSettings slice_;
     private final StageScanSettings stageScan_;
@@ -41,12 +42,12 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     private ScapeAcquisitionSettings(Builder builder) {
         super(builder);
         channels_ = builder.channelBuilder().build();
-        timing_ = builder.timingBuilder_.build();
-        volume_ = builder.volumeBuilder_.build();
+        timing_ = builder.timingBuilder().build();
+        volume_ = builder.volumeBuilder().build();
         slice_ = builder.sliceBuilder().build();
         stageScan_ = builder.stageScanBuilder().build();
-        sheetCalibration_ = builder.sheetCalibBuilder_.build();
-        sliceCalibration_ = builder.sliceCalibBuilder_.build();
+        sheetCalibration_ = builder.sheetCalibrationBuilder().build();
+        sliceCalibration_ = builder.sliceCalibrationBuilder().build();
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
         imagingCameraOrder_ = builder.imagingCameraOrder_;
@@ -79,7 +80,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     }
 
     @Override
-    public DefaultTimingSettings timing() {
+    public TimingSettings timing() {
         return timing_;
     }
 
@@ -221,7 +222,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             implements AcquisitionSettingsScape.Builder<Builder> {
 
         private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
-        private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
+        private TimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
         private VolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
         private SliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
         private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
@@ -335,7 +336,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             return channelBuilder_;
         }
 
-        public DefaultTimingSettings.Builder timingBuilder() {
+        public TimingSettings.Builder timingBuilder() {
             return timingBuilder_;
         }
 
@@ -380,7 +381,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         // TODO: finish toString with rest of properties
         @Override
         public String toString() {
-            return String.format("[tsb_=%s]", timingBuilder_);
+            return String.format("%s[timingBuilder=%s]",
+                    getClass().getSimpleName(), timingBuilder_);
         }
 
     }

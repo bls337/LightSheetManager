@@ -36,12 +36,12 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     private DispimAcquisitionSettings(Builder builder) {
         super(builder);
-        channels_ = builder.channelBuilder_.build();
-        timing_ = builder.timingBuilder_.build();
-        volume_ = builder.volumeBuilder_.build();
-        slice_ = builder.sliceBuilder_.build();
-        sliceLS_ = builder.ssbLS_.build();
-        stageScan_ = builder.stageScanBuilder_.build();
+        channels_ = builder.channelBuilder().build();
+        timing_ = builder.timingBuilder().build();
+        volume_ = builder.volumeBuilder().build();
+        slice_ = builder.sliceBuilder().build();
+        sliceLS_ = builder.sliceLSBuilder().build();
+        stageScan_ = builder.stageScanBuilder().build();
         sheetCalibrations_ = new DefaultSheetCalibration[2];
         sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
         for (int i = 0; i < 2; i++) {

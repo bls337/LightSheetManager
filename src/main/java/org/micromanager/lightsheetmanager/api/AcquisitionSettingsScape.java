@@ -33,7 +33,7 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return immutable DefaultTimingSettings instance.
      */
-    DefaultTimingSettings timing();
+    TimingSettings timing();
 
     /**
      * Returns the immutable DefaultVolumeSettings instance.

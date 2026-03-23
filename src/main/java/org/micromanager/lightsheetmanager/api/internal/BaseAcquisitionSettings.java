@@ -9,6 +9,7 @@ import org.micromanager.lightsheetmanager.api.SheetCalibration;
 import org.micromanager.lightsheetmanager.api.SliceCalibration;
 import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
+import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 
@@ -228,6 +229,11 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
                         (jsonElement, typeOfT, context) -> {
                             // This forces Gson to use the concrete implementation class
                             return context.deserialize(jsonElement, DefaultChannelSettings.class);
+                        })
+                .registerTypeAdapter(TimingSettings.class, (JsonDeserializer<TimingSettings>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultTimingSettings.class);
                         })
                 .registerTypeAdapter(VolumeSettings.class, (JsonDeserializer<VolumeSettings>)
                         (jsonElement, typeOfT, context) -> {
