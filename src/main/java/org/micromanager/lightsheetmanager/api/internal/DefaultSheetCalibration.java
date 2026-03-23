@@ -24,6 +24,11 @@ public class DefaultSheetCalibration implements SheetCalibration {
         scanOffset_ = builder.scanOffset_;
     }
 
+    // Note: used by GSON library for deserialization
+    private DefaultSheetCalibration() {
+        this(new Builder());
+    }
+
     public static Builder builder() {
         return new Builder();
     }

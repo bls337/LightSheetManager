@@ -61,14 +61,14 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return immutable DefaultSheetCalibration instance.
      */
-    DefaultSheetCalibration sheetCalibration();
+    SheetCalibration sheetCalibration();
 
     /**
      * Returns the immutable DefaultSliceCalibration instance.
      *
      * @return immutable DefaultSliceCalibration instance.
      */
-    DefaultSliceCalibration sliceCalibration();
+    SliceCalibration sliceCalibration();
 
     /**
      * Returns the acquisition mode.

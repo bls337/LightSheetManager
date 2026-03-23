@@ -2,6 +2,8 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsScape;
 import org.micromanager.lightsheetmanager.api.ChannelSettings;
+import org.micromanager.lightsheetmanager.api.SheetCalibration;
+import org.micromanager.lightsheetmanager.api.SliceCalibration;
 import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
@@ -18,8 +20,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     private final DefaultVolumeSettings volume_;
     private final SliceSettings slice_;
     private final StageScanSettings stageScan_;
-    private final DefaultSheetCalibration sheetCalibration_;
-    private final DefaultSliceCalibration sliceCalibration_;
+    private final SheetCalibration sheetCalibration_;
+    private final SliceCalibration sliceCalibration_;
 
     private final AcquisitionMode acquisitionMode_;
 
@@ -96,12 +98,12 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     }
 
     @Override
-    public DefaultSheetCalibration sheetCalibration() {
+    public SheetCalibration sheetCalibration() {
         return sheetCalibration_;
     }
 
     @Override
-    public DefaultSliceCalibration sliceCalibration() {
+    public SliceCalibration sliceCalibration() {
         return sliceCalibration_;
     }
 
@@ -222,8 +224,8 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
         private SliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
         private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
-        private DefaultSheetCalibration.Builder sheetCalibBuilder_ = DefaultSheetCalibration.builder();
-        private DefaultSliceCalibration.Builder sliceCalibBuilder_ = DefaultSliceCalibration.builder();
+        private SheetCalibration.Builder sheetCalibBuilder_ = DefaultSheetCalibration.builder();
+        private SliceCalibration.Builder sliceCalibBuilder_ = DefaultSliceCalibration.builder();
 
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
 
@@ -348,11 +350,11 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             return stageScanBuilder_;
         }
 
-        public DefaultSheetCalibration.Builder sheetCalibrationBuilder() {
+        public SheetCalibration.Builder sheetCalibrationBuilder() {
             return sheetCalibBuilder_;
         }
 
-        public DefaultSliceCalibration.Builder sliceCalibrationBuilder() {
+        public SliceCalibration.Builder sliceCalibrationBuilder() {
             return sliceCalibBuilder_;
         }
 
