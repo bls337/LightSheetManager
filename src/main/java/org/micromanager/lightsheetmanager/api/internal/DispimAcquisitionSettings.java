@@ -164,13 +164,23 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         return liveScanPeriod_;
     }
 
+    // TODO: finish this
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                channels_
+        );
+    }
+
     // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
     @Override
     public String toString() {
-        return String.format("[timing=%s]", timing_);
+        return String.format("%s[channels=%s, timing=%s]", getClass().getSimpleName(), channels_, timing_);
     }
 
-    public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDispim.Builder<Builder> {
+    public static class Builder
+            extends BaseAcquisitionSettings.Builder<Builder>
+            implements AcquisitionSettingsDispim.Builder<Builder> {
 
         private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
         private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();

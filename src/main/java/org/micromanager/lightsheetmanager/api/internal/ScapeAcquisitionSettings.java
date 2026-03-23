@@ -8,6 +8,7 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements AcquisitionSettingsScape {
@@ -154,10 +155,34 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         return postMoveDelay_;
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                channels_,
+                timing_,
+                volume_,
+                slice_,
+                stageScan_,
+                sheetCalibration_,
+                sliceCalibration_,
+                acquisitionMode_,
+                cameraMode_,
+                Arrays.hashCode(imagingCameraOrder_),
+                useTimePoints_,
+                useMultiplePositions_,
+                useHardwareTimePoints_,
+                useAdvancedTiming_,
+                numTimePoints_,
+                timePointInterval_,
+                postMoveDelay_
+        );
+    }
+
     // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
     @Override
     public String toString() {
-        return String.format("[timing=%s]", timing_);
+        return String.format("%s[channels=%s, timing=%s, volume=%s, slice=%s]",
+                getClass().getSimpleName(), channels_, timing_, volume_, slice_);
     }
 
     public static class Builder
