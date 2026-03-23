@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class DispimAcquisitionSettings extends BaseAcquisitionSettings implements AcquisitionSettingsDispim {
@@ -166,6 +167,36 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     // TODO: finish this
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        DispimAcquisitionSettings other = (DispimAcquisitionSettings) obj;
+        return Objects.equals(channels_, other.channels_) &&
+                Objects.equals(timing_, other.timing_) &&
+                Objects.equals(volume_, other.volume_) &&
+                Objects.equals(slice_, other.slice_) &&
+                Objects.equals(sliceLS_, other.sliceLS_) &&
+                Objects.equals(stageScan_, other.stageScan_) &&
+                // Objects.equals(sheetCalibration_, other.sheetCalibration_) &&
+                // Objects.equals(sliceCalibration_, other.sliceCalibration_) &&
+                acquisitionMode_ == other.acquisitionMode_ &&
+                cameraMode_ == other.cameraMode_ &&
+                // Arrays.equals(imagingCameraOrder_, other.imagingCameraOrder_) &&
+                useTimePoints_ == other.useTimePoints_ &&
+                useMultiplePositions_ == other.useMultiplePositions_ &&
+                useHardwareTimePoints_ == other.useHardwareTimePoints_ &&
+                useAdvancedTiming_ == other.useAdvancedTiming_ &&
+                numTimePoints_ == other.numTimePoints_ &&
+                Double.compare(other.timePointInterval_, timePointInterval_) == 0 &&
+                postMoveDelay_ == other.postMoveDelay_;
+    }
+
+    // TODO: finish this
+    @Override
     public int hashCode() {
         return Objects.hash(
                 channels_,
@@ -173,7 +204,19 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 volume_,
                 slice_,
                 sliceLS_,
-                stageScan_
+                stageScan_,
+                // sheetCalibration_,
+                // sliceCalibration_,
+                acquisitionMode_,
+                cameraMode_,
+                //Arrays.hashCode(imagingCameraOrder_),
+                useTimePoints_,
+                useMultiplePositions_,
+                useHardwareTimePoints_,
+                useAdvancedTiming_,
+                numTimePoints_,
+                timePointInterval_,
+                postMoveDelay_
         );
     }
 
