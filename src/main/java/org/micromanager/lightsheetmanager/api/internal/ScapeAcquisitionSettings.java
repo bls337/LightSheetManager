@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.api.SheetCalibration;
 import org.micromanager.lightsheetmanager.api.SliceCalibration;
 import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
+import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
@@ -17,7 +18,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     private final ChannelSettings channels_;
     private final DefaultTimingSettings timing_;
-    private final DefaultVolumeSettings volume_;
+    private final VolumeSettings volume_;
     private final SliceSettings slice_;
     private final StageScanSettings stageScan_;
     private final SheetCalibration sheetCalibration_;
@@ -83,7 +84,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     }
 
     @Override
-    public DefaultVolumeSettings volume() {
+    public VolumeSettings volume() {
         return volume_;
     }
 
@@ -221,7 +222,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
         private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
         private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
-        private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
+        private VolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
         private SliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
         private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
         private SheetCalibration.Builder sheetCalibBuilder_ = DefaultSheetCalibration.builder();
@@ -338,7 +339,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             return timingBuilder_;
         }
 
-        public DefaultVolumeSettings.Builder volumeBuilder() {
+        public VolumeSettings.Builder volumeBuilder() {
             return volumeBuilder_;
         }
 

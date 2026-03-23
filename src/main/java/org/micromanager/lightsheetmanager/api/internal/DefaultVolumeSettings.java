@@ -26,6 +26,11 @@ public class DefaultVolumeSettings implements VolumeSettings {
         endPosition_ = builder.endPosition_;
     }
 
+    // Note: used by GSON library for deserialization
+    private DefaultVolumeSettings() {
+        this(new Builder());
+    }
+
     public static Builder builder() {
         return new Builder();
     }

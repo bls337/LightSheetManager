@@ -40,7 +40,7 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return immutable DefaultVolumeSettings instance.
      */
-    DefaultVolumeSettings volume();
+    VolumeSettings volume();
 
     /**
      * Returns the immutable SliceSettings instance.
