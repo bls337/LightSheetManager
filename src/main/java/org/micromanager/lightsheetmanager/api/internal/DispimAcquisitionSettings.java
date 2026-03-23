@@ -2,7 +2,12 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsDispim;
 import org.micromanager.lightsheetmanager.api.ChannelSettings;
+import org.micromanager.lightsheetmanager.api.SheetCalibration;
+import org.micromanager.lightsheetmanager.api.SliceCalibration;
+import org.micromanager.lightsheetmanager.api.SliceSettings;
+import org.micromanager.lightsheetmanager.api.SliceSettingsLightSheet;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
+import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
@@ -13,13 +18,13 @@ import java.util.Objects;
 public class DispimAcquisitionSettings extends BaseAcquisitionSettings implements AcquisitionSettingsDispim {
 
     private final ChannelSettings channels_;
-    private final DefaultTimingSettings timing_;
+    private final TimingSettings timing_;
     private final VolumeSettings volume_;
-    private final DefaultSliceSettings slice_;
-    private final DefaultSliceSettingsLS sliceLS_;
+    private final SliceSettings slice_;
+    private final SliceSettingsLightSheet sliceLS_;
     private final StageScanSettings stageScan_;
-    private final DefaultSheetCalibration[] sheetCalibrations_;
-    private final DefaultSliceCalibration[] sliceCalibrations_;
+    private final SheetCalibration[] sheetCalibrations_;
+    private final SliceCalibration[] sliceCalibrations_;
 
     private final AcquisitionMode acquisitionMode_;
     private final CameraMode cameraMode_;
@@ -82,7 +87,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     }
 
     @Override
-    public DefaultTimingSettings timing() {
+    public TimingSettings timing() {
         return timing_;
     }
 
@@ -92,12 +97,12 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     }
 
     @Override
-    public DefaultSliceSettings slice() {
+    public SliceSettings slice() {
         return slice_;
     }
 
     @Override
-    public DefaultSliceSettingsLS sliceLS() {
+    public SliceSettingsLightSheet sliceLS() {
         return sliceLS_;
     }
 
@@ -107,12 +112,12 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     }
 
     @Override
-    public DefaultSheetCalibration sheetCalibration(final int view) {
+    public SheetCalibration sheetCalibration(final int view) {
         return sheetCalibrations_[view-1];
     }
 
     @Override
-    public DefaultSliceCalibration sliceCalibration(final int view) {
+    public SliceCalibration sliceCalibration(final int view) {
         return sliceCalibrations_[view-1];
     }
 
@@ -233,13 +238,13 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             implements AcquisitionSettingsDispim.Builder<Builder> {
 
         private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
-        private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
+        private TimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
         private VolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
-        private DefaultSliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
-        private DefaultSliceSettingsLS.Builder ssbLS_ = DefaultSliceSettingsLS.builder(); // maybe this should be LightSheetSliceSettings? replace ssb_?
+        private SliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
+        private SliceSettingsLightSheet.Builder ssbLS_ = DefaultSliceSettingsLS.builder(); // maybe this should be LightSheetSliceSettings? replace ssb_?
         private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
-        private DefaultSheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
-        private DefaultSliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
+        private SheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
+        private SliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
 
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
         private CameraMode cameraMode_ = CameraMode.EDGE;
@@ -351,7 +356,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             return channelBuilder_;
         }
 
-        public DefaultTimingSettings.Builder timingBuilder() {
+        public TimingSettings.Builder timingBuilder() {
             return timingBuilder_;
         }
 
@@ -359,11 +364,11 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             return volumeBuilder_;
         }
 
-        public DefaultSliceSettings.Builder sliceBuilder() {
+        public SliceSettings.Builder sliceBuilder() {
             return sliceBuilder_;
         }
 
-        public DefaultSliceSettingsLS.Builder sliceLSBuilder() {
+        public SliceSettingsLightSheet.Builder sliceLSBuilder() {
             return ssbLS_;
         }
 
@@ -371,11 +376,11 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             return stageScanBuilder_;
         }
 
-        public DefaultSheetCalibration.Builder sheetCalibrationBuilder(final int view) {
+        public SheetCalibration.Builder sheetCalibrationBuilder(final int view) {
             return shcb_[view-1];
         }
 
-        public DefaultSliceCalibration.Builder sliceCalibrationBuilder(final int view) {
+        public SliceCalibration.Builder sliceCalibrationBuilder(final int view) {
             return slcb_[view-1];
         }
 

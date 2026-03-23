@@ -34,7 +34,7 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultTimingSettings instance.
      */
-    DefaultTimingSettings timing();
+    TimingSettings timing();
 
     /**
      * Returns the immutable DefaultVolumeSettings instance.
@@ -48,14 +48,14 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultSliceSettings instance.
      */
-    DefaultSliceSettings slice();
+    SliceSettings slice();
 
     /**
      * Returns the immutable DefaultSliceSettingsLS instance.
      *
      * @return immutable DefaultSliceSettingsLS instance.
      */
-    DefaultSliceSettingsLS sliceLS();
+    SliceSettingsLightSheet sliceLS();
 
     /**
      * Returns the immutable DefaultScanSettings instance.
@@ -69,15 +69,14 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultSheetCalibration instance.
      */
-    DefaultSheetCalibration sheetCalibration(final int view);
+    SheetCalibration sheetCalibration(final int view);
 
     /**
      * Returns the immutable DefaultSliceCalibration instance.
      *
      * @return immutable DefaultSliceCalibration instance.
      */
-    DefaultSliceCalibration sliceCalibration(final int view);
-    //DefaultSliceCalibration sliceCalibration();
+    SliceCalibration sliceCalibration(final int view);
 
     /**
      * Returns the acquisition mode.
