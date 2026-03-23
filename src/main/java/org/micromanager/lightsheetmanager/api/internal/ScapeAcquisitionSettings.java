@@ -156,6 +156,34 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ScapeAcquisitionSettings other = (ScapeAcquisitionSettings) obj;
+        return Objects.equals(channels_, other.channels_) &&
+                Objects.equals(timing_, other.timing_) &&
+                Objects.equals(volume_, other.volume_) &&
+                Objects.equals(slice_, other.slice_) &&
+                Objects.equals(stageScan_, other.stageScan_) &&
+                Objects.equals(sheetCalibration_, other.sheetCalibration_) &&
+                Objects.equals(sliceCalibration_, other.sliceCalibration_) &&
+                acquisitionMode_ == other.acquisitionMode_ &&
+                cameraMode_ == other.cameraMode_ &&
+                Arrays.equals(imagingCameraOrder_, other.imagingCameraOrder_) &&
+                useTimePoints_ == other.useTimePoints_ &&
+                useMultiplePositions_ == other.useMultiplePositions_ &&
+                useHardwareTimePoints_ == other.useHardwareTimePoints_ &&
+                useAdvancedTiming_ == other.useAdvancedTiming_ &&
+                numTimePoints_ == other.numTimePoints_ &&
+                Double.compare(other.timePointInterval_, timePointInterval_) == 0 &&
+                postMoveDelay_ == other.postMoveDelay_;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(
                 channels_,

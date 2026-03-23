@@ -13,8 +13,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     private final ChannelSettings channels_;
     private final DefaultTimingSettings timing_;
     private final DefaultVolumeSettings volume_;
-    private final DefaultSliceSettingsLS sliceLS_;
     private final DefaultSliceSettings slice_;
+    private final DefaultSliceSettingsLS sliceLS_;
     private final StageScanSettings stageScan_;
     private final DefaultSheetCalibration[] sheetCalibrations_;
     private final DefaultSliceCalibration[] sliceCalibrations_;
@@ -168,14 +168,20 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     @Override
     public int hashCode() {
         return Objects.hash(
-                channels_
+                channels_,
+                timing_,
+                volume_,
+                slice_,
+                sliceLS_,
+                stageScan_
         );
     }
 
     // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
     @Override
     public String toString() {
-        return String.format("%s[channels=%s, timing=%s]", getClass().getSimpleName(), channels_, timing_);
+        return String.format("%s[channels=%s, timing=%s, volume=%s, slice=%s, sliceLS=%s, stageScan=%s]",
+                getClass().getSimpleName(), channels_, timing_, volume_, slice_, sliceLS_, stageScan_);
     }
 
     public static class Builder
@@ -301,23 +307,23 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             return channelBuilder_;
         }
 
-        public DefaultTimingSettings.Builder timingSettingsBuilder() {
+        public DefaultTimingSettings.Builder timingBuilder() {
             return timingBuilder_;
         }
 
-        public DefaultVolumeSettings.Builder volumeSettingsBuilder() {
+        public DefaultVolumeSettings.Builder volumeBuilder() {
             return volumeBuilder_;
         }
 
-        public DefaultSliceSettings.Builder sliceSettingsBuilder() {
+        public DefaultSliceSettings.Builder sliceBuilder() {
             return sliceBuilder_;
         }
 
-        public DefaultSliceSettingsLS.Builder sliceSettingsLSBuilder() {
+        public DefaultSliceSettingsLS.Builder sliceLSBuilder() {
             return ssbLS_;
         }
 
-        public StageScanSettings.Builder scanSettingsBuilder() {
+        public StageScanSettings.Builder stageScanBuilder() {
             return stageScanBuilder_;
         }
 
@@ -329,11 +335,11 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             return slcb_[view-1];
         }
 
-        public void timingSettingsBuilder(DefaultTimingSettings.Builder builder) {
+        public void timingBuilder(DefaultTimingSettings.Builder builder) {
             timingBuilder_ = builder;
         }
 
-        public void volumeSettingsBuilder(DefaultVolumeSettings.Builder builder) {
+        public void volumeBuilder(DefaultVolumeSettings.Builder builder) {
             volumeBuilder_ = builder;
         }
 
