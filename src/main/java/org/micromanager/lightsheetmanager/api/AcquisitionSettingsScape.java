@@ -22,9 +22,9 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
     //Builder copyBuilder();
 
     /**
-     * Returns the immutable DefaultChannelSettings instance.
+     * Returns the immutable ChannelSettings instance.
      *
-     * @return immutable DefaultChannelSettings instance.
+     * @return immutable ChannelSettings instance.
      */
     ChannelSettings channels();
 
@@ -43,9 +43,9 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
     DefaultVolumeSettings volume();
 
     /**
-     * Returns the immutable DefaultSliceSettings instance.
+     * Returns the immutable SliceSettings instance.
      *
-     * @return immutable DefaultSliceSettings instance.
+     * @return immutable SliceSettings instance.
      */
     SliceSettings slice();
 
@@ -144,6 +144,9 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
 
         /**
          * Sets the acquisition mode.
+         * <p>
+         * If the mode is a stage scanning mode,
+         * set the stage scanning flag to true.
          *
          * @param mode the acquisition mode
          * @return {@code this} builder

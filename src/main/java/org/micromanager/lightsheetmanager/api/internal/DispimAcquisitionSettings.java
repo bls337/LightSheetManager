@@ -6,10 +6,168 @@ import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 
+import java.util.Objects;
+
 public class DispimAcquisitionSettings extends BaseAcquisitionSettings implements AcquisitionSettingsDispim {
+
+    private final ChannelSettings channels_;
+    private final DefaultTimingSettings timing_;
+    private final DefaultVolumeSettings volume_;
+    private final DefaultSliceSettingsLS sliceLS_;
+    private final DefaultSliceSettings slice_;
+    private final StageScanSettings stageScan_;
+    private final DefaultSheetCalibration[] sheetCalibrations_;
+    private final DefaultSliceCalibration[] sliceCalibrations_;
+
+    private final AcquisitionMode acquisitionMode_;
+    private final CameraMode cameraMode_;
+
+    private final boolean useTimePoints_;
+    private final boolean useMultiplePositions_;
+    private final boolean useHardwareTimePoints_;
+    private final boolean useAdvancedTiming_;
+
+    private final int numTimePoints_;
+    private final int timePointInterval_;
+    private final int postMoveDelay_;
+
+    private final double liveScanPeriod_;
+
+    private DispimAcquisitionSettings(Builder builder) {
+        super(builder);
+        channels_ = builder.channelBuilder_.build();
+        timing_ = builder.timingBuilder_.build();
+        volume_ = builder.volumeBuilder_.build();
+        slice_ = builder.sliceBuilder_.build();
+        sliceLS_ = builder.ssbLS_.build();
+        stageScan_ = builder.stageScanBuilder_.build();
+        sheetCalibrations_ = new DefaultSheetCalibration[2];
+        sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
+        for (int i = 0; i < 2; i++) {
+            sheetCalibrations_[i] = builder.shcb_[i].build();
+            sliceCalibrations_[i] = builder.slcb_[i].build();
+        }
+        acquisitionMode_ = builder.acquisitionMode_;
+        cameraMode_ = builder.cameraMode_;
+        useTimePoints_ = builder.useTimePoints_;
+        useMultiplePositions_ = builder.useMultiplePositions_;
+        useHardwareTimePoints_ = builder.useHardwareTimePoints_;
+        useAdvancedTiming_ = builder.useAdvancedTiming_;
+        numTimePoints_ = builder.numTimePoints_;
+        timePointInterval_ = builder.timePointInterval_;
+        postMoveDelay_ = builder.postMoveDelay_;
+        liveScanPeriod_= builder.liveScanPeriod_;
+    }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static Builder builder(DispimAcquisitionSettings settings) {
+        Objects.requireNonNull(settings, "Cannot copy from null settings");
+        return new Builder(settings);
+    }
+
+//    @Override
+//    public DefaultAcquisitionSettingsDISPIM.Builder copyBuilder() {
+//        return new Builder(this);
+//        );
+//    }
+
+    @Override
+    public ChannelSettings channels() {
+        return channels_;
+    }
+
+    @Override
+    public DefaultTimingSettings timing() {
+        return timing_;
+    }
+
+    @Override
+    public DefaultVolumeSettings volume() {
+        return volume_;
+    }
+
+    @Override
+    public DefaultSliceSettings slice() {
+        return slice_;
+    }
+
+    @Override
+    public DefaultSliceSettingsLS sliceLS() {
+        return sliceLS_;
+    }
+
+    @Override
+    public StageScanSettings stageScan() {
+        return stageScan_;
+    }
+
+    @Override
+    public DefaultSheetCalibration sheetCalibration(final int view) {
+        return sheetCalibrations_[view-1];
+    }
+
+    @Override
+    public DefaultSliceCalibration sliceCalibration(final int view) {
+        return sliceCalibrations_[view-1];
+    }
+
+    @Override
+    public AcquisitionMode acquisitionMode() {
+        return acquisitionMode_;
+    }
+
+    @Override
+    public CameraMode cameraMode() {
+        return cameraMode_;
+    }
+
+    @Override
+    public boolean isUsingTimePoints() {
+        return useTimePoints_;
+    }
+
+    @Override
+    public boolean isUsingMultiplePositions() {
+        return useMultiplePositions_;
+    }
+
+    @Override
+    public boolean isUsingHardwareTimePoints() {
+        return useHardwareTimePoints_;
+    }
+
+    @Override
+    public boolean isUsingAdvancedTiming() {
+        return useAdvancedTiming_;
+    }
+
+    @Override
+    public int numTimePoints() {
+        return numTimePoints_;
+    }
+
+    @Override
+    public int timePointInterval() {
+        return timePointInterval_;
+    }
+
+    @Override
+    public int postMoveDelay() {
+        return postMoveDelay_;
+    }
+
+    @Override
+    public double liveScanPeriod() {
+        return liveScanPeriod_;
+    }
+
+    // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
+    @Override
+    public String toString() {
+        return String.format("[timing=%s]", timing_);
     }
 
     public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsDispim.Builder<Builder> {
@@ -68,99 +226,54 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             liveScanPeriod_ = settings.liveScanPeriod_;
         }
 
-        /**
-         * Sets the acquisition mode.
-         *
-         * @param acqMode the acquisition mode
-         */
         @Override
-        public Builder acquisitionMode(final AcquisitionMode acqMode) {
-            acquisitionMode_ = acqMode;
+        public Builder acquisitionMode(final AcquisitionMode mode) {
+            acquisitionMode_ = mode;
             return this;
         }
 
-        /**
-         * Sets the camera mode.
-         *
-         * @param cameraMode the camera mode.
-         */
         @Override
-        public Builder cameraMode(final CameraMode cameraMode) {
-            cameraMode_ = cameraMode;
+        public Builder cameraMode(final CameraMode mode) {
+            cameraMode_ = mode;
             return this;
         }
 
-        /**
-         * Sets the acquisition to use time points.
-         *
-         * @param state true to use time points.
-         */
         @Override
         public Builder useTimePoints(final boolean state) {
             useTimePoints_ = state;
             return this;
         }
 
-        /**
-         * Sets the acquisition to use multiple positions.
-         *
-         * @param state true to use multiple positions.
-         */
         @Override
         public Builder useMultiplePositions(final boolean state) {
             useMultiplePositions_ = state;
             return this;
         }
 
-        /**
-         * Sets the acquisition to use hardware time points.
-         *
-         * @param state true to use time points.
-         */
         @Override
         public Builder useHardwareTimePoints(final boolean state) {
             useHardwareTimePoints_ = state;
             return this;
         }
 
-        /**
-         * Sets the acquisition to use advanced timing settings.
-         *
-         * @param state true to use advanced timing settings
-         */
         @Override
         public Builder useAdvancedTiming(final boolean state) {
             useAdvancedTiming_ = state;
             return this;
         }
 
-        /**
-         * Sets the number of time points.
-         *
-         * @param numTimePoints the number of time points
-         */
         @Override
         public Builder numTimePoints(final int numTimePoints) {
             numTimePoints_ = numTimePoints;
             return this;
         }
 
-        /**
-         * Sets the time point interval between time points in seconds.
-         *
-         * @param timePointInterval the time point interval in seconds.
-         */
         @Override
         public Builder timePointInterval(final int timePointInterval) {
             timePointInterval_ = timePointInterval;
             return this;
         }
 
-        /**
-         * Sets the delay after a move when using multiple positions.
-         *
-         * @param postMoveDelay the delay in milliseconds.
-         */
         @Override
         public Builder postMoveDelay(final int postMoveDelay) {
             postMoveDelay_ = postMoveDelay;
@@ -214,11 +327,6 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             volumeBuilder_ = builder;
         }
 
-        /**
-         * Creates an immutable instance of DispimAcquisitionSettings
-         *
-         * @return Immutable version of DispimAcquisitionSettings
-         */
         @Override
         public DispimAcquisitionSettings build() {
             return new DispimAcquisitionSettings(this);
@@ -232,263 +340,9 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         // TODO: finish toString with rest of properties
         @Override
         public String toString() {
-            return String.format("[tsb_=%s]", timingBuilder_);
+            return String.format("[timingBuilder_=%s]", timingBuilder_);
         }
 
     }
 
-    private final ChannelSettings channels_;
-    private final DefaultTimingSettings timing_;
-    private final DefaultVolumeSettings volume_;
-    private final DefaultSliceSettingsLS sliceLS_;
-    private final DefaultSliceSettings slice_;
-    private final StageScanSettings stageScan_;
-    private final DefaultSheetCalibration[] sheetCalibrations_;
-    private final DefaultSliceCalibration[] sliceCalibrations_;
-
-    private final AcquisitionMode acquisitionMode_;
-    private final CameraMode cameraMode_;
-
-    private final boolean useTimePoints_;
-    private final boolean useMultiplePositions_;
-    private final boolean useHardwareTimePoints_;
-    private final boolean useAdvancedTiming_;
-
-    private final int numTimePoints_;
-    private final int timePointInterval_;
-    private final int postMoveDelay_;
-
-    private final double liveScanPeriod_;
-
-    private DispimAcquisitionSettings(Builder builder) {
-        super(builder);
-        channels_ = builder.channelBuilder_.build();
-        timing_ = builder.timingBuilder_.build();
-        volume_ = builder.volumeBuilder_.build();
-        slice_ = builder.sliceBuilder_.build();
-        sliceLS_ = builder.ssbLS_.build();
-        stageScan_ = builder.stageScanBuilder_.build();
-        sheetCalibrations_ = new DefaultSheetCalibration[2];
-        sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
-        for (int i = 0; i < 2; i++) {
-            sheetCalibrations_[i] = builder.shcb_[i].build();
-            sliceCalibrations_[i] = builder.slcb_[i].build();
-        }
-        acquisitionMode_ = builder.acquisitionMode_;
-        cameraMode_ = builder.cameraMode_;
-        useTimePoints_ = builder.useTimePoints_;
-        useMultiplePositions_ = builder.useMultiplePositions_;
-        useHardwareTimePoints_ = builder.useHardwareTimePoints_;
-        useAdvancedTiming_ = builder.useAdvancedTiming_;
-        numTimePoints_ = builder.numTimePoints_;
-        timePointInterval_ = builder.timePointInterval_;
-        postMoveDelay_ = builder.postMoveDelay_;
-        liveScanPeriod_= builder.liveScanPeriod_;
-    }
-
-//    /**
-//     * Creates a Builder populated with settings of this DefaultAcquisitionSettingsDISPIM instance.
-//     *
-//     * @return DefaultAcquisitionSettingsDISPIM.Builder pre-populated with settings of this instance.
-//     */
-//    @Override
-//    public DefaultAcquisitionSettingsDISPIM.Builder copyBuilder() {
-//        return new Builder(this);
-//        );
-//    }
-
-    /**
-     * Returns the immutable DefaultChannelSettings instance.
-     *
-     * @return immutable DefaultChannelSettings instance.
-     */
-    @Override
-    public ChannelSettings channels() {
-        return channels_;
-    }
-
-    /**
-     * Returns the immutable DefaultTimingSettings instance.
-     *
-     * @return immutable DefaultTimingSettings instance.
-     */
-    @Override
-    public DefaultTimingSettings timing() {
-        return timing_;
-    }
-
-    /**
-     * Returns the immutable DefaultVolumeSettings instance.
-     *
-     * @return immutable DefaultVolumeSettings instance.
-     */
-    @Override
-    public DefaultVolumeSettings volume() {
-        return volume_;
-    }
-
-    /**
-     * Returns the immutable DefaultSliceSettings instance.
-     *
-     * @return immutable DefaultSliceSettings instance.
-     */
-    @Override
-    public DefaultSliceSettings slice() {
-        return slice_;
-    }
-
-    /**
-     * Returns the immutable DefaultSliceSettingsLS instance.
-     *
-     * @return immutable DefaultSliceSettingsLS instance.
-     */
-    @Override
-    public DefaultSliceSettingsLS sliceLS() {
-        return sliceLS_;
-    }
-
-    /**
-     * Returns the immutable DefaultScanSettings instance.
-     *
-     * @return immutable DefaultScanSettings instance.
-     */
-    @Override
-    public StageScanSettings stageScan() {
-        return stageScan_;
-    }
-
-    /**
-     * Returns the immutable DefaultSheetCalibration instance.
-     *
-     * @return immutable DefaultSheetCalibration instance.
-     */
-    @Override
-    public DefaultSheetCalibration sheetCalibration(final int view) {
-        return sheetCalibrations_[view-1];
-    }
-
-    /**
-     * Returns an immutable DefaultSliceCalibration instance.
-     * <p>
-     * Views start at index 1.
-     *
-     * @return immutable DefaultSliceCalibration instance.
-     */
-    @Override
-    public DefaultSliceCalibration sliceCalibration(final int view) {
-        return sliceCalibrations_[view-1];
-    }
-
-    /**
-     * Returns the acquisition mode.
-     *
-     * @return the acquisition mode.
-     */
-    @Override
-    public AcquisitionMode acquisitionMode() {
-        return acquisitionMode_;
-    }
-
-    /**
-     * Returns the camera mode.
-     *
-     * @return the camera mode.
-     */
-    @Override
-    public CameraMode cameraMode() {
-        return cameraMode_;
-    }
-
-    /**
-     * Returns true if using time points.
-     *
-     * @return true if using time points.
-     */
-    @Override
-    public boolean isUsingTimePoints() {
-        return useTimePoints_;
-    }
-
-    /**
-     * Returns true if using multiple positions.
-     *
-     * @return true if using multiple positions.
-     */
-    @Override
-    public boolean isUsingMultiplePositions() {
-        return useMultiplePositions_;
-    }
-
-    /**
-     * Returns true if using hardware time points.
-     *
-     * @return true if using hardware time points.
-     */
-    @Override
-    public boolean isUsingHardwareTimePoints() {
-        return useHardwareTimePoints_;
-    }
-
-    /**
-     * Returns true if using advanced timing settings.
-     *
-     * @return true if using advanced timing settings.
-     */
-    @Override
-    public boolean isUsingAdvancedTiming() {
-        return useAdvancedTiming_;
-    }
-
-    /**
-     * Returns the number of time points.
-     *
-     * @return the number of time points.
-     */
-    @Override
-    public int numTimePoints() {
-        return numTimePoints_;
-    }
-
-    /**
-     * Returns the time point interval in seconds.
-     *
-     * @return the time point interval in seconds.
-     */
-    @Override
-    public int timePointInterval() {
-        return timePointInterval_;
-    }
-
-    /**
-     * Returns the post move delay in milliseconds.
-     *
-     * @return the post move delay in milliseconds.
-     */
-    @Override
-    public int postMoveDelay() {
-        return postMoveDelay_;
-    }
-
-    @Override
-    public double liveScanPeriod() {
-        return liveScanPeriod_;
-    }
-
-    // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
-    @Override
-    public String toString() {
-        return String.format("[timing=%s]", timing_);
-    }
-//    public String toJson() {
-//        return new Gson().toJson(this);
-//    }
-
-//    public String toPrettyJson() {
-//        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//        return gson.toJson(this);
-//    }
-
-//    public static DefaultAcquisitionSettingsDISPIM fromJson(final String json) {
-//        return new Gson().fromJson(json, DefaultAcquisitionSettingsDISPIM.class);
-//    }
 }
