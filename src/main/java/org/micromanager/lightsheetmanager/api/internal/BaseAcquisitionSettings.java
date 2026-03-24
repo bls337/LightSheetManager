@@ -5,8 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.ChannelSettings;
+import org.micromanager.lightsheetmanager.api.SheetCalibration;
+import org.micromanager.lightsheetmanager.api.SliceCalibration;
 import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
+import org.micromanager.lightsheetmanager.api.TimingSettings;
+import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 
 /**
@@ -221,20 +225,40 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
 
     public static <T extends AcquisitionSettings> T fromJson(final String json, final Class<T> cls) {
         Gson gson = new GsonBuilder()
-                .registerTypeAdapter(StageScanSettings.class, (JsonDeserializer<StageScanSettings>)
-                        (jsonElement, typeOfT, context) -> {
-                            // This forces Gson to use the concrete implementation class
-                            return context.deserialize(jsonElement, DefaultStageScanSettings.class);
-                        })
                 .registerTypeAdapter(ChannelSettings.class, (JsonDeserializer<ChannelSettings>)
                         (jsonElement, typeOfT, context) -> {
                             // This forces Gson to use the concrete implementation class
                             return context.deserialize(jsonElement, DefaultChannelSettings.class);
                         })
+                .registerTypeAdapter(TimingSettings.class, (JsonDeserializer<TimingSettings>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultTimingSettings.class);
+                        })
+                .registerTypeAdapter(VolumeSettings.class, (JsonDeserializer<VolumeSettings>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultVolumeSettings.class);
+                        })
+                .registerTypeAdapter(StageScanSettings.class, (JsonDeserializer<StageScanSettings>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultStageScanSettings.class);
+                        })
                 .registerTypeAdapter(SliceSettings.class, (JsonDeserializer<SliceSettings>)
                         (jsonElement, typeOfT, context) -> {
                             // This forces Gson to use the concrete implementation class
                             return context.deserialize(jsonElement, DefaultSliceSettings.class);
+                        })
+                .registerTypeAdapter(SheetCalibration.class, (JsonDeserializer<SheetCalibration>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultSheetCalibration.class);
+                        })
+                .registerTypeAdapter(SliceCalibration.class, (JsonDeserializer<SliceCalibration>)
+                        (jsonElement, typeOfT, context) -> {
+                            // This forces Gson to use the concrete implementation class
+                            return context.deserialize(jsonElement, DefaultSliceCalibration.class);
                         })
                 .create();
         return gson.fromJson(json, cls);

@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
+import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
@@ -48,7 +49,7 @@ public class AdvancedTimingPanel extends Panel {
         final Label lblScansPerSlice = new Label("Scans Per Slice: ");
         final Label lblCameraExposure = new Label("Camera Exposure [ms]: ");
 
-        final DefaultTimingSettings timingSettings = model_.acquisitions().settings().timing();
+        final TimingSettings timingSettings = model_.acquisitions().settings().timing();
 
         spnDelayBeforeScan_ = Spinner.createDoubleSpinner(
                 timingSettings.delayBeforeScan(), 0.0, 10000.0, 0.25);
@@ -191,7 +192,7 @@ public class AdvancedTimingPanel extends Panel {
      * Updates the spinner values from the timing settings builder.
      */
     public void updateSpinners() {
-        final DefaultTimingSettings timingSettings = model_.acquisitions()
+        final TimingSettings timingSettings = model_.acquisitions()
                 .settingsBuilder().timingBuilder().build();
         spnDelayBeforeScan_.setDouble(timingSettings.delayBeforeScan());
         spnScansPerSlice_.setInt(timingSettings.scansPerSlice());

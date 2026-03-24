@@ -3,11 +3,6 @@ package org.micromanager.lightsheetmanager.api;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 
 /**
  * Acquisition settings for SCAPE microscopes.
@@ -19,12 +14,12 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return a builder to create a modified copy of these settings
      */
-    //Builder copyBuilder();
+    Builder copyBuilder();
 
     /**
-     * Returns the immutable DefaultChannelSettings instance.
+     * Returns the immutable ChannelSettings instance.
      *
-     * @return immutable DefaultChannelSettings instance.
+     * @return immutable ChannelSettings instance.
      */
     ChannelSettings channels();
 
@@ -33,19 +28,19 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return immutable DefaultTimingSettings instance.
      */
-    DefaultTimingSettings timing();
+    TimingSettings timing();
 
     /**
      * Returns the immutable DefaultVolumeSettings instance.
      *
      * @return immutable DefaultVolumeSettings instance.
      */
-    DefaultVolumeSettings volume();
+    VolumeSettings volume();
 
     /**
-     * Returns the immutable DefaultSliceSettings instance.
+     * Returns the immutable SliceSettings instance.
      *
-     * @return immutable DefaultSliceSettings instance.
+     * @return immutable SliceSettings instance.
      */
     SliceSettings slice();
 
@@ -61,14 +56,14 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return immutable DefaultSheetCalibration instance.
      */
-    DefaultSheetCalibration sheetCalibration();
+    SheetCalibration sheetCalibration();
 
     /**
      * Returns the immutable DefaultSliceCalibration instance.
      *
      * @return immutable DefaultSliceCalibration instance.
      */
-    DefaultSliceCalibration sliceCalibration();
+    SliceCalibration sliceCalibration();
 
     /**
      * Returns the acquisition mode.
@@ -144,6 +139,9 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
 
         /**
          * Sets the acquisition mode.
+         * <p>
+         * If the mode is a stage scanning mode,
+         * set the stage scanning flag to true.
          *
          * @param mode the acquisition mode
          * @return {@code this} builder

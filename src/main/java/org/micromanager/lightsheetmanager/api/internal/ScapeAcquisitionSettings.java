@@ -2,27 +2,232 @@ package org.micromanager.lightsheetmanager.api.internal;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettingsScape;
 import org.micromanager.lightsheetmanager.api.ChannelSettings;
+import org.micromanager.lightsheetmanager.api.SheetCalibration;
+import org.micromanager.lightsheetmanager.api.SliceCalibration;
 import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
+import org.micromanager.lightsheetmanager.api.TimingSettings;
+import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements AcquisitionSettingsScape {
+
+    private final ChannelSettings channels_;
+    private final TimingSettings timing_;
+    private final VolumeSettings volume_;
+    private final SliceSettings slice_;
+    private final StageScanSettings stageScan_;
+    private final SheetCalibration sheetCalibration_;
+    private final SliceCalibration sliceCalibration_;
+
+    private final AcquisitionMode acquisitionMode_;
+
+    private final CameraMode cameraMode_;
+    private final CameraData[] imagingCameraOrder_;
+
+    private final boolean useTimePoints_;
+    private final boolean useMultiplePositions_;
+    private final boolean useHardwareTimePoints_;
+    private final boolean useAdvancedTiming_;
+
+    private final int numTimePoints_;
+    private final double timePointInterval_;
+    private final int postMoveDelay_;
+
+    private ScapeAcquisitionSettings(Builder builder) {
+        super(builder);
+        channels_ = builder.channelBuilder().build();
+        timing_ = builder.timingBuilder().build();
+        volume_ = builder.volumeBuilder().build();
+        slice_ = builder.sliceBuilder().build();
+        stageScan_ = builder.stageScanBuilder().build();
+        sheetCalibration_ = builder.sheetCalibrationBuilder().build();
+        sliceCalibration_ = builder.sliceCalibrationBuilder().build();
+        acquisitionMode_ = builder.acquisitionMode_;
+        cameraMode_ = builder.cameraMode_;
+        imagingCameraOrder_ = builder.imagingCameraOrder_.clone();
+        useTimePoints_ = builder.useTimePoints_;
+        useMultiplePositions_ = builder.useMultiplePositions_;
+        useHardwareTimePoints_ = builder.useHardwareTimePoints_;
+        useAdvancedTiming_ = builder.useAdvancedTiming_;
+        numTimePoints_ = builder.numTimePoints_;
+        timePointInterval_ = builder.timePointInterval_;
+        postMoveDelay_ = builder.postMoveDelay_;
+    }
 
     public static Builder builder() {
         return new Builder();
     }
 
-    public static class Builder extends BaseAcquisitionSettings.Builder<Builder> implements AcquisitionSettingsScape.Builder<Builder> {
+    public static Builder builder(ScapeAcquisitionSettings settings) {
+        Objects.requireNonNull(settings, "Cannot copy from null settings");
+        return new Builder(settings);
+    }
+
+    @Override
+    public Builder copyBuilder() {
+        return new Builder(this);
+    }
+
+    @Override
+    public ChannelSettings channels() {
+        return channels_;
+    }
+
+    @Override
+    public TimingSettings timing() {
+        return timing_;
+    }
+
+    @Override
+    public VolumeSettings volume() {
+        return volume_;
+    }
+
+    @Override
+    public SliceSettings slice() {
+        return slice_;
+    }
+
+    @Override
+    public StageScanSettings stageScan() {
+        return stageScan_;
+    }
+
+    @Override
+    public SheetCalibration sheetCalibration() {
+        return sheetCalibration_;
+    }
+
+    @Override
+    public SliceCalibration sliceCalibration() {
+        return sliceCalibration_;
+    }
+
+    @Override
+    public AcquisitionMode acquisitionMode() {
+        return acquisitionMode_;
+    }
+
+    @Override
+    public CameraMode cameraMode() {
+        return cameraMode_;
+    }
+
+    @Override
+    public CameraData[] imagingCameraOrder() {
+        return imagingCameraOrder_;
+    }
+
+    @Override
+    public boolean isUsingTimePoints() {
+        return useTimePoints_;
+    }
+
+    @Override
+    public boolean isUsingMultiplePositions() {
+        return useMultiplePositions_;
+    }
+
+    @Override
+    public boolean isUsingHardwareTimePoints() {
+        return useHardwareTimePoints_;
+    }
+
+    @Override
+    public boolean isUsingAdvancedTiming() {
+        return useAdvancedTiming_;
+    }
+
+    @Override
+    public int numTimePoints() {
+        return numTimePoints_;
+    }
+
+    @Override
+    public double timePointInterval() {
+        return timePointInterval_;
+    }
+
+    @Override
+    public int postMoveDelay() {
+        return postMoveDelay_;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        ScapeAcquisitionSettings other = (ScapeAcquisitionSettings) obj;
+        return Objects.equals(channels_, other.channels_) &&
+                Objects.equals(timing_, other.timing_) &&
+                Objects.equals(volume_, other.volume_) &&
+                Objects.equals(slice_, other.slice_) &&
+                Objects.equals(stageScan_, other.stageScan_) &&
+                Objects.equals(sheetCalibration_, other.sheetCalibration_) &&
+                Objects.equals(sliceCalibration_, other.sliceCalibration_) &&
+                acquisitionMode_ == other.acquisitionMode_ &&
+                cameraMode_ == other.cameraMode_ &&
+                Arrays.equals(imagingCameraOrder_, other.imagingCameraOrder_) &&
+                useTimePoints_ == other.useTimePoints_ &&
+                useMultiplePositions_ == other.useMultiplePositions_ &&
+                useHardwareTimePoints_ == other.useHardwareTimePoints_ &&
+                useAdvancedTiming_ == other.useAdvancedTiming_ &&
+                numTimePoints_ == other.numTimePoints_ &&
+                Double.compare(other.timePointInterval_, timePointInterval_) == 0 &&
+                postMoveDelay_ == other.postMoveDelay_;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                channels_,
+                timing_,
+                volume_,
+                slice_,
+                stageScan_,
+                sheetCalibration_,
+                sliceCalibration_,
+                acquisitionMode_,
+                cameraMode_,
+                Arrays.hashCode(imagingCameraOrder_),
+                useTimePoints_,
+                useMultiplePositions_,
+                useHardwareTimePoints_,
+                useAdvancedTiming_,
+                numTimePoints_,
+                timePointInterval_,
+                postMoveDelay_
+        );
+    }
+
+    // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
+    @Override
+    public String toString() {
+        return String.format("%s[channels=%s, timing=%s, volume=%s, slice=%s]",
+                getClass().getSimpleName(), channels_, timing_, volume_, slice_);
+    }
+
+    public static class Builder
+            extends BaseAcquisitionSettings.Builder<Builder>
+            implements AcquisitionSettingsScape.Builder<Builder> {
 
         private ChannelSettings.Builder channelBuilder_ = DefaultChannelSettings.builder();
-        private DefaultTimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
-        private DefaultVolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
+        private TimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
+        private VolumeSettings.Builder volumeBuilder_ = DefaultVolumeSettings.builder();
         private SliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
         private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
-        private DefaultSheetCalibration.Builder sheetCalibBuilder_ = DefaultSheetCalibration.builder();
-        private DefaultSliceCalibration.Builder sliceCalibBuilder_ = DefaultSliceCalibration.builder();
+        private SheetCalibration.Builder sheetCalibBuilder_ = DefaultSheetCalibration.builder();
+        private SliceCalibration.Builder sliceCalibBuilder_ = DefaultSliceCalibration.builder();
 
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
 
@@ -62,14 +267,6 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             postMoveDelay_ = settings.postMoveDelay();
         }
 
-        /**
-         * Set the mode for the acquisition.
-         * <p>
-         * If the mode is a stage scanning mode,
-         * set internal stage scanning flag.
-         *
-         * @param mode the acquisition mode
-         */
         @Override
         public Builder acquisitionMode(final AcquisitionMode mode) {
             acquisitionMode_ = mode;
@@ -80,99 +277,54 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             return this;
         }
 
-        /**
-         * Sets the camera mode.
-         *
-         * @param mode the camera mode.
-         */
         @Override
         public Builder cameraMode(final CameraMode mode) {
             cameraMode_ = mode;
             return this;
         }
 
-        /**
-         * Sets the imaging camera order.
-         *
-         * @param order the imaging camera order
-         */
         @Override
         public Builder imagingCameraOrder(final CameraData[] order) {
             imagingCameraOrder_ = order;
             return this;
         }
 
-        /**
-         * Sets the acquisition to use time points.
-         *
-         * @param state true to use time points.
-         */
         @Override
         public Builder useTimePoints(final boolean state) {
             useTimePoints_ = state;
             return this;
         }
 
-        /**
-         * Sets the acquisition to use multiple positions.
-         *
-         * @param state true to use multiple positions.
-         */
         @Override
         public Builder useMultiplePositions(final boolean state) {
             useMultiplePositions_ = state;
             return this;
         }
 
-        /**
-         * Sets the acquisition to use hardware time points.
-         *
-         * @param state true to use time points.
-         */
         @Override
         public Builder useHardwareTimePoints(final boolean state) {
             useHardwareTimePoints_ = state;
             return this;
         }
 
-        /**
-         * Sets the acquisition to use advanced timing settings.
-         *
-         * @param state true to use advanced timing settings
-         */
         @Override
         public Builder useAdvancedTiming(final boolean state) {
             useAdvancedTiming_ = state;
             return this;
         }
 
-        /**
-         * Sets the number of time points.
-         *
-         * @param numTimePoints the number of time points
-         */
         @Override
         public Builder numTimePoints(final int numTimePoints) {
             numTimePoints_ = numTimePoints;
             return this;
         }
 
-        /**
-         * Sets the time point interval between time points in seconds.
-         *
-         * @param timePointInterval the time point interval in seconds.
-         */
         @Override
         public Builder timePointInterval(final double timePointInterval) {
             timePointInterval_ = timePointInterval;
             return this;
         }
 
-        /**
-         * Sets the delay after a move when using multiple positions.
-         *
-         * @param postMoveDelay the delay in milliseconds.
-         */
         @Override
         public Builder postMoveDelay(final int postMoveDelay) {
             postMoveDelay_ = postMoveDelay;
@@ -184,11 +336,11 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             return channelBuilder_;
         }
 
-        public DefaultTimingSettings.Builder timingBuilder() {
+        public TimingSettings.Builder timingBuilder() {
             return timingBuilder_;
         }
 
-        public DefaultVolumeSettings.Builder volumeBuilder() {
+        public VolumeSettings.Builder volumeBuilder() {
             return volumeBuilder_;
         }
 
@@ -200,11 +352,11 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
             return stageScanBuilder_;
         }
 
-        public DefaultSheetCalibration.Builder sheetCalibrationBuilder() {
+        public SheetCalibration.Builder sheetCalibrationBuilder() {
             return sheetCalibBuilder_;
         }
 
-        public DefaultSliceCalibration.Builder sliceCalibrationBuilder() {
+        public SliceCalibration.Builder sliceCalibrationBuilder() {
             return sliceCalibBuilder_;
         }
 
@@ -229,252 +381,10 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         // TODO: finish toString with rest of properties
         @Override
         public String toString() {
-            return String.format("[tsb_=%s]", timingBuilder_);
+            return String.format("%s[timingBuilder=%s]",
+                    getClass().getSimpleName(), timingBuilder_);
         }
 
     }
 
-    private final ChannelSettings channels_;
-    private final DefaultTimingSettings timing_;
-    private final DefaultVolumeSettings volume_;
-    private final SliceSettings slice_;
-    private final StageScanSettings stageScan_;
-    private final DefaultSheetCalibration sheetCalibration_;
-    private final DefaultSliceCalibration sliceCalibration_;
-
-    private final AcquisitionMode acquisitionMode_;
-
-    private final CameraMode cameraMode_;
-    private final CameraData[] imagingCameraOrder_;
-
-    private final boolean useTimePoints_;
-    private final boolean useMultiplePositions_;
-    private final boolean useHardwareTimePoints_;
-    private final boolean useAdvancedTiming_;
-
-    private final int numTimePoints_;
-    private final double timePointInterval_;
-    private final int postMoveDelay_;
-
-    private ScapeAcquisitionSettings(Builder builder) {
-        super(builder);
-        channels_ = builder.channelBuilder().build();
-        timing_ = builder.timingBuilder_.build();
-        volume_ = builder.volumeBuilder_.build();
-        slice_ = builder.sliceBuilder().build();
-        stageScan_ = builder.stageScanBuilder().build();
-        sheetCalibration_ = builder.sheetCalibBuilder_.build();
-        sliceCalibration_ = builder.sliceCalibBuilder_.build();
-        acquisitionMode_ = builder.acquisitionMode_;
-        cameraMode_ = builder.cameraMode_;
-        imagingCameraOrder_ = builder.imagingCameraOrder_;
-        useTimePoints_ = builder.useTimePoints_;
-        useMultiplePositions_ = builder.useMultiplePositions_;
-        useHardwareTimePoints_ = builder.useHardwareTimePoints_;
-        useAdvancedTiming_ = builder.useAdvancedTiming_;
-        numTimePoints_ = builder.numTimePoints_;
-        timePointInterval_ = builder.timePointInterval_;
-        postMoveDelay_ = builder.postMoveDelay_;
-    }
-
-//    /**
-//     * Creates a Builder populated with settings of this DefaultAcquisitionSettingsSCAPE instance.
-//     *
-//     * @return DefaultAcquisitionSettingsSCAPE.Builder pre-populated with settings of this instance.
-//     */
-//    @Override
-//    public DefaultAcquisitionSettingsSCAPE.Builder copyBuilder() {
-//        return new Builder(this);
-//    }
-
-    /**
-     * Returns the immutable DefaultChannelSettings instance.
-     *
-     * @return immutable DefaultChannelSettings instance.
-     */
-    @Override
-    public ChannelSettings channels() {
-        return channels_;
-    }
-
-    /**
-     * Returns the immutable DefaultTimingSettings instance.
-     *
-     * @return immutable DefaultTimingSettings instance.
-     */
-    @Override
-    public DefaultTimingSettings timing() {
-        return timing_;
-    }
-
-    /**
-     * Returns the immutable DefaultVolumeSettings instance.
-     *
-     * @return immutable DefaultVolumeSettings instance.
-     */
-    @Override
-    public DefaultVolumeSettings volume() {
-        return volume_;
-    }
-
-    /**
-     * Returns the immutable DefaultSliceSettings instance.
-     *
-     * @return immutable DefaultSliceSettings instance.
-     */
-    @Override
-    public SliceSettings slice() {
-        return slice_;
-    }
-
-    /**
-     * Returns the immutable DefaultStageScanSettings instance.
-     *
-     * @return immutable DefaultStageScanSettings instance.
-     */
-    @Override
-    public StageScanSettings stageScan() {
-        return stageScan_;
-    }
-
-    /**
-     * Returns the immutable DefaultSheetCalibration instance.
-     *
-     * @return immutable DefaultSheetCalibration instance.
-     */
-    @Override
-    public DefaultSheetCalibration sheetCalibration() {
-        return sheetCalibration_;
-    }
-
-    /**
-     * Returns an immutable DefaultSliceCalibration instance.
-     * <p>
-     * Views start at index 1.
-     *
-     * @return immutable DefaultSliceCalibration instance.
-     */
-    @Override
-    public DefaultSliceCalibration sliceCalibration() {
-        return sliceCalibration_;
-    }
-
-    /**
-     * Returns the acquisition mode.
-     *
-     * @return the acquisition mode.
-     */
-    @Override
-    public AcquisitionMode acquisitionMode() {
-        return acquisitionMode_;
-    }
-
-    /**
-     * Returns the camera mode.
-     *
-     * @return the camera mode.
-     */
-    @Override
-    public CameraMode cameraMode() {
-        return cameraMode_;
-    }
-
-    /**
-     * Returns the imaging camera order.
-     *
-     * @return the imaging camera order
-     */
-    @Override
-    public CameraData[] imagingCameraOrder() {
-        return imagingCameraOrder_;
-    }
-
-    /**
-     * Returns true if using time points.
-     *
-     * @return true if using time points.
-     */
-    @Override
-    public boolean isUsingTimePoints() {
-        return useTimePoints_;
-    }
-
-    /**
-     * Returns true if using multiple positions.
-     *
-     * @return true if using multiple positions.
-     */
-    @Override
-    public boolean isUsingMultiplePositions() {
-        return useMultiplePositions_;
-    }
-
-    /**
-     * Returns true if using hardware time points.
-     *
-     * @return true if using hardware time points.
-     */
-    @Override
-    public boolean isUsingHardwareTimePoints() {
-        return useHardwareTimePoints_;
-    }
-
-    /**
-     * Returns true if using advanced timing settings.
-     *
-     * @return true if using advanced timing settings.
-     */
-    @Override
-    public boolean isUsingAdvancedTiming() {
-        return useAdvancedTiming_;
-    }
-
-    /**
-     * Returns the number of time points.
-     *
-     * @return the number of time points.
-     */
-    @Override
-    public int numTimePoints() {
-        return numTimePoints_;
-    }
-
-    /**
-     * Returns the time point interval in seconds.
-     *
-     * @return the time point interval in seconds.
-     */
-    @Override
-    public double timePointInterval() {
-        return timePointInterval_;
-    }
-
-    /**
-     * Returns the post move delay in milliseconds.
-     *
-     * @return the post move delay in milliseconds.
-     */
-    @Override
-    public int postMoveDelay() {
-        return postMoveDelay_;
-    }
-
-    // TODO: finish this, and maybe use pretty printing? or just rely on JSON conversion?
-    @Override
-    public String toString() {
-        return String.format("[timingSettings_=%s]", timing_);
-    }
-
-//    public String toJson() {
-//        return new Gson().toJson(this);
-//    }
-
-//    public String toPrettyJson() {
-//        final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//        return gson.toJson(this);
-//    }
-
-//    public static DefaultAcquisitionSettingsDISPIM fromJson(final String json) {
-//        return new Gson().fromJson(json, DefaultAcquisitionSettingsDISPIM.class);
-//    }
 }

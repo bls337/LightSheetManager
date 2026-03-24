@@ -30,6 +30,11 @@ public class DefaultTimingSettings implements TimingSettings {
         alternateScanDirection_ = builder.alternateScanDirection_;
     }
 
+    // Note: used by GSON library for deserialization
+    private DefaultTimingSettings() {
+        this(new Builder());
+    }
+
     public static Builder builder() {
         return new Builder();
     }

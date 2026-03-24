@@ -26,6 +26,11 @@ public class DefaultVolumeSettings implements VolumeSettings {
         endPosition_ = builder.endPosition_;
     }
 
+    // Note: used by GSON library for deserialization
+    private DefaultVolumeSettings() {
+        this(new Builder());
+    }
+
     public static Builder builder() {
         return new Builder();
     }
@@ -40,81 +45,41 @@ public class DefaultVolumeSettings implements VolumeSettings {
         return new Builder(this);
     }
 
-    /**
-     * Returns the imaging path that the acquisition starts on.
-     *
-     * @return the first view
-     */
     @Override
     public int firstView() {
         return firstView_;
     }
 
-    /**
-     * Return the number of views to use during an acquisition.
-     *
-     * @return the number of views
-     */
     @Override
     public int numViews() {
         return numViews_;
     }
 
-    /**
-     * Returns the number of slices per volume.
-     *
-     * @return the number of slices
-     */
     @Override
     public int slicesPerView() {
         return slicesPerView_;
     }
 
-    /**
-     * Return the delay in milliseconds before switching imaging paths in milliseconds.
-     *
-     * @return the delay in milliseconds
-     */
     @Override
     public double delayBeforeView() {
         return delayBeforeView_;
     }
 
-    /**
-     * Returns the step size in microns.
-     *
-     * @return the step size in microns
-     */
     @Override
     public double sliceStepSize() {
         return sliceStepSize_;
     }
 
-    /**
-     * Returns the start position of the volume.
-     *
-     * @return the start position
-     */
     @Override
     public double startPosition() {
         return startPosition_;
     }
 
-    /**
-     * Returns the center position of the volume.
-     *
-     * @return the center position
-     */
     @Override
     public double centerPosition() {
         return centerPosition_;
     }
 
-    /**
-     * Returns the end position of the volume.
-     *
-     * @return the end position
-     */
     @Override
     public double endPosition() {
         return endPosition_;
@@ -170,11 +135,6 @@ public class DefaultVolumeSettings implements VolumeSettings {
         private Builder() {
         }
 
-        /**
-         * Create a builder with values populated from already existing DefaultVolumeSettings.
-         *
-         * @param settings the settings to copy
-         */
         private Builder(final VolumeSettings settings) {
             firstView_ = settings.firstView();
             numViews_ = settings.numViews();
@@ -186,33 +146,18 @@ public class DefaultVolumeSettings implements VolumeSettings {
             endPosition_ = settings.endPosition();
         }
 
-        /**
-         * Sets the number of views to use during an acquisition.
-         *
-         * @param numViews the number of view
-         */
         @Override
         public Builder numViews(final int numViews) {
             numViews_ = numViews;
             return this;
         }
 
-        /**
-         * Sets the imaging path to start the acquisition with.
-         *
-         * @param firstView the first view
-         */
         @Override
         public Builder firstView(final int firstView) {
             firstView_ = firstView;
             return this;
         }
 
-        /**
-         * Sets the delay between switching imaging paths in an acquisition.
-         *
-         * @param viewDelayMs the delay in milliseconds
-         */
         @Override
         public Builder delayBeforeView(final double viewDelayMs) {
             delayBeforeView_ = viewDelayMs;
@@ -220,25 +165,18 @@ public class DefaultVolumeSettings implements VolumeSettings {
         }
 
         @Override
-        public Builder slicesPerView(final int n) {
-            slicesPerView_ = n;
+        public Builder slicesPerView(final int numSlices) {
+            slicesPerView_ = numSlices;
             return this;
         }
 
         @Override
-        public Builder sliceStepSize(final double um) {
-            sliceStepSize_ = um;
+        public Builder sliceStepSize(final double stepSizeUm) {
+            sliceStepSize_ = stepSizeUm;
             return this;
         }
 
         // TODO: what happens when stepSize is not evenly divided by range? maybe just remove?
-        /**
-         * Sets the volume bounds, automatically computing numSlices and centerPosition.
-         *
-         * @param startPosition the start position
-         * @param endPosition the end position
-         * @param stepSizeUm the step size in micron
-         */
         @Override
         public Builder volumeBounds(final double startPosition, final double endPosition, final double stepSizeUm) {
             startPosition_ = startPosition;
@@ -249,13 +187,6 @@ public class DefaultVolumeSettings implements VolumeSettings {
             return this;
         }
 
-        /**
-         * Sets the volume bounds, automatically computing stepSizeUm and centerPosition.
-         *
-         * @param startPosition the start position
-         * @param endPosition the end position
-         * @param numSlices the number of slices
-         */
         @Override
         public Builder volumeBounds(final double startPosition, final double endPosition, final int numSlices) {
             startPosition_ = startPosition;
@@ -266,13 +197,6 @@ public class DefaultVolumeSettings implements VolumeSettings {
             return this;
         }
 
-        /**
-         * Sets the volume bounds, automatically computing startPosition and endPosition.
-         *
-         * @param centerPosition the center position
-         * @param numSlices the number of slices
-         * @param stepSizeUm the step size in microns
-         */
         @Override
         public Builder volumeBounds(final double centerPosition, final int numSlices, final double stepSizeUm) {
             final double halfDistance = (stepSizeUm * numSlices) / 2.0;
@@ -284,15 +208,11 @@ public class DefaultVolumeSettings implements VolumeSettings {
             return this;
         }
 
-        /**
-         * Creates an immutable instance of VolumeSettings
-         *
-         * @return Immutable version of VolumeSettings
-         */
         @Override
         public DefaultVolumeSettings build() {
             return new DefaultVolumeSettings(this);
         }
+
     }
 
 }

@@ -4,6 +4,7 @@ import mmcorej.CMMCore;
 import mmcorej.Configuration;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
@@ -301,7 +302,7 @@ public class PLogicScape {
     //    * gets the correct value for the slice timing's sliceDuration field based on other values of slice timing
 
     // slice duration is the max out of the scan time, laser time, and camera time
-    public double getSliceDuration(final DefaultTimingSettings s, final int scanNum) {
+    public double getSliceDuration(final TimingSettings s, final int scanNum) {
         return Math.max(Math.max(
                         s.delayBeforeScan() + (s.scanDuration() * scanNum), // scan time
                         s.delayBeforeLaser() + s.laserTriggerDuration()     // laser time

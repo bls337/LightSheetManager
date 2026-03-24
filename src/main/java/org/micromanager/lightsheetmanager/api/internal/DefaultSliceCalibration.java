@@ -14,6 +14,11 @@ public class DefaultSliceCalibration implements SliceCalibration {
         offset_ = builder.offset_;
     }
 
+    // Note: used by GSON library for deserialization
+    private DefaultSliceCalibration() {
+        this(new Builder());
+    }
+
     public static Builder builder() {
         return new Builder();
     }

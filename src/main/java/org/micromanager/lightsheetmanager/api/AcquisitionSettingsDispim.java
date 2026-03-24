@@ -1,13 +1,7 @@
 package org.micromanager.lightsheetmanager.api;
 
+import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
-import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 
 /**
@@ -20,7 +14,7 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return a builder to create a modified copy of these settings
      */
-    //Builder copyBuilder();
+    Builder copyBuilder();
 
     /**
      * Returns the immutable DefaultChannelSettings instance.
@@ -34,28 +28,28 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultTimingSettings instance.
      */
-    DefaultTimingSettings timing();
+    TimingSettings timing();
 
     /**
      * Returns the immutable DefaultVolumeSettings instance.
      *
      * @return immutable DefaultVolumeSettings instance.
      */
-    DefaultVolumeSettings volume();
+    VolumeSettings volume();
 
     /**
      * Returns the immutable DefaultSliceSettings instance.
      *
      * @return immutable DefaultSliceSettings instance.
      */
-    DefaultSliceSettings slice();
+    SliceSettings slice();
 
     /**
      * Returns the immutable DefaultSliceSettingsLS instance.
      *
      * @return immutable DefaultSliceSettingsLS instance.
      */
-    DefaultSliceSettingsLS sliceLS();
+    SliceSettingsLightSheet sliceLS();
 
     /**
      * Returns the immutable DefaultScanSettings instance.
@@ -69,15 +63,14 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      *
      * @return immutable DefaultSheetCalibration instance.
      */
-    DefaultSheetCalibration sheetCalibration(final int view);
+    SheetCalibration sheetCalibration(final int view);
 
     /**
      * Returns the immutable DefaultSliceCalibration instance.
      *
      * @return immutable DefaultSliceCalibration instance.
      */
-    DefaultSliceCalibration sliceCalibration(final int view);
-    //DefaultSliceCalibration sliceCalibration();
+    SliceCalibration sliceCalibration(final int view);
 
     /**
      * Returns the acquisition mode.
@@ -92,6 +85,13 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
      * @return the camera mode.
      */
     CameraMode cameraMode();
+
+    /**
+     * Returns the imaging camera order.
+     *
+     * @return the imaging camera order
+     */
+    CameraData[] imagingCameraOrder();
 
     /**
      * Returns true if using time points.
@@ -161,6 +161,14 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
          * @return {@code this} builder
          */
         T cameraMode(final CameraMode cameraMode);
+
+        /**
+         * Sets the imaging camera order.
+         *
+         * @param order the imaging camera order
+         * @return {@code this} builder
+         */
+        T imagingCameraOrder(final CameraData[] order);
 
         /**
          * Sets the acquisition to use time points.

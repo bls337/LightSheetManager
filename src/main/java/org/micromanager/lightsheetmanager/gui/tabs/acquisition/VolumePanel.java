@@ -1,5 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
+import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 import org.micromanager.lightsheetmanager.LightSheetManager;
@@ -40,8 +41,7 @@ public class VolumePanel extends Panel {
         final GeometryType geometryType = model_.devices().adapter().geometry();
         final int numImagingPaths = model_.devices().adapter().numImagingPaths();
 
-        final DefaultVolumeSettings volumeSettings = model_.acquisitions()
-                .settings().volume();
+        final VolumeSettings volumeSettings = model_.acquisitions().settings().volume();
 
         // create labels for combo boxes
         Integer[] viewOptions = new Integer[numImagingPaths];
