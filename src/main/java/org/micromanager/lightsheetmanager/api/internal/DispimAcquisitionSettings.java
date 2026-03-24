@@ -75,11 +75,10 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         return new Builder(settings);
     }
 
-//    @Override
-//    public DefaultAcquisitionSettingsDISPIM.Builder copyBuilder() {
-//        return new Builder(this);
-//        );
-//    }
+    @Override
+    public Builder copyBuilder() {
+        return new Builder(this);
+    }
 
     @Override
     public ChannelSettings channels() {

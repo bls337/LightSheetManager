@@ -19,7 +19,7 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
      *
      * @return a builder to create a modified copy of these settings
      */
-    //Builder copyBuilder();
+    Builder copyBuilder();
 
     /**
      * Returns the immutable ChannelSettings instance.

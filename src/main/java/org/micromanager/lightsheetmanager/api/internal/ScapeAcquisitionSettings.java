@@ -69,10 +69,10 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         return new Builder(settings);
     }
 
-//    @Override
-//    public DefaultAcquisitionSettingsSCAPE.Builder copyBuilder() {
-//        return new Builder(this);
-//    }
+    @Override
+    public Builder copyBuilder() {
+        return new Builder(this);
+    }
 
     @Override
     public ChannelSettings channels() {
