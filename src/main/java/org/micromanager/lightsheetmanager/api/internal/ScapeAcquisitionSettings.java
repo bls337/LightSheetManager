@@ -50,7 +50,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         sliceCalibration_ = builder.sliceCalibrationBuilder().build();
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
-        imagingCameraOrder_ = builder.imagingCameraOrder_;
+        imagingCameraOrder_ = builder.imagingCameraOrder_.clone();
         useTimePoints_ = builder.useTimePoints_;
         useMultiplePositions_ = builder.useMultiplePositions_;
         useHardwareTimePoints_ = builder.useHardwareTimePoints_;

@@ -1,13 +1,7 @@
 package org.micromanager.lightsheetmanager.api;
 
+import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultChannelSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettingsLS;
-import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 
 /**
@@ -93,6 +87,13 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
     CameraMode cameraMode();
 
     /**
+     * Returns the imaging camera order.
+     *
+     * @return the imaging camera order
+     */
+    CameraData[] imagingCameraOrder();
+
+    /**
      * Returns true if using time points.
      *
      * @return true if using time points.
@@ -160,6 +161,14 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
          * @return {@code this} builder
          */
         T cameraMode(final CameraMode cameraMode);
+
+        /**
+         * Sets the imaging camera order.
+         *
+         * @param order the imaging camera order
+         * @return {@code this} builder
+         */
+        T imagingCameraOrder(final CameraData[] order);
 
         /**
          * Sets the acquisition to use time points.

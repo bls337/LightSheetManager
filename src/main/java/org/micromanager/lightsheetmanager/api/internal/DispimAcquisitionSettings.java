@@ -9,6 +9,7 @@ import org.micromanager.lightsheetmanager.api.SliceSettingsLightSheet;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
+import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 
@@ -27,7 +28,9 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     private final SliceCalibration[] sliceCalibrations_;
 
     private final AcquisitionMode acquisitionMode_;
+
     private final CameraMode cameraMode_;
+    private final CameraData[] imagingCameraOrder_;
 
     private final boolean useTimePoints_;
     private final boolean useMultiplePositions_;
@@ -56,6 +59,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         }
         acquisitionMode_ = builder.acquisitionMode_;
         cameraMode_ = builder.cameraMode_;
+        imagingCameraOrder_ = builder.imagingCameraOrder_.clone();
         useTimePoints_ = builder.useTimePoints_;
         useMultiplePositions_ = builder.useMultiplePositions_;
         useHardwareTimePoints_ = builder.useHardwareTimePoints_;
@@ -131,6 +135,11 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     }
 
     @Override
+    public CameraData[] imagingCameraOrder() {
+        return imagingCameraOrder_;
+    }
+
+    @Override
     public boolean isUsingTimePoints() {
         return useTimePoints_;
     }
@@ -190,7 +199,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 // Objects.equals(sliceCalibration_, other.sliceCalibration_) &&
                 acquisitionMode_ == other.acquisitionMode_ &&
                 cameraMode_ == other.cameraMode_ &&
-                // Arrays.equals(imagingCameraOrder_, other.imagingCameraOrder_) &&
+                Arrays.equals(imagingCameraOrder_, other.imagingCameraOrder_) &&
                 useTimePoints_ == other.useTimePoints_ &&
                 useMultiplePositions_ == other.useMultiplePositions_ &&
                 useHardwareTimePoints_ == other.useHardwareTimePoints_ &&
@@ -214,7 +223,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 // sliceCalibration_,
                 acquisitionMode_,
                 cameraMode_,
-                //Arrays.hashCode(imagingCameraOrder_),
+                Arrays.hashCode(imagingCameraOrder_),
                 useTimePoints_,
                 useMultiplePositions_,
                 useHardwareTimePoints_,
@@ -246,7 +255,9 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         private SliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
 
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
+
         private CameraMode cameraMode_ = CameraMode.EDGE;
+        private CameraData[] imagingCameraOrder_ = {};
 
         private boolean useTimePoints_ = false;
         private boolean useMultiplePositions_ = false;
@@ -278,21 +289,28 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 slcb_[i] = settings.sliceCalibrations_[i].copyBuilder();
                 shcb_[i] = settings.sheetCalibrations_[i].copyBuilder();
             }
-            acquisitionMode_ = settings.acquisitionMode_;
-            cameraMode_ = settings.cameraMode_;
-            useTimePoints_ = settings.useTimePoints_;
-            useMultiplePositions_ = settings.useMultiplePositions_;
-            useHardwareTimePoints_ = settings.useHardwareTimePoints_;
-            useAdvancedTiming_ =  settings.useAdvancedTiming_;
-            numTimePoints_ = settings.numTimePoints_;
-            timePointInterval_ = settings.timePointInterval_;
-            postMoveDelay_ = settings.postMoveDelay_;
-            liveScanPeriod_ = settings.liveScanPeriod_;
+            acquisitionMode_ = settings.acquisitionMode();
+            cameraMode_ = settings.cameraMode();
+            imagingCameraOrder_ = settings.imagingCameraOrder();
+            useTimePoints_ = settings.isUsingTimePoints();
+            useMultiplePositions_ = settings.isUsingMultiplePositions();
+            useHardwareTimePoints_ = settings.isUsingHardwareTimePoints();
+            useAdvancedTiming_ =  settings.isUsingAdvancedTiming();
+            numTimePoints_ = settings.numTimePoints();
+            timePointInterval_ = settings.timePointInterval();
+            postMoveDelay_ = settings.postMoveDelay();
+            liveScanPeriod_ = settings.liveScanPeriod();
         }
 
         @Override
         public Builder acquisitionMode(final AcquisitionMode mode) {
             acquisitionMode_ = mode;
+            return this;
+        }
+
+        @Override
+        public Builder imagingCameraOrder(final CameraData[] order) {
+            imagingCameraOrder_ = order;
             return this;
         }
 

@@ -3,11 +3,6 @@ package org.micromanager.lightsheetmanager.api;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSheetCalibration;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceCalibration;
-import org.micromanager.lightsheetmanager.api.internal.DefaultSliceSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 
 /**
  * Acquisition settings for SCAPE microscopes.
