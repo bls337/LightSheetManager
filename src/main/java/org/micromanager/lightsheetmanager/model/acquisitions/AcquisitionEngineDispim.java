@@ -36,6 +36,8 @@ import java.util.ArrayList;
  */
 public class AcquisitionEngineDispim extends AcquisitionEngine {
 
+    private boolean isPolling_; // true if polling was enabled at the start of an acquisition
+
 //    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
    // TODO: remove this when a more generic method is available and get from base class
     private DispimAcquisitionSettings acqSettings_;
@@ -46,32 +48,22 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         acqSettings_ = DispimAcquisitionSettings.builder().build();
     }
 
-//    @Override
-//    public DefaultAcquisitionSettingsDISPIM settings() {
-//        return acqSettings_;
-//    }
-//
-//    @Override
-//    public DefaultAcquisitionSettingsDISPIM.Builder settingsBuilder() {
-//        return asb_;
-//    }
-
     @Override
     boolean setup() {
+        isPolling_ = model_.positions().isPolling();
+        if (isPolling_) {
+            model_.positions().stopPolling();
+            studio_.logs().logMessage("stopped position polling");
+        }
+
+        // make settings current
+        updateAcquisitionSettings();
+
         return true;
     }
 
     @Override
     boolean run() {
-
-        final boolean isPolling = model_.positions().isPolling();
-        if (isPolling) {
-            studio_.logs().logMessage("stopped position polling");
-            model_.positions().stopPolling();
-        }
-
-        // make settings current
-        updateAcquisitionSettings();
 
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
@@ -497,19 +489,15 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 //            }
 //        }
 
-
-
         // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
         // once everything finishes
         currentAcquisition_.finish();
-
 
         currentAcquisition_.waitForCompletion();
 
         // cleanup
         studio_.logs().logMessage("diSPIM plugin acquisition " +
                 " took: " + (System.currentTimeMillis() - acqButtonStart) + "ms");
-
 
         // clean up controller settings after acquisition
         // want to do this, even with demo cameras, so we can test everything else
@@ -542,6 +530,12 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
     @Override
     boolean finish() {
+
+        // start polling for navigation panel
+        if (isPolling_) {
+            studio_.logs().logMessage("started position polling after acquisition");
+            model_.positions().startPolling();
+        }
         return true;
     }
 

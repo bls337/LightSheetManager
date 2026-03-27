@@ -550,26 +550,15 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
-            // TODO(Brandon): account for > 2 simultaneous cameras
             final DeviceAdapter adapter = model_.devices().adapter();
             if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
-               // multiple simultaneous cameras
-                //if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
-                if (true) {
-                    // use 2 cameras
-                    final ArrayList<String> names = new ArrayList<>();
-                    final CameraBase[] cameraList = model_.devices().imagingCameras();
-                    for (CameraBase camera: cameraList) {
-                        names.add(camera.getDeviceName());
-                    }
-                    cameraNames = names.toArray(String[]::new);
-                } else {
-                    // use 1 camera
-                    final String camera = "ImagingCamera1"; // model_.acquisitions().settings().primaryCamera();
-                    cameraNames = new String[] {
-                            model_.devices().device(camera).getDeviceName(),
-                    };
+                // multiple simultaneous cameras
+                final ArrayList<String> names = new ArrayList<>();
+                final CameraBase[] cameraList = model_.devices().imagingCameras();
+                for (CameraBase camera: cameraList) {
+                    names.add(camera.getDeviceName());
                 }
+                cameraNames = names.toArray(String[]::new);
             } else {
                // standard camera setup
                if (acqSettings_.volume().numViews() > 1) {

@@ -286,23 +286,7 @@ public class DeviceManager {
     }
 
     public CameraBase firstImagingCamera() {
-        String deviceKey;
-        //if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
-        if (true) {
-            deviceKey =  firstActiveCameraName();
-        } else {
-            final DeviceAdapter adapter = model_.devices().adapter();
-            if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
-                deviceKey = "ImagingCamera1";
-            } else if (adapter.numSimultaneousCameras() > 1) {
-                deviceKey = "Imaging1Camera1";
-            } else if (adapter.numImagingPaths() > 1) {
-                deviceKey = "Imaging1Camera";
-            } else {
-                deviceKey = "ImagingCamera";
-            }
-        }
-        return (CameraBase) deviceMap_.get(deviceKey);
+        return (CameraBase) deviceMap_.get(firstActiveCameraName());
     }
 
     // For simultaneous cameras
@@ -352,19 +336,14 @@ public class DeviceManager {
 
     public CameraBase[] imagingCameras() {
         String[] cameraNames;
-        //if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
-        if (true) {
-            ArrayList<String> names = new ArrayList<>();
-            final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
-            for (CameraData camera : cameras) {
-                if (camera.isActive()) {
-                    names.add(camera.name());
-                }
+        ArrayList<String> names = new ArrayList<>();
+        final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
+        for (CameraData camera : cameras) {
+            if (camera.isActive()) {
+                names.add(camera.name());
             }
-            cameraNames = names.toArray(String[]::new);
-        } else {
-            cameraNames = imagingCameraNames();
         }
+        cameraNames = names.toArray(String[]::new);
         return Arrays.stream(cameraNames)
                 .map(name -> (CameraBase)deviceMap_.get(name))
                 .filter(Objects::nonNull)
