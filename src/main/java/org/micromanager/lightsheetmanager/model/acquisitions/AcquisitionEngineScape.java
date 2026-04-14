@@ -240,14 +240,18 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // TODO: put this in AcquisitionEngine base class, between setup and run once structure is better
         // save settings as JSON to the save directory
         FileUtils.writeStringToFile(saveDir + File.separator + "acq_settings.json", settingsJson);
-        final PositionList positionList = model_.studio().positions().getPositionList();
-        if (positionList.getNumberOfPositions() > 0) {
-            try {
-                final String path = saveDir + File.separator + "position_list.pos";
-                positionList.save(path);
-                model_.studio().logs().logMessage("Position list saved to " + path);
-            } catch (Exception e) {
-                model_.studio().logs().logError(e, "Could not save position list.");
+
+        // write the position list if we are using multiple positions
+        if (model_.acquisitions().settings().isUsingMultiplePositions()) {
+            final PositionList positionList = model_.studio().positions().getPositionList();
+            if (positionList.getNumberOfPositions() > 0) {
+                try {
+                    final String path = saveDir + File.separator + "position_list.pos";
+                    positionList.save(path);
+                    model_.studio().logs().logMessage("Position list saved to " + path);
+                } catch (Exception e) {
+                    model_.studio().logs().logError(e, "Could not save position list.");
+                }
             }
         }
 
