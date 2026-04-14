@@ -11,6 +11,7 @@ import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.model.DataStorage;
+import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 
 import javax.swing.JLabel;
 import java.awt.Color;
@@ -30,7 +31,12 @@ public class SavePanel extends Panel {
     private ComboBox<DataStorage.SaveMode> cbxSaveMode_;
     private CheckBox cbxSaveWhileAcquiring_;
 
+    private Button btnSaveSettings_;
+    private Button btnLoadSettings_;
+
     private final FileDialogs.FileType directorySelect_;
+    private final FileDialogs.FileType jsonFileSave_;
+    private final FileDialogs.FileType jsonFileLoad_;
 
     private final LightSheetManager model_;
     private final LightSheetManagerFrame frame_;
@@ -40,13 +46,28 @@ public class SavePanel extends Panel {
         model_ = Objects.requireNonNull(model);
         frame_ = Objects.requireNonNull(frame);
 
-        // file type filter
         directorySelect_ = new FileDialogs.FileType(
                 "SAVE_DIRECTORY",
                 "All Directories",
                 "",
                 false,
                 ""
+        );
+
+        jsonFileSave_ = new FileDialogs.FileType(
+                "SAVE_FILE",
+                "JSON Files",
+                "acq_settings.json",
+                false,
+                "json"
+        );
+
+        jsonFileLoad_ = new FileDialogs.FileType(
+                "OPEN_FILE",
+                "JSON Files",
+                "acq_settings.json",
+                false,
+                "json"
         );
 
         createUserInterface();
@@ -86,6 +107,9 @@ public class SavePanel extends Panel {
         cbxSaveWhileAcquiring_ = new CheckBox("Save images during acquisition",
                 acqSettings.isSavingImagesDuringAcquisition());
 
+        btnSaveSettings_ = new Button("Save", 60, 20);
+        btnLoadSettings_ = new Button("Load", 60, 20);
+
         add(lblSaveDirectory, "");
         add(txtSaveDirectory_, "");
         add(btnBrowse_, "");
@@ -95,6 +119,9 @@ public class SavePanel extends Panel {
         add(lblSaveMode, "");
         add(cbxSaveMode_, "split 2, wrap");
         add(cbxSaveWhileAcquiring_, "span 2, wrap");
+        add(new JLabel("Acq Settings:"), "");
+        add(btnSaveSettings_, "split 2");
+        add(btnLoadSettings_, "");
     }
 
     public void createEventHandlers() {
@@ -123,8 +150,33 @@ public class SavePanel extends Panel {
         cbxSaveMode_.registerListener(e ->
                 model_.acquisitions().settingsBuilder().saveMode(cbxSaveMode_.getSelected()));
 
+        btnSaveSettings_.registerListener(e -> {
+            final File file = FileDialogs.save(frame_,
+                    "Save the acquisition settings to JSON...", jsonFileSave_
+            );
+            if (file != null) {
+                // TODO: prompt if file exists
+                FileUtils.writeStringToFile(file.toString(), model_.acquisitions().settings().toPrettyJson());
+                model_.studio().logs().logMessage("Acquisition settings saved to: " + file);
+            }
+        });
+
+        btnLoadSettings_.registerListener(e -> {
+            final File file = FileDialogs.openFile(frame_,
+                    "Load the acquisition settings from JSON...", jsonFileLoad_
+            );
+            if (file != null) {
+                // TODO: prompt to overwrite settings
+                final String json = FileUtils.readFileToString(file.toString());
+                model_.acquisitions().setAcquisitionSettingsAndBuilder(
+                        ScapeAcquisitionSettings.fromJson(json, ScapeAcquisitionSettings.class));
+                model_.studio().logs().logMessage("Acquisition settings loaded from: " + file);
+            }
+        });
+
     }
 
+    // Opens the file explorer to the save directory
     private void openDirectory(final String path) {
         final File directory = new File(path);
         if (directory.exists()) {
