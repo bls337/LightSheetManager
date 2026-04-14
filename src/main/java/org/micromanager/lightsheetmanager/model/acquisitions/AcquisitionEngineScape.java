@@ -40,6 +40,7 @@ import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import javax.swing.JLabel;
 import java.awt.geom.Point2D;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -230,10 +231,15 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         updateAcquisitionSettings();
 
-        studio_.logs().logMessage("Starting Acquisition with settings:\n" + acqSettings_.toPrettyJson());
+        final String settingsJson = acqSettings_.toPrettyJson();
+        studio_.logs().logMessage("Starting Acquisition with settings:\n" + settingsJson);
 
         String saveDir = acqSettings_.saveDirectory();
         String saveName = acqSettings_.saveNamePrefix();
+
+        // TODO: put this in AcquisitionEngine base class, between setup and run once structure is better
+        // save settings as JSON to the save directory
+        FileUtils.writeStringToFile(saveDir + File.separator + "acq_settings.json", settingsJson);
 
         // This sets the preferred save mode for DefaultDatastore, this value
         // is used in the MMAcquisition constructor to set the Storage object.
