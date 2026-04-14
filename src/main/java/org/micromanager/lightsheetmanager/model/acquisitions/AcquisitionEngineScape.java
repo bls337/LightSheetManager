@@ -40,6 +40,7 @@ import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import javax.swing.JLabel;
 import java.awt.geom.Point2D;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -230,10 +231,25 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         updateAcquisitionSettings();
 
-        studio_.logs().logMessage("Starting Acquisition with settings:\n" + acqSettings_.toPrettyJson());
+        final String settingsJson = acqSettings_.toPrettyJson();
+        studio_.logs().logMessage("Starting Acquisition with settings:\n" + settingsJson);
 
         String saveDir = acqSettings_.saveDirectory();
         String saveName = acqSettings_.saveNamePrefix();
+
+        // TODO: put this in AcquisitionEngine base class, between setup and run once structure is better
+        // save settings as JSON to the save directory
+        FileUtils.writeStringToFile(saveDir + File.separator + "acq_settings.json", settingsJson);
+        final PositionList positionList = model_.studio().positions().getPositionList();
+        if (positionList.getNumberOfPositions() > 0) {
+            try {
+                final String path = saveDir + File.separator + "position_list.pos";
+                positionList.save(path);
+                model_.studio().logs().logMessage("Position list saved to " + path);
+            } catch (Exception e) {
+                model_.studio().logs().logError(e, "Could not save position list.");
+            }
+        }
 
         // This sets the preferred save mode for DefaultDatastore, this value
         // is used in the MMAcquisition constructor to set the Storage object.
@@ -550,26 +566,15 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
             cameraNames = cameraDeviceNames.toArray(new String[0]);
         } else {
-            // TODO(Brandon): account for > 2 simultaneous cameras
             final DeviceAdapter adapter = model_.devices().adapter();
             if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
-               // multiple simultaneous cameras
-                //if (model_.acquisitions().settings().isUsingSimultaneousCameras()) {
-                if (true) {
-                    // use 2 cameras
-                    final ArrayList<String> names = new ArrayList<>();
-                    final CameraBase[] cameraList = model_.devices().imagingCameras();
-                    for (CameraBase camera: cameraList) {
-                        names.add(camera.getDeviceName());
-                    }
-                    cameraNames = names.toArray(String[]::new);
-                } else {
-                    // use 1 camera
-                    final String camera = "ImagingCamera1"; // model_.acquisitions().settings().primaryCamera();
-                    cameraNames = new String[] {
-                            model_.devices().device(camera).getDeviceName(),
-                    };
+                // multiple simultaneous cameras
+                final ArrayList<String> names = new ArrayList<>();
+                final CameraBase[] cameraList = model_.devices().imagingCameras();
+                for (CameraBase camera: cameraList) {
+                    names.add(camera.getDeviceName());
                 }
+                cameraNames = names.toArray(String[]::new);
             } else {
                // standard camera setup
                if (acqSettings_.volume().numViews() > 1) {
