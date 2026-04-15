@@ -183,7 +183,7 @@ public class PositionPanel extends Panel implements Subscriber {
             final ASIPiezo piezo = model_.devices().device("ImagingFocus");
             final ASIScanner scanner = model_.devices().device("IllumSlice");
 
-            btnImagingCenterSet_.registerListener(e -> {
+            btnImagingCenterSet_.registerListener(() -> {
                 // FIXME: check for piezo limits!
                 final double piezoPosition = piezo.getPosition();
                 model_.acquisitions().settingsBuilder()
@@ -191,7 +191,7 @@ public class PositionPanel extends Panel implements Subscriber {
                 lblImagingCenterValue_.setText(String.format("%.3f μm", piezoPosition));
             });
 
-            btnImagingCenterGo_.registerListener(e -> {
+            btnImagingCenterGo_.registerListener(() -> {
                 // FIXME: make sure this is the same as original plugin, diSPIM also moves Scanner with computeGalvoFromPiezo
                 final double imagingCenter = model_.acquisitions().settingsBuilder().build()
                         .sheetCalibration().imagingCenter();
@@ -199,23 +199,23 @@ public class PositionPanel extends Panel implements Subscriber {
                 lblImagingPositionValue_.setText(String.format("%.3f μm", piezo.getPosition()));
             });
 
-            btnImagingZero_.registerListener(e -> {
+            btnImagingZero_.registerListener(() -> {
                 piezo.setPosition(0.0);
                 lblImagingPositionValue_.setText(String.format("%.3f μm", piezo.getPosition()));
             });
 
-            btnSliceZero_.registerListener(e -> {
+            btnSliceZero_.registerListener(() -> {
                 final double xValue = scanner.getPosition().x;
                 scanner.setPosition(xValue, 0.0);
                 lblSlicePositionValue_.setText(String.format("%.3f °", scanner.getPosition().y));
             });
 
-            txtImagingPosition_.registerListener(e -> {
+            txtImagingPosition_.registerListener(() -> {
                 piezo.setPosition(Double.parseDouble(txtImagingPosition_.getText()));
                 lblImagingPositionValue_.setText(String.format("%.3f μm", piezo.getPosition()));
             });
 
-            txtSlicePosition_.registerListener(e -> {
+            txtSlicePosition_.registerListener(() -> {
                 final double xValue = scanner.getPosition().x;
                 scanner.setPosition(xValue, Double.parseDouble(txtSlicePosition_.getText()));
                 lblSlicePositionValue_.setText(String.format("%.3f °", scanner.getPosition().y));

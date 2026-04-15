@@ -193,51 +193,51 @@ public class AutofocusTab extends Panel implements ListeningPanel {
     private void createEventHandlers() {
 
         // general autofocus settings
-        cbxShowImages_.registerListener(e -> model_.acquisitions().settingsBuilder()
+        cbxShowImages_.registerListener(() -> model_.acquisitions().settingsBuilder()
                 .autofocusSettingsBuilder().showImages(cbxShowImages_.isSelected()));
 
-        cbxShowGraph_.registerListener(e -> model_.acquisitions().settingsBuilder()
+        cbxShowGraph_.registerListener(() -> model_.acquisitions().settingsBuilder()
                 .autofocusSettingsBuilder().showGraph(cbxShowGraph_.isSelected()));
 
-        spnNumImages_.registerListener(e -> model_.acquisitions().settingsBuilder()
+        spnNumImages_.registerListener(() -> model_.acquisitions().settingsBuilder()
                 .autofocusSettingsBuilder().numImages(spnNumImages_.getInt()));
 
-        spnStepSize_.registerListener(e -> model_.acquisitions().settingsBuilder()
+        spnStepSize_.registerListener(() -> model_.acquisitions().settingsBuilder()
                 .autofocusSettingsBuilder().stepSizeUm(spnStepSize_.getDouble()));
 
-     //   spnToleranceUm_.registerListener(e -> model_.acquisitions().settingsBuilder()
+     //   spnToleranceUm_.registerListener(() -> model_.acquisitions().settingsBuilder()
      //          .autofocusSettingsBuilder().toleranceUm(spnToleranceUm_.getDouble()));
 
-        cmbAutofocusMode_.registerListener(e -> model_.acquisitions().settingsBuilder()
+        cmbAutofocusMode_.registerListener(() -> model_.acquisitions().settingsBuilder()
                 .autofocusSettingsBuilder().mode(cmbAutofocusMode_.getSelected()));
 
-        cmbScoringMethod_.registerListener(e -> model_.acquisitions().settingsBuilder()
+        cmbScoringMethod_.registerListener(() -> model_.acquisitions().settingsBuilder()
                 .autofocusSettingsBuilder().scoringMethod(cmbScoringMethod_.getSelected()));
 
-        btnRunAutofocus_.registerListener(e -> model_.acquisitions().autofocus().run());
+        btnRunAutofocus_.registerListener(() -> model_.acquisitions().autofocus().run());
 
         // autofocus options during acquisition
-        cbxAutofocusEveryPass_.registerListener(e -> {
+        cbxAutofocusEveryPass_.registerListener(() -> {
             //System.out.println("cbxAutofocusEveryPass_: " + cbxAutofocusEveryPass_.isSelected());
         });
-        cbxAutofocusBeforeAcq_.registerListener(e -> {
+        cbxAutofocusBeforeAcq_.registerListener(() -> {
             //System.out.println("cbxAutofocusBeforeAcq_: " + cbxAutofocusBeforeAcq_.isSelected());
         });
-        cmbAutofocusChannel_.registerListener(e -> {
+        cmbAutofocusChannel_.registerListener(() -> {
             //System.out.println("cmbAutofocusChannel_");
         });
 
-        spnAutofocusEveryX_.registerListener(e -> {
+        spnAutofocusEveryX_.registerListener(() -> {
 
         });
 
-        spnMaxOffsetSetup_.registerListener(e -> {
+        spnMaxOffsetSetup_.registerListener(() -> {
 
         });
 
         // autofocus options during setup
-        cbxAutoUpdateFocusFound_.registerListener(e ->
-                setSetupOptionsState(cbxAutoUpdateFocusFound_.isSelected()));
+        cbxAutoUpdateFocusFound_.registerListener(
+                () -> setSetupOptionsState(cbxAutoUpdateFocusFound_.isSelected()));
     }
 
     @Override

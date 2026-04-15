@@ -92,7 +92,7 @@ public class AdvancedTimingPanel extends Panel {
 
     private void createEventHandlers() {
 
-        spnDelayBeforeScan_.registerListener(e -> {
+        spnDelayBeforeScan_.registerListener(() -> {
             final double value = spnDelayBeforeScan_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -105,13 +105,13 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnScansPerSlice_.registerListener(e -> {
+        spnScansPerSlice_.registerListener(() -> {
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().scansPerSlice(spnScansPerSlice_.getInt());
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnScanDuration_.registerListener(e -> {
+        spnScanDuration_.registerListener(() -> {
             final double value = spnScanDuration_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -124,7 +124,7 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnDelayBeforeLaser_.registerListener(e -> {
+        spnDelayBeforeLaser_.registerListener(() -> {
             final double value = spnDelayBeforeLaser_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -137,7 +137,7 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnLaserTriggerDuration_.registerListener(e -> {
+        spnLaserTriggerDuration_.registerListener(() -> {
             final double value = spnLaserTriggerDuration_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -150,7 +150,7 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnDelayBeforeCamera_.registerListener(e -> {
+        spnDelayBeforeCamera_.registerListener(() -> {
             final double value = spnDelayBeforeCamera_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -163,7 +163,7 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnCameraTriggerDuration_.registerListener(e -> {
+        spnCameraTriggerDuration_.registerListener(() -> {
             final double value = spnCameraTriggerDuration_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -176,13 +176,13 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnCameraExposure_.registerListener(e -> {
+        spnCameraExposure_.registerListener(() -> {
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().cameraExposure(spnCameraExposure_.getDouble());
             model_.acquisitions().updateDurationLabels();
         });
 
-        cbxAlternateScanDirection_.registerListener(e -> {
+        cbxAlternateScanDirection_.registerListener(() -> {
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().useAlternateScanDirection(cbxAlternateScanDirection_.isSelected());
         });

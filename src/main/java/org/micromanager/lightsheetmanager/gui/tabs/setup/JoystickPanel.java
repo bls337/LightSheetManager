@@ -51,15 +51,15 @@ public class JoystickPanel extends Panel {
 
     private void createEventHandlers() {
 
-        cmbJoystick_.registerListener(e -> {
+        cmbJoystick_.registerListener(() -> {
 
         });
 
-        cmbLeftWheel_.registerListener(e -> {
+        cmbLeftWheel_.registerListener(() -> {
 
         });
 
-        cmbRightWheel_.registerListener(e -> {
+        cmbRightWheel_.registerListener(() -> {
 
         });
 

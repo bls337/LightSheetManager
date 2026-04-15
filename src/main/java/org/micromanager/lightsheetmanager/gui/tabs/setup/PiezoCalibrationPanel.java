@@ -154,7 +154,7 @@ public class PiezoCalibrationPanel extends Panel {
             final ASIPiezo piezo = model_.devices().device("ImagingFocus");
             final ASIScanner scanner = model_.devices().device("IllumSlice");
 
-            btnUpdate_.registerListener(e -> {
+            btnUpdate_.registerListener(() -> {
                 if (scanner.isBeamOn()) {
                     final double rate = model_.acquisitions().settings()
                             .sliceCalibration().slope();
@@ -184,14 +184,14 @@ public class PiezoCalibrationPanel extends Panel {
 //        txtStepSize_.registerListener(e -> {
 //        });
 
-        txtSlope_.registerListener(e -> {
+        txtSlope_.registerListener(() -> {
             final double slope = Double.parseDouble(txtSlope_.getText());
             model_.acquisitions().settingsBuilder()
                     .sliceCalibrationBuilder().slope(slope);
             lblSlopeValue_.setText(String.format("%.3f μm/°", slope));
         });
 
-        txtOffset_.registerListener(e -> {
+        txtOffset_.registerListener(() -> {
             final double offset = Double.parseDouble(txtOffset_.getText());
             model_.acquisitions().settingsBuilder()
                     .sliceCalibrationBuilder().offset(offset);
@@ -202,7 +202,7 @@ public class PiezoCalibrationPanel extends Panel {
                   .sheetCalibrationBuilder().imagingCenter(offset);
         });
 
-        btnRunAutofocus_.registerListener(e -> {
+        btnRunAutofocus_.registerListener(() -> {
             model_.acquisitions().autofocus().run();
         });
     }

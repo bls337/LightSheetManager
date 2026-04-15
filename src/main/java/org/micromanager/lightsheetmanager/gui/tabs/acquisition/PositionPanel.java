@@ -50,7 +50,7 @@ public class PositionPanel extends Panel {
     private void createEventHandlers() {
 
         // open XYZ grid
-        btnOpenXYZGrid_.registerListener(e -> {
+        btnOpenXYZGrid_.registerListener(() -> {
             if (model_.devices().hasDevice("SampleXY")
                     && model_.devices().hasDevice("SampleZ")) {
                 xyzGridFrame_.setVisible(true);
@@ -61,9 +61,9 @@ public class PositionPanel extends Panel {
         });
 
         // open position list
-        btnEditPositionList_.registerListener(e -> model_.studio().app().showPositionList());
+        btnEditPositionList_.registerListener(() -> model_.studio().app().showPositionList());
 
-        spnPostMoveDelay_.registerListener(e -> model_.acquisitions()
+        spnPostMoveDelay_.registerListener(() -> model_.acquisitions()
                 .settingsBuilder().postMoveDelay(spnPostMoveDelay_.getInt()));
 
     }

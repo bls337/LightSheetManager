@@ -103,17 +103,17 @@ public class CameraPanel extends Panel {
 
     private void createEventHandlers() {
         // camera trigger mode
-        cmbCameraTriggerMode_.registerListener(e -> {
+        cmbCameraTriggerMode_.registerListener(() -> {
             final CameraMode cameraMode = cmbCameraTriggerMode_.getSelected();
             model_.acquisitions().settingsBuilder().cameraMode(cameraMode);
         });
 
         // select primary camera
-        radPrimaryCamera_.registerListener(e -> computeCameraOrder());
+        radPrimaryCamera_.registerListener(this::computeCameraOrder);
 
         // active camera check boxes
         for (CheckBox cbx : cbxCameras_) {
-            cbx.registerListener(e -> computeCameraOrder());
+            cbx.registerListener(this::computeCameraOrder);
         }
     }
 

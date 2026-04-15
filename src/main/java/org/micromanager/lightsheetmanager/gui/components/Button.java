@@ -52,7 +52,7 @@ public class Button extends JButton {
         setMaximumSize(size);
     }
 
-    public void registerListener(final Method method) {
-        addActionListener(method::run);
+    public void registerListener(final Runnable listener) {
+        addActionListener(e -> listener.run());
     }
 }

@@ -71,7 +71,7 @@ public class ChannelTablePanel extends Panel {
     private void createEventHandlers() {
 
         // select channel group
-        cmbChannelGroup_.registerListener(e -> {
+        cmbChannelGroup_.registerListener(() -> {
             final String channelGroup = cmbChannelGroup_.getSelected();
             table_.updatePresetComboBoxes(channelGroup);
             // set the channel group to use when we get the channels
@@ -84,7 +84,7 @@ public class ChannelTablePanel extends Panel {
         });
 
         // add channel
-        btnAddChannel_.registerListener(e -> {
+        btnAddChannel_.registerListener(() -> {
             table_.getTableModel().addEmptyChannel();
             final ChannelSpec[] channels = table_.getData().getChannels();
             model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
@@ -93,7 +93,7 @@ public class ChannelTablePanel extends Panel {
         });
 
         // remove channel
-        btnRemoveChannel_.registerListener(e -> {
+        btnRemoveChannel_.registerListener(() -> {
             final int row = table_.getTable().getSelectedRow();
             if (row != -1) { // is any row selected?
                 table_.getTableModel().removeChannel(row);
@@ -104,7 +104,7 @@ public class ChannelTablePanel extends Panel {
         });
 
         // refresh channel table
-        btnRefresh_.registerListener(e -> {
+        btnRefresh_.registerListener(() -> {
             final String channelGroup = model_.acquisitions().settings().channels().group();
             final String[] groups = table_.getChannelGroups();
             cmbChannelGroup_.removeAllItems();
@@ -120,7 +120,7 @@ public class ChannelTablePanel extends Panel {
         });
 
         // select channel mode
-        cmbChannelMode_.registerListener(e -> {
+        cmbChannelMode_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().channelBuilder()
                   .mode(cmbChannelMode_.getSelected());
         });

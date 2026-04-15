@@ -239,16 +239,16 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
             }
         });
 
-        btnOpenPlaylist_.registerListener(e -> acqTableFrame_.setVisible(true));
+        btnOpenPlaylist_.registerListener(() -> acqTableFrame_.setVisible(true));
         btnOpenPlaylist_.setEnabled(false); // TODO: enable when playlist is implemented
 
-        btnSpeedTest_.registerListener(e -> runAcquisition(true));
-        btnRunOverviewAcq_.registerListener(e -> {
+        btnSpeedTest_.registerListener(() -> runAcquisition(true));
+        btnRunOverviewAcq_.registerListener(() -> {
             // TODO: run the overview acq
         });
 
         // multiple positions
-        cbxUseMultiplePositions_.registerListener(e -> {
+        cbxUseMultiplePositions_.registerListener(() -> {
             final boolean selected = cbxUseMultiplePositions_.isSelected();
             model_.acquisitions().settingsBuilder().useMultiplePositions(selected);
             model_.acquisitions().updateDurationLabels();
@@ -256,7 +256,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         });
 
         // time points
-        cbxUseTimePoints_.registerListener(e -> {
+        cbxUseTimePoints_.registerListener(() -> {
             final boolean selected = cbxUseTimePoints_.isSelected();
             model_.acquisitions().settingsBuilder().useTimePoints(selected);
             model_.acquisitions().updateDurationLabels();
@@ -264,7 +264,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         });
 
         // use channels
-        cbxUseChannels_.registerListener(e -> {
+        cbxUseChannels_.registerListener(() -> {
             final boolean selected = cbxUseChannels_.isSelected();
             model_.acquisitions().settingsBuilder().channelBuilder().enabled(selected);
             model_.acquisitions().updateDurationLabels();
@@ -272,11 +272,12 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         });
 
         // select the acquisition mode
-        cmbAcquisitionModes_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().acquisitionMode(cmbAcquisitionModes_.getSelected()));
+        cmbAcquisitionModes_.registerListener(
+                () -> model_.acquisitions().settingsBuilder()
+                        .acquisitionMode(cmbAcquisitionModes_.getSelected()));
 
         // switches timing panels based on check box
-        cbxUseAdvancedTiming_.registerListener(e -> {
+        cbxUseAdvancedTiming_.registerListener(() -> {
             final boolean selected = cbxUseAdvancedTiming_.isSelected();
             model_.acquisitions().settingsBuilder().useAdvancedTiming(selected);
             swapTimingSettingsPanels(selected);

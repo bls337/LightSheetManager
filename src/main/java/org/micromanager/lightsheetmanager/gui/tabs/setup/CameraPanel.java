@@ -47,9 +47,6 @@ public class CameraPanel extends Panel {
                 "[]5[]"
         );
 
-        // register micro-manager events
-        model_.studio().events().registerForEvents(this);
-
         Button.setDefaultSize(80, 26);
         btnImagingPath_ = new Button("Imaging");
         btnMultiPath_ = new Button("Multi");
@@ -74,7 +71,6 @@ public class CameraPanel extends Panel {
                 add(btnLiveMode_, "span 2");
                 break;
             case SCAPE:
-                //btnInvertedPath_.setAbsoluteSize(165, 26);
                 add(btnInvertedPath_, "wrap");
                 add(btnLiveMode_, "");
                 break;
@@ -88,15 +84,15 @@ public class CameraPanel extends Panel {
 
         switch (geometryType) {
             case DISPIM:
-                btnImagingPath_.registerListener(e -> {
+                btnImagingPath_.registerListener(() -> {
 
                 });
 
-                btnMultiPath_.registerListener(e -> {
+                btnMultiPath_.registerListener(() -> {
 
                 });
 
-                btnEpiPath_.registerListener(e -> {
+                btnEpiPath_.registerListener(() -> {
 
                 });
 
@@ -109,7 +105,6 @@ public class CameraPanel extends Panel {
                 });
                 break;
             case SCAPE:
-                //btnInvertedPath_.setText("Preview");
                 btnInvertedPath_.registerListener(e -> {
                     closeLiveModeWindow();
                     final CameraBase camera = model_.devices().device("PreviewCamera");
@@ -170,18 +165,19 @@ public class CameraPanel extends Panel {
         }
     }
 
-    @Subscribe
-    public void liveModeListener(LiveModeEvent event) {
-        if (!model_.studio().live().isLiveModeOn()) {
-            if (isPreviewPressed) {
-                isPreviewPressed = false;
-                btnInvertedPath_.setState(false);
-            }
-            if (isLivePressed) {
-                isLivePressed = false;
-                btnLiveMode_.setState(false);;
-            }
-        }
-    }
+    // TODO: do we want to subscribe to events?
+//    @Subscribe
+//    public void liveModeListener(LiveModeEvent event) {
+//        if (!model_.studio().live().isLiveModeOn()) {
+//            if (isPreviewPressed) {
+//                isPreviewPressed = false;
+//                btnInvertedPath_.setState(false);
+//            }
+//            if (isLivePressed) {
+//                isLivePressed = false;
+//                btnLiveMode_.setState(false);;
+//            }
+//        }
+//    }
 
 }

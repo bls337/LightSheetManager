@@ -52,12 +52,12 @@ public class TimePointsPanel extends Panel {
     // TODO: update duration labels
     private void createEventHandlers() {
 
-        spnNumTimePoints_.registerListener(e -> {
+        spnNumTimePoints_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().numTimePoints(spnNumTimePoints_.getInt());
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnTimePointInterval_.registerListener(e -> {
+        spnTimePointInterval_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().timePointInterval(spnTimePointInterval_.getDouble());
             model_.acquisitions().updateDurationLabels();
         });

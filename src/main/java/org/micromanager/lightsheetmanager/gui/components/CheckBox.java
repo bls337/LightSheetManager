@@ -3,6 +3,8 @@ package org.micromanager.lightsheetmanager.gui.components;
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 
 public class CheckBox extends JCheckBox {
 
@@ -39,9 +41,9 @@ public class CheckBox extends JCheckBox {
     public void setLocked(final boolean locked) {
         isLocked_ = locked;
         if (isLocked_) {
-            setFont(getFont().deriveFont(java.awt.Font.BOLD));
+            setFont(getFont().deriveFont(Font.BOLD));
         } else {
-            setFont(getFont().deriveFont(java.awt.Font.PLAIN));
+            setFont(getFont().deriveFont(Font.PLAIN));
         }
     }
 
@@ -61,10 +63,6 @@ public class CheckBox extends JCheckBox {
         }
     }
 
-    public void registerListener(final Method method) {
-        addActionListener(method::run);
-    }
-
     @Override
     public void setSelected(boolean state) {
         // default to true, always fires events
@@ -72,17 +70,21 @@ public class CheckBox extends JCheckBox {
     }
 
     @Override
-    protected void processMouseEvent(java.awt.event.MouseEvent e) {
+    protected void processMouseEvent(MouseEvent e) {
         if (!isLocked_) {
             super.processMouseEvent(e);
         }
     }
 
     @Override
-    protected void processKeyEvent(java.awt.event.KeyEvent e) {
+    protected void processKeyEvent(KeyEvent e) {
         if (!isLocked_) {
             super.processKeyEvent(e);
         }
+    }
+
+    public void registerListener(final Runnable listener) {
+        addActionListener(e -> listener.run());
     }
 
 }

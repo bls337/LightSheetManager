@@ -112,30 +112,30 @@ public class VolumePanel extends Panel implements SettingsListener {
     private void createEventHandlers() {
 
         if (geometryType_ == GeometryType.DISPIM) {
-            cmbNumViews_.registerListener(e -> {
+            cmbNumViews_.registerListener(() -> {
                 model_.acquisitions().settingsBuilder().volumeBuilder()
                         .numViews(cmbNumViews_.getSelected());
             });
 
-            cmbFirstView_.registerListener(e -> {
+            cmbFirstView_.registerListener(() -> {
                 model_.acquisitions().settingsBuilder().volumeBuilder()
                         .firstView(cmbFirstView_.getSelected());
             });
         }
 
-        spnViewDelay_.registerListener(e -> {
+        spnViewDelay_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().volumeBuilder()
                     .delayBeforeView(spnViewDelay_.getDouble());
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnNumSlices_.registerListener(e -> {
+        spnNumSlices_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().volumeBuilder()
                     .slicesPerView(spnNumSlices_.getInt());
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnSliceStepSize_.registerListener(e -> {
+        spnSliceStepSize_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().volumeBuilder()
                     .sliceStepSize(spnSliceStepSize_.getDouble());
         });

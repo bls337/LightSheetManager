@@ -59,9 +59,8 @@ public class DeviceTab extends Panel implements ListeningPanel {
     }
 
     private void createEventHandlers() {
-        btnCreateConfigGroup_.registerListener(e -> {
-            devices_.createConfigGroup();
-        });
+        btnCreateConfigGroup_.registerListener(
+                () -> devices_.createConfigGroup());
     }
 
     @Override

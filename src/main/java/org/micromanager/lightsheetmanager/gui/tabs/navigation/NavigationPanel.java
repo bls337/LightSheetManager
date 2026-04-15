@@ -222,7 +222,7 @@ public class NavigationPanel extends Panel {
     private void createEventHandlers() {
 
         // refresh devices and ui
-        btnRefreshPanel_.registerListener(e -> {
+        btnRefreshPanel_.registerListener(() -> {
             removeAll();
             createUserInterface();
             createEventHandlers();
@@ -234,10 +234,10 @@ public class NavigationPanel extends Panel {
         });
 
         // halt stage devices
-        btnHaltDevices_.registerListener(e -> model_.devices().haltDevices());
+        btnHaltDevices_.registerListener(() -> model_.devices().haltDevices());
 
         // position polling
-        cbxPollPositions_.registerListener(e -> {
+        cbxPollPositions_.registerListener(() -> {
             final boolean isSelected = cbxPollPositions_.isSelected();
             model_.pluginSettings().setPollingPositions(isSelected);
             if (isSelected) {

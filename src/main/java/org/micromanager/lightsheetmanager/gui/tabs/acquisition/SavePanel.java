@@ -129,7 +129,7 @@ public class SavePanel extends Panel implements SettingsListener {
     }
 
     public void createEventHandlers() {
-        btnBrowse_.registerListener(e -> {
+        btnBrowse_.registerListener(() -> {
             final File result = FileDialogs.openDir(frame_,
                     "Please select the directory to save images to...",
                     directorySelect_
@@ -141,20 +141,22 @@ public class SavePanel extends Panel implements SettingsListener {
         });
 
         // use the text field so we don't need to update settings
-        btnOpen_.registerListener(e ->
-                openDirectory(txtSaveDirectory_.getText()));
+        btnOpen_.registerListener(
+                () -> openDirectory(txtSaveDirectory_.getText()));
 
-        cbxSaveWhileAcquiring_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().saveImagesDuringAcquisition(
-                        cbxSaveWhileAcquiring_.isSelected()));
+        cbxSaveWhileAcquiring_.registerListener(
+                () -> model_.acquisitions().settingsBuilder()
+                        .saveImagesDuringAcquisition(cbxSaveWhileAcquiring_.isSelected()));
 
-        txtSaveFileName_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().saveNamePrefix(txtSaveFileName_.getText()));
+        txtSaveFileName_.registerListener(
+                () -> model_.acquisitions().settingsBuilder()
+                        .saveNamePrefix(txtSaveFileName_.getText()));
 
-        cbxSaveMode_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().saveMode(cbxSaveMode_.getSelected()));
+        cbxSaveMode_.registerListener(
+                () -> model_.acquisitions().settingsBuilder()
+                        .saveMode(cbxSaveMode_.getSelected()));
 
-        btnSaveSettings_.registerListener(e -> {
+        btnSaveSettings_.registerListener(() -> {
             final File file = FileDialogs.save(frame_,
                     "Save the acquisition settings to JSON...", jsonFileSave_
             );
@@ -166,7 +168,7 @@ public class SavePanel extends Panel implements SettingsListener {
             }
         });
 
-        btnLoadSettings_.registerListener(e -> {
+        btnLoadSettings_.registerListener(() -> {
             final File file = FileDialogs.openFile(frame_,
                     "Load the acquisition settings from JSON...", jsonFileLoad_
             );

@@ -64,7 +64,7 @@ public class Spinner extends JSpinner {
         setValue(n);
     }
 
-    public void registerListener(final Method method) {
-        addChangeListener(method::run);
+    public void registerListener(final Runnable listener) {
+        addChangeListener(e -> listener.run());
     }
 }

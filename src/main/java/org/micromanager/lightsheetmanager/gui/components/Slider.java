@@ -3,7 +3,9 @@ package org.micromanager.lightsheetmanager.gui.components;
 import javax.swing.JLabel;
 import javax.swing.JSlider;
 import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
 import java.util.Hashtable;
+import java.util.function.Consumer;
 
 
 /**
@@ -39,14 +41,6 @@ public class Slider extends JSlider {
         setSnapToTicks(false);
     }
 
-    public void registerListener(final Method method) {
-        addChangeListener(e -> {
-            if (!this.getValueIsAdjusting()) {
-                method.run(e);
-            }
-        });
-    }
-
     /**
      * Returns the actual value that the slider is meant to represent.
      *
@@ -59,4 +53,13 @@ public class Slider extends JSlider {
     public void setDouble(final double value) {
         setValue((int)(value*scaleFactor_));
     }
+
+    public void registerListener(final Consumer<ChangeEvent> listener) {
+        addChangeListener(e -> {
+            if (!this.getValueIsAdjusting()) {
+                listener.accept(e);
+            }
+        });
+    }
+
 }

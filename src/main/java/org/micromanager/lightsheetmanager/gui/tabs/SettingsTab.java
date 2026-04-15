@@ -140,27 +140,27 @@ public class SettingsTab extends Panel implements ListeningPanel {
 
         // Scan Settings
         if (isUsingScanSettings_) {
-            spnScanAcceleration_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().stageScanBuilder()
+            spnScanAcceleration_.registerListener(
+                    () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .accelerationFactor(spnScanAcceleration_.getDouble()));
-            spnScanOvershootDist_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().stageScanBuilder()
+            spnScanOvershootDist_.registerListener(
+                    () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .overshootDistance(spnScanOvershootDist_.getInt()));
-            spnScanRetraceSpeed_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().stageScanBuilder()
+            spnScanRetraceSpeed_.registerListener(
+                    () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .retraceSpeed(spnScanRetraceSpeed_.getDouble()));
-            spnScanFirstViewAngle_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().stageScanBuilder()
+            spnScanFirstViewAngle_.registerListener(
+                    () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .firstViewAngle(spnScanFirstViewAngle_.getDouble()));
 
-            cbxScanFromCurrentPosition_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().stageScanBuilder()
+            cbxScanFromCurrentPosition_.registerListener(
+                    () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .fromCurrentPosition(cbxScanFromCurrentPosition_.isSelected()));
-            cbxScanNegativeDirection_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().stageScanBuilder()
+            cbxScanNegativeDirection_.registerListener(
+                    () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .fromNegativeDirection(cbxScanNegativeDirection_.isSelected()));
-            cbxReturnToStart_.registerListener(e ->
-                    model_.acquisitions().settingsBuilder().stageScanBuilder()
+            cbxReturnToStart_.registerListener(
+                    () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .returnToStart(cbxReturnToStart_.isSelected()));
         }
 
@@ -169,10 +169,10 @@ public class SettingsTab extends Panel implements ListeningPanel {
             final ASIScanner scanner = model_.devices().device("IllumSlice");
 
             spnSheetAxisFilterFreq_.registerListener(
-                    e -> scanner.setFilterFreqX(spnSheetAxisFilterFreq_.getDouble()));
+                    () -> scanner.setFilterFreqX(spnSheetAxisFilterFreq_.getDouble()));
 
             spnSliceAxisFilterFreq_.registerListener(
-                    e -> scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble()));
+                    () -> scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble()));
         }
 
         // TODO: make this work with diSPIM settings

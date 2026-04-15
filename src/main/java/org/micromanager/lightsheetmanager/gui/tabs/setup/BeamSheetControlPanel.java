@@ -158,26 +158,26 @@ public class BeamSheetControlPanel extends Panel {
 
     private void createEventHandlers() {
         // first panel
-        //btnPlotProfile_.registerListener(e -> {
+        //btnPlotProfile_.registerListener(() -> {
             //System.out.println("do something here...");
         //});
 
         // second panel
-//        cbxAutoSheetWidth_.registerListener(e -> {
+//        cbxAutoSheetWidth_.registerListener(() -> {
 //            final boolean state = cbxAutoSheetWidth_.isSelected();
 //            model_.acquisitions().settingsBuilder()
 //                    .sheetCalibrationBuilder(pathNum_).useAutoSheetWidth(state);
 //            setEnabledSheetWidth(state);
 //        });
 //
-//        sldSheetWidth_.registerListener(e -> {
+//        sldSheetWidth_.registerListener(() -> {
 //            final double value = sldSheetWidth_.getDouble();
 //            model_.acquisitions().settingsBuilder()
 //                    .sheetCalibrationBuilder(pathNum_).sheetWidth(value);
 //            //System.out.println("sheetWidth value: " + value);
 //        });
 //
-//        sldSheetOffset_.registerListener(e -> {
+//        sldSheetOffset_.registerListener(() -> {
 //            final double value = sldSheetOffset_.getDouble();
 //            model_.acquisitions().settingsBuilder()
 //                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
@@ -190,7 +190,7 @@ public class BeamSheetControlPanel extends Panel {
 //            //System.out.println("sheetOffset value: " + strValue);
 //        });
 
-        txtSheetOffset_.registerListener(e -> {
+        txtSheetOffset_.registerListener(() -> {
             final double value = Double.parseDouble(txtSheetOffset_.getText());
             //final double total = Math.max(-1.0, Math.min(1.0, value));
             model_.acquisitions().settingsBuilder()
@@ -202,7 +202,7 @@ public class BeamSheetControlPanel extends Panel {
 //            });
         });
 
-//        btnCenterOffset_.registerListener(e -> {
+//        btnCenterOffset_.registerListener(() -> {
 //            //System.out.println("center offset pressed");
 //            model_.acquisitions().settingsBuilder()
 //                    .sheetCalibrationBuilder(pathNum_).sheetOffset(0.0);
@@ -213,7 +213,7 @@ public class BeamSheetControlPanel extends Panel {
 //        });
 //
 //        // TODO: buttons
-//        btnSheetOffsetMinus_.registerListener(e -> {
+//        btnSheetOffsetMinus_.registerListener(() -> {
 //            //final double value = model_.acquisitions().getAcquisitionSettings()
 //            //        .sheetCalibration(pathNum_).sheetOffset() - 0.01;
 //            currentOffset_ -= 0.01;
@@ -225,7 +225,7 @@ public class BeamSheetControlPanel extends Panel {
 //            sldSheetOffset_.setDouble(value);
 //        });
 //
-//        btnSheetOffsetPlus_.registerListener(e -> {
+//        btnSheetOffsetPlus_.registerListener(() -> {
 ////            final double value = model_.acquisitions().getAcquisitionSettings()
 ////                    .sheetCalibration(pathNum_).sheetOffset() + 0.01;
 //            currentOffset_ += 0.01;
@@ -237,10 +237,10 @@ public class BeamSheetControlPanel extends Panel {
 //            sldSheetOffset_.setDouble(value);
 //        });
 
-//        btnSheetWidthMinus_.registerListener(e -> {
+//        btnSheetWidthMinus_.registerListener(() -> {
 //        });
 //
-//        btnSheetWidthPlus_.registerListener(e -> {
+//        btnSheetWidthPlus_.registerListener(() -> {
 //        });
 
     }

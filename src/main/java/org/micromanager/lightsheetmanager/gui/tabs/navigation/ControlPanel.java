@@ -154,14 +154,14 @@ public class ControlPanel extends Panel implements Subscriber {
         if (deviceType_ == DeviceType.XYStageDevice) {
             switch (axis_) {
                 case X:
-                    txtAbsoluteMove_.registerListener(e ->
-                            setXPosition(Double.parseDouble(txtAbsoluteMove_.getText())));
-                    btnRelMovePlus_.registerListener(e ->
-                            setRelativeXPosition(Double.parseDouble(txtRelMoveStepSize_.getText())));
-                    btnRelMoveMinus_.registerListener(e ->
-                            setRelativeXPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
-                    btnMoveToZero_.registerListener(e -> setXPosition(0.0));
-                    btnSetZero_.registerListener(e -> {
+                    txtAbsoluteMove_.registerListener(
+                            () -> setXPosition(Double.parseDouble(txtAbsoluteMove_.getText())));
+                    btnRelMovePlus_.registerListener(
+                            () -> setRelativeXPosition(Double.parseDouble(txtRelMoveStepSize_.getText())));
+                    btnRelMoveMinus_.registerListener(
+                            () -> setRelativeXPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
+                    btnMoveToZero_.registerListener(() -> setXPosition(0.0));
+                    btnSetZero_.registerListener(() -> {
                        final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
                              "This will change the coordinate system. Are you sure you would like to proceed?");
                        if (result) {
@@ -170,14 +170,14 @@ public class ControlPanel extends Panel implements Subscriber {
                     });
                     break;
                 case Y:
-                    txtAbsoluteMove_.registerListener(e ->
-                            setYPosition(Double.parseDouble(txtAbsoluteMove_.getText())));
-                    btnRelMovePlus_.registerListener(e ->
-                            setRelativeYPosition(Double.parseDouble(txtRelMoveStepSize_.getText())));
-                    btnRelMoveMinus_.registerListener(e ->
-                            setRelativeYPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
-                    btnMoveToZero_.registerListener(e -> setYPosition(0.0));
-                    btnSetZero_.registerListener(e -> {
+                    txtAbsoluteMove_.registerListener(
+                            () -> setYPosition(Double.parseDouble(txtAbsoluteMove_.getText())));
+                    btnRelMovePlus_.registerListener(
+                            () -> setRelativeYPosition(Double.parseDouble(txtRelMoveStepSize_.getText())));
+                    btnRelMoveMinus_.registerListener(
+                            () -> setRelativeYPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
+                    btnMoveToZero_.registerListener(() -> setYPosition(0.0));
+                    btnSetZero_.registerListener(() -> {
                        final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
                              "This will change the coordinate system. Are you sure you would like to proceed?");
                        if (result) {
@@ -191,14 +191,14 @@ public class ControlPanel extends Panel implements Subscriber {
 
         } else if (deviceType_ == DeviceType.StageDevice) {
             // single axis device
-            txtAbsoluteMove_.registerListener(e ->
-                    setPosition(Double.parseDouble(txtAbsoluteMove_.getText())));
-            btnRelMovePlus_.registerListener(e ->
-                    setRelativePosition(Double.parseDouble(txtRelMoveStepSize_.getText())));
-            btnRelMoveMinus_.registerListener(e ->
-                    setRelativePosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
-            btnMoveToZero_.registerListener(e -> setPosition(0.0));
-            btnSetZero_.registerListener(e -> {
+            txtAbsoluteMove_.registerListener(
+                    () -> setPosition(Double.parseDouble(txtAbsoluteMove_.getText())));
+            btnRelMovePlus_.registerListener(
+                    () -> setRelativePosition(Double.parseDouble(txtRelMoveStepSize_.getText())));
+            btnRelMoveMinus_.registerListener(
+                    () -> setRelativePosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
+            btnMoveToZero_.registerListener(() -> setPosition(0.0));
+            btnSetZero_.registerListener(() -> {
                final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
                      "This will change the coordinate system. Are you sure you would like to proceed?");
                if (result) {
@@ -209,22 +209,22 @@ public class ControlPanel extends Panel implements Subscriber {
             // do not add btnSetZero_ to GalvoDevices
             switch (axis_) {
                 case X:
-                    txtAbsoluteMove_.registerListener(e ->
-                            setPositionGalvoX(Double.parseDouble(txtAbsoluteMove_.getText())));
-                    btnRelMovePlus_.registerListener(e ->
-                            setRelativeGalvoPositionX(Double.parseDouble(txtRelMoveStepSize_.getText())));
-                    btnRelMoveMinus_.registerListener(e ->
-                            setRelativeGalvoPositionX(-Double.parseDouble(txtRelMoveStepSize_.getText())));
-                    btnMoveToZero_.registerListener(e -> setPositionGalvoX(0.0));
+                    txtAbsoluteMove_.registerListener(
+                            () -> setPositionGalvoX(Double.parseDouble(txtAbsoluteMove_.getText())));
+                    btnRelMovePlus_.registerListener(
+                            () -> setRelativeGalvoPositionX(Double.parseDouble(txtRelMoveStepSize_.getText())));
+                    btnRelMoveMinus_.registerListener(
+                            () -> setRelativeGalvoPositionX(-Double.parseDouble(txtRelMoveStepSize_.getText())));
+                    btnMoveToZero_.registerListener(() -> setPositionGalvoX(0.0));
                     break;
                 case Y:
-                    txtAbsoluteMove_.registerListener(e ->
-                            setPositionGalvoY(Double.parseDouble(txtAbsoluteMove_.getText())));
-                    btnRelMovePlus_.registerListener(e ->
-                            setRelativeGalvoPositionY(Double.parseDouble(txtRelMoveStepSize_.getText())));
-                    btnRelMoveMinus_.registerListener(e ->
-                            setRelativeGalvoPositionY(-Double.parseDouble(txtRelMoveStepSize_.getText())));
-                    btnMoveToZero_.registerListener(e -> setPositionGalvoY(0.0));
+                    txtAbsoluteMove_.registerListener(
+                            () -> setPositionGalvoY(Double.parseDouble(txtAbsoluteMove_.getText())));
+                    btnRelMovePlus_.registerListener(
+                            () -> setRelativeGalvoPositionY(Double.parseDouble(txtRelMoveStepSize_.getText())));
+                    btnRelMoveMinus_.registerListener(
+                            () -> setRelativeGalvoPositionY(-Double.parseDouble(txtRelMoveStepSize_.getText())));
+                    btnMoveToZero_.registerListener(() -> setPositionGalvoY(0.0));
                     break;
                 default:
                     break;
