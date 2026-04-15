@@ -174,9 +174,7 @@ public class SavePanel extends Panel implements SettingsListener {
             if (file != null) {
                 // TODO: prompt to overwrite settings
                 final String json = FileUtils.readFileToString(file.toString());
-//                model_.acquisitions().setAcquisitionSettingsAndBuilder(
-//                        ScapeAcquisitionSettings.fromJson(json, ScapeAcquisitionSettings.class));
-                model_.userSettings().loadFromJson(json);
+                model_.userSettings().loadFromJson(json, true);
                 model_.studio().logs().logMessage("Acquisition settings loaded from: " + file);
             }
         });
@@ -206,12 +204,7 @@ public class SavePanel extends Panel implements SettingsListener {
 
     @Override
     public void onSettingsChanged(final AcquisitionSettings settings) {
-        SwingUtilities.invokeLater(() -> {
-            System.out.println("HIHIHI");
-            txtSaveDirectory_.setText(settings.saveDirectory());
-            txtSaveFileName_.setText(settings.saveNamePrefix());
-            revalidate();
-            repaint();
-        });
+        txtSaveDirectory_.setText(settings.saveDirectory());
+        txtSaveFileName_.setText(settings.saveNamePrefix());
     }
 }

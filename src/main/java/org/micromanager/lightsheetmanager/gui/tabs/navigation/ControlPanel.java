@@ -10,8 +10,8 @@ import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.positions.Subscriber;
 
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.geom.Point2D;
 import java.util.Objects;
 
@@ -494,10 +494,10 @@ public class ControlPanel extends Panel implements Subscriber {
 
     @Override
     public void update(String topic, Object value) {
-       //System.out.println("topic: " + topic + " obj:" + value);
-       EventQueue.invokeLater(() -> {
-          lblPosition_.setText(String.format("%.3f %s", updateMethod_.update(), units_));
-       });
+        //System.out.println("topic: " + topic + " obj:" + value);
+        SwingUtilities.invokeLater(() -> {
+            lblPosition_.setText(String.format("%.3f %s", updateMethod_.update(), units_));
+        });
     }
 
 }

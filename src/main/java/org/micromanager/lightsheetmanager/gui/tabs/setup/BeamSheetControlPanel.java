@@ -183,7 +183,7 @@ public class BeamSheetControlPanel extends Panel {
 //                    .sheetCalibrationBuilder(pathNum_).sheetOffset(value);
 //            final String strValue = String.format("%.3f", value);
 //            currentOffset_ = value;
-//            EventQueue.invokeLater(() -> {
+//            SwingUtilities.invokeLater(() -> {
 //               txtSheetOffset_.setText(strValue);
 //               lblSlopeOffset_.setText(strValue);
 //            });
@@ -196,7 +196,7 @@ public class BeamSheetControlPanel extends Panel {
             model_.acquisitions().settingsBuilder()
                     .sheetCalibrationBuilder().sheetOffset(value);
            // currentOffset_ = total;
-//            EventQueue.invokeLater(() -> {
+//            SwingUtilities.invokeLater(() -> {
 //                lblSlopeOffset_.setText(String.format("%.3f", total));
 //                //sldSheetOffset_.setDouble(total);
 //            });

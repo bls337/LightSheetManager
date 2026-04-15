@@ -10,8 +10,8 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.positions.Subscriber;
 
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.geom.Point2D;
 import java.util.Objects;
 
@@ -229,7 +229,7 @@ public class PositionPanel extends Panel implements Subscriber {
 
     @Override
     public void update(String topic, Object value) {
-        EventQueue.invokeLater(() -> {
+        SwingUtilities.invokeLater(() -> {
             if (topic.equals("ImagingFocus")) {
                 lblImagingPositionValue_.setText(String.format("%.3f μm", (double)value));
             } else if (topic.equals("IllumSlice")) {
