@@ -223,7 +223,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
     private void createEventHandlers() {
 
         // start/stop acquisitions
-        btnRunAcquisition_.registerListener(e -> {
+        btnRunAcquisition_.registerListener(() -> {
             if (btnRunAcquisition_.isSelected()) {
                 runAcquisition(false);
             } else {
@@ -231,7 +231,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
             }
         });
 
-        btnPauseAcquisition_.registerListener(e -> {
+        btnPauseAcquisition_.registerListener(() -> {
             if (btnPauseAcquisition_.isSelected()) {
                 model_.acquisitions().requestPause();
             } else {

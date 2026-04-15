@@ -5,8 +5,6 @@ import javax.swing.JToggleButton;
 
 import java.awt.Insets;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.util.function.Consumer;
 
 public class ToggleButton extends JToggleButton {
 
@@ -73,10 +71,10 @@ public class ToggleButton extends JToggleButton {
         setMaximumSize(size);
     }
 
-    public void registerListener(final Consumer<ActionEvent> listener) {
+    public void registerListener(final Runnable listener) {
         addActionListener(event -> {
             setState(isSelected());
-            listener.accept(event);
+            listener.run();
         });
     }
 

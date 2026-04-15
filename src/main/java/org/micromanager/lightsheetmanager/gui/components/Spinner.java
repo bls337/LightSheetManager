@@ -1,6 +1,5 @@
 package org.micromanager.lightsheetmanager.gui.components;
 
-import javax.swing.JComponent;
 import javax.swing.JFormattedTextField;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -39,8 +38,7 @@ public class Spinner extends JSpinner {
     }
 
     public void setColumnSize(final int width) {
-        final JComponent editor = getEditor();
-        final JFormattedTextField textField = ((NumberEditor)editor).getTextField();
+        final JFormattedTextField textField = ((NumberEditor)getEditor()).getTextField();
         textField.setColumns(width);
     }
 

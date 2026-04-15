@@ -96,16 +96,16 @@ public class CameraPanel extends Panel {
 
                 });
 
-                btnInvertedPath_.registerListener(e -> {
+                btnInvertedPath_.registerListener(() -> {
 
                 });
 
-                btnLiveMode_.registerListener(e -> {
+                btnLiveMode_.registerListener(() -> {
 
                 });
                 break;
             case SCAPE:
-                btnInvertedPath_.registerListener(e -> {
+                btnInvertedPath_.registerListener(() -> {
                     closeLiveModeWindow();
                     final CameraBase camera = model_.devices().device("PreviewCamera");
                     if (camera != null) {
@@ -126,7 +126,7 @@ public class CameraPanel extends Panel {
                 });
 
                 // live mode
-                btnLiveMode_.registerListener(e -> {
+                btnLiveMode_.registerListener(() -> {
                     closeLiveModeWindow();
                     final CameraBase camera = model_.devices().firstImagingCamera();
                     if (camera != null) {
