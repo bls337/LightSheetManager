@@ -4,11 +4,15 @@ import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
 import org.micromanager.UserProfile;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.propertymap.MutablePropertyMapView;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -32,6 +36,8 @@ public class UserSettings {
 
     // Note: increase this value based on the amount of nested json in the settings
     private static final int MAX_RECURSION_DEPTH_JSON = 4;
+
+    private final List<SettingsListener> listeners = new ArrayList<>();
 
     private final LightSheetManager model_;
 
@@ -57,7 +63,7 @@ public class UserSettings {
      *
      * @return a {@code String} containing the name
      */
-    public String getUserName() {
+    public String userName() {
         return userName_;
     }
 
@@ -86,13 +92,16 @@ public class UserSettings {
             // validate user settings and create settings object
             final Optional<JSONObject> loadedJson = validateUserSettings(json);
             if (loadedJson.isPresent()) {
-                // TODO: switch this based on microscope geometry type
-                final ScapeAcquisitionSettings acqSettings = ScapeAcquisitionSettings.fromJson(
-                        loadedJson.get().toString(), ScapeAcquisitionSettings.class);
-                // update both the settings and builder
-                model_.acquisitions().setAcquisitionSettingsAndBuilder(acqSettings);
-                model_.studio().logs().logDebugMessage("loaded JSON from " + key + ": "
-                        + model_.acquisitions().settings().toPrettyJson());
+                loadedJson.ifPresent(jsonObject -> loadFromJson(jsonObject.toString()));
+//                // TODO: switch this based on microscope geometry type
+//                final ScapeAcquisitionSettings acqSettings = ScapeAcquisitionSettings.fromJson(
+//                        loadedJson.get().toString(), ScapeAcquisitionSettings.class);
+//                // update both the settings and builder
+//                model_.acquisitions().setAcquisitionSettingsAndBuilder(acqSettings);
+//                model_.studio().logs().logDebugMessage("loaded JSON from " + key + ": "
+//                        + model_.acquisitions().settings().toPrettyJson());
+//                // update the ui panels
+//                notifyListeners(acqSettings);
             }
         }
 
@@ -105,6 +114,18 @@ public class UserSettings {
             model_.studio().logs().logDebugMessage("loaded PluginSettings from " + SETTINGS_PLUGIN + ": "
                     + model_.pluginSettings().toPrettyJson());
         }
+    }
+
+    /**
+     * Load the user settings from a file.
+     */
+    public void loadFromJson(final String json) {
+        final ScapeAcquisitionSettings acqSettings = ScapeAcquisitionSettings.fromJson(
+                json, ScapeAcquisitionSettings.class);
+        // update both the settings and builder
+        model_.acquisitions().setAcquisitionSettingsAndBuilder(acqSettings);
+        // update the ui panels
+        notifyListeners(acqSettings);
     }
 
     /**
@@ -224,5 +245,15 @@ public class UserSettings {
         }
         return numKeys;
     }
+
+    public void addChangeListener(SettingsListener listener) {
+        listeners.add(listener);
+    }
+
+     private void notifyListeners(final AcquisitionSettings settings) {
+        for (SettingsListener listener : listeners) {
+            listener.onSettingsChanged(settings);
+        }
+     }
 
 }

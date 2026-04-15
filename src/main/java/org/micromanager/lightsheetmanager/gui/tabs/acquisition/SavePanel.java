@@ -3,24 +3,27 @@ package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 import org.micromanager.internal.utils.FileDialogs;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-public class SavePanel extends Panel {
+public class SavePanel extends Panel implements SettingsListener {
 
     private TextField txtSaveDirectory_;
     private TextField txtSaveFileName_;
@@ -72,6 +75,8 @@ public class SavePanel extends Panel {
 
         createUserInterface();
         createEventHandlers();
+
+        model.userSettings().addChangeListener(this);
     }
 
     public void createUserInterface() {
@@ -155,7 +160,8 @@ public class SavePanel extends Panel {
                     "Save the acquisition settings to JSON...", jsonFileSave_
             );
             if (file != null) {
-                // TODO: prompt if file exists
+                // update settings and save to file
+                model_.acquisitions().updateAcquisitionSettings();
                 FileUtils.writeStringToFile(file.toString(), model_.acquisitions().settings().toPrettyJson());
                 model_.studio().logs().logMessage("Acquisition settings saved to: " + file);
             }
@@ -168,8 +174,9 @@ public class SavePanel extends Panel {
             if (file != null) {
                 // TODO: prompt to overwrite settings
                 final String json = FileUtils.readFileToString(file.toString());
-                model_.acquisitions().setAcquisitionSettingsAndBuilder(
-                        ScapeAcquisitionSettings.fromJson(json, ScapeAcquisitionSettings.class));
+//                model_.acquisitions().setAcquisitionSettingsAndBuilder(
+//                        ScapeAcquisitionSettings.fromJson(json, ScapeAcquisitionSettings.class));
+                model_.userSettings().loadFromJson(json);
                 model_.studio().logs().logMessage("Acquisition settings loaded from: " + file);
             }
         });
@@ -197,4 +204,14 @@ public class SavePanel extends Panel {
         }
     }
 
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        SwingUtilities.invokeLater(() -> {
+            System.out.println("HIHIHI");
+            txtSaveDirectory_.setText(settings.saveDirectory());
+            txtSaveFileName_.setText(settings.saveNamePrefix());
+            revalidate();
+            repaint();
+        });
+    }
 }
