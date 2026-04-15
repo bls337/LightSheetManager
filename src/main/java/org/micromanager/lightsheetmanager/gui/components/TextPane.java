@@ -1,5 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.components;
 
+import org.micromanager.internal.MMStudio;
+
 import javax.swing.JTextPane;
 import javax.swing.event.HyperlinkEvent;
 import java.awt.Desktop;
@@ -19,10 +21,8 @@ public class TextPane extends JTextPane {
             if (HyperlinkEvent.EventType.ACTIVATED.equals(event.getEventType())) {
                 try {
                     Desktop.getDesktop().browse(new URI(event.getURL().toString()));
-                } catch (URISyntaxException e) {
-                    //MyDialogUtils.showError("Could not open web browser.");
-                } catch (IOException e) {
-                    //MyDialogUtils.showError("Could not open web browser.");
+                } catch (URISyntaxException | IOException e) {
+                    MMStudio.getInstance().logs().logMessage("Could not open web browser.");
                 }
             }
         });

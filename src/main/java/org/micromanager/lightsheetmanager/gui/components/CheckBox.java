@@ -38,7 +38,7 @@ public class CheckBox extends JCheckBox {
      */
     public void setLocked(final boolean locked) {
         isLocked_ = locked;
-        if (locked) {
+        if (isLocked_) {
             setFont(getFont().deriveFont(java.awt.Font.BOLD));
         } else {
             setFont(getFont().deriveFont(java.awt.Font.PLAIN));

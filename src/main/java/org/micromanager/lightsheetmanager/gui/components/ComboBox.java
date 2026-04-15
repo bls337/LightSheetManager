@@ -3,7 +3,6 @@ package org.micromanager.lightsheetmanager.gui.components;
 import javax.swing.JComboBox;
 
 import java.awt.Dimension;
-import java.util.Arrays;
 
 public class ComboBox<T> extends JComboBox<T> {
 

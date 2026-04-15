@@ -16,7 +16,6 @@ import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.io.File;

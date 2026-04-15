@@ -1,17 +1,22 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.VolumeSettings;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
-import org.micromanager.lightsheetmanager.api.internal.DefaultVolumeSettings;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.api.internal.DispimAcquisitionSettings;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 
 import java.util.Objects;
 
-public class VolumePanel extends Panel {
+public class VolumePanel extends Panel implements SettingsListener {
+
+    private GeometryType geometryType_;
 
     private ComboBox<Integer> cmbNumViews_;
     private ComboBox<Integer> cmbFirstView_;
@@ -38,12 +43,10 @@ public class VolumePanel extends Panel {
 
         setAbsoluteSize(275, 115);
 
-        final GeometryType geometryType = model_.devices().adapter().geometry();
-        final int numImagingPaths = model_.devices().adapter().numImagingPaths();
-
-        final VolumeSettings volumeSettings = model_.acquisitions().settings().volume();
+        geometryType_ = model_.devices().adapter().geometry();
 
         // create labels for combo boxes
+        final int numImagingPaths = model_.devices().adapter().numImagingPaths();
         Integer[] viewOptions = new Integer[numImagingPaths];
         for (int i = 0; i < numImagingPaths; i++) {
             viewOptions[i] = i + 1;
@@ -57,6 +60,7 @@ public class VolumePanel extends Panel {
 
         // if the number of sides has changed and the firstView or numViews is larger
         // than the number of sides, default to 1.
+        final VolumeSettings volumeSettings = model_.acquisitions().settings().volume();
         int numViews = volumeSettings.numViews();
         int firstView = volumeSettings.firstView();
         if (numViews > viewOptions.length) {
@@ -70,13 +74,16 @@ public class VolumePanel extends Panel {
         cmbFirstView_ = new ComboBox<>(viewOptions, firstView, 60, 20);
 
         spnViewDelay_ = Spinner.createDoubleSpinner(
-                volumeSettings.delayBeforeView(), 0.0, Double.MAX_VALUE, 0.25);
+                volumeSettings.delayBeforeView(),
+                0.0, Double.MAX_VALUE, 0.25);
         spnSliceStepSize_ = Spinner.createDoubleSpinner(
-                volumeSettings.sliceStepSize(), 0.0, Double.MAX_VALUE, 0.1);
+                volumeSettings.sliceStepSize(),
+                0.0, Double.MAX_VALUE, 0.1);
         spnNumSlices_ = Spinner.createIntegerSpinner(
-                volumeSettings.slicesPerView(), 1, Integer.MAX_VALUE, 1);
+                volumeSettings.slicesPerView(),
+                1, Integer.MAX_VALUE, 1);
 
-        switch (geometryType) {
+        switch (geometryType_) {
             case DISPIM:
                 add(lblNumViews, "");
                 add(cmbNumViews_, "wrap");
@@ -104,15 +111,17 @@ public class VolumePanel extends Panel {
 
     private void createEventHandlers() {
 
-        cmbNumViews_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().volumeBuilder()
-                    .numViews(cmbNumViews_.getSelected());
-        });
+        if (geometryType_ == GeometryType.DISPIM) {
+            cmbNumViews_.registerListener(e -> {
+                model_.acquisitions().settingsBuilder().volumeBuilder()
+                        .numViews(cmbNumViews_.getSelected());
+            });
 
-        cmbFirstView_.registerListener(e -> {
-            model_.acquisitions().settingsBuilder().volumeBuilder()
-                    .firstView(cmbFirstView_.getSelected());
-        });
+            cmbFirstView_.registerListener(e -> {
+                model_.acquisitions().settingsBuilder().volumeBuilder()
+                        .firstView(cmbFirstView_.getSelected());
+            });
+        }
 
         spnViewDelay_.registerListener(e -> {
             model_.acquisitions().settingsBuilder().volumeBuilder()
@@ -130,5 +139,22 @@ public class VolumePanel extends Panel {
             model_.acquisitions().settingsBuilder().volumeBuilder()
                     .sliceStepSize(spnSliceStepSize_.getDouble());
         });
+    }
+
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings)settings;
+            spnViewDelay_.setValue(settingsScape.volume().delayBeforeView());
+            spnNumSlices_.setValue(settingsScape.volume().slicesPerView());
+            spnSliceStepSize_.setValue(settingsScape.volume().sliceStepSize());
+        } else if (settings instanceof DispimAcquisitionSettings) {
+            var settingsDispim = (DispimAcquisitionSettings)settings;
+            cmbNumViews_.setSelectedItem(settingsDispim.volume().numViews());
+            cmbFirstView_.setSelectedItem(settingsDispim.volume().firstView());
+            spnViewDelay_.setValue(settingsDispim.volume().delayBeforeView());
+            spnNumSlices_.setValue(settingsDispim.volume().slicesPerView());
+            spnSliceStepSize_.setValue(settingsDispim.volume().sliceStepSize());
+        }
     }
 }
