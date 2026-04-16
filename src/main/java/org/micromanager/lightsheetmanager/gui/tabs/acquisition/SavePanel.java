@@ -12,6 +12,7 @@ import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
+import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 
@@ -161,6 +162,13 @@ public class SavePanel extends Panel implements SettingsListener {
                     "Save the acquisition settings to JSON...", jsonFileSave_
             );
             if (file != null) {
+                if (file.exists()) {
+                    final boolean clickedYes = DialogUtils.showYesNoDialog(frame_, "Confirm Overwrite",
+                            "The file already exists, would you like to overwrite the file?");
+                    if (!clickedYes) {
+                        return; // early exit => do not overwrite!
+                    }
+                }
                 // update settings and save to file
                 model_.acquisitions().updateAcquisitionSettings();
                 FileUtils.writeStringToFile(file.toString(), model_.acquisitions().settings().toPrettyJson());
@@ -173,7 +181,6 @@ public class SavePanel extends Panel implements SettingsListener {
                     "Load the acquisition settings from JSON...", jsonFileLoad_
             );
             if (file != null) {
-                // TODO: prompt to overwrite settings
                 final String json = FileUtils.readFileToString(file.toString());
                 model_.userSettings().loadFromJson(json, true);
                 model_.studio().logs().logMessage("Acquisition settings loaded from: " + file);
@@ -207,5 +214,7 @@ public class SavePanel extends Panel implements SettingsListener {
     public void onSettingsChanged(final AcquisitionSettings settings) {
         txtSaveDirectory_.setText(settings.saveDirectory());
         txtSaveFileName_.setText(settings.saveNamePrefix());
+        cbxSaveMode_.setSelected(settings.saveMode());
+        cbxSaveWhileAcquiring_.setSelected(settings.isSavingImagesDuringAcquisition());
     }
 }

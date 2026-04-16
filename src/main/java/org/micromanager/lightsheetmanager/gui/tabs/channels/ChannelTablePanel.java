@@ -1,11 +1,14 @@
 package org.micromanager.lightsheetmanager.gui.tabs.channels;
 
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 import javax.swing.JLabel;
@@ -14,7 +17,7 @@ import java.util.Objects;
 /**
  * This panel contains the ChannelTable and controls.
  */
-public class ChannelTablePanel extends Panel {
+public class ChannelTablePanel extends Panel implements SettingsListener {
 
     private JLabel lblChannelGroup_;
     private JLabel lblChangeChannel_;
@@ -35,6 +38,7 @@ public class ChannelTablePanel extends Panel {
         table_ = new ChannelTable(model_);
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     private void createUserInterface() {
@@ -144,4 +148,13 @@ public class ChannelTablePanel extends Panel {
         table_.setHeaderRowColor(state);
     }
 
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings) settings;
+            cmbChannelGroup_.setSelectedItem(settingsScape.channels().group());
+            cmbChannelMode_.setSelected(settingsScape.channels().mode());
+            setItemsEnabled(settingsScape.channels().enabled());
+        }
+    }
 }

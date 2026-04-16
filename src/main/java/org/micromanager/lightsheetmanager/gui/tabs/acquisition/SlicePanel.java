@@ -1,16 +1,20 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
-public class SlicePanel extends Panel {
+// TODO: make a separate panel for diSPIM?
+public class SlicePanel extends Panel implements SettingsListener {
 
     // regular panel
     private CheckBox cbxMinimizeSlicePeriod_;
@@ -36,6 +40,7 @@ public class SlicePanel extends Panel {
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     private void createUserInterface() {
@@ -46,22 +51,19 @@ public class SlicePanel extends Panel {
         );
 
         final SliceSettings sliceSettings = model_.acquisitions().settings().slice();
-        final boolean isSlicePeriodMinimized = sliceSettings.periodMinimized();
+        final boolean periodMinimized = sliceSettings.periodMinimized();
 
         // regular panel
         lblSlicePeriod_ = new Label("Slice period [ms]:");
         lblSampleExposure_ = new Label("Sample exposure [ms]:");
         cbxMinimizeSlicePeriod_ = new CheckBox(
-                "Minimize slice period", 12, isSlicePeriodMinimized, CheckBox.RIGHT);
+                "Minimize slice period", 12, periodMinimized, CheckBox.RIGHT);
         spnSlicePeriod_ = Spinner.createDoubleSpinner(
                 sliceSettings.period(), 0.0, Double.MAX_VALUE, 0.25);
         spnSampleExposure_ = Spinner.createDoubleSpinner(
                 sliceSettings.sampleExposure(), 0.0, Double.MAX_VALUE, 0.25);
 
-        if (isSlicePeriodMinimized) {
-            lblSlicePeriod_.setEnabled(false);
-            spnSlicePeriod_.setEnabled(false);
-        }
+        setSpinnerEnabled(!periodMinimized);
 
         // TODO: this should added back in for diSPIM
 //        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
@@ -83,7 +85,7 @@ public class SlicePanel extends Panel {
 //        }
 
         // create the ui based on the camera trigger mode
-        switchUI(model_.acquisitions().settings().cameraMode());
+        switchDisplayPanel(model_.acquisitions().settings().cameraMode());
     }
 
     /**
@@ -149,7 +151,7 @@ public class SlicePanel extends Panel {
      *
      * @param cameraMode the current camera trigger mode
      */
-    public void switchUI(final CameraMode cameraMode) {
+    private void switchDisplayPanel(final CameraMode cameraMode) {
         removeAll();
         if (cameraMode != CameraMode.VIRTUAL_SLIT) {
             add(cbxMinimizeSlicePeriod_, "wrap");
@@ -171,4 +173,21 @@ public class SlicePanel extends Panel {
         repaint();
     }
 
+    private void setSpinnerEnabled(final boolean state) {
+        lblSlicePeriod_.setEnabled(state);
+        spnSlicePeriod_.setEnabled(state);
+    }
+
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        // TODO: add dispim part
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings) settings;
+            spnSlicePeriod_.setDouble(settingsScape.slice().period());
+            spnSampleExposure_.setDouble(settingsScape.slice().sampleExposure());
+            final boolean periodMinimized = settingsScape.slice().periodMinimized();
+            cbxMinimizeSlicePeriod_.setSelected(periodMinimized);
+            setSpinnerEnabled(!periodMinimized);
+        }
+    }
 }

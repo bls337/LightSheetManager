@@ -32,6 +32,7 @@ public class VolumePanel extends Panel implements SettingsListener {
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     private void createUserInterface() {
@@ -144,12 +145,12 @@ public class VolumePanel extends Panel implements SettingsListener {
     @Override
     public void onSettingsChanged(final AcquisitionSettings settings) {
         if (settings instanceof ScapeAcquisitionSettings) {
-            var settingsScape = (ScapeAcquisitionSettings)settings;
+            var settingsScape = (ScapeAcquisitionSettings) settings;
             spnViewDelay_.setValue(settingsScape.volume().delayBeforeView());
             spnNumSlices_.setValue(settingsScape.volume().slicesPerView());
             spnSliceStepSize_.setValue(settingsScape.volume().sliceStepSize());
         } else if (settings instanceof DispimAcquisitionSettings) {
-            var settingsDispim = (DispimAcquisitionSettings)settings;
+            var settingsDispim = (DispimAcquisitionSettings) settings;
             cmbNumViews_.setSelectedItem(settingsDispim.volume().numViews());
             cmbFirstView_.setSelectedItem(settingsDispim.volume().firstView());
             spnViewDelay_.setValue(settingsDispim.volume().delayBeforeView());

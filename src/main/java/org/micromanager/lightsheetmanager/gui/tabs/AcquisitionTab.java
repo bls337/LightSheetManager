@@ -4,8 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
@@ -28,7 +30,7 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import javax.swing.JLabel;
 import java.util.Objects;
 
-public class AcquisitionTab extends Panel implements ListeningPanel {
+public class AcquisitionTab extends Panel implements ListeningPanel, SettingsListener {
 
     // layout panel
     private Panel pnlRight_;
@@ -83,6 +85,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         acqTableFrame_ = new AcquisitionTableFrame(model_.studio());
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     /**
@@ -222,7 +225,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
      */
     private void createEventHandlers() {
 
-        // start/stop acquisitions
+        // toggle acquisition running
         btnRunAcquisition_.registerListener(() -> {
             if (btnRunAcquisition_.isSelected()) {
                 runAcquisition(false);
@@ -305,10 +308,6 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlRight_.repaint();
     }
 
-    public SlicePanel getSliceSettingsPanel() {
-        return pnlSliceSettings_;
-    }
-
     public PositionPanel getMultiPositionPanel() {
         return pnlMultiPositions_;
     }
@@ -353,4 +352,24 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
     }
 
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings) settings;
+            // update ui elements
+            cmbAcquisitionModes_.setSelected(settingsScape.acquisitionMode());
+            cbxUseTimePoints_.setSelected(settingsScape.isUsingTimePoints());
+            cbxUseMultiplePositions_.setSelected(settingsScape.isUsingMultiplePositions());
+            cbxUseChannels_.setSelected(settingsScape.channels().enabled());
+            cbxUseAdvancedTiming_.setSelected(settingsScape.isUsingAdvancedTiming());
+            // enable or disable ui
+            pnlTimePoints_.setPanelEnabled(settingsScape.isUsingTimePoints());
+            pnlMultiPositions_.setPanelEnabled(settingsScape.isUsingMultiplePositions());
+            pnlChannelTable_.setItemsEnabled(settingsScape.channels().enabled());
+            swapTimingSettingsPanels(settingsScape.isUsingAdvancedTiming());
+            // display the updates
+            revalidate();
+            repaint();
+        }
+    }
 }
