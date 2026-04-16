@@ -2,7 +2,8 @@ package org.micromanager.lightsheetmanager.gui.components;
 
 import javax.swing.JLabel;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
 
 public class Label extends JLabel {
 

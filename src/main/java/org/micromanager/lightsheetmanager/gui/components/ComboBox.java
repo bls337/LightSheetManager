@@ -3,7 +3,6 @@ package org.micromanager.lightsheetmanager.gui.components;
 import javax.swing.JComboBox;
 
 import java.awt.Dimension;
-import java.util.Arrays;
 
 public class ComboBox<T> extends JComboBox<T> {
 
@@ -30,8 +29,8 @@ public class ComboBox<T> extends JComboBox<T> {
         setMaximumSize(size);
     }
 
-    public void registerListener(final Method method) {
-        addActionListener(method::run);
+    public void registerListener(final Runnable listener) {
+        addActionListener(e -> listener.run());
     }
 
 }

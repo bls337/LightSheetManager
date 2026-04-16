@@ -7,6 +7,8 @@ import org.micromanager.Studio;
 import org.scijava.plugin.Plugin;
 import org.scijava.plugin.SciJavaPlugin;
 
+import javax.swing.JFrame;
+
 @Plugin(type = MenuPlugin.class)
 public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
     public static final String copyright = "Applied Scientific Instrumentation (ASI), 2022-2026";
@@ -30,24 +32,50 @@ public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
 
     @Override
     public void onPluginSelected() {
-        // only one instance of the plugin can be open
+        // restore the window if the plugin is already open
         if (WindowUtils.isOpen(frame_)) {
-            WindowUtils.close(frame_);
-        }
-
-        // TODO: capture all errors like this?
-        try {
-            model_ = new LightSheetManager(studio_);
-            final boolean isLoaded = model_.setup();
-            frame_ = new LightSheetManagerFrame(model_, isLoaded);
-            if (isLoaded) {
-                model_.acquisitions().setFrame(frame_);
+            if (WindowUtils.isMinimized(frame_)) {
+                frame_.setState(JFrame.NORMAL);
             }
             frame_.setVisible(true);
             frame_.toFront();
+            frame_.requestFocus();
+            return; // early exit => plugin is already open
+        }
+
+        // start the plugin
+        try {
+            // create the data model and load settings
+            model_ = new LightSheetManager(studio_);
+            final boolean isLoaded = model_.setup();
+
+            // create the ui; show an error ui on failure
+            frame_ = new LightSheetManagerFrame(model_, isLoaded);
+            frame_.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            if (isLoaded) {
+                model_.acquisitions().setFrame(frame_);
+            }
+
+            WindowUtils.registerWindowClosingEvent(frame_, event -> {
+                model_.positions().stopPolling();
+                model_.userSettings().save();
+            });
+
+            WindowUtils.registerWindowClosedEvent(frame_, event -> {
+                frame_ = null;
+                model_ = null;
+            });
+
+            frame_.pack();
+            frame_.setVisible(true);
+            frame_.toFront();
         } catch (Exception e) {
+            // cleanup resources
+            frame_ = null;
+            model_ = null;
             if (studio_ != null) {
-                studio_.logs().showError(e);
+                studio_.logs().showError(e, "Error starting Light Sheet Manager");
             }
         }
     }

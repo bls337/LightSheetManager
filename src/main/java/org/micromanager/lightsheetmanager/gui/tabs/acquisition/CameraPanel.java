@@ -1,13 +1,16 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.RadioButton;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
 import javax.swing.JLabel;
@@ -15,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CameraPanel extends Panel {
+public class CameraPanel extends Panel implements SettingsListener {
 
-    private ComboBox<CameraMode> cmbCameraTriggerMode_;
+    private ComboBox<CameraMode> cmbCameraMode_;
     private RadioButton radPrimaryCamera_;
     private List<CheckBox> cbxCameras_;
     private int selectedIndex_;
@@ -29,6 +32,7 @@ public class CameraPanel extends Panel {
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     private void createUserInterface() {
@@ -48,7 +52,7 @@ public class CameraPanel extends Panel {
             modes = CameraMode.modesByDeviceLibrary(camLib);
         }
 
-        cmbCameraTriggerMode_ = new ComboBox<>(modes,
+        cmbCameraMode_ = new ComboBox<>(modes,
                 model_.acquisitions().settings().cameraMode(), 140, 20);
 
         // validate that the logical device name exists
@@ -98,22 +102,22 @@ public class CameraPanel extends Panel {
 
         add(pnlCameraSelectionRow, "wrap");
         add(new JLabel("Camera Trigger Mode:"), "wrap");
-        add(cmbCameraTriggerMode_, "wrap");
+        add(cmbCameraMode_, "wrap");
     }
 
     private void createEventHandlers() {
         // camera trigger mode
-        cmbCameraTriggerMode_.registerListener(e -> {
-            final CameraMode cameraMode = cmbCameraTriggerMode_.getSelected();
+        cmbCameraMode_.registerListener(() -> {
+            final CameraMode cameraMode = cmbCameraMode_.getSelected();
             model_.acquisitions().settingsBuilder().cameraMode(cameraMode);
         });
 
         // select primary camera
-        radPrimaryCamera_.registerListener(e -> computeCameraOrder());
+        radPrimaryCamera_.registerListener(this::computeCameraOrder);
 
         // active camera check boxes
         for (CheckBox cbx : cbxCameras_) {
-            cbx.registerListener(e -> computeCameraOrder());
+            cbx.registerListener(this::computeCameraOrder);
         }
     }
 
@@ -160,4 +164,18 @@ public class CameraPanel extends Panel {
                 .imagingCameraOrder(cameraData.toArray(CameraData[]::new));
     }
 
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        // TODO: add remaining props
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings) settings;
+            cmbCameraMode_.setSelectedItem(settingsScape.cameraMode());
+            // set the primary camera
+//            final CameraData[] cameraOrder = settingsScape.imagingCameraOrder();
+//            if (cameraOrder.length > 0) {
+//                final String primaryCamera = cameraOrder[0].name();
+//                radPrimaryCamera_.setSelected(primaryCamera, true);
+//            }
+        }
+    }
 }

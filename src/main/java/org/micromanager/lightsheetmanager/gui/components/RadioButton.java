@@ -99,9 +99,9 @@ public class RadioButton extends JPanel {
         return -1;
     }
 
-    public void registerListener(final Method method) {
+    public void registerListener(final Runnable listener) {
         for (final JRadioButton button : buttons) {
-            button.addActionListener(method::run);
+            button.addActionListener(e -> listener.run());
         }
     }
 }

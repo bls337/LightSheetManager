@@ -4,8 +4,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
@@ -28,7 +30,7 @@ import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import javax.swing.JLabel;
 import java.util.Objects;
 
-public class AcquisitionTab extends Panel implements ListeningPanel {
+public class AcquisitionTab extends Panel implements ListeningPanel, SettingsListener {
 
     // layout panel
     private Panel pnlRight_;
@@ -83,6 +85,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         acqTableFrame_ = new AcquisitionTableFrame(model_.studio());
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     /**
@@ -222,8 +225,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
      */
     private void createEventHandlers() {
 
-        // start/stop acquisitions
-        btnRunAcquisition_.registerListener(e -> {
+        // toggle acquisition running
+        btnRunAcquisition_.registerListener(() -> {
             if (btnRunAcquisition_.isSelected()) {
                 runAcquisition(false);
             } else {
@@ -231,7 +234,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
             }
         });
 
-        btnPauseAcquisition_.registerListener(e -> {
+        btnPauseAcquisition_.registerListener(() -> {
             if (btnPauseAcquisition_.isSelected()) {
                 model_.acquisitions().requestPause();
             } else {
@@ -239,16 +242,16 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
             }
         });
 
-        btnOpenPlaylist_.registerListener(e -> acqTableFrame_.setVisible(true));
+        btnOpenPlaylist_.registerListener(() -> acqTableFrame_.setVisible(true));
         btnOpenPlaylist_.setEnabled(false); // TODO: enable when playlist is implemented
 
-        btnSpeedTest_.registerListener(e -> runAcquisition(true));
-        btnRunOverviewAcq_.registerListener(e -> {
+        btnSpeedTest_.registerListener(() -> runAcquisition(true));
+        btnRunOverviewAcq_.registerListener(() -> {
             // TODO: run the overview acq
         });
 
         // multiple positions
-        cbxUseMultiplePositions_.registerListener(e -> {
+        cbxUseMultiplePositions_.registerListener(() -> {
             final boolean selected = cbxUseMultiplePositions_.isSelected();
             model_.acquisitions().settingsBuilder().useMultiplePositions(selected);
             model_.acquisitions().updateDurationLabels();
@@ -256,7 +259,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         });
 
         // time points
-        cbxUseTimePoints_.registerListener(e -> {
+        cbxUseTimePoints_.registerListener(() -> {
             final boolean selected = cbxUseTimePoints_.isSelected();
             model_.acquisitions().settingsBuilder().useTimePoints(selected);
             model_.acquisitions().updateDurationLabels();
@@ -264,7 +267,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         });
 
         // use channels
-        cbxUseChannels_.registerListener(e -> {
+        cbxUseChannels_.registerListener(() -> {
             final boolean selected = cbxUseChannels_.isSelected();
             model_.acquisitions().settingsBuilder().channelBuilder().enabled(selected);
             model_.acquisitions().updateDurationLabels();
@@ -272,11 +275,12 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         });
 
         // select the acquisition mode
-        cmbAcquisitionModes_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().acquisitionMode(cmbAcquisitionModes_.getSelected()));
+        cmbAcquisitionModes_.registerListener(
+                () -> model_.acquisitions().settingsBuilder()
+                        .acquisitionMode(cmbAcquisitionModes_.getSelected()));
 
         // switches timing panels based on check box
-        cbxUseAdvancedTiming_.registerListener(e -> {
+        cbxUseAdvancedTiming_.registerListener(() -> {
             final boolean selected = cbxUseAdvancedTiming_.isSelected();
             model_.acquisitions().settingsBuilder().useAdvancedTiming(selected);
             swapTimingSettingsPanels(selected);
@@ -302,10 +306,6 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
         pnlRight_.add(cbxUseAdvancedTiming_, "growx");
         pnlRight_.revalidate();
         pnlRight_.repaint();
-    }
-
-    public SlicePanel getSliceSettingsPanel() {
-        return pnlSliceSettings_;
     }
 
     public PositionPanel getMultiPositionPanel() {
@@ -352,4 +352,24 @@ public class AcquisitionTab extends Panel implements ListeningPanel {
 
     }
 
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings) settings;
+            // update ui elements
+            cmbAcquisitionModes_.setSelected(settingsScape.acquisitionMode());
+            cbxUseTimePoints_.setSelected(settingsScape.isUsingTimePoints());
+            cbxUseMultiplePositions_.setSelected(settingsScape.isUsingMultiplePositions());
+            cbxUseChannels_.setSelected(settingsScape.channels().enabled());
+            cbxUseAdvancedTiming_.setSelected(settingsScape.isUsingAdvancedTiming());
+            // enable or disable ui
+            pnlTimePoints_.setPanelEnabled(settingsScape.isUsingTimePoints());
+            pnlMultiPositions_.setPanelEnabled(settingsScape.isUsingMultiplePositions());
+            pnlChannelTable_.setItemsEnabled(settingsScape.channels().enabled());
+            swapTimingSettingsPanels(settingsScape.isUsingAdvancedTiming());
+            // display the updates
+            revalidate();
+            repaint();
+        }
+    }
 }

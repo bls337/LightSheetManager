@@ -17,8 +17,8 @@ public class TextField extends JTextField {
         setColumns(size);
     }
 
-    public void registerListener(final Method method) {
-        addActionListener(method::run);
+    public void registerListener(final Runnable listener) {
+        addActionListener(e -> listener.run());
     }
 
 }

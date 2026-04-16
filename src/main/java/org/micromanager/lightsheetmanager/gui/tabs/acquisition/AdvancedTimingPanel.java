@@ -1,17 +1,20 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import java.util.Objects;
 
-public class AdvancedTimingPanel extends Panel {
+public class AdvancedTimingPanel extends Panel implements SettingsListener {
 
     private Spinner spnDelayBeforeScan_;
     private Spinner spnDelayBeforeLaser_;
@@ -31,6 +34,7 @@ public class AdvancedTimingPanel extends Panel {
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     private void createUserInterface() {
@@ -92,7 +96,7 @@ public class AdvancedTimingPanel extends Panel {
 
     private void createEventHandlers() {
 
-        spnDelayBeforeScan_.registerListener(e -> {
+        spnDelayBeforeScan_.registerListener(() -> {
             final double value = spnDelayBeforeScan_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -105,13 +109,13 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnScansPerSlice_.registerListener(e -> {
+        spnScansPerSlice_.registerListener(() -> {
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().scansPerSlice(spnScansPerSlice_.getInt());
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnScanDuration_.registerListener(e -> {
+        spnScanDuration_.registerListener(() -> {
             final double value = spnScanDuration_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -124,7 +128,7 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnDelayBeforeLaser_.registerListener(e -> {
+        spnDelayBeforeLaser_.registerListener(() -> {
             final double value = spnDelayBeforeLaser_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -137,7 +141,7 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnLaserTriggerDuration_.registerListener(e -> {
+        spnLaserTriggerDuration_.registerListener(() -> {
             final double value = spnLaserTriggerDuration_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -150,7 +154,7 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnDelayBeforeCamera_.registerListener(e -> {
+        spnDelayBeforeCamera_.registerListener(() -> {
             final double value = spnDelayBeforeCamera_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -163,7 +167,7 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnCameraTriggerDuration_.registerListener(e -> {
+        spnCameraTriggerDuration_.registerListener(() -> {
             final double value = spnCameraTriggerDuration_.getDouble();
             final double rounded = NumberUtils.roundToQuarterMs(value);
             if (Math.abs(value - rounded) > 1e-6) {
@@ -176,13 +180,13 @@ public class AdvancedTimingPanel extends Panel {
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnCameraExposure_.registerListener(e -> {
+        spnCameraExposure_.registerListener(() -> {
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().cameraExposure(spnCameraExposure_.getDouble());
             model_.acquisitions().updateDurationLabels();
         });
 
-        cbxAlternateScanDirection_.registerListener(e -> {
+        cbxAlternateScanDirection_.registerListener(() -> {
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().useAlternateScanDirection(cbxAlternateScanDirection_.isSelected());
         });
@@ -203,5 +207,23 @@ public class AdvancedTimingPanel extends Panel {
         spnCameraTriggerDuration_.setDouble(timingSettings.cameraTriggerDuration());
         spnCameraExposure_.setDouble(timingSettings.cameraExposure());
         cbxAlternateScanDirection_.setSelected(timingSettings.useAlternateScanDirection());
+    }
+
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings) settings;
+            spnDelayBeforeScan_.setValue(settingsScape.timing().delayBeforeScan());
+            spnScansPerSlice_.setValue(settingsScape.timing().scansPerSlice());
+            spnScanDuration_.setValue(settingsScape.timing().scanDuration());
+            spnDelayBeforeLaser_.setValue(settingsScape.timing().delayBeforeLaser());
+            spnLaserTriggerDuration_.setValue(settingsScape.timing().laserTriggerDuration());
+            spnDelayBeforeCamera_.setValue(settingsScape.timing().cameraTriggerDuration());
+            spnLaserTriggerDuration_.setValue(settingsScape.timing().cameraTriggerDuration());
+            spnDelayBeforeCamera_.setDouble(settingsScape.timing().cameraTriggerDuration());
+            spnCameraTriggerDuration_.setDouble(settingsScape.timing().cameraTriggerDuration());
+            spnCameraExposure_.setValue(settingsScape.timing().cameraExposure());
+            cbxAlternateScanDirection_.setSelected(settingsScape.timing().useAlternateScanDirection());
+        }
     }
 }

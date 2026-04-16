@@ -41,7 +41,7 @@ public class TabbedPane extends JTabbedPane {
     }
 
 //    @Override
-//    public void addTab(String title, java.awt.Component component) throws Exception {
+//    public void addTab(String title, Component component) throws Exception {
 //        if (component instanceof ListeningPanel) {
 //            super.addTab(title, component);
 //        } else {

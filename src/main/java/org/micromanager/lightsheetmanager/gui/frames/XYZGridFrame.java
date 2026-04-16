@@ -209,57 +209,47 @@ public class XYZGridFrame extends JFrame {
         final XYZGrid grid = model_.pluginSettings().xyzGrid();
 
         // Check Boxes
-        cbxUseX_.registerListener(e -> {
+        cbxUseX_.registerListener(() -> {
             final boolean selected = cbxUseX_.isSelected();
             grid.setUseX(selected);
             setEnabledX(selected);
         });
 
-        cbxUseY_.registerListener(e -> {
+        cbxUseY_.registerListener(() -> {
             final boolean selected = cbxUseY_.isSelected();
             grid.setUseY(selected);
             setEnabledY(selected);
         });
 
-        cbxUseZ_.registerListener(e -> {
+        cbxUseZ_.registerListener(() -> {
             final boolean selected = cbxUseZ_.isSelected();
             grid.setUseZ(selected);
             setEnabledZ(selected);
         });
 
-        cbxClearPositions_.registerListener(e ->
-                grid.setClearYZ(cbxClearPositions_.isSelected()));
+        cbxClearPositions_.registerListener(
+                () -> grid.setClearYZ(cbxClearPositions_.isSelected()));
 
         // Spinners X
-        spnXStart_.registerListener(e ->
-                grid.setStartX(spnXStart_.getDouble()));
-        spnXStop_.registerListener(e ->
-                grid.setStopX(spnXStop_.getDouble()));
-        spnXDelta_.registerListener(e ->
-                grid.setDeltaX(spnXDelta_.getDouble()));
+        spnXStart_.registerListener(() -> grid.setStartX(spnXStart_.getDouble()));
+        spnXStop_.registerListener(() -> grid.setStopX(spnXStop_.getDouble()));
+        spnXDelta_.registerListener(() -> grid.setDeltaX(spnXDelta_.getDouble()));
 
         // Spinners Y
-        spnYStart_.registerListener(e ->
-                grid.setStartY(spnYStart_.getDouble()));
-        spnYStop_.registerListener(e ->
-                grid.setStopY(spnYStop_.getDouble()));
-        spnYDelta_.registerListener(e ->
-                grid.setDeltaY(spnYDelta_.getDouble()));
+        spnYStart_.registerListener(() -> grid.setStartY(spnYStart_.getDouble()));
+        spnYStop_.registerListener(() -> grid.setStopY(spnYStop_.getDouble()));
+        spnYDelta_.registerListener(() -> grid.setDeltaY(spnYDelta_.getDouble()));
 
         // Spinners Z
-        spnZStart_.registerListener(e ->
-                grid.setStartZ(spnZStart_.getDouble()));
-        spnZStop_.registerListener(e ->
-                grid.setStopZ(spnZStop_.getDouble()));
-        spnZDelta_.registerListener(e ->
-                grid.setDeltaZ(spnZDelta_.getDouble()));
+        spnZStart_.registerListener(() -> grid.setStartZ(spnZStart_.getDouble()));
+        spnZStop_.registerListener(() -> grid.setStopZ(spnZStop_.getDouble()));
+        spnZDelta_.registerListener(() -> grid.setDeltaZ(spnZDelta_.getDouble()));
 
         // Overlap
-        spnOverlapYZ_.registerListener(e ->
-                grid.setOverlapYZ(spnOverlapYZ_.getInt()));
+        spnOverlapYZ_.registerListener(() -> grid.setOverlapYZ(spnOverlapYZ_.getInt()));
 
         // compute XYZ grid
-        btnComputeGrid_.registerListener(e -> {
+        btnComputeGrid_.registerListener(() -> {
             final PositionList positionList = model_.studio().positions().getPositionList();
             if (positionList.getNumberOfPositions() != 0) {
                 final boolean result = DialogUtils.showYesNoDialog(this, "Warning",
@@ -273,10 +263,10 @@ public class XYZGridFrame extends JFrame {
             loadFromSettings();
         });
 
-        btnEditPositionList_.registerListener(e ->
-                model_.studio().app().showPositionList());
-        btnRunOverviewAcq_.registerListener(e ->
-                model_.studio().logs().showError("Not implemented yet!")); // TODO: !!!
+        btnEditPositionList_.registerListener(
+                () -> model_.studio().app().showPositionList());
+        btnRunOverviewAcq_.registerListener(
+                () -> model_.studio().logs().showError("Not implemented yet!")); // TODO: !!!
     }
 
     private void loadFromSettings() {

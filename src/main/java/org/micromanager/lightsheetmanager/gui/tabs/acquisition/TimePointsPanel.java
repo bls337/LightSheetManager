@@ -1,15 +1,17 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
-public class TimePointsPanel extends Panel {
+public class TimePointsPanel extends Panel implements SettingsListener {
 
     private Label lblNumTimePoints_;
     private Label lblTimePointInterval_;
@@ -23,6 +25,7 @@ public class TimePointsPanel extends Panel {
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     private void createUserInterface() {
@@ -52,12 +55,12 @@ public class TimePointsPanel extends Panel {
     // TODO: update duration labels
     private void createEventHandlers() {
 
-        spnNumTimePoints_.registerListener(e -> {
+        spnNumTimePoints_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().numTimePoints(spnNumTimePoints_.getInt());
             model_.acquisitions().updateDurationLabels();
         });
 
-        spnTimePointInterval_.registerListener(e -> {
+        spnTimePointInterval_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().timePointInterval(spnTimePointInterval_.getDouble());
             model_.acquisitions().updateDurationLabels();
         });
@@ -70,4 +73,13 @@ public class TimePointsPanel extends Panel {
         spnTimePointInterval_.setEnabled(state);
     }
 
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        // TODO: timepoints should probably be a part of the base acq settings
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings) settings;
+            spnNumTimePoints_.setValue(settingsScape.numTimePoints());
+            spnTimePointInterval_.setValue(settingsScape.timePointInterval());
+        }
+    }
 }

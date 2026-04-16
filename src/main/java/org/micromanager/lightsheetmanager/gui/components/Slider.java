@@ -5,7 +5,6 @@ import javax.swing.JSlider;
 import javax.swing.UIManager;
 import java.util.Hashtable;
 
-
 /**
  * Create a slider that uses double values using a scale factor.
  * <p>
@@ -39,18 +38,10 @@ public class Slider extends JSlider {
         setSnapToTicks(false);
     }
 
-    public void registerListener(final Method method) {
-        addChangeListener(e -> {
-            if (!this.getValueIsAdjusting()) {
-                method.run(e);
-            }
-        });
-    }
-
     /**
      * Returns the actual value that the slider is meant to represent.
      *
-     * @return the unscaled
+     * @return the unscaled value
      */
     public double getDouble() {
         return (double) getValue() / scaleFactor_;
@@ -59,4 +50,13 @@ public class Slider extends JSlider {
     public void setDouble(final double value) {
         setValue((int)(value*scaleFactor_));
     }
+
+    public void registerListener(final Runnable listener) {
+        addChangeListener(e -> {
+            if (!this.getValueIsAdjusting()) {
+                listener.run();
+            }
+        });
+    }
+
 }

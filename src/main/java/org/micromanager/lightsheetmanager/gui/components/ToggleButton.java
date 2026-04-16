@@ -71,10 +71,10 @@ public class ToggleButton extends JToggleButton {
         setMaximumSize(size);
     }
 
-    public void registerListener(final Method method) {
+    public void registerListener(final Runnable listener) {
         addActionListener(event -> {
             setState(isSelected());
-            method.run(event);
+            listener.run();
         });
     }
 

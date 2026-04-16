@@ -4,11 +4,16 @@ import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
 import org.micromanager.UserProfile;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.propertymap.MutablePropertyMapView;
 
+import javax.swing.SwingUtilities;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -32,6 +37,8 @@ public class UserSettings {
 
     // Note: increase this value based on the amount of nested json in the settings
     private static final int MAX_RECURSION_DEPTH_JSON = 4;
+
+    private final List<SettingsListener> listeners = new ArrayList<>();
 
     private final LightSheetManager model_;
 
@@ -57,7 +64,7 @@ public class UserSettings {
      *
      * @return a {@code String} containing the name
      */
-    public String getUserName() {
+    public String userName() {
         return userName_;
     }
 
@@ -75,6 +82,7 @@ public class UserSettings {
         // get JSON from settings based on microscope geometry type
         final GeometryType geometryType = model_.devices().adapter().geometry();
 
+        // get the JSON from the user settings based on geometry type
         final String key = SETTINGS_PREFIX + geometryType.toString().toUpperCase();
         final String json = settings_.getString(key, SETTINGS_NOT_FOUND);
 
@@ -83,17 +91,12 @@ public class UserSettings {
             model_.studio().logs().logDebugMessage(
                     "settings not found, using default settings for " + geometryType);
         } else {
-            // validate user settings and create settings object
-            final Optional<JSONObject> loadedJson = validateUserSettings(json);
-            if (loadedJson.isPresent()) {
-                // TODO: switch this based on microscope geometry type
-                final ScapeAcquisitionSettings acqSettings = ScapeAcquisitionSettings.fromJson(
-                        loadedJson.get().toString(), ScapeAcquisitionSettings.class);
-                // update both the settings and builder
-                model_.acquisitions().setAcquisitionSettingsAndBuilder(acqSettings);
-                model_.studio().logs().logDebugMessage("loaded JSON from " + key + ": "
-                        + model_.acquisitions().settings().toPrettyJson());
-            }
+            // validate user settings and create AcquisitionSettings object
+            final Optional<JSONObject> settingsJson = validateUserSettings(json);
+            settingsJson.ifPresent(jsonObject ->
+                    loadFromJson(jsonObject.toString(), false));
+            model_.studio().logs().logDebugMessage("loaded JSON from " + key + ": "
+                    + model_.acquisitions().settings().toPrettyJson());
         }
 
         // load plugin settings or default plugin settings
@@ -104,6 +107,18 @@ public class UserSettings {
             model_.pluginSettings(PluginSettings.fromJson(jsonStr));
             model_.studio().logs().logDebugMessage("loaded PluginSettings from " + SETTINGS_PLUGIN + ": "
                     + model_.pluginSettings().toPrettyJson());
+        }
+    }
+
+    /**
+     * Load {@link AcquisitionSettings} from a JSON file.
+     */
+    public void loadFromJson(final String json, final boolean notify) {
+        // TODO: switch this based on microscope geometry type
+        var settings = ScapeAcquisitionSettings.fromJson(json, ScapeAcquisitionSettings.class);
+        model_.acquisitions().setAcquisitionSettingsAndBuilder(settings);
+        if (notify) {
+            notifyListeners(settings); // update the ui
         }
     }
 
@@ -223,6 +238,35 @@ public class UserSettings {
             }
         }
         return numKeys;
+    }
+
+    /**
+     * Adds a listener that will update when the settings are loaded.
+     *
+     * @param listener listens to the settings object
+     */
+    public void addChangeListener(final SettingsListener listener) {
+        listeners.add(listener);
+    }
+
+    /**
+     * Updates all listeners on the Event Dispatch Thread (EDT).
+     *
+     * @param settings the acquisition settings
+     */
+    private void notifyListeners(final AcquisitionSettings settings) {
+        // always update listeners on the EDT regardless of where we are called from
+        if (SwingUtilities.isEventDispatchThread()) {
+            for (SettingsListener listener : listeners) {
+                listener.onSettingsChanged(settings);
+            }
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                for (SettingsListener listener : listeners) {
+                    listener.onSettingsChanged(settings);
+                }
+            });
+        }
     }
 
 }

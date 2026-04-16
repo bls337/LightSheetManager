@@ -1,16 +1,19 @@
 package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.gui.frames.XYZGridFrame;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
-public class PositionPanel extends Panel {
+public class PositionPanel extends Panel implements SettingsListener {
 
     private Label lblPostMoveDelay_;
     private Spinner spnPostMoveDelay_;
@@ -26,6 +29,7 @@ public class PositionPanel extends Panel {
         xyzGridFrame_ = new XYZGridFrame(model_);
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     private void createUserInterface() {
@@ -50,7 +54,7 @@ public class PositionPanel extends Panel {
     private void createEventHandlers() {
 
         // open XYZ grid
-        btnOpenXYZGrid_.registerListener(e -> {
+        btnOpenXYZGrid_.registerListener(() -> {
             if (model_.devices().hasDevice("SampleXY")
                     && model_.devices().hasDevice("SampleZ")) {
                 xyzGridFrame_.setVisible(true);
@@ -61,9 +65,9 @@ public class PositionPanel extends Panel {
         });
 
         // open position list
-        btnEditPositionList_.registerListener(e -> model_.studio().app().showPositionList());
+        btnEditPositionList_.registerListener(() -> model_.studio().app().showPositionList());
 
-        spnPostMoveDelay_.registerListener(e -> model_.acquisitions()
+        spnPostMoveDelay_.registerListener(() -> model_.acquisitions()
                 .settingsBuilder().postMoveDelay(spnPostMoveDelay_.getInt()));
 
     }
@@ -76,5 +80,14 @@ public class PositionPanel extends Panel {
 
     public XYZGridFrame getXYZGridFrame() {
         return xyzGridFrame_;
+    }
+
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        // TODO: multi positions should probably be a part of the base acq settings
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings) settings;
+            spnPostMoveDelay_.setValue(settingsScape.postMoveDelay());
+        }
     }
 }

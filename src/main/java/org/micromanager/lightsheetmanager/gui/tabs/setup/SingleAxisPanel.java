@@ -69,20 +69,16 @@ public class SingleAxisPanel extends Panel {
     private void createEventHandlers() {
 
         if (isUsingPLogic_) {
-            final ASIScanner galvo = model_.devices()
-                    .device("IllumSlice");
+            final ASIScanner galvo = model_.devices().device("IllumSlice");
 
-            cbxPattern_.registerListener(e -> {
-                galvo.sa().setPatternY(cbxPattern_.getSelected());
-            });
+            cbxPattern_.registerListener(
+                    () -> galvo.sa().setPatternY(cbxPattern_.getSelected()));
 
-            spnAmplitude_.registerListener(e -> {
-                galvo.sa().setAmplitudeY(spnAmplitude_.getDouble());
-            });
+            spnAmplitude_.registerListener(
+                    () -> galvo.sa().setAmplitudeY(spnAmplitude_.getDouble()));
 
-            spnPeriod_.registerListener(e -> {
-                galvo.sa().setPeriodY(spnPeriod_.getInt());
-            });
+            spnPeriod_.registerListener(
+                    () -> galvo.sa().setPeriodY(spnPeriod_.getInt()));
 
         }
     }

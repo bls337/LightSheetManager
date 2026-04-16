@@ -3,13 +3,16 @@ package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 import org.micromanager.internal.utils.FileDialogs;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
+import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 
@@ -20,7 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-public class SavePanel extends Panel {
+public class SavePanel extends Panel implements SettingsListener {
 
     private TextField txtSaveDirectory_;
     private TextField txtSaveFileName_;
@@ -72,6 +75,8 @@ public class SavePanel extends Panel {
 
         createUserInterface();
         createEventHandlers();
+
+        model.userSettings().addChangeListener(this);
     }
 
     public void createUserInterface() {
@@ -125,7 +130,7 @@ public class SavePanel extends Panel {
     }
 
     public void createEventHandlers() {
-        btnBrowse_.registerListener(e -> {
+        btnBrowse_.registerListener(() -> {
             final File result = FileDialogs.openDir(frame_,
                     "Please select the directory to save images to...",
                     directorySelect_
@@ -137,39 +142,47 @@ public class SavePanel extends Panel {
         });
 
         // use the text field so we don't need to update settings
-        btnOpen_.registerListener(e ->
-                openDirectory(txtSaveDirectory_.getText()));
+        btnOpen_.registerListener(
+                () -> openDirectory(txtSaveDirectory_.getText()));
 
-        cbxSaveWhileAcquiring_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().saveImagesDuringAcquisition(
-                        cbxSaveWhileAcquiring_.isSelected()));
+        cbxSaveWhileAcquiring_.registerListener(
+                () -> model_.acquisitions().settingsBuilder()
+                        .saveImagesDuringAcquisition(cbxSaveWhileAcquiring_.isSelected()));
 
-        txtSaveFileName_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().saveNamePrefix(txtSaveFileName_.getText()));
+        txtSaveFileName_.registerListener(
+                () -> model_.acquisitions().settingsBuilder()
+                        .saveNamePrefix(txtSaveFileName_.getText()));
 
-        cbxSaveMode_.registerListener(e ->
-                model_.acquisitions().settingsBuilder().saveMode(cbxSaveMode_.getSelected()));
+        cbxSaveMode_.registerListener(
+                () -> model_.acquisitions().settingsBuilder()
+                        .saveMode(cbxSaveMode_.getSelected()));
 
-        btnSaveSettings_.registerListener(e -> {
+        btnSaveSettings_.registerListener(() -> {
             final File file = FileDialogs.save(frame_,
                     "Save the acquisition settings to JSON...", jsonFileSave_
             );
             if (file != null) {
-                // TODO: prompt if file exists
+                if (file.exists()) {
+                    final boolean clickedYes = DialogUtils.showYesNoDialog(frame_, "Confirm Overwrite",
+                            "The file already exists, would you like to overwrite the file?");
+                    if (!clickedYes) {
+                        return; // early exit => do not overwrite!
+                    }
+                }
+                // update settings and save to file
+                model_.acquisitions().updateAcquisitionSettings();
                 FileUtils.writeStringToFile(file.toString(), model_.acquisitions().settings().toPrettyJson());
                 model_.studio().logs().logMessage("Acquisition settings saved to: " + file);
             }
         });
 
-        btnLoadSettings_.registerListener(e -> {
+        btnLoadSettings_.registerListener(() -> {
             final File file = FileDialogs.openFile(frame_,
                     "Load the acquisition settings from JSON...", jsonFileLoad_
             );
             if (file != null) {
-                // TODO: prompt to overwrite settings
                 final String json = FileUtils.readFileToString(file.toString());
-                model_.acquisitions().setAcquisitionSettingsAndBuilder(
-                        ScapeAcquisitionSettings.fromJson(json, ScapeAcquisitionSettings.class));
+                model_.userSettings().loadFromJson(json, true);
                 model_.studio().logs().logMessage("Acquisition settings loaded from: " + file);
             }
         });
@@ -197,4 +210,11 @@ public class SavePanel extends Panel {
         }
     }
 
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        txtSaveDirectory_.setText(settings.saveDirectory());
+        txtSaveFileName_.setText(settings.saveNamePrefix());
+        cbxSaveMode_.setSelected(settings.saveMode());
+        cbxSaveWhileAcquiring_.setSelected(settings.isSavingImagesDuringAcquisition());
+    }
 }

@@ -1,11 +1,14 @@
 package org.micromanager.lightsheetmanager.gui.tabs.channels;
 
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
+import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
 import javax.swing.JLabel;
@@ -14,7 +17,7 @@ import java.util.Objects;
 /**
  * This panel contains the ChannelTable and controls.
  */
-public class ChannelTablePanel extends Panel {
+public class ChannelTablePanel extends Panel implements SettingsListener {
 
     private JLabel lblChannelGroup_;
     private JLabel lblChangeChannel_;
@@ -35,6 +38,7 @@ public class ChannelTablePanel extends Panel {
         table_ = new ChannelTable(model_);
         createUserInterface();
         createEventHandlers();
+        model.userSettings().addChangeListener(this);
     }
 
     private void createUserInterface() {
@@ -71,7 +75,7 @@ public class ChannelTablePanel extends Panel {
     private void createEventHandlers() {
 
         // select channel group
-        cmbChannelGroup_.registerListener(e -> {
+        cmbChannelGroup_.registerListener(() -> {
             final String channelGroup = cmbChannelGroup_.getSelected();
             table_.updatePresetComboBoxes(channelGroup);
             // set the channel group to use when we get the channels
@@ -84,7 +88,7 @@ public class ChannelTablePanel extends Panel {
         });
 
         // add channel
-        btnAddChannel_.registerListener(e -> {
+        btnAddChannel_.registerListener(() -> {
             table_.getTableModel().addEmptyChannel();
             final ChannelSpec[] channels = table_.getData().getChannels();
             model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
@@ -93,7 +97,7 @@ public class ChannelTablePanel extends Panel {
         });
 
         // remove channel
-        btnRemoveChannel_.registerListener(e -> {
+        btnRemoveChannel_.registerListener(() -> {
             final int row = table_.getTable().getSelectedRow();
             if (row != -1) { // is any row selected?
                 table_.getTableModel().removeChannel(row);
@@ -104,7 +108,7 @@ public class ChannelTablePanel extends Panel {
         });
 
         // refresh channel table
-        btnRefresh_.registerListener(e -> {
+        btnRefresh_.registerListener(() -> {
             final String channelGroup = model_.acquisitions().settings().channels().group();
             final String[] groups = table_.getChannelGroups();
             cmbChannelGroup_.removeAllItems();
@@ -120,7 +124,7 @@ public class ChannelTablePanel extends Panel {
         });
 
         // select channel mode
-        cmbChannelMode_.registerListener(e -> {
+        cmbChannelMode_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().channelBuilder()
                   .mode(cmbChannelMode_.getSelected());
         });
@@ -144,4 +148,13 @@ public class ChannelTablePanel extends Panel {
         table_.setHeaderRowColor(state);
     }
 
+    @Override
+    public void onSettingsChanged(final AcquisitionSettings settings) {
+        if (settings instanceof ScapeAcquisitionSettings) {
+            var settingsScape = (ScapeAcquisitionSettings) settings;
+            cmbChannelGroup_.setSelectedItem(settingsScape.channels().group());
+            cmbChannelMode_.setSelected(settingsScape.channels().mode());
+            setItemsEnabled(settingsScape.channels().enabled());
+        }
+    }
 }
