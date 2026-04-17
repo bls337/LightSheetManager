@@ -14,6 +14,7 @@ import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
+import org.micromanager.lightsheetmanager.model.SettingsAdapter;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 
 import javax.swing.JLabel;
@@ -36,6 +37,7 @@ public class SavePanel extends Panel implements SettingsListener {
 
     private Button btnSaveSettings_;
     private Button btnLoadSettings_;
+    private Button btnConvertSettings_;
 
     private final FileDialogs.FileType directorySelect_;
     private final FileDialogs.FileType jsonFileSave_;
@@ -114,19 +116,21 @@ public class SavePanel extends Panel implements SettingsListener {
 
         btnSaveSettings_ = new Button("Save", 60, 20);
         btnLoadSettings_ = new Button("Load", 60, 20);
+        btnConvertSettings_ = new Button("Convert", 72, 20);
 
         add(lblSaveDirectory, "");
         add(txtSaveDirectory_, "");
         add(btnBrowse_, "");
         add(btnOpen_, "wrap");
         add(lblSaveFileName, "");
-        add(txtSaveFileName_, "wrap");
+        add(txtSaveFileName_, "span 3, wrap");
         add(lblSaveMode, "");
         add(cbxSaveMode_, "split 2, wrap");
         add(cbxSaveWhileAcquiring_, "span 2, wrap");
         add(new JLabel("Acq Settings:"), "");
-        add(btnSaveSettings_, "split 2");
+        add(btnSaveSettings_, "split 3, span 3");
         add(btnLoadSettings_, "");
+        add(btnConvertSettings_, "");
     }
 
     public void createEventHandlers() {
@@ -187,6 +191,17 @@ public class SavePanel extends Panel implements SettingsListener {
             }
         });
 
+        btnConvertSettings_.registerListener(() -> {
+            final File file = FileDialogs.openFile(frame_,
+                    "Load the acquisition settings from JSON...", jsonFileLoad_
+            );
+            if (file != null) {
+                final String json = FileUtils.readFileToString(file.toString());
+                SettingsAdapter adapter = new SettingsAdapter(model_);
+                adapter.convert(json);
+                //System.out.println(json);
+            }
+        });
     }
 
     // Opens the file explorer to the save directory

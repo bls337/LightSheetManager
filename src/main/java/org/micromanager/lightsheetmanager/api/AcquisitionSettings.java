@@ -50,7 +50,7 @@ public interface AcquisitionSettings {
          *
          * @return the autofocus settings builder
          */
-        DefaultAutofocusSettings.Builder autofocusSettingsBuilder();
+        DefaultAutofocusSettings.Builder autofocusBuilder();
 
         // TODO: document this
         /**

@@ -194,25 +194,25 @@ public class AutofocusTab extends Panel implements ListeningPanel {
 
         // general autofocus settings
         cbxShowImages_.registerListener(() -> model_.acquisitions().settingsBuilder()
-                .autofocusSettingsBuilder().showImages(cbxShowImages_.isSelected()));
+                .autofocusBuilder().showImages(cbxShowImages_.isSelected()));
 
         cbxShowGraph_.registerListener(() -> model_.acquisitions().settingsBuilder()
-                .autofocusSettingsBuilder().showGraph(cbxShowGraph_.isSelected()));
+                .autofocusBuilder().showGraph(cbxShowGraph_.isSelected()));
 
         spnNumImages_.registerListener(() -> model_.acquisitions().settingsBuilder()
-                .autofocusSettingsBuilder().numImages(spnNumImages_.getInt()));
+                .autofocusBuilder().numImages(spnNumImages_.getInt()));
 
         spnStepSize_.registerListener(() -> model_.acquisitions().settingsBuilder()
-                .autofocusSettingsBuilder().stepSizeUm(spnStepSize_.getDouble()));
+                .autofocusBuilder().stepSizeUm(spnStepSize_.getDouble()));
 
      //   spnToleranceUm_.registerListener(() -> model_.acquisitions().settingsBuilder()
      //          .autofocusSettingsBuilder().toleranceUm(spnToleranceUm_.getDouble()));
 
         cmbAutofocusMode_.registerListener(() -> model_.acquisitions().settingsBuilder()
-                .autofocusSettingsBuilder().mode(cmbAutofocusMode_.getSelected()));
+                .autofocusBuilder().mode(cmbAutofocusMode_.getSelected()));
 
         cmbScoringMethod_.registerListener(() -> model_.acquisitions().settingsBuilder()
-                .autofocusSettingsBuilder().scoringMethod(cmbScoringMethod_.getSelected()));
+                .autofocusBuilder().scoringMethod(cmbScoringMethod_.getSelected()));
 
         btnRunAutofocus_.registerListener(() -> model_.acquisitions().autofocus().run());
 

@@ -26,7 +26,7 @@ public class AutofocusAdapter {
 //                .acquisitions().settings().autofocusSettings();
 
         final DefaultAutofocusSettings afSettings = model_
-                .acquisitions().settingsBuilder().autofocusSettingsBuilder().build();
+                .acquisitions().settingsBuilder().autofocusBuilder().build();
 
         // save the original plugin settings
         final AutofocusManager manager = model_.studio().getAutofocusManager();
