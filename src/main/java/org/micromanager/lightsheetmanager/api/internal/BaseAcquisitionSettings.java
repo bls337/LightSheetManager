@@ -96,7 +96,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         }
 
         @Override
-        public DefaultAutofocusSettings.Builder autofocusSettingsBuilder() {
+        public DefaultAutofocusSettings.Builder autofocusBuilder() {
             return afBuilder_;
         }
 

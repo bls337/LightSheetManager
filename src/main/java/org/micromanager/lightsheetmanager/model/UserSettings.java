@@ -254,7 +254,7 @@ public class UserSettings {
      *
      * @param settings the acquisition settings
      */
-    private void notifyListeners(final AcquisitionSettings settings) {
+    public void notifyListeners(final AcquisitionSettings settings) {
         // always update listeners on the EDT regardless of where we are called from
         if (SwingUtilities.isEventDispatchThread()) {
             for (SettingsListener listener : listeners) {
