@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
+import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -28,6 +29,8 @@ public class SettingsTab extends Panel implements ListeningPanel {
     private Spinner spnSliceAxisFilterFreq_;
     private Spinner spnLiveScanPeriod_;
 
+    private Button btnCreateConfigGroup_;
+
     // changes the ui setup
     private boolean isUsingPLogic_;
     private boolean isUsingScanSettings_;
@@ -46,6 +49,21 @@ public class SettingsTab extends Panel implements ListeningPanel {
         // check for devices to set up the tab
         isUsingPLogic_ = model_.devices().isUsingPLogic();
         isUsingScanSettings_ = model_.devices().hasStageScanning();
+
+        btnCreateConfigGroup_ = new Button("Create Devices Configuration Group", 220, 30);
+        btnCreateConfigGroup_.setToolTipText("Creates or updates the \"System::Startup\" configuration " +
+                "group with all editable properties from the Light Sheet Manager device adapter.");
+
+        final JLabel lblGeometryType = new JLabel("Microscope Geometry: "
+                + model_.devices().adapter().geometry());
+        final JLabel lblLightSheetType = new JLabel("Light Sheet Type: "
+                + model_.devices().adapter().lightSheetType());
+        final JLabel lblNumImagingPaths = new JLabel("Imaging Paths: "
+                + model_.devices().adapter().numImagingPaths());
+        final JLabel lblNumIlluminationPaths = new JLabel("Illumination Paths: "
+                + model_.devices().adapter().numIlluminationPaths());
+        final JLabel lblNumSimultaneousCameras = new JLabel("Simultaneous Cameras: "
+                + model_.devices().adapter().numSimultaneousCameras());
 
         final Panel pnlScanSettings = new Panel("Stage Scan Settings");
         pnlScanSettings.setMigLayout(
@@ -99,6 +117,12 @@ public class SettingsTab extends Panel implements ListeningPanel {
         spnSliceAxisFilterFreq_ = Spinner.createDoubleSpinner(0.4, 0.1, 1.0, 0.1);
         spnLiveScanPeriod_ = Spinner.createIntegerSpinner(20, 2, 10000, 100);
 
+        add(lblGeometryType, "wrap");
+        add(lblLightSheetType, "wrap");
+        add(lblNumImagingPaths, "wrap");
+        add(lblNumIlluminationPaths, "wrap");
+        add(lblNumSimultaneousCameras, "wrap");
+
         // scan settings panel
         if (isUsingScanSettings_) {
             pnlScanSettings.add(lblScanAcceleration, "");
@@ -134,6 +158,8 @@ public class SettingsTab extends Panel implements ListeningPanel {
         if (isUsingPLogic_) {
             add(pnlLightSheet, "growx");
         }
+
+        add(btnCreateConfigGroup_, "gaptop 40");
     }
 
     private void createEventHandlers() {
@@ -174,6 +200,8 @@ public class SettingsTab extends Panel implements ListeningPanel {
             spnSliceAxisFilterFreq_.registerListener(
                     () -> scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble()));
         }
+
+        btnCreateConfigGroup_.registerListener(() -> model_.devices().createConfigGroup());
 
         // TODO: make this work with diSPIM settings
 //        spnLiveScanPeriod_.registerListener(
