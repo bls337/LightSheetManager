@@ -2,7 +2,6 @@ package org.micromanager.lightsheetmanager.gui.tabs.acquisition;
 
 import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.TimingSettings;
-import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.CheckBox;
 import org.micromanager.lightsheetmanager.gui.components.Label;
@@ -15,6 +14,15 @@ import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 import java.util.Objects;
 
 public class AdvancedTimingPanel extends Panel implements SettingsListener {
+
+    private Label lblDelayBeforeScan_;
+    private Label lblScansPerSlice_;
+    private Label lblScanDuration_;
+    private Label lblDelayBeforeLaser_;
+    private Label lblDelayBeforeCamera_;
+    private Label lblLaserTriggerDuration_;
+    private Label lblCameraTriggerDuration_;
+    private Label lblCameraExposure_;
 
     private Spinner spnDelayBeforeScan_;
     private Spinner spnDelayBeforeLaser_;
@@ -44,14 +52,14 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
                 "[]5[]"
         );
 
-        final Label lblDelayBeforeScan = new Label("Delay Before Scan [ms]: ");
-        final Label lblDelayBeforeLaser = new Label("Delay Before Laser [ms]: ");
-        final Label lblDelayBeforeCamera = new Label("Delay Before Camera [ms]: ");
-        final Label lblLaserTriggerDuration = new Label("Laser Trigger Duration [ms]: ");
-        final Label lblCameraTriggerDuration = new Label("Camera Trigger Duration [ms]: ");
-        final Label lblScanDuration = new Label("Scan Duration [ms]: ");
-        final Label lblScansPerSlice = new Label("Scans Per Slice: ");
-        final Label lblCameraExposure = new Label("Camera Exposure [ms]: ");
+        lblDelayBeforeScan_ = new Label("Delay Before Scan [ms]: ");
+        lblScansPerSlice_ = new Label("Scans Per Slice: ");
+        lblScanDuration_ = new Label("Scan Duration [ms]: ");
+        lblDelayBeforeLaser_ = new Label("Delay Before Laser [ms]: ");
+        lblDelayBeforeCamera_ = new Label("Delay Before Camera [ms]: ");
+        lblLaserTriggerDuration_ = new Label("Laser Trigger Duration [ms]: ");
+        lblCameraTriggerDuration_ = new Label("Camera Trigger Duration [ms]: ");
+        lblCameraExposure_ = new Label("Camera Exposure [ms]: ");
 
         final TimingSettings timingSettings = model_.acquisitions().settings().timing();
 
@@ -75,21 +83,21 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
         cbxAlternateScanDirection_ = new CheckBox(
                 "Alternate scan direction", false, CheckBox.LEFT);
 
-        add(lblDelayBeforeScan, "");
+        add(lblDelayBeforeScan_, "");
         add(spnDelayBeforeScan_, "wrap");
-        add(lblScansPerSlice, "");
+        add(lblScansPerSlice_, "");
         add(spnScansPerSlice_, "wrap");
-        add(lblScanDuration, "");
+        add(lblScanDuration_, "");
         add(spnScanDuration_, "wrap");
-        add(lblDelayBeforeLaser, "");
+        add(lblDelayBeforeLaser_, "");
         add(spnDelayBeforeLaser_, "wrap");
-        add(lblLaserTriggerDuration, "");
+        add(lblLaserTriggerDuration_, "");
         add(spnLaserTriggerDuration_, "wrap");
-        add(lblDelayBeforeCamera, "");
+        add(lblDelayBeforeCamera_, "");
         add(spnDelayBeforeCamera_, "wrap");
-        add(lblCameraTriggerDuration, "");
+        add(lblCameraTriggerDuration_, "");
         add(spnCameraTriggerDuration_, "wrap");
-        add(lblCameraExposure, "");
+        add(lblCameraExposure_, "");
         add(spnCameraExposure_, "wrap");
         add(cbxAlternateScanDirection_, "");
     }
@@ -190,6 +198,33 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
             model_.acquisitions().settingsBuilder()
                     .timingBuilder().useAlternateScanDirection(cbxAlternateScanDirection_.isSelected());
         });
+    }
+
+    /**
+     * Set the enabled state of the entire panel.
+     *
+     * @param state true to set to enabled
+     */
+    public void setPanelEnabled(final boolean state) {
+        // labels
+        lblDelayBeforeScan_.setEnabled(state);
+        lblScansPerSlice_.setEnabled(state);
+        lblScanDuration_.setEnabled(state);
+        lblDelayBeforeLaser_.setEnabled(state);
+        lblDelayBeforeCamera_.setEnabled(state);
+        lblLaserTriggerDuration_.setEnabled(state);
+        lblCameraTriggerDuration_.setEnabled(state);
+        lblCameraExposure_.setEnabled(state);
+        // spinners
+        spnDelayBeforeScan_.setEnabled(state);
+        spnScansPerSlice_.setEnabled(state);
+        spnScanDuration_.setEnabled(state);
+        spnDelayBeforeLaser_.setEnabled(state);
+        spnLaserTriggerDuration_.setEnabled(state);
+        spnDelayBeforeCamera_.setEnabled(state);
+        spnCameraTriggerDuration_.setEnabled(state);
+        spnCameraExposure_.setEnabled(state);
+        cbxAlternateScanDirection_.setEnabled(state);
     }
 
     /**

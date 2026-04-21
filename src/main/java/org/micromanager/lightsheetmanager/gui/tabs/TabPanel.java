@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TabbedPane;
@@ -19,10 +20,8 @@ public class TabPanel extends Panel {
     private NavigationTab navigationTab_;
     private AcquisitionTab acquisitionTab_;
     private AutofocusTab autofocusTab_;
-    private DeviceTab deviceTab_;
     private CameraTab cameraTab_;
     private SettingsTab settingsTab_;
-    private HelpTab helpTab_;
     private ArrayList<SetupPathTab> setupPathTabs_;
 
     private final TabbedPane tabbedPane_;
@@ -55,9 +54,7 @@ public class TabPanel extends Panel {
         acquisitionTab_ = new AcquisitionTab(model_, frame_);
         autofocusTab_ = new AutofocusTab(model_);
         cameraTab_ = new CameraTab(model_);
-        deviceTab_ = new DeviceTab(model_);
         settingsTab_ = new SettingsTab(model_);
-        helpTab_ = new HelpTab();
 
         // add tabs to the pane
         tabbedPane_.addTab(createTabTitle("Navigation"), navigationTab_);
@@ -66,16 +63,18 @@ public class TabPanel extends Panel {
         final int numImagingPaths = devices_.adapter().numImagingPaths();
         for (int i = 0; i < numImagingPaths; i++) {
             SetupPathTab setupPathTab = new SetupPathTab(model_, i + 1);
-            tabbedPane_.add(createTabTitle("Setup Path " + (i + 1)), setupPathTab);
+            if (numImagingPaths > 1) {
+                tabbedPane_.add(createTabTitle("Setup Path " + (i + 1)), setupPathTab);
+            } else {
+                tabbedPane_.add(createTabTitle("Setup Path"), setupPathTab);
+            }
             setupPathTabs_.add(setupPathTab);
         }
 
         tabbedPane_.addTab(createTabTitle("Acquisition"), acquisitionTab_);
         tabbedPane_.addTab(createTabTitle("Autofocus"), autofocusTab_);
         tabbedPane_.addTab(createTabTitle("Cameras"), cameraTab_);
-        tabbedPane_.addTab(createTabTitle("Devices"), deviceTab_);
         tabbedPane_.addTab(createTabTitle("Settings"), settingsTab_);
-        tabbedPane_.addTab(createTabTitle("Help"), helpTab_);
 
         // set acquisition tab to default
         tabbedPane_.setSelectedIndex(numImagingPaths + 1);
@@ -112,10 +111,6 @@ public class TabPanel extends Panel {
 
     public AcquisitionTab getAcquisitionTab() {
         return acquisitionTab_;
-    }
-
-    public DeviceTab getDeviceTab() {
-        return deviceTab_;
     }
 
     public CameraTab getCameraTab() {

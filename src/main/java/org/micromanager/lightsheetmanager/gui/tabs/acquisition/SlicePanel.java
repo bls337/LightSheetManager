@@ -17,7 +17,7 @@ import java.util.Objects;
 public class SlicePanel extends Panel implements SettingsListener {
 
     // regular panel
-    private CheckBox cbxMinimizeSlicePeriod_;
+    private CheckBox cbxMinimizePeriod_;
     private Label lblSlicePeriod_;
     private Label lblSampleExposure_;
     private Spinner spnSlicePeriod_;
@@ -56,7 +56,7 @@ public class SlicePanel extends Panel implements SettingsListener {
         // regular panel
         lblSlicePeriod_ = new Label("Slice period [ms]:");
         lblSampleExposure_ = new Label("Sample exposure [ms]:");
-        cbxMinimizeSlicePeriod_ = new CheckBox(
+        cbxMinimizePeriod_ = new CheckBox(
                 "Minimize slice period", 12, periodMinimized, CheckBox.RIGHT);
         spnSlicePeriod_ = Spinner.createDoubleSpinner(
                 sliceSettings.period(), 0.0, Double.MAX_VALUE, 0.25);
@@ -94,8 +94,8 @@ public class SlicePanel extends Panel implements SettingsListener {
     private void createEventHandlers() {
 
         // regular panel
-        cbxMinimizeSlicePeriod_.registerListener(() -> {
-            final boolean selected = cbxMinimizeSlicePeriod_.isSelected();
+        cbxMinimizePeriod_.registerListener(() -> {
+            final boolean selected = cbxMinimizePeriod_.isSelected();
             lblSlicePeriod_.setEnabled(!selected);
             spnSlicePeriod_.setEnabled(!selected);
             model_.acquisitions().settingsBuilder()
@@ -154,7 +154,7 @@ public class SlicePanel extends Panel implements SettingsListener {
     private void switchDisplayPanel(final CameraMode cameraMode) {
         removeAll();
         if (cameraMode != CameraMode.VIRTUAL_SLIT) {
-            add(cbxMinimizeSlicePeriod_, "wrap");
+            add(cbxMinimizePeriod_, "wrap");
             add(lblSlicePeriod_, "");
             add(spnSlicePeriod_, "wrap");
             add(lblSampleExposure_, "");
@@ -173,6 +173,22 @@ public class SlicePanel extends Panel implements SettingsListener {
         repaint();
     }
 
+    public void setPanelEnabled(final boolean state) {
+        cbxMinimizePeriod_.setEnabled(state);
+        if (!cbxMinimizePeriod_.isSelected()) {
+            lblSlicePeriod_.setEnabled(state);
+            spnSlicePeriod_.setEnabled(state);
+        }
+        lblSampleExposure_.setEnabled(state);
+        spnSampleExposure_.setEnabled(state);
+    }
+
+    /**
+     * Sets the enabled status of the label and spinner.
+     * Used when the user clicks "Minimize Slice Period"
+     *
+     * @param state true to disable the spinner
+     */
     private void setSpinnerEnabled(final boolean state) {
         lblSlicePeriod_.setEnabled(state);
         spnSlicePeriod_.setEnabled(state);
@@ -186,7 +202,7 @@ public class SlicePanel extends Panel implements SettingsListener {
             spnSlicePeriod_.setDouble(settingsScape.slice().period());
             spnSampleExposure_.setDouble(settingsScape.slice().sampleExposure());
             final boolean periodMinimized = settingsScape.slice().periodMinimized();
-            cbxMinimizeSlicePeriod_.setSelected(periodMinimized);
+            cbxMinimizePeriod_.setSelected(periodMinimized);
             setSpinnerEnabled(!periodMinimized);
         }
     }

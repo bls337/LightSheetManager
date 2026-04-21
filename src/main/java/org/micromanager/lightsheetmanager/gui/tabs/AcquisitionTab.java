@@ -186,7 +186,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
         // set ui sizes, should match the MigLayout constraints
         pnlChannelTable_.setAbsoluteSize(280, 400);
         pnlLeft.setAbsoluteSize(300, 580);
-        pnlRight_.setAbsoluteSize(300, 420);
+        pnlRight_.setAbsoluteSize(300, 580);
 
         // acquisition buttons
         pnlButtons_.add(btnRunAcquisition_, "");
@@ -208,8 +208,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
         pnlCenter.add(cmbAcquisitionModes_, "");
 
         pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
-        pnlRight_.add(model_.acquisitions().settings().isUsingAdvancedTiming() ?
-                pnlAdvancedTiming_ : pnlSliceSettings_, "growx, wrap");
+        pnlRight_.add(pnlSliceSettings_, "growx, wrap");
+        pnlRight_.add(pnlAdvancedTiming_, "growx, wrap");
         pnlRight_.add(cbxUseAdvancedTiming_, "growx");
 
         // add panels
@@ -299,13 +299,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
      * @param useAdvancedTiming {@code true} to swap to the advanced timing panel
      */
     private void swapTimingSettingsPanels(final boolean useAdvancedTiming) {
-        pnlRight_.removeAll();
-        pnlRight_.add(pnlVolumeSettings_, "growx, wrap");
-        pnlRight_.add(useAdvancedTiming ?
-                pnlAdvancedTiming_ : pnlSliceSettings_, "growx, wrap");
-        pnlRight_.add(cbxUseAdvancedTiming_, "growx");
-        pnlRight_.revalidate();
-        pnlRight_.repaint();
+        pnlAdvancedTiming_.setPanelEnabled(useAdvancedTiming);
+        pnlSliceSettings_.setPanelEnabled(!useAdvancedTiming);
     }
 
     public PositionPanel getMultiPositionPanel() {
