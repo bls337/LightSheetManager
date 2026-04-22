@@ -1505,4 +1505,5 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         studio_.logs().logDebugMessage("stage retrace duration is " + retraceDuration + " milliseconds");
         return retraceDuration;
     }
+
 }

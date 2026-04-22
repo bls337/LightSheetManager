@@ -296,21 +296,6 @@ public class PLogicScape {
         return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().accelerationFactor();
     }
 
-    // TODO: scanNum was part of SliceSettings (now TimingSettings)
-    // scanNum was populated from numScansPerSlice_ which is the scanner SPIM_NUM_SCANSPERSLICE("SPIMNumScansPerSlice")
-    // labeled "Lines scans per slice:" in advanced timing tab
-    //    * gets the correct value for the slice timing's sliceDuration field based on other values of slice timing
-
-    // slice duration is the max out of the scan time, laser time, and camera time
-    public double getSliceDuration(final TimingSettings s, final int scanNum) {
-        return Math.max(Math.max(
-                        s.delayBeforeScan() + (s.scanDuration() * scanNum), // scan time
-                        s.delayBeforeLaser() + s.laserTriggerDuration()     // laser time
-                ),
-                s.delayBeforeCamera() + s.cameraTriggerDuration()   // camera time
-        );
-    }
-
     /**
      * Compute appropriate acceleration time in ms for the specified motor speed.
      * Set to be 10ms + 0-100ms depending on relative speed to max, all scaled by factor specified on the settings panel
