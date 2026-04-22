@@ -266,9 +266,6 @@ public class PLogicScape {
 
     // Compute appropriate motor speed in mm/s for the given stage scanning settings
     public double computeScanSpeed(final ScapeAcquisitionSettings settings) {
-        //double sliceDuration = settings.timingSettings().sliceDuration();
-        // TODO: getSliceDuration only used here, but maybe should be computed elsewhere, and get with method above?
-        //double sliceDuration = getSliceDuration(settings.timing(), numScansPerSlice);
         double sliceDuration = settings.timing().sliceDuration();
         if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             // pretend like our slice takes twice as long so that we move the correct speed
