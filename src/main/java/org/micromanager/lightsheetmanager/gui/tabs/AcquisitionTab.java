@@ -278,9 +278,11 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
         });
 
         // select the acquisition mode
-        cmbAcquisitionModes_.registerListener(
-                () -> model_.acquisitions().settingsBuilder()
-                        .acquisitionMode(cmbAcquisitionModes_.getSelected()));
+        cmbAcquisitionModes_.registerListener(() -> {
+            model_.acquisitions().settingsBuilder()
+                    .acquisitionMode(cmbAcquisitionModes_.getSelected());
+            model_.acquisitions().updateDurationLabels();
+        });
 
         // switches timing panels based on check box
         cbxUseAdvancedTiming_.registerListener(() -> {
