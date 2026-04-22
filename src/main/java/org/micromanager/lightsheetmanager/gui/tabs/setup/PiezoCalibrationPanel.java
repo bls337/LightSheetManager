@@ -174,7 +174,7 @@ public class PiezoCalibrationPanel extends Panel {
                     model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
                             newOffset + " (with channel offset of " + channelOffset + ")");
                 } else {
-                    model_.studio().logs().showError("The beam must be enabled to update the offsets.", btnUpdate_);
+                    model_.studio().logs().showError("The beam must be enabled to update the offset.", btnUpdate_);
                 }
             });
         }
