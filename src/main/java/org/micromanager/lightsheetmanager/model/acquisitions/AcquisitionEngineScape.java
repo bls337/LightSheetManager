@@ -1129,7 +1129,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
-                studio_.logs().showError("Increasing slice period to meet laser exposure constraint\n"
+                studio_.logs().logDebugMessage("Increasing slice period to meet laser exposure constraint\n"
                         + "(time required for camera readout; readout time depends on ROI).");
             }
             delayBeforeCamera += globalDelay;
@@ -1314,7 +1314,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
-                studio_.logs().showError("Increasing slice period to meet laser exposure constraint\n"
+                studio_.logs().logDebugMessage("Increasing slice period to meet laser exposure constraint\n"
                         + "(time required for camera readout; readout time depends on ROI).");
             }
             delayBeforeCamera += globalDelay;
