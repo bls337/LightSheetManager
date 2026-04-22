@@ -193,7 +193,7 @@ public class PLogicScape {
             final boolean isInterleaved = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
 
             // figure out the speed we should be going according to slice period, slice spacing, geometry, etc.
-            final double requestedMotorSpeed = computeScanSpeed(settings, scanner_.getSPIMNumScansPerSlice());  // in mm/sec
+            final double requestedMotorSpeed = computeScanSpeed(settings);  // in mm/sec
 
             final double maxSpeed = xyStage_.getMaxSpeedX();
             if (requestedMotorSpeed > (maxSpeed * 0.8)) {
@@ -265,10 +265,11 @@ public class PLogicScape {
     }
 
     // Compute appropriate motor speed in mm/s for the given stage scanning settings
-    public double computeScanSpeed(ScapeAcquisitionSettings settings, final int numScansPerSlice) {
+    public double computeScanSpeed(final ScapeAcquisitionSettings settings) {
         //double sliceDuration = settings.timingSettings().sliceDuration();
         // TODO: getSliceDuration only used here, but maybe should be computed elsewhere, and get with method above?
-        double sliceDuration = getSliceDuration(settings.timing(), numScansPerSlice);
+        //double sliceDuration = getSliceDuration(settings.timing(), numScansPerSlice);
+        double sliceDuration = settings.timing().sliceDuration();
         if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             // pretend like our slice takes twice as long so that we move the correct speed
             // this has the effect of halving the motor speed, but keeping the scan distance the same
@@ -291,7 +292,7 @@ public class PLogicScape {
      * @param motorSpeed
      * @return
      */
-    public double computeScanAcceleration(final double motorSpeed, ScapeAcquisitionSettings settings) {
+    public double computeScanAcceleration(final double motorSpeed, final ScapeAcquisitionSettings settings) {
         return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().accelerationFactor();
     }
 
