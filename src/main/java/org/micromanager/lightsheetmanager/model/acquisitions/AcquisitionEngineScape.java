@@ -992,8 +992,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         double extraChannelOffset = 0.0;
-        plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
-        return true;
+        return plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
     }
 
     private void doHardwareCalculationsNIDAQ() {
