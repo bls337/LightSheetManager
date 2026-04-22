@@ -754,11 +754,14 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             studio_.logs().logError("Couldn't restore shutter to original state");
         }
 
-        // Check if acquisition ended due to an exception and show error to user if it did
-        try {
-            currentAcquisition_.checkForExceptions();
-        } catch (Exception e) {
-            studio_.logs().logError(e);
+        // check if acquisition ended due to an exception and show error
+        // currentAcquisition_ can be null if an error occurred during setup
+        if (currentAcquisition_ != null) {
+            try {
+                currentAcquisition_.checkForExceptions();
+            } catch (Exception e) {
+                studio_.logs().logError(e);
+            }
         }
 
         // TODO: execute any end-acquisition runnables
