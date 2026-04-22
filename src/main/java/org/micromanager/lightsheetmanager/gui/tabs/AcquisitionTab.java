@@ -177,8 +177,11 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
                 settings.acquisitionMode(),
                 180, 24);
 
+        final boolean isUsingAdvancedTiming = settings.isUsingAdvancedTiming();
         cbxUseAdvancedTiming_ = new CheckBox("Use advanced timing settings",
-                12, settings.isUsingAdvancedTiming(), CheckBox.RIGHT);
+                12, isUsingAdvancedTiming, CheckBox.RIGHT);
+        // initial enabled or disabled state
+        swapTimingSettingsPanels(isUsingAdvancedTiming);
 
         btnRunOverviewAcq_.setEnabled(false); // TODO: re-enable when these features are put in
         btnTestAcquisition_.setEnabled(false);
