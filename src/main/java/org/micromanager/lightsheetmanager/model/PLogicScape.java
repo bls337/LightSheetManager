@@ -487,7 +487,8 @@ public class PLogicScape {
         //final double slope2 = settings.sliceCalibration(2).sliceSlope();
         double sliceRate = settings.sliceCalibration().slope();//(view == 1) ? slope1 : slope2;
         if (NumberUtils.doublesEqual(sliceRate, 0.0)) {
-            studio_.logs().showError("Calibration slope for view " + view + " cannot be zero. Re-do calibration on Setup tab.");
+            studio_.logs().showError("The \"Galvo constant\" is not set, it must not be 0.\n" +
+                    "Please update the value on the setup tab.");
             return false;
         }
         //final double offset1 = settings.sliceCalibration(1).sliceOffset() + channelOffset;

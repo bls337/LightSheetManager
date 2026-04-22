@@ -7,8 +7,6 @@ import org.micromanager.lightsheetmanager.LightSheetManager;
 
 import java.util.Objects;
 
-// Note: changes based on camera trigger mode
-
 /**
  * A setup panel for diSPIM.
  */
