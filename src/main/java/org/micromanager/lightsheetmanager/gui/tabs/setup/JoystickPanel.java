@@ -34,11 +34,12 @@ public class JoystickPanel extends Panel {
                 "[]5[]"
         );
 
-        String[] labels = {"Imaging Piezo", "XYStage", "Imaging Slice"};
+        String[] joystickLabels = {"None", "Scanner", "XYStage"};
+        String[] wheelLabels = {"None", "Imaging Piezo", "Imaging Slice", "Light Sheet Tilt", "Sample Height"};
 
-        cmbJoystick_ = new ComboBox<>(labels, "XYStage", 100, 24);
-        cmbLeftWheel_ = new ComboBox<>(labels, "Imaging Piezo", 100, 24);
-        cmbRightWheel_ = new ComboBox<>(labels, "Imaging Slice", 100, 24);
+        cmbJoystick_ = new ComboBox<>(joystickLabels, "XYStage", 100, 24);
+        cmbLeftWheel_ = new ComboBox<>(wheelLabels, "Imaging Piezo", 100, 24);
+        cmbRightWheel_ = new ComboBox<>(wheelLabels, "Imaging Slice", 100, 24);
 
         add(lblJoystick, "");
         add(cmbJoystick_, "wrap");
