@@ -15,7 +15,7 @@ import javax.swing.JLabel;
 import java.awt.Dimension;
 import java.util.Objects;
 
-public class PiezoCalibrationPanel extends Panel {
+public class CalibrationPanel extends Panel {
 
     private Button btnTwoPoint_;
     private Button btnUpdate_;
@@ -37,7 +37,7 @@ public class PiezoCalibrationPanel extends Panel {
     private final PositionPanel panel_;
     private final LightSheetManager model_;
 
-    public PiezoCalibrationPanel(final LightSheetManager model, final PositionPanel panel, final int pathNum) {
+    public CalibrationPanel(final LightSheetManager model, final PositionPanel panel, final int pathNum) {
         super("Galvo Piezo Calibration");
         model_ = Objects.requireNonNull(model);
         panel_ = Objects.requireNonNull(panel);

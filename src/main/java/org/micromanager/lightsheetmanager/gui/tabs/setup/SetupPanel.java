@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class SetupPanel extends Panel implements ListeningPanel {
 
-    private PiezoCalibrationPanel piezoPanel_;
+    private CalibrationPanel piezoPanel_;
     private BeamSheetControlPanel beamSheetPanel_;
 
     private PositionPanel positionPanel_;
@@ -46,7 +46,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
 
         beamSheetPanel_ = new BeamSheetControlPanel(model_, pathNum);
         positionPanel_ = new PositionPanel(model_, pathNum);
-        piezoPanel_ = new PiezoCalibrationPanel(model_, positionPanel_, pathNum);
+        piezoPanel_ = new CalibrationPanel(model_, positionPanel_, pathNum);
 
         joystickPanel_ = new JoystickPanel(model_);
         excitationPanel_ = new ExcitationPanel(model_);
