@@ -1479,12 +1479,16 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     }
 
     private double getScanStageAcceleration(final ScapeAcquisitionSettings settings) {
+        // TODO: remove this and find a better way
+        if (controller_ == null) {
+            controller_ = new PLogicScape(model_);
+        }
         // extra 1 for rounding up that often happens in controller
         return controller_.computeScanAcceleration(controller_.computeScanSpeed(settings), settings) + 1;
     }
 
     private double getStageRetraceDuration(final ScapeAcquisitionSettings settings) {
-        final ASIXYStage stage = model_.devices().device("XYStage");
+        final ASIXYStage stage = model_.devices().device("SampleXY");
         if (stage == null) {
             studio_.logs().showError("could not find XY stage!");
             return 0.0; // early exit => error
