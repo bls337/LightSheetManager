@@ -4,7 +4,6 @@ import mmcorej.CMMCore;
 import mmcorej.Configuration;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
