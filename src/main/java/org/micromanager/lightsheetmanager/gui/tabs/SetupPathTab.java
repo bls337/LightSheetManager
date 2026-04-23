@@ -35,15 +35,7 @@ public class SetupPathTab extends Panel implements ListeningPanel {
     }
 
     public void swapPanels(final CameraMode cameraMode) {
-        setupPanel_.getScannerPanel().swapPanels(cameraMode);
-    }
-
-    public int getPathNum() {
-        return pathNum_;
-    }
-
-    public SetupPanel getSetupPanel() {
-        return setupPanel_;
+        setupPanel_.getLightSheetPanel().swapPanels(cameraMode);
     }
 
     @Override
