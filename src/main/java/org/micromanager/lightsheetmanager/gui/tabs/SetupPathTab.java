@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
@@ -36,7 +35,7 @@ public class SetupPathTab extends Panel implements ListeningPanel {
     }
 
     public void swapPanels(final CameraMode cameraMode) {
-        setupPanel_.getBeamSheetPanel().swapPanels(cameraMode);
+        setupPanel_.getScannerPanel().swapPanels(cameraMode);
     }
 
     public int getPathNum() {

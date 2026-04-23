@@ -13,7 +13,7 @@ import java.util.Objects;
 public class SetupPanel extends Panel implements ListeningPanel {
 
     private CalibrationPanel piezoPanel_;
-    private BeamSheetControlPanel beamSheetPanel_;
+    private ScannerPanel beamSheetPanel_;
 
     private PositionPanel positionPanel_;
 
@@ -44,7 +44,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
         leftPanel_ = new Panel();
         rightPanel_ = new Panel();
 
-        beamSheetPanel_ = new BeamSheetControlPanel(model_, pathNum);
+        beamSheetPanel_ = new ScannerPanel(model_, pathNum);
         positionPanel_ = new PositionPanel(model_, pathNum);
         piezoPanel_ = new CalibrationPanel(model_, positionPanel_, pathNum);
 
@@ -69,7 +69,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
         add(rightPanel_, "aligny top");
     }
 
-    public BeamSheetControlPanel getBeamSheetPanel() {
+    public ScannerPanel getScannerPanel() {
         return beamSheetPanel_;
     }
 

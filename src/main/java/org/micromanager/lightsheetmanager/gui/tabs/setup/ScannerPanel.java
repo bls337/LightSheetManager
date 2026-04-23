@@ -13,7 +13,7 @@ import org.micromanager.lightsheetmanager.LightSheetManager;
 import javax.swing.JLabel;
 import java.util.Objects;
 
-public class BeamSheetControlPanel extends Panel {
+public class ScannerPanel extends Panel {
 
     // first panel
     private TextField txtSlope_;
@@ -50,7 +50,7 @@ public class BeamSheetControlPanel extends Panel {
 
     private final LightSheetManager model_;
 
-    public BeamSheetControlPanel(final LightSheetManager model, final int pathNum) {
+    public ScannerPanel(final LightSheetManager model, final int pathNum) {
         super("Light Sheet Synchronization");
         model_ = Objects.requireNonNull(model);
         pathNum_ = pathNum;
