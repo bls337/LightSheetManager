@@ -34,12 +34,11 @@ public class JoystickPanel extends Panel {
                 "[]5[]"
         );
 
-        // TODO: enum for combo values
         String[] labels = {"Imaging Piezo", "XYStage", "Imaging Slice"};
 
-        cmbJoystick_ = new ComboBox<>(labels, "XYStage", 100, 20);
-        cmbLeftWheel_ = new ComboBox<>(labels, "Imaging Piezo", 100, 20);
-        cmbRightWheel_ = new ComboBox<>(labels, "Imaging Slice", 100, 20);
+        cmbJoystick_ = new ComboBox<>(labels, "XYStage", 100, 24);
+        cmbLeftWheel_ = new ComboBox<>(labels, "Imaging Piezo", 100, 24);
+        cmbRightWheel_ = new ComboBox<>(labels, "Imaging Slice", 100, 24);
 
         add(lblJoystick, "");
         add(cmbJoystick_, "wrap");
