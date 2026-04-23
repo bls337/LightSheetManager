@@ -156,10 +156,10 @@ public class SettingsTab extends Panel implements ListeningPanel {
 
         add(pnlScanSettings, "wrap");
         if (isUsingPLogic_) {
-            add(pnlLightSheet, "growx");
+            add(pnlLightSheet, "growx, wrap");
         }
 
-        add(btnCreateConfigGroup_, "gaptop 40");
+        add(btnCreateConfigGroup_, "");
     }
 
     private void createEventHandlers() {

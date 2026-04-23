@@ -885,17 +885,6 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         );
     }
 
-    private double getSliceDuration(DefaultTimingSettings.Builder tsb) {
-        DefaultTimingSettings s = tsb.build();
-        // slice duration is the max out of the scan time, laser time, and camera time
-        return Math.max(Math.max(
-                        s.delayBeforeScan() + (s.scanDuration() * s.scansPerSlice()),   // scan time
-                        s.delayBeforeLaser() + s.laserTriggerDuration()                 // laser time
-                ),
-                s.delayBeforeCamera() + s.cameraTriggerDuration()                      // camera time
-        );
-    }
-
     private double computeTimePointDuration() {
         final double volumeDuration = computeActualVolumeDuration(acqSettings_);
         if (acqSettings_.isUsingMultiplePositions()) {

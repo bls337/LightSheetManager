@@ -4,7 +4,6 @@ import mmcorej.CMMCore;
 import mmcorej.Configuration;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
@@ -193,7 +192,7 @@ public class PLogicScape {
             final boolean isInterleaved = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
 
             // figure out the speed we should be going according to slice period, slice spacing, geometry, etc.
-            final double requestedMotorSpeed = computeScanSpeed(settings, scanner_.getSPIMNumScansPerSlice());  // in mm/sec
+            final double requestedMotorSpeed = computeScanSpeed(settings);  // in mm/sec
 
             final double maxSpeed = xyStage_.getMaxSpeedX();
             if (requestedMotorSpeed > (maxSpeed * 0.8)) {
@@ -265,10 +264,8 @@ public class PLogicScape {
     }
 
     // Compute appropriate motor speed in mm/s for the given stage scanning settings
-    public double computeScanSpeed(ScapeAcquisitionSettings settings, final int numScansPerSlice) {
-        //double sliceDuration = settings.timingSettings().sliceDuration();
-        // TODO: getSliceDuration only used here, but maybe should be computed elsewhere, and get with method above?
-        double sliceDuration = getSliceDuration(settings.timing(), numScansPerSlice);
+    public double computeScanSpeed(final ScapeAcquisitionSettings settings) {
+        double sliceDuration = settings.timing().sliceDuration();
         if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             // pretend like our slice takes twice as long so that we move the correct speed
             // this has the effect of halving the motor speed, but keeping the scan distance the same
@@ -291,23 +288,8 @@ public class PLogicScape {
      * @param motorSpeed
      * @return
      */
-    public double computeScanAcceleration(final double motorSpeed, ScapeAcquisitionSettings settings) {
+    public double computeScanAcceleration(final double motorSpeed, final ScapeAcquisitionSettings settings) {
         return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().accelerationFactor();
-    }
-
-    // TODO: scanNum was part of SliceSettings (now TimingSettings)
-    // scanNum was populated from numScansPerSlice_ which is the scanner SPIM_NUM_SCANSPERSLICE("SPIMNumScansPerSlice")
-    // labeled "Lines scans per slice:" in advanced timing tab
-    //    * gets the correct value for the slice timing's sliceDuration field based on other values of slice timing
-
-    // slice duration is the max out of the scan time, laser time, and camera time
-    public double getSliceDuration(final TimingSettings s, final int scanNum) {
-        return Math.max(Math.max(
-                        s.delayBeforeScan() + (s.scanDuration() * scanNum), // scan time
-                        s.delayBeforeLaser() + s.laserTriggerDuration()     // laser time
-                ),
-                s.delayBeforeCamera() + s.cameraTriggerDuration()   // camera time
-        );
     }
 
     /**
@@ -487,7 +469,8 @@ public class PLogicScape {
         //final double slope2 = settings.sliceCalibration(2).sliceSlope();
         double sliceRate = settings.sliceCalibration().slope();//(view == 1) ? slope1 : slope2;
         if (NumberUtils.doublesEqual(sliceRate, 0.0)) {
-            studio_.logs().showError("Calibration slope for view " + view + " cannot be zero. Re-do calibration on Setup tab.");
+            studio_.logs().showError("The \"Galvo constant\" is not set, it must not be 0.\n" +
+                    "Please update the value on the setup tab.");
             return false;
         }
         //final double offset1 = settings.sliceCalibration(1).sliceOffset() + channelOffset;

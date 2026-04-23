@@ -21,6 +21,7 @@ import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.DataStorage;
 import org.micromanager.lightsheetmanager.LightSheetManager;
@@ -36,6 +37,7 @@ import org.micromanager.lightsheetmanager.model.devices.cameras.PvCamera;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
+import org.micromanager.lightsheetmanager.model.utils.GeometryUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import javax.swing.JLabel;
@@ -754,11 +756,14 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             studio_.logs().logError("Couldn't restore shutter to original state");
         }
 
-        // Check if acquisition ended due to an exception and show error to user if it did
-        try {
-            currentAcquisition_.checkForExceptions();
-        } catch (Exception e) {
-            studio_.logs().logError(e);
+        // check if acquisition ended due to an exception and show error
+        // currentAcquisition_ can be null if an error occurred during setup
+        if (currentAcquisition_ != null) {
+            try {
+                currentAcquisition_.checkForExceptions();
+            } catch (Exception e) {
+                studio_.logs().logError(e);
+            }
         }
 
         // TODO: execute any end-acquisition runnables
@@ -992,8 +997,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         double extraChannelOffset = 0.0;
-        plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
-        return true;
+        return plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
     }
 
     private void doHardwareCalculationsNIDAQ() {
@@ -1125,7 +1129,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
-                studio_.logs().showError("Increasing slice period to meet laser exposure constraint\n"
+                studio_.logs().logDebugMessage("Increasing slice period to meet laser exposure constraint\n"
                         + "(time required for camera readout; readout time depends on ROI).");
             }
             delayBeforeCamera += globalDelay;
@@ -1310,7 +1314,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             // only true when user has specified period that is unattainable
             if (globalDelay < 0) {
                 globalDelay = 0;
-                studio_.logs().showError("Increasing slice period to meet laser exposure constraint\n"
+                studio_.logs().logDebugMessage("Increasing slice period to meet laser exposure constraint\n"
                         + "(time required for camera readout; readout time depends on ROI).");
             }
             delayBeforeCamera += globalDelay;
@@ -1432,8 +1436,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         final double stackDuration = numCameraTriggers * acqSettings_.timing().sliceDuration();
 
         if (acqSettings_.stageScan().enabled()) {
-            final double rampDuration = 1; //getStageRampDuration(acqSettings);
-            final double retraceTime = 1; //getStageRetraceDuration(acqSettings);
+            final double rampDuration = getStageRampDuration(acqSettings_);
+            final double retraceTime = getStageRetraceDuration(acqSettings_);
             // TODO(Jon): double-check these calculations below, at least they are better than before ;-)
             if (acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN) {
                 if (channelMode == ChannelMode.SLICE_HW) {
@@ -1466,6 +1470,44 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         + (numChannels - 1) * channelSwitchDelay;
             }
         }
+    }
+
+    private double getStageRampDuration(final ScapeAcquisitionSettings settings) {
+        final double rampDuration = settings.volume().delayBeforeView() + getScanStageAcceleration(settings);
+        model_.studio().logs().logDebugMessage("stage ramp duration is " + rampDuration + " milliseconds");
+        return rampDuration;
+    }
+
+    private double getScanStageAcceleration(final ScapeAcquisitionSettings settings) {
+        // TODO: remove this and find a better way
+        if (controller_ == null) {
+            controller_ = new PLogicScape(model_);
+        }
+        // extra 1 for rounding up that often happens in controller
+        return controller_.computeScanAcceleration(controller_.computeScanSpeed(settings), settings) + 1;
+    }
+
+    private double getStageRetraceDuration(final ScapeAcquisitionSettings settings) {
+        final ASIXYStage stage = model_.devices().device("SampleXY");
+        if (stage == null) {
+            studio_.logs().showError("could not find XY stage!");
+            return 0.0; // early exit => error
+        }
+        final double retraceRelativeSpeedPercent;
+        if (stage.hasProperty(ASIXYStage.Properties.SCAN_RETRACE_SPEED)) {
+            // this added in firmware v3.30; if not present then we set to firmware default hardcoded previously
+            retraceRelativeSpeedPercent = stage.getScanRetraceSpeed();
+        } else {
+            retraceRelativeSpeedPercent = 67.0;
+        }
+        final double retraceSpeed = retraceRelativeSpeedPercent / 100 * stage.getMaxSpeedX();
+        final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
+                settings.stageScan().firstViewAngle(), settings.volume().firstView() == 1);
+        final double scanDistance = settings.volume().slicesPerView() * settings.volume().sliceStepSize() * speedFactor;
+        final double accelerationX = getScanStageAcceleration(settings);
+        final double retraceDuration = scanDistance / retraceSpeed + accelerationX * 2;
+        studio_.logs().logDebugMessage("stage retrace duration is " + retraceDuration + " milliseconds");
+        return retraceDuration;
     }
 
 }
