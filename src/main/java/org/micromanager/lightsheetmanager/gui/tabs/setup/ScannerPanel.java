@@ -78,17 +78,16 @@ public class ScannerPanel extends Panel implements ListeningPanel {
             });
         }
 
-        cbxSheetExc_.registerListener(() -> {
+        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
+            cbxSheetExc_.registerListener(() -> {
+            });
 
-        });
+            cbxBeamEpi_.registerListener(() -> {
+            });
 
-        cbxBeamEpi_.registerListener(() -> {
-
-        });
-
-        cbxSheetEpi_.registerListener(() -> {
-
-        });
+            cbxSheetEpi_.registerListener(() -> {
+            });
+        }
     }
 
     // TODO: only handles SCAPE for now
