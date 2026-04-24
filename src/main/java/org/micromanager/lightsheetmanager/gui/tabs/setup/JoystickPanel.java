@@ -3,7 +3,6 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.Joystick;
@@ -67,9 +66,9 @@ public class JoystickPanel extends Panel {
         final String[] joystickLabels = {"None", "Scanner", "XYStage"};
         final String[] wheelLabels = {"None", "Imaging Piezo", "Imaging Slice", "Light Sheet Tilt", "Sample Height"};
 
-        cmbJoystick_ = new ComboBox<>(joystickLabels, "XYStage", 100, 24);
-        cmbLeftWheel_ = new ComboBox<>(wheelLabels, "Imaging Piezo", 100, 24);
-        cmbRightWheel_ = new ComboBox<>(wheelLabels, "Imaging Slice", 100, 24);
+        cmbJoystick_ = new ComboBox<>(joystickLabels, "None", 100, 24);
+        cmbLeftWheel_ = new ComboBox<>(wheelLabels, "None", 100, 24);
+        cmbRightWheel_ = new ComboBox<>(wheelLabels, "None", 100, 24);
 
         add(lblJoystick, "");
         add(cmbJoystick_, "wrap");

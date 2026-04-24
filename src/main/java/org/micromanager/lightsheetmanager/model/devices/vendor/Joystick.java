@@ -94,7 +94,7 @@ public class Joystick extends DeviceBase {
     }
 
     public enum Input {
-        NONE("0 - None"),
+        NONE("0 - none"),
         JOYSTICK_X("2 - joystick X"),
         JOYSTICK_Y("3 - joystick Y"),
         RIGHT_WHEEL("22 - right wheel"),
