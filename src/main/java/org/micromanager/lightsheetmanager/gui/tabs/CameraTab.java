@@ -7,6 +7,7 @@ import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
 import java.awt.Font;
 import java.util.Objects;
@@ -67,7 +68,12 @@ public class CameraTab extends Panel implements ListeningPanel {
     }
 
     private void createEventHandlers() {
-        //model_.studio().core().setROI();
+        btnUnchangedROI_.registerListener(() -> {
+            final CameraBase[] cameras = model_.devices().imagingCameras();
+            for (CameraBase camera : cameras) {
+                camera.setROI();
+            }
+        });
     }
 
     @Override

@@ -187,8 +187,8 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
             default:
                 break;
         }
-//        ReportingUtils.logDebugMessage("camera readout time computed as " + readoutTimeMs +
-//                " for camera " + devices_.getMMDevice(camKey));
+        studio_.logs().logDebugMessage("camera readout time computed as "
+                + readoutTimeMs + " for camera " + deviceName_);
         return readoutTimeMs;
     }
 
@@ -210,8 +210,8 @@ public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
                 numRowsOverhead = 10; // overhead of 9 rows plus jitter of 1 row
             }
             final double resetTimeMs = camReadoutTime + (numRowsOverhead * rowReadoutTime);
-//        ReportingUtils.logDebugMessage("camera reset time computed as " + resetTimeMs +
-//                " for camera " + devices_.getMMDevice(camKey));
+            studio_.logs().logDebugMessage("camera reset time computed as "
+                    + resetTimeMs + " for camera " + deviceName_);
             return resetTimeMs; // assume 10ms readout if not otherwise possible to calculate
         }
     }

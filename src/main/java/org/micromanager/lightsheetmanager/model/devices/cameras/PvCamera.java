@@ -39,12 +39,12 @@ public class PvCamera extends CameraBase implements LightSheetCamera {
         public final static String EDGE_TRIGGER = "Edge Trigger";
     }
 
-    public PvCamera(Studio studio, String deviceName) {
+    public PvCamera(final Studio studio, final String deviceName) {
         super(studio, deviceName);
     }
 
     @Override
-    public void setTriggerMode(CameraMode cameraMode) {
+    public void setTriggerMode(final CameraMode cameraMode) {
         switch (cameraMode) {
             case EDGE:
             case PSEUDO_OVERLAP:
@@ -99,7 +99,7 @@ public class PvCamera extends CameraBase implements LightSheetCamera {
     }
 
     @Override
-    public double getReadoutTime(CameraMode cameraMode) {
+    public double getReadoutTime(final CameraMode cameraMode) {
         double readoutTimeMs = 10.0;
         switch (cameraMode) {
             case OVERLAP:
@@ -109,7 +109,7 @@ public class PvCamera extends CameraBase implements LightSheetCamera {
                 if (isKinetix() || isPrime95B()) {
                     final double preTime = getPropertyFloat(Properties.PRE_TRIGGER_TIME);
                     readoutTimeMs = preTime / 1e6;
-                    // for safety we make sure to wait at least a quarter millisecond to trigger
+                    // for safety, we make sure to wait at least a quarter millisecond to trigger
                     //   (may have hidden assumptions in other code about at least one tic wait)
                     if (readoutTimeMs < 0.249) {
                         readoutTimeMs = 0.25;
@@ -131,17 +131,18 @@ public class PvCamera extends CameraBase implements LightSheetCamera {
             default:
                 break;
         }
+        studio_.logs().logDebugMessage("camera readout time computed as "
+                + readoutTimeMs + " for camera " + deviceName_);
         return readoutTimeMs;
     }
 
     @Override
-    public double getResetTime(CameraMode cameraMode) {
+    public double getResetTime(final CameraMode cameraMode) {
         double resetTimeMs;
         if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             resetTimeMs = 0.0;
         } else {
             // TODO(Jon): Confirm that the Kinetix camera is like the Prime 95B
-
             // Photometrics Prime 95B is very different from other cameras so handle it as special case
             if (isKinetix() || isPrime95B()) {
                 final double trigToGlobal = getPropertyFloat(Properties.POST_TRIGGER_TIME)
@@ -153,6 +154,8 @@ public class PvCamera extends CameraBase implements LightSheetCamera {
                 resetTimeMs = 14.25;  // strange number just to make it easy to find later; I think the original Prime needs to be added
             }
         }
+        studio_.logs().logDebugMessage("camera reset time computed as "
+                + resetTimeMs + " for camera " + deviceName_);
         return resetTimeMs;
     }
 
