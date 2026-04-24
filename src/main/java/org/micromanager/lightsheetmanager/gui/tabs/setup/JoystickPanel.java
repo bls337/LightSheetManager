@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.Joystick;
@@ -21,7 +22,9 @@ public class JoystickPanel extends Panel {
     private ComboBox<String> cmbLeftWheel_;
     private ComboBox<String> cmbRightWheel_;
 
-    private String previousDevice_;
+    private String previousJoystick_;
+    private String previousLeftWheel_;
+    private String previousRightWheel_;
     private Map<String, Runnable> methods_;
 
     private final LightSheetManager model_;
@@ -37,19 +40,31 @@ public class JoystickPanel extends Panel {
     private void createMap() {
         final ASIXYStage xyStage = model_.devices().device("SampleXY");
         final ASIScanner scanner = model_.devices().device("IllumSlice");
+        final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
 
-        previousDevice_ = "None"; // set to the default value
+        // set to the default values
+        previousJoystick_ = "None";
+        previousLeftWheel_ = "None";
+        previousRightWheel_ = "None";
+
         methods_ = new HashMap<>();
 
-        // create map, these methods are called when switching js input
-        methods_.put("None", () -> {
-            // do nothing
-        });
+        // joystick keys
+        methods_.put("None", () -> { /* do nothing */ });
         methods_.put("Scanner", () -> {
             scanner.js().inputX(Joystick.Input.NONE);
             scanner.js().inputY(Joystick.Input.NONE);
         });
         methods_.put("XYStage", () -> xyStage.js().enabled(false));
+
+        // wheel keys
+        methods_.put("Imaging Piezo", () -> piezo.js().input(Joystick.Input.NONE));
+        methods_.put("Imaging Slice", () -> {
+            scanner.js().inputX(Joystick.Input.NONE);
+            scanner.js().inputY(Joystick.Input.NONE);
+        });
+        methods_.put("Light Sheet Tilt", () -> {});
+        methods_.put("Sample Height", () -> {});
     }
 
     private void createUserInterface() {
@@ -63,8 +78,19 @@ public class JoystickPanel extends Panel {
                 "[]5[]"
         );
 
-        final String[] joystickLabels = {"None", "Scanner", "XYStage"};
-        final String[] wheelLabels = {"None", "Imaging Piezo", "Imaging Slice", "Light Sheet Tilt", "Sample Height"};
+        final String[] joystickLabels = {
+                "None",
+                "Scanner",
+                "XYStage"
+        };
+
+        final String[] wheelLabels = {
+                "None",
+                "Imaging Piezo",
+                "Imaging Slice",
+                "Light Sheet Tilt",
+                "Sample Height"
+        };
 
         cmbJoystick_ = new ComboBox<>(joystickLabels, "None", 100, 24);
         cmbLeftWheel_ = new ComboBox<>(wheelLabels, "None", 100, 24);
@@ -83,9 +109,7 @@ public class JoystickPanel extends Panel {
         // select joystick input
         cmbJoystick_.registerListener(() -> {
             final String selected = cmbJoystick_.getSelected();
-            // disable the previous device
-            methods_.get(previousDevice_).run();
-            // enable the selected device
+            methods_.get(previousJoystick_).run(); // disable the previous device
             switch (selected) {
                 case "None":
                     return; // early exit => do nothing
@@ -102,14 +126,16 @@ public class JoystickPanel extends Panel {
                     break;
             }
             // track the previous device to disable later
-            previousDevice_ = selected;
+            previousJoystick_ = selected;
         });
 
         // select left wheel input
         cmbLeftWheel_.registerListener(() -> {
             final String selected = cmbLeftWheel_.getSelected();
+            methods_.get(previousLeftWheel_).run(); // disable the previous device
             switch (selected) {
                 case "Imaging Piezo":
+                    final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
                     break;
                 case "Imaging Slice":
                     break;
@@ -120,13 +146,17 @@ public class JoystickPanel extends Panel {
                 default:
                     break;
             }
+            // track the previous device to disable later
+            previousLeftWheel_ = selected;
         });
 
         // select right wheel input
         cmbRightWheel_.registerListener(() -> {
             final String selected = cmbRightWheel_.getSelected();
+            methods_.get(previousRightWheel_).run(); // disable the previous device
             switch (selected) {
                 case "Imaging Piezo":
+                    final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
                     break;
                 case "Imaging Slice":
                     break;
@@ -137,7 +167,8 @@ public class JoystickPanel extends Panel {
                 default:
                     break;
             }
+            // track the previous device to disable later
+            previousRightWheel_ = selected;
         });
-
     }
 }

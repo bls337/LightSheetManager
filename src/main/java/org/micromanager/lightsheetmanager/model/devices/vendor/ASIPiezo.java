@@ -9,14 +9,20 @@ import java.util.stream.Stream;
 public class ASIPiezo extends ASITigerBase {
 
     private final SingleAxis singleAxis_;
+    private final Joystick joystick_;
 
     public ASIPiezo(final Studio studio, final String deviceName) {
         super(studio, deviceName);
         singleAxis_ = new SingleAxis(studio, deviceName);
+        joystick_ = new Joystick(studio, deviceName);
     }
 
     public SingleAxis sa() {
         return singleAxis_;
+    }
+
+    public Joystick js() {
+        return joystick_;
     }
 
     public void setPosition(final double position) {
