@@ -33,7 +33,9 @@ public class JoystickPanel extends Panel {
     public JoystickPanel(final LightSheetManager model) {
         super("Joystick");
         model_ = Objects.requireNonNull(model);
-        createMap();
+        if (model_.devices().isUsingPLogic()) {
+            createMap();
+        }
         createUserInterface();
         createEventHandlers();
     }
