@@ -6,6 +6,7 @@ import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIZStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.Joystick;
 
 import javax.swing.JLabel;
@@ -39,6 +40,7 @@ public class JoystickPanel extends Panel {
 
     private void createMap() {
         final ASIXYStage xyStage = model_.devices().device("SampleXY");
+        final ASIZStage zStage = model_.devices().device("SampleZ");
         final ASIScanner scanner = model_.devices().device("IllumSlice");
         final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
 
@@ -63,8 +65,8 @@ public class JoystickPanel extends Panel {
             scanner.js().inputX(Joystick.Input.NONE);
             scanner.js().inputY(Joystick.Input.NONE);
         });
-        methods_.put("Light Sheet Tilt", () -> {});
-        methods_.put("Sample Height", () -> {});
+        methods_.put("Light Sheet Tilt", () -> {}); // TODO: impl
+        methods_.put("Sample Height", () -> zStage.js().input(Joystick.Input.NONE));
     }
 
     private void createUserInterface() {
@@ -136,12 +138,19 @@ public class JoystickPanel extends Panel {
             switch (selected) {
                 case "Imaging Piezo":
                     final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
+                    piezo.js().input(Joystick.Input.LEFT_WHEEL);
                     break;
                 case "Imaging Slice":
+                    final ASIScanner scanner = model_.devices().device("IllumSlice");
+                    scanner.js().inputX(Joystick.Input.LEFT_WHEEL);
                     break;
                 case "Light Sheet Tilt":
+                    //final ASIZStage stage = model_.devices().device("SampleZ");
+                    //stage.js().input(Joystick.Input.LEFT_WHEEL);
                     break;
                 case "Sample Height":
+                    final ASIZStage zStage = model_.devices().device("SampleZ");
+                    zStage.js().input(Joystick.Input.LEFT_WHEEL);
                     break;
                 default:
                     break;
@@ -157,12 +166,19 @@ public class JoystickPanel extends Panel {
             switch (selected) {
                 case "Imaging Piezo":
                     final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
+                    piezo.js().input(Joystick.Input.RIGHT_WHEEL);
                     break;
                 case "Imaging Slice":
+                    final ASIScanner scanner = model_.devices().device("IllumSlice");
+                    scanner.js().inputX(Joystick.Input.RIGHT_WHEEL);
                     break;
                 case "Light Sheet Tilt":
+                    //final ASIZStage stage = model_.devices().device("SampleZ");
+                    //stage.js().input(Joystick.Input.RIGHT_WHEEL);
                     break;
                 case "Sample Height":
+                    final ASIZStage zStage = model_.devices().device("SampleZ");
+                    zStage.js().input(Joystick.Input.RIGHT_WHEEL);
                     break;
                 default:
                     break;
