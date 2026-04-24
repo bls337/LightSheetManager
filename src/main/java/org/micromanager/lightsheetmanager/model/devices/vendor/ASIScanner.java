@@ -7,30 +7,33 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// TODO: single axis commands and joystick
-
 /**
  * ASI Scanner Device
- *
  */
 public class ASIScanner extends ASITigerBase {
 
-    private SingleAxis singleAxis_;
+    private final SingleAxis singleAxis_;
+    private final Joystick joystick_;
 
     public ASIScanner(Studio studio, final String deviceName) {
         super(studio, deviceName);
         singleAxis_ = new SingleAxis(studio, deviceName);
+        joystick_ = new Joystick(studio, deviceName);
     }
 
     public SingleAxis sa() {
         return singleAxis_;
     }
 
+    public Joystick js() {
+        return joystick_;
+    }
+
     public void setPosition(final double x, final double y) {
         try {
             core_.setGalvoPosition(deviceName_, x, y);
         } catch (Exception e) {
-            studio_.logs().showError("Could not move scanner!");
+            studio_.logs().showError("Could not move the scanner!");
         }
     }
 
@@ -38,7 +41,7 @@ public class ASIScanner extends ASITigerBase {
         try {
             return core_.getGalvoPosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("Could get the scanner position!");
+            studio_.logs().showError("Could not get the scanner position!");
             return new Point2D.Double(0.0, 0.0);
         }
     }

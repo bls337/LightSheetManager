@@ -9,8 +9,15 @@ import java.util.stream.Stream;
 
 public class ASIXYStage extends ASITigerBase {
 
+    private final Joystick joystick_;
+
     public ASIXYStage(final Studio studio, final String deviceName) {
         super(studio, deviceName);
+        joystick_ = new Joystick(studio, deviceName);
+    }
+
+    public Joystick js() {
+        return joystick_;
     }
 
     public void setRelativeXYPosition(final double x, final double y) {

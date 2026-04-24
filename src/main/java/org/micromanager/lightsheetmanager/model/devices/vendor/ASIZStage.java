@@ -4,8 +4,15 @@ import org.micromanager.Studio;
 
 public class ASIZStage extends ASITigerBase {
 
+    private final Joystick joystick_;
+
     public ASIZStage(final Studio studio, final String deviceName) {
         super(studio, deviceName);
+        joystick_ = new Joystick(studio, deviceName);
+    }
+
+    public Joystick js() {
+        return joystick_;
     }
 
     public void setPosition(final double position) {

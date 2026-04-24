@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public class SingleAxis extends DeviceBase {
 
-    public SingleAxis(Studio studio, String deviceName) {
+    public SingleAxis(final Studio studio, final String deviceName) {
         super(studio, deviceName);
     }
 
@@ -204,7 +204,6 @@ public class SingleAxis extends DeviceBase {
         }
     }
 
-
     public enum ClockSource {
         EXTERNAL("external clock"),
         INTERNAL("internal 4kHz clock");
@@ -227,7 +226,6 @@ public class SingleAxis extends DeviceBase {
             return stringToEnum.getOrDefault(symbol, ClockSource.INTERNAL);
         }
     }
-
 
     public enum ClockPolarity {
         NEGATIVE("negative edge"),
