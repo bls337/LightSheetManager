@@ -13,7 +13,7 @@ import java.util.Objects;
 /**
  * Activate lasers and light sheet.
  */
-public class ExcitationPanel extends Panel implements ListeningPanel {
+public class ScannerPanel extends Panel implements ListeningPanel {
 
     private CheckBox cbxBeamExc_;
     private CheckBox cbxSheetExc_;
@@ -24,7 +24,7 @@ public class ExcitationPanel extends Panel implements ListeningPanel {
 
     private final LightSheetManager model_;
 
-    public ExcitationPanel(final LightSheetManager model) {
+    public ScannerPanel(final LightSheetManager model) {
         super("Scanner");
         model_ = Objects.requireNonNull(model);
         createUserInterface();
@@ -78,17 +78,16 @@ public class ExcitationPanel extends Panel implements ListeningPanel {
             });
         }
 
-        cbxSheetExc_.registerListener(() -> {
+        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
+            cbxSheetExc_.registerListener(() -> {
+            });
 
-        });
+            cbxBeamEpi_.registerListener(() -> {
+            });
 
-        cbxBeamEpi_.registerListener(() -> {
-
-        });
-
-        cbxSheetEpi_.registerListener(() -> {
-
-        });
+            cbxSheetEpi_.registerListener(() -> {
+            });
+        }
     }
 
     // TODO: only handles SCAPE for now

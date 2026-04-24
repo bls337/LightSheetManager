@@ -3,7 +3,6 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TabbedPane;
@@ -13,7 +12,6 @@ import java.util.Objects;
 
 /**
  * The tabbed pane to select between different settings panels.
- *
  */
 public class TabPanel extends Panel {
 
@@ -26,7 +24,7 @@ public class TabPanel extends Panel {
 
     private final TabbedPane tabbedPane_;
 
-    private DeviceManager devices_;
+    private final DeviceManager devices_;
 
     private final LightSheetManager model_;
     private final LightSheetManagerFrame frame_;
@@ -105,16 +103,8 @@ public class TabPanel extends Panel {
         }
     }
 
-    public NavigationTab getNavigationTab() {
-        return navigationTab_;
-    }
-
     public AcquisitionTab getAcquisitionTab() {
         return acquisitionTab_;
-    }
-
-    public CameraTab getCameraTab() {
-        return cameraTab_;
     }
 
     public SetupPathTab getSetupPathTab(final int view) {

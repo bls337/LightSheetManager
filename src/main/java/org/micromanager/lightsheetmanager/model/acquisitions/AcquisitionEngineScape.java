@@ -991,6 +991,13 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
+        if (acqSettings_.isUsingMultiplePositions() && acqSettings_.numTimePoints() > 1) {
+            if (timepointIntervalMs < volumeDuration) {
+                studio_.logs().showError("Time point interval shorter than the time to collect a single volume.");
+                return false;
+            }
+        }
+
         // set exposure for imaging camera
         for (CameraBase camera : cameras) {
            camera.setExposure(exposureTime);

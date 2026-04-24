@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager;
 import net.miginfocom.swing.MigLayout;
 
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
+import org.micromanager.lightsheetmanager.api.data.LightSheetType;
 import org.micromanager.lightsheetmanager.gui.components.Label;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.gui.tabs.TabPanel;
@@ -45,6 +46,18 @@ public class LightSheetManagerFrame extends JFrame {
                         model_.setErrorText("SCAPE geometry does not support multiple imaging paths. "
                                 + " Use the \"SimultaneousCameras\" property to support multiple cameras.");
                         createErrorUserInterface();
+                        return;
+                    }
+                    if (model_.devices().adapter().numIlluminationPaths() > 1) {
+                        model_.setErrorText("SCAPE geometry can only have a single illumination path.");
+                        createErrorUserInterface();
+                        return;
+                    }
+                    if (model_.devices().adapter().lightSheetType() == LightSheetType.SCANNED) {
+                        model_.setErrorText("Scanned light sheets are not implemented for SCAPE geometry, " +
+                                "please contact the developers if you need this feature.");
+                        createErrorUserInterface();
+                        return;
                     }
                     createUserInterface();
                     // update after loading the settings and creating ui

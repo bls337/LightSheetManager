@@ -12,13 +12,13 @@ import java.util.Objects;
  */
 public class SetupPanel extends Panel implements ListeningPanel {
 
-    private PiezoCalibrationPanel piezoPanel_;
-    private BeamSheetControlPanel beamSheetPanel_;
+    private CalibrationPanel piezoPanel_;
+    private LightSheetPanel beamSheetPanel_;
 
     private PositionPanel positionPanel_;
 
     private JoystickPanel joystickPanel_;
-    private ExcitationPanel excitationPanel_;
+    private ScannerPanel scannerPanel_;
     private CameraPanel cameraPanel_;
 
     private Panel leftPanel_;
@@ -44,17 +44,17 @@ public class SetupPanel extends Panel implements ListeningPanel {
         leftPanel_ = new Panel();
         rightPanel_ = new Panel();
 
-        beamSheetPanel_ = new BeamSheetControlPanel(model_, pathNum);
+        beamSheetPanel_ = new LightSheetPanel(model_, pathNum);
         positionPanel_ = new PositionPanel(model_, pathNum);
-        piezoPanel_ = new PiezoCalibrationPanel(model_, positionPanel_, pathNum);
+        piezoPanel_ = new CalibrationPanel(model_, positionPanel_, pathNum);
 
         joystickPanel_ = new JoystickPanel(model_);
-        excitationPanel_ = new ExcitationPanel(model_);
+        scannerPanel_ = new ScannerPanel(model_);
         cameraPanel_ = new CameraPanel(model_);
 
         // TODO: add joystick panel back in
-        leftPanel_.add(excitationPanel_, "growx, wrap");
-        //leftPanel_.add(joystickPanel_, "growx, wrap");
+        leftPanel_.add(scannerPanel_, "growx, wrap");
+        leftPanel_.add(joystickPanel_, "growx, wrap");
         if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
             singleAxisPanel_ = new SingleAxisPanel(model_);
             leftPanel_.add(singleAxisPanel_, "growx, wrap");
@@ -69,7 +69,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
         add(rightPanel_, "aligny top");
     }
 
-    public BeamSheetControlPanel getBeamSheetPanel() {
+    public LightSheetPanel getLightSheetPanel() {
         return beamSheetPanel_;
     }
 
@@ -79,7 +79,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
 
     @Override
     public void selected() {
-        excitationPanel_.selected();
+        scannerPanel_.selected();
     }
 
     @Override
