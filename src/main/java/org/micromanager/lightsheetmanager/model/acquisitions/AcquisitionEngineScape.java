@@ -169,7 +169,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
                 // if X speed is less than 0.2 mm/s then it probably wasn't restored to correct speed some other time
                 if (origSpeedX_ < 0.2) {
-                    final boolean result = DialogUtils.showYesNoDialog(frame_, "Change Speed",
+                    final boolean result = DialogUtils.showYesNoDialog(null, "Change Speed",
                             "Max speed of X axis is small, perhaps it was not correctly restored after " +
                                     "stage scanning previously. Do you want to set it to 1 mm/s now?");
                     if (result) {
