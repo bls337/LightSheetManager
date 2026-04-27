@@ -17,7 +17,6 @@ import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.lightsheetmanager.LightSheetManagerPlugin;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
-import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.DurationPanel;
 import org.micromanager.lightsheetmanager.model.autofocus.AutofocusAdapter;
 import org.micromanager.lightsheetmanager.model.DataStorage;
@@ -52,9 +51,6 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     protected DurationPanel pnlDuration_;
 
-    // TODO: remove later, hacky method to stop position updater for now
-    protected LightSheetManagerFrame frame_;
-
     protected final LightSheetManager model_;
 
     public AcquisitionEngine(final LightSheetManager model) {
@@ -86,10 +82,6 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     public void setDurationPanel(final DurationPanel panel) {
         pnlDuration_ = Objects.requireNonNull(panel);;
-    }
-
-    public void setFrame(final LightSheetManagerFrame frame) {
-        frame_ = Objects.requireNonNull(frame);
     }
 
     /**
