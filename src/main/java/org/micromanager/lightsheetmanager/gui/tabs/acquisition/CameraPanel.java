@@ -28,7 +28,8 @@ public class CameraPanel extends Panel implements SettingsListener {
     private final LightSheetManager model_;
 
     public CameraPanel(final LightSheetManager model) {
-        super("Simultaneous Cameras");
+        super((model.devices().adapter().numSimultaneousCameras() > 1) ?
+                "Simultaneous Cameras" : "Camera Settings");
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
@@ -100,8 +101,10 @@ public class CameraPanel extends Panel implements SettingsListener {
         pnlCameraSelectionRow.add(radPrimaryCamera_, "");
         pnlCameraSelectionRow.add(pnlCheckboxes, "gaptop 2px");
 
-        add(pnlCameraSelectionRow, "wrap");
-        add(new JLabel("Camera Trigger Mode:"), "wrap");
+        if (model_.devices().adapter().numSimultaneousCameras() > 1) {
+            add(pnlCameraSelectionRow, "wrap");
+        }
+        add(new JLabel("Trigger Mode:"), "split 2");
         add(cmbCameraMode_, "wrap");
     }
 
