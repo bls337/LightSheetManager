@@ -120,24 +120,12 @@ public class LightSheetManager implements LightSheetManagerApi {
         pluginSettings_ = Objects.requireNonNull(pluginSettings);
     }
 
-    public CMMCore getCore() {
-        return core_;
-    }
-
     public CMMCore core() {
         return core_;
     }
 
-    public Studio getStudio() {
-        return studio_;
-    }
-
     public Studio studio() {
         return studio_;
-    }
-
-    public AcquisitionEngine getAcquisitionEngine() {
-        return acqEngine_;
     }
 
     @Override
