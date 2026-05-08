@@ -87,7 +87,7 @@ public class LightSheetManager implements LightSheetManagerApi {
         // load settings
         userSettings_.load();
 
-        // TODO: put this somewhere better, need to put this value into LSMAcquisitionEvents for now
+        // TODO: put this somewhere better, need to put this value into LightSheetEventAdapter for now
         LightSheetEventAdapter.isUsingMultipleCameras =
               deviceManager_.adapter().numSimultaneousCameras() > 1;
 
@@ -131,10 +131,6 @@ public class LightSheetManager implements LightSheetManagerApi {
     @Override
     public AcquisitionEngine acquisitions() {
         return acqEngine_;
-    }
-
-    public DeviceManager getDeviceManager() {
-        return deviceManager_;
     }
 
     @Override

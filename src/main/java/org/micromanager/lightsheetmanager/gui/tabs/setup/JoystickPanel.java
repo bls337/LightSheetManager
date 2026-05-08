@@ -147,8 +147,8 @@ public class JoystickPanel extends Panel {
                     scanner.js().inputX(Joystick.Input.LEFT_WHEEL);
                     break;
                 case "Light Sheet Tilt":
-                    //final ASIZStage stage = model_.devices().device("SampleZ");
-                    //stage.js().input(Joystick.Input.LEFT_WHEEL);
+                    final ASIZStage stage = model_.devices().device("IllumAngle");
+                    stage.js().input(Joystick.Input.LEFT_WHEEL);
                     break;
                 case "Sample Height":
                     final ASIZStage zStage = model_.devices().device("SampleZ");
@@ -175,8 +175,8 @@ public class JoystickPanel extends Panel {
                     scanner.js().inputX(Joystick.Input.RIGHT_WHEEL);
                     break;
                 case "Light Sheet Tilt":
-                    //final ASIZStage stage = model_.devices().device("SampleZ");
-                    //stage.js().input(Joystick.Input.RIGHT_WHEEL);
+                    final ASIZStage stage = model_.devices().device("IllumAngle");
+                    stage.js().input(Joystick.Input.RIGHT_WHEEL);
                     break;
                 case "Sample Height":
                     final ASIZStage zStage = model_.devices().device("SampleZ");
