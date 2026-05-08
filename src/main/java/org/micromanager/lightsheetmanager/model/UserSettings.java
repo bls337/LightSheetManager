@@ -90,6 +90,8 @@ public class UserSettings {
         if (json.equals(SETTINGS_NOT_FOUND)) {
             model_.studio().logs().logDebugMessage(
                     "settings not found, using default settings for " + geometryType);
+            // add the cameras to the imaging camera order
+            model_.devices().useDefaultImagingCameraOrder();
         } else {
             // validate user settings and create AcquisitionSettings object
             final Optional<JSONObject> settingsJson = validateUserSettings(json);

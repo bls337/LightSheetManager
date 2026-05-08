@@ -335,15 +335,14 @@ public class DeviceManager {
     }
 
     public CameraBase[] imagingCameras() {
-        String[] cameraNames;
-        ArrayList<String> names = new ArrayList<>();
+        final List<String> names = new ArrayList<>();
         final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
         for (CameraData camera : cameras) {
             if (camera.isActive()) {
                 names.add(camera.name());
             }
         }
-        cameraNames = names.toArray(String[]::new);
+        final String[] cameraNames = names.toArray(String[]::new);
         return Arrays.stream(cameraNames)
                 .map(name -> (CameraBase)deviceMap_.get(name))
                 .filter(Objects::nonNull)
@@ -359,25 +358,53 @@ public class DeviceManager {
     public boolean validateCameras() {
         // cameras in settings
         final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
+
+        // check for no cameras
         if (cameras.length == 0) {
             final String message = "No cameras found in the settings.";
             model_.studio().logs().logError(message);
-            model_.setErrorText(message);
-            return false;
+            if (DialogUtils.showYesNoDialog(null, "No Imaging Cameras",
+                    message + "\nWould you like to use the default imaging camera order?")) {
+                useDefaultImagingCameraOrder();
+                return true;
+            } else {
+                model_.setErrorText(message);
+                return false;
+            }
         }
 
         // valid camera names
         final List<String> validNames = Arrays.asList(imagingCameraNames());
 
+        // check for camera name mismatches
         for (CameraData camera : cameras) {
             if (!validNames.contains(camera.name())) {
-                final String message = "Camera in settings not found in hardware: " + camera.name();
+                final String message = "Camera in settings not found in hardware: " + camera.name()
+                        + ", consider creating a new user profile if the pre-init properties changed.";
                 model_.studio().logs().logError(message);
                 model_.setErrorText(message);
                 return false;
             }
         }
+
         return true;
+    }
+
+    /**
+     * Used to create the default imaging camera order.
+     */
+    public void useDefaultImagingCameraOrder() {
+        final List<CameraData> cameras = new ArrayList<>();
+        final String[] cameraNames = imagingCameraNames();
+        for (String name : cameraNames) {
+            // Note: there is no ui control to change the active state of the
+            // camera when there is only 1 camera, so make sure it's active.
+            cameras.add(new CameraData(name, cameraNames.length == 1));
+        }
+        // update settings with default camera order
+        model_.acquisitions().settingsBuilder()
+                .imagingCameraOrder(cameras.toArray(new CameraData[0]));
+        model_.acquisitions().updateAcquisitionSettings();
     }
 
     public DeviceAdapter adapter() {
