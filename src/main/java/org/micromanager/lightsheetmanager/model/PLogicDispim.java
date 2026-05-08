@@ -1020,7 +1020,7 @@ public class PLogicDispim {
 //        final Properties.Keys widthProp = (side == Devices.Sides.A) ?
 //                Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_A : Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_B;
 //        sheetWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, widthProp);
-        sheetWidth = model_.getAcquisitionEngine().settings().sheetCalibration().sheetWidth();
+        sheetWidth = model_.acquisitions().settings().sheetCalibration().sheetWidth();
 
         if (cameraName == null || cameraName.isEmpty()) {
             studio_.logs().logDebugMessage("Could not get sheet width for invalid device " + cameraName);
@@ -1039,13 +1039,13 @@ public class PLogicDispim {
 //            final float slopePolarity = (side == Devices.Sides.B) ? -1 : 1;
 //            sheetWidth = roi.height * sheetSlope * slopePolarity / 1e6;  // in microdegrees per pixel, convert to degrees
         } else {
-            final boolean autoSheet = model_.getAcquisitionEngine().settings().sheetCalibration().autoSheetWidthEnabled();
+            final boolean autoSheet = model_.acquisitions().settings().sheetCalibration().autoSheetWidthEnabled();
             if (autoSheet) {
                 Rectangle roi = camera.getROI();
                 if (roi == null || roi.height == 0) {
                     studio_.logs().logDebugMessage("Could not get camera ROI for auto sheet mode");
                 }
-                final double sheetSlope = model_.getAcquisitionEngine().settings().sheetCalibration().autoSheetWidthPerPixel();
+                final double sheetSlope = model_.acquisitions().settings().sheetCalibration().autoSheetWidthPerPixel();
                 sheetWidth = roi.height *  sheetSlope / 1000.0;  // in millidegrees per pixel, convert to degrees
                 sheetWidth *= 1.1;  // 10% extra width just to be sure
             }
@@ -1074,12 +1074,12 @@ public class PLogicDispim {
         if (cameraMode == CameraMode.VIRTUAL_SLIT) {
             // in millidegrees, convert to degrees
             // TODO: is this correct?
-            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration().sheetOffset() / 1000.0;
+            sheetOffset = model_.acquisitions().settings().sheetCalibration().sheetOffset() / 1000.0;
             //sheetOffset = prefs_.getFloat(
                     //MyStrings.PanelNames.SETUP.toString() + side.toString(),
                     //Properties.Keys.PLUGIN_LIGHTSHEET_OFFSET, 0) / 1000;  // in millidegrees, convert to degrees
         } else {
-            sheetOffset = model_.getAcquisitionEngine().settings().sheetCalibration().sheetOffset();
+            sheetOffset = model_.acquisitions().settings().sheetCalibration().sheetOffset();
             //final Properties.Keys offsetProp = (side == Devices.Sides.A) ?
                    // Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_A : Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_B;
            // sheetOffset = props_.getPropValueFloat(Devices.Keys.PLUGIN, offsetProp);

@@ -45,7 +45,7 @@ public class UserSettings {
     public UserSettings(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         // setup user profile
-        final UserProfile profile = model_.getStudio().getUserProfile();
+        final UserProfile profile = model_.studio().getUserProfile();
         settings_ = profile.getSettings(UserSettings.class);
         userName_ = profile.getProfileName();
     }
