@@ -81,11 +81,16 @@ public class LightSheetManager implements LightSheetManagerApi {
                 final String message = "AcquisitionEngine not implemented for " + geometryType;
                 studio_.logs().logError(message);
                 errorText_ = message;
-                return false; // early exit => error
+                return false; // early exit => show error ui
         }
 
         // load settings
         userSettings_.load();
+
+        // validate settings
+        if (!devices().validateCameras()) {
+            return false; // early exit => show error ui
+        }
 
         // TODO: put this somewhere better, need to put this value into LightSheetEventAdapter for now
         LightSheetEventAdapter.isUsingMultipleCameras =

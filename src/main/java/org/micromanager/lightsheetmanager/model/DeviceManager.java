@@ -350,6 +350,36 @@ public class DeviceManager {
                 .toArray(CameraBase[]::new);
     }
 
+    /**
+     * Returns {@code true} if all cameras in the settings are valid.
+     * This is used to detect changes in pre-init properties.
+     *
+     * @return {@code true} if the cameras are valid
+     */
+    public boolean validateCameras() {
+        // cameras in settings
+        final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
+        if (cameras.length == 0) {
+            final String message = "No cameras found in the settings.";
+            model_.studio().logs().logError(message);
+            model_.setErrorText(message);
+            return false;
+        }
+
+        // valid camera names
+        final List<String> validNames = Arrays.asList(imagingCameraNames());
+
+        for (CameraData camera : cameras) {
+            if (!validNames.contains(camera.name())) {
+                final String message = "Camera in settings not found in hardware: " + camera.name();
+                model_.studio().logs().logError(message);
+                model_.setErrorText(message);
+                return false;
+            }
+        }
+        return true;
+    }
+
     public DeviceAdapter adapter() {
         return (DeviceAdapter)deviceMap_.get("LightSheetDeviceManager");
     }
