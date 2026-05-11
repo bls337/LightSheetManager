@@ -106,6 +106,10 @@ public class CameraPanel extends Panel {
                 break;
             case SCAPE:
                 btnInvertedPath_.registerListener(() -> {
+                    if (!btnInvertedPath_.isSelected()) {
+                        model_.studio().live().setLiveModeOn(false);
+                        return;
+                    }
                     closeLiveModeWindow();
                     final CameraBase camera = model_.devices().device("PreviewCamera");
                     if (camera != null) {
@@ -127,6 +131,10 @@ public class CameraPanel extends Panel {
 
                 // live mode
                 btnLiveMode_.registerListener(() -> {
+                    if (!btnLiveMode_.isSelected()) {
+                        model_.studio().live().setLiveModeOn(false);
+                        return;
+                    }
                     closeLiveModeWindow();
                     final CameraBase camera = model_.devices().firstImagingCamera();
                     if (camera != null) {

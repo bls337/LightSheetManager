@@ -619,6 +619,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
                 if (acqSettings_.isUsingTimePoints()) {
                     baseEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
+                    baseEvent.setMinimumStartTime((long) (timeIndex * (model_.acquisitions().settings().timePointInterval() * 1000.0)));
                 }
                 // Loop 2: XY positions
                 for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
