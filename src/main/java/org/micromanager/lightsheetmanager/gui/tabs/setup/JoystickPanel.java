@@ -175,7 +175,7 @@ public class JoystickPanel extends Panel {
                 break;
             case "Imaging Slice":
                 final ASIScanner scanner = model_.devices().device("IllumSlice");
-                scanner.js().inputX(target);
+                scanner.js().inputY(target);
                 break;
             case "Light Sheet Tilt":
                 final ASIZStage stage = model_.devices().device("IllumAngle");
