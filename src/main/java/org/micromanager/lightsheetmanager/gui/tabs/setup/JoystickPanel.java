@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Control an ASI joystick.
+ * Control an ASI joystick, left wheel, and right wheel.
  */
 public class JoystickPanel extends Panel {
 
@@ -26,6 +26,7 @@ public class JoystickPanel extends Panel {
     private String previousJoystick_;
     private String previousLeftWheel_;
     private String previousRightWheel_;
+
     private Map<String, Runnable> methods_;
 
     private final LightSheetManager model_;
@@ -113,6 +114,7 @@ public class JoystickPanel extends Panel {
         // select joystick input
         cmbJoystick_.registerListener(() -> {
             final String selected = cmbJoystick_.getSelected();
+            model_.pluginSettings().joystickPanel().joystick(selected);
             methods_.get(previousJoystick_).run(); // disable the previous device
             switch (selected) {
                 case "None":
@@ -136,6 +138,7 @@ public class JoystickPanel extends Panel {
         // select left wheel input
         cmbLeftWheel_.registerListener(() -> {
             final String selected = cmbLeftWheel_.getSelected();
+            model_.pluginSettings().joystickPanel().leftWheel(selected);
             methods_.get(previousLeftWheel_).run(); // disable the previous device
             switch (selected) {
                 case "Imaging Piezo":
@@ -164,6 +167,7 @@ public class JoystickPanel extends Panel {
         // select right wheel input
         cmbRightWheel_.registerListener(() -> {
             final String selected = cmbRightWheel_.getSelected();
+            model_.pluginSettings().joystickPanel().rightWheel(selected);
             methods_.get(previousRightWheel_).run(); // disable the previous device
             switch (selected) {
                 case "Imaging Piezo":
@@ -189,4 +193,5 @@ public class JoystickPanel extends Panel {
             previousRightWheel_ = selected;
         });
     }
+
 }
