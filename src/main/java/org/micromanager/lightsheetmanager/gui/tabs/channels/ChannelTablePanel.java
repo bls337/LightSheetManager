@@ -9,9 +9,10 @@ import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
+import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 
-import javax.swing.JLabel;
+import javax.swing.*;
 import java.util.Objects;
 
 /**
@@ -60,7 +61,7 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
 
         cmbChannelMode_ = new ComboBox<>(ChannelMode.values(),
                 model_.acquisitions().settings().channels().mode(),
-                120, 22);
+                140, 22);
 
         add(lblChannelGroup_, "split 2");
         add(cmbChannelGroup_, "wrap");
@@ -125,8 +126,14 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
 
         // select channel mode
         cmbChannelMode_.registerListener(() -> {
-            model_.acquisitions().settingsBuilder().channelBuilder()
-                  .mode(cmbChannelMode_.getSelected());
+            final ChannelMode selected = cmbChannelMode_.getSelected();
+            model_.acquisitions().settingsBuilder().channelBuilder().mode(selected);
+            if (selected == ChannelMode.VOLUME_HW) {
+                SwingUtilities.invokeLater(() -> {
+                    DialogUtils.showErrorMessage(cmbChannelMode_, "Not Implemented",
+                            "Not implemented in SCAPE, please contact ASI to request this feature.");
+                });
+            }
         });
 
     }
