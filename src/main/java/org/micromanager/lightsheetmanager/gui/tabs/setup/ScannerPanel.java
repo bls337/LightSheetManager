@@ -87,13 +87,12 @@ public class ScannerPanel extends Panel implements ListeningPanel {
         }
     }
 
-    // TODO: only handles SCAPE for now
     @Override
     public void selected() {
         if (isUsingPLogic_) {
 //            final ASIScanner scanner = model_.devices().device("IllumSlice");
 //            if (scanner != null && !scanner.isBeamOn()) {
-//                cbxBeamExc_.setSelected(true);
+//                scanner.setBeamOn(true);
 //            }
         }
     }
