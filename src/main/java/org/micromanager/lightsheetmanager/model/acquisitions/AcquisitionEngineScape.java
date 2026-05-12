@@ -79,7 +79,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         asb_.sheetCalibrationBuilder().autoSheetWidthPerPixel(0.0);
 
         // make settings current
-        updateAcquisitionSettings();
+        updateSettings();
 
 //        // check pixel size
 //        if (core_.getPixelSizeUm() < 1e-6) {
@@ -231,7 +231,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 //                System.out.println(jsonStr);
 //            }
 
-        updateAcquisitionSettings();
+        updateSettings();
 
         final String settingsJson = acqSettings_.toPrettyJson();
         studio_.logs().logMessage("Starting Acquisition with settings:\n" + settingsJson);
@@ -1340,7 +1340,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     @Override
     public void updateDurationLabels() {
         model_.acquisitions().recalculateSliceTiming();
-        model_.acquisitions().updateAcquisitionSettings();
+        model_.acquisitions().updateSettings();
         // update durations now that settings are current
         updateSlicePeriodLabel(pnlDuration_.getSliceDurationLabel());
         updateVolumeDurationLabel(pnlDuration_.getVolumeDurationLabel());

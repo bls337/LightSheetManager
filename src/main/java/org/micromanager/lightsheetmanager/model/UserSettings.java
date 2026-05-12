@@ -129,7 +129,7 @@ public class UserSettings {
      */
     public void save() {
         // make settings current before saving
-        model_.acquisitions().updateAcquisitionSettings();
+        model_.acquisitions().updateSettings();
 
         // settings key based on geometry type
         final GeometryType geometryType = model_.devices().adapter().geometry();

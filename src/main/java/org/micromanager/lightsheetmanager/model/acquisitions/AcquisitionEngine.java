@@ -101,7 +101,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     /**
      * Build the {@code DefaultAcquisitionSettingsSCAPE} with the builder and update settings.
      */
-    public void updateAcquisitionSettings() {
+    public void updateSettings() {
         acqSettings_ = asb_.build();
     }
 
@@ -115,7 +115,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             }
 
             try {
-                updateAcquisitionSettings(); // make sure settings are current
+                updateSettings(); // make sure settings are current
 
                 if (speedTest) {
                     try {

@@ -57,7 +57,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         }
 
         // make settings current
-        updateAcquisitionSettings();
+        updateSettings();
 
         return true;
     }
@@ -167,7 +167,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 //            e1.printStackTrace();
 //        }
 
-        updateAcquisitionSettings();
+        updateSettings();
 
         studio_.logs().logMessage("Starting Acquisition with settings:\n" + acqSettings_.toPrettyJson());
 

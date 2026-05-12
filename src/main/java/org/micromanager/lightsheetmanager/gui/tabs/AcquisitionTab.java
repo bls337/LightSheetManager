@@ -292,7 +292,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
             if (selected) {
                 pnlAdvancedTiming_.updateSpinners();
             } else {
-                model_.acquisitions().updateAcquisitionSettings();
+                model_.acquisitions().updateSettings();
                 model_.acquisitions().recalculateSliceTiming();
             }
         });

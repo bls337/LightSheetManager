@@ -181,7 +181,7 @@ public class SavePanel extends Panel implements SettingsListener {
                     }
                 }
                 // update settings and save to file
-                model_.acquisitions().updateAcquisitionSettings();
+                model_.acquisitions().updateSettings();
                 FileUtils.writeStringToFile(file.toString(), model_.acquisitions().settings().toPrettyJson());
                 model_.studio().logs().logMessage("Acquisition settings saved to: " + file);
             }
