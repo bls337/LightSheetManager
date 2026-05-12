@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
+import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.LightSheetManager;
@@ -15,7 +16,7 @@ import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.util.Objects;
 
-public class PositionPanel extends Panel implements Subscriber {
+public class PositionPanel extends Panel implements Subscriber, ListeningPanel {
 
     private JLabel lblImagingCenterValue_;
 
@@ -193,6 +194,7 @@ public class PositionPanel extends Panel implements Subscriber {
 
             btnImagingCenterGo_.registerListener(() -> {
                 // FIXME: make sure this is the same as original plugin, diSPIM also moves Scanner with computeGalvoFromPiezo
+                // TODO: (also check if the move when the tab is selected is correct)
                 final double imagingCenter = model_.acquisitions().settingsBuilder().build()
                         .sheetCalibration().imagingCenter();
                 piezo.setPosition(imagingCenter);
@@ -237,5 +239,21 @@ public class PositionPanel extends Panel implements Subscriber {
                 lblSlicePositionValue_.setText(String.format("%.3f °", point.y));
             }
         });
+    }
+
+    @Override
+    public void selected() {
+        if (model_.devices().isUsingPLogic()) {
+            // TODO: check the fixme above
+            final double imagingCenter = model_.acquisitions().settingsBuilder().build()
+                    .sheetCalibration().imagingCenter();
+            final ASIPiezo piezo = model_.devices().device("ImagingFocus");
+            piezo.setPosition(imagingCenter);
+        }
+    }
+
+    @Override
+    public void unselected() {
+
     }
 }

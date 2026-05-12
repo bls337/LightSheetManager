@@ -4,6 +4,7 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 
 import java.util.Objects;
 
@@ -52,7 +53,6 @@ public class SetupPanel extends Panel implements ListeningPanel {
         scannerPanel_ = new ScannerPanel(model_);
         cameraPanel_ = new CameraPanel(model_);
 
-        // TODO: add joystick panel back in
         leftPanel_.add(scannerPanel_, "growx, wrap");
         leftPanel_.add(joystickPanel_, "growx, wrap");
         if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
@@ -80,6 +80,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
     @Override
     public void selected() {
         scannerPanel_.selected();
+        positionPanel_.selected();
     }
 
     @Override
