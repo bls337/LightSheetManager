@@ -58,9 +58,9 @@ public class PositionPanel extends Panel implements Subscriber {
         isUsingPLogic_ = model_.devices().isUsingPLogic();
 
         final JLabel lblImagingCenter = new JLabel("Imaging Center:");
-        final double imagingCenter = model_.acquisitions().settings()
-                .sheetCalibration().imagingCenter();
-        lblImagingCenterValue_ = new JLabel(imagingCenter + " μm");
+        final String imagingCenter = String.format("%.3f μm",
+                model_.acquisitions().settings().sheetCalibration().imagingCenter());
+        lblImagingCenterValue_ = new JLabel(imagingCenter);
 
         setMigLayout(
                 "",
@@ -116,7 +116,7 @@ public class PositionPanel extends Panel implements Subscriber {
             lblSlicePositionValue_.setText(scannerPositionStr);
         }
 
-        // test fields
+        // text fields
         txtSlicePosition_.setText("0");
         txtImagingPosition_.setText("0");
         txtIllumPosition_.setText("0");
