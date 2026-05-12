@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Control an ASI joystick.
+ * Control an ASI joystick, left wheel, and right wheel.
  */
 public class JoystickPanel extends Panel {
 
@@ -26,6 +26,7 @@ public class JoystickPanel extends Panel {
     private String previousJoystick_;
     private String previousLeftWheel_;
     private String previousRightWheel_;
+
     private Map<String, Runnable> methods_;
 
     private final LightSheetManager model_;
@@ -38,18 +39,22 @@ public class JoystickPanel extends Panel {
         }
         createUserInterface();
         createEventHandlers();
+        if (model_.devices().isUsingPLogic()) {
+            initHardware();
+        }
     }
 
     private void createMap() {
         final ASIXYStage xyStage = model_.devices().device("SampleXY");
         final ASIZStage zStage = model_.devices().device("SampleZ");
+        final ASIZStage stage = model_.devices().device("IllumAngle");
         final ASIScanner scanner = model_.devices().device("IllumSlice");
-        final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
+        final ASIPiezo piezo = model_.devices().device("ImagingFocus");
 
         // set to the default values
-        previousJoystick_ = "None";
-        previousLeftWheel_ = "None";
-        previousRightWheel_ = "None";
+        previousJoystick_ = model_.pluginSettings().joystickPanel().joystick();
+        previousLeftWheel_ = model_.pluginSettings().joystickPanel().leftWheel();
+        previousRightWheel_ = model_.pluginSettings().joystickPanel().rightWheel();
 
         methods_ = new HashMap<>();
 
@@ -67,8 +72,14 @@ public class JoystickPanel extends Panel {
             scanner.js().inputX(Joystick.Input.NONE);
             scanner.js().inputY(Joystick.Input.NONE);
         });
-        methods_.put("Light Sheet Tilt", () -> {}); // TODO: impl
+        methods_.put("Light Sheet Tilt", () -> stage.js().input(Joystick.Input.NONE));
         methods_.put("Sample Height", () -> zStage.js().input(Joystick.Input.NONE));
+    }
+
+    private void initHardware() {
+        setJoystick(cmbJoystick_.getSelected());
+        setWheel(cmbLeftWheel_.getSelected(), Joystick.Input.LEFT_WHEEL);
+        setWheel(cmbRightWheel_.getSelected(), Joystick.Input.RIGHT_WHEEL);
     }
 
     private void createUserInterface() {
@@ -96,9 +107,9 @@ public class JoystickPanel extends Panel {
                 "Sample Height"
         };
 
-        cmbJoystick_ = new ComboBox<>(joystickLabels, "None", 100, 24);
-        cmbLeftWheel_ = new ComboBox<>(wheelLabels, "None", 100, 24);
-        cmbRightWheel_ = new ComboBox<>(wheelLabels, "None", 100, 24);
+        cmbJoystick_ = new ComboBox<>(joystickLabels, previousJoystick_, 100, 24);
+        cmbLeftWheel_ = new ComboBox<>(wheelLabels, previousLeftWheel_, 100, 24);
+        cmbRightWheel_ = new ComboBox<>(wheelLabels, previousRightWheel_, 100, 24);
 
         add(lblJoystick, "");
         add(cmbJoystick_, "wrap");
@@ -113,80 +124,70 @@ public class JoystickPanel extends Panel {
         // select joystick input
         cmbJoystick_.registerListener(() -> {
             final String selected = cmbJoystick_.getSelected();
+            model_.pluginSettings().joystickPanel().joystick(selected);
             methods_.get(previousJoystick_).run(); // disable the previous device
-            switch (selected) {
-                case "None":
-                    return; // early exit => do nothing
-                case "Scanner":
-                    final ASIScanner scanner = model_.devices().device("IllumSlice");
-                    scanner.js().inputX(Joystick.Input.JOYSTICK_X);
-                    scanner.js().inputY(Joystick.Input.JOYSTICK_Y);
-                    break;
-                case "XYStage":
-                    final ASIXYStage xyStage = model_.devices().device("SampleXY");
-                    xyStage.js().enabled(true);
-                    break;
-                default:
-                    break;
-            }
-            // track the previous device to disable later
-            previousJoystick_ = selected;
+            setJoystick(selected);
+            previousJoystick_ = selected; // track the previous device to disable later
         });
 
         // select left wheel input
         cmbLeftWheel_.registerListener(() -> {
             final String selected = cmbLeftWheel_.getSelected();
+            model_.pluginSettings().joystickPanel().leftWheel(selected);
             methods_.get(previousLeftWheel_).run(); // disable the previous device
-            switch (selected) {
-                case "Imaging Piezo":
-                    final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
-                    piezo.js().input(Joystick.Input.LEFT_WHEEL);
-                    break;
-                case "Imaging Slice":
-                    final ASIScanner scanner = model_.devices().device("IllumSlice");
-                    scanner.js().inputX(Joystick.Input.LEFT_WHEEL);
-                    break;
-                case "Light Sheet Tilt":
-                    final ASIZStage stage = model_.devices().device("IllumAngle");
-                    stage.js().input(Joystick.Input.LEFT_WHEEL);
-                    break;
-                case "Sample Height":
-                    final ASIZStage zStage = model_.devices().device("SampleZ");
-                    zStage.js().input(Joystick.Input.LEFT_WHEEL);
-                    break;
-                default:
-                    break;
-            }
-            // track the previous device to disable later
-            previousLeftWheel_ = selected;
+            setWheel(selected, Joystick.Input.LEFT_WHEEL);
+            previousLeftWheel_ = selected; // track the previous device to disable later
         });
 
         // select right wheel input
         cmbRightWheel_.registerListener(() -> {
             final String selected = cmbRightWheel_.getSelected();
+            model_.pluginSettings().joystickPanel().rightWheel(selected);
             methods_.get(previousRightWheel_).run(); // disable the previous device
-            switch (selected) {
-                case "Imaging Piezo":
-                    final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
-                    piezo.js().input(Joystick.Input.RIGHT_WHEEL);
-                    break;
-                case "Imaging Slice":
-                    final ASIScanner scanner = model_.devices().device("IllumSlice");
-                    scanner.js().inputX(Joystick.Input.RIGHT_WHEEL);
-                    break;
-                case "Light Sheet Tilt":
-                    final ASIZStage stage = model_.devices().device("IllumAngle");
-                    stage.js().input(Joystick.Input.RIGHT_WHEEL);
-                    break;
-                case "Sample Height":
-                    final ASIZStage zStage = model_.devices().device("SampleZ");
-                    zStage.js().input(Joystick.Input.RIGHT_WHEEL);
-                    break;
-                default:
-                    break;
-            }
-            // track the previous device to disable later
-            previousRightWheel_ = selected;
+            setWheel(selected, Joystick.Input.RIGHT_WHEEL);
+            previousRightWheel_ = selected; // track the previous device to disable later
         });
     }
+
+    private void setJoystick(final String selected) {
+        switch (selected) {
+            case "None":
+                return; // early exit => do nothing
+            case "Scanner":
+                final ASIScanner scanner = model_.devices().device("IllumSlice");
+                scanner.js().inputX(Joystick.Input.JOYSTICK_X);
+                scanner.js().inputY(Joystick.Input.JOYSTICK_Y);
+                break;
+            case "XYStage":
+                final ASIXYStage xyStage = model_.devices().device("SampleXY");
+                xyStage.js().enabled(true);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void setWheel(final String selected, final Joystick.Input target) {
+        switch (selected) {
+            case "Imaging Piezo":
+                final ASIPiezo piezo  = model_.devices().device("ImagingFocus");
+                piezo.js().input(target);
+                break;
+            case "Imaging Slice":
+                final ASIScanner scanner = model_.devices().device("IllumSlice");
+                scanner.js().inputY(target);
+                break;
+            case "Light Sheet Tilt":
+                final ASIZStage stage = model_.devices().device("IllumAngle");
+                stage.js().input(target);
+                break;
+            case "Sample Height":
+                final ASIZStage zStage = model_.devices().device("SampleZ");
+                zStage.js().input(target);
+                break;
+            default:
+                break;
+        }
+    }
+
 }

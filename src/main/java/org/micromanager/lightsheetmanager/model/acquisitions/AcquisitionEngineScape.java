@@ -619,6 +619,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
                 if (acqSettings_.isUsingTimePoints()) {
                     baseEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
+                    baseEvent.setMinimumStartTime((long) (timeIndex * (model_.acquisitions().settings().timePointInterval() * 1000.0)));
                 }
                 // Loop 2: XY positions
                 for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
@@ -787,6 +788,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 model_.studio().logs().showError("could not save the acquisition data to: \n" + savePath);
             }
         }
+
+        // unregister to stop ghost events
+        studio_.events().unregisterForEvents(this);
 
         // start polling for navigation panel
         if (isPolling_) {

@@ -195,7 +195,18 @@ public final class LightSheetEventAdapter {
                     cameraEvent.setAxisPosition(CAMERA_AXIS, cameraIndex_
                             + (currentChannelIndex_ * cameraDeviceNames_.length));
                 } else {
-                    cameraEvent.setAxisPosition(CAMERA_AXIS, cameraIndex_);
+                    Object position = event.getAxisPosition(CAMERA_AXIS);
+                    int baseIndex = 0;
+
+                    if (position != null) {
+                        try {
+                            baseIndex = Integer.parseInt(position.toString());
+                        } catch (NumberFormatException e) {
+                            // ignore => number already assigned
+                        }
+                    }
+
+                    cameraEvent.setAxisPosition(CAMERA_AXIS, baseIndex + cameraIndex_);
                 }
                 cameraIndex_++;
                 return cameraEvent;
@@ -218,6 +229,7 @@ public final class LightSheetEventAdapter {
             public AcquisitionEvent next() {
                 AcquisitionEvent sliceEvent = event.copy();
                 sliceEvent.setAxisPosition(AcqEngMetadata.Z_AXIS, zIndex_);
+                // System.out.println("Final Event Axes: " + sliceEvent.getAxesAsJSONString());
                 // The tiger controller handles Z axis, so no need to add the actual Z position
                 zIndex_++;
                 return sliceEvent;
@@ -244,7 +256,6 @@ public final class LightSheetEventAdapter {
                 }
                 timePointEvent.setTimeIndex(frameIndex_);
                 frameIndex_++;
-
                 return timePointEvent;
             }
         };
@@ -253,7 +264,7 @@ public final class LightSheetEventAdapter {
     /**
      * Make an iterator for events for each active channel
      *
-     * @param channelList
+     * @param channelList the list of channels to iterate over
      * @return
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels(
@@ -299,7 +310,7 @@ public final class LightSheetEventAdapter {
      * the axes that assume the order in the list provided correspond to the
      * desired indices
      *
-     * @param positionList
+     * @param positionList the list of positions or iterate over
      * @return
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> positions(

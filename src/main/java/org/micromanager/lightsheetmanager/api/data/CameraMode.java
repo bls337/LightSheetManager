@@ -77,7 +77,8 @@ public enum CameraMode {
         return camLib != CameraLibrary.UNKNOWN;
     }
 
-    public static CameraMode[] modesByDeviceLibrary(final CameraLibrary cameraLibrary) {
+    public static CameraMode[] modesByDeviceLibrary(
+            final CameraLibrary cameraLibrary, final GeometryType geometry) {
         ArrayList<CameraMode> modes = new ArrayList<>();
         if (isCameraValid(cameraLibrary)) {
             modes.add(CameraMode.EDGE);
@@ -90,7 +91,7 @@ public enum CameraMode {
             if (hasPseudoOverlapTrigger(cameraLibrary)) {
                 modes.add(CameraMode.PSEUDO_OVERLAP);
             }
-            if (hasLightSheetTrigger(cameraLibrary)) {
+            if (geometry != GeometryType.SCAPE && hasLightSheetTrigger(cameraLibrary)) {
                 modes.add(CameraMode.VIRTUAL_SLIT);
             }
         }

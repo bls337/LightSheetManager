@@ -50,7 +50,7 @@ public class CameraPanel extends Panel implements SettingsListener {
         final CameraBase camera = model_.devices().firstImagingCamera();
         if (camera != null) {
             final CameraLibrary camLib = CameraLibrary.fromString(camera.getDeviceLibrary());
-            modes = CameraMode.modesByDeviceLibrary(camLib);
+            modes = CameraMode.modesByDeviceLibrary(camLib, model_.devices().adapter().geometry());
         }
 
         cmbCameraMode_ = new ComboBox<>(modes,
