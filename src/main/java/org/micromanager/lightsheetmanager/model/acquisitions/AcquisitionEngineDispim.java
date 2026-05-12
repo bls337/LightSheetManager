@@ -191,11 +191,6 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
             throw new RuntimeException(e);
         }
 
-
-        // Projection mode
-        //TODO: where should this come from in settings?
-        boolean projectionMode = false;
-
         //////////////////////////////////////
         // Begin AcqEngJ integration
         //      The acqSettings object should be static at this point, it will now
@@ -208,7 +203,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         currentAcquisition_ = new Acquisition(sink);
 
         JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
-        DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata, projectionMode);
+        DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata);
 
         // TODO(Brandon): where should i get this from?
         SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
@@ -238,26 +233,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 //                  AcquisitionAPI.BEFORE_HARDWARE_HOOK);
 //        }
 
-
-
-       // TODO: how much of this do we need? use the projector plugin...
-//        if (projectionMode) {
-//            // DiSPIM always uses 45 degrees
-//            double theta = Math.PI / 4;
-//            double zStep = acqSettings_.volumeSettings().sliceStepSize();
-//            int numZSlices = acqSettings_.volumeSettings().slicesPerView();
-//            int cameraWidth = (int) core_.getImageWidth();
-//            int cameraHeight = (int) core_.getImageHeight();
-//            double pixelSizeXYUm = core_.getPixelSizeUm();
-//
-//            int numUniqueProcessorsNeeded = 2; // Always keep enough around for 2 views
-//            if (acqSettings_.isUsingChannels()) {
-//                numUniqueProcessorsNeeded *= acqSettings_.channels().length;
-//            }
-//        }
-
         long acqButtonStart = System.currentTimeMillis();
-
 
         ////////////  Acquisition hooks ////////////////////
         // These functions will be run on different threads during the acquisition process
