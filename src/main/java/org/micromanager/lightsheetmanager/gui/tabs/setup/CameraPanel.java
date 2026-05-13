@@ -19,7 +19,7 @@ import java.util.Objects;
  */
 public class CameraPanel extends Panel {
 
-    public static final String CONFIG_GROUP = "Path select";
+    public static final String CONFIG_GROUP = "Path Select";
 
     private boolean isPreviewPressed = false;
     private boolean isLivePressed = false;
