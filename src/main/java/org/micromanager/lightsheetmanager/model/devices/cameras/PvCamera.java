@@ -35,8 +35,8 @@ public class PvCamera extends CameraBase implements LightSheetCamera {
     }
 
     public static class Values {
-        public final static String INTERNAL_TRIGGER = "Internal Trigger";
-        public final static String EDGE_TRIGGER = "Edge Trigger";
+        public static final String INTERNAL_TRIGGER = "Internal Trigger";
+        public static final String EDGE_TRIGGER = "Edge Trigger";
     }
 
     public PvCamera(final Studio studio, final String deviceName) {
