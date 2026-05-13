@@ -79,7 +79,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         asb_.sheetCalibrationBuilder().autoSheetWidthPerPixel(0.0);
 
         // make settings current
-        updateAcquisitionSettings();
+        updateSettings();
 
 //        // check pixel size
 //        if (core_.getPixelSizeUm() < 1e-6) {
@@ -231,7 +231,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 //                System.out.println(jsonStr);
 //            }
 
-        updateAcquisitionSettings();
+        updateSettings();
 
         final String settingsJson = acqSettings_.toPrettyJson();
         studio_.logs().logMessage("Starting Acquisition with settings:\n" + settingsJson);
@@ -270,10 +270,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return false;
         }
 
-        // Projection mode
-        //TODO: where should this come from in settings?
-        boolean projectionMode = false;
-
         //////////////////////////////////////
         // Begin AcqEngJ integration
         //      The acqSettings object should be static at this point, it will now
@@ -291,7 +287,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         } catch (JSONException e) {
             studio_.logs().logError("Failed to add z-um_step metadata: " + e.getMessage());
         }
-        DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata, projectionMode);
+        DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata);
 
         // TODO(Brandon): where should i get this from?
         SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
@@ -321,26 +317,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 //                  AcquisitionAPI.BEFORE_HARDWARE_HOOK);
 //        }
 
-
-
-        // TODO: how much of this do we need? use the projector plugin...
-//        if (projectionMode) {
-//            // DiSPIM always uses 45 degrees
-//            double theta = Math.PI / 4;
-//            double zStep = acqSettings_.volumeSettings().sliceStepSize();
-//            int numZSlices = acqSettings_.volumeSettings().slicesPerView();
-//            int cameraWidth = (int) core_.getImageWidth();
-//            int cameraHeight = (int) core_.getImageHeight();
-//            double pixelSizeXYUm = core_.getPixelSizeUm();
-//
-//            int numUniqueProcessorsNeeded = 2; // Always keep enough around for 2 views
-//            if (acqSettings_.isUsingChannels()) {
-//                numUniqueProcessorsNeeded *= acqSettings_.channels().length;
-//            }
-//        }
-
         long acqButtonStart = System.currentTimeMillis();
-
 
         ////////////  Acquisition hooks ////////////////////
         // These functions will be run on different threads during the acquisition process
@@ -1363,7 +1340,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     @Override
     public void updateDurationLabels() {
         model_.acquisitions().recalculateSliceTiming();
-        model_.acquisitions().updateAcquisitionSettings();
+        model_.acquisitions().updateSettings();
         // update durations now that settings are current
         updateSlicePeriodLabel(pnlDuration_.getSliceDurationLabel());
         updateVolumeDurationLabel(pnlDuration_.getVolumeDurationLabel());

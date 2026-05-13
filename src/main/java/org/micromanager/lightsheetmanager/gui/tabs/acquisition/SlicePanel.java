@@ -101,7 +101,7 @@ public class SlicePanel extends Panel implements SettingsListener {
             model_.acquisitions().settingsBuilder()
                     .sliceBuilder().periodMinimized(selected);
             // update slice timing
-            model_.acquisitions().updateAcquisitionSettings();
+            model_.acquisitions().updateSettings();
             model_.acquisitions().recalculateSliceTiming();
         });
 
@@ -109,7 +109,7 @@ public class SlicePanel extends Panel implements SettingsListener {
             model_.acquisitions().settingsBuilder()
                     .sliceBuilder().period(spnSlicePeriod_.getDouble());
             // update slice timing
-            model_.acquisitions().updateAcquisitionSettings();
+            model_.acquisitions().updateSettings();
             model_.acquisitions().recalculateSliceTiming();
         });
 
@@ -117,7 +117,7 @@ public class SlicePanel extends Panel implements SettingsListener {
             model_.acquisitions().settingsBuilder()
                     .sliceBuilder().sampleExposure(spnSampleExposure_.getDouble());
             // update slice timing
-            model_.acquisitions().updateAcquisitionSettings();
+            model_.acquisitions().updateSettings();
             model_.acquisitions().recalculateSliceTiming();
         });
 

@@ -72,10 +72,7 @@ public class ScannerPanel extends Panel implements ListeningPanel {
         if (isUsingPLogic_) {
             final ASIScanner scanner = model_.devices().device("IllumSlice");
 
-            cbxBeamExc_.registerListener(() -> {
-                scanner.setBeamOn(cbxBeamExc_.isSelected());
-                //System.out.println("set beam on: " + cbxBeamExc_.isSelected());
-            });
+            cbxBeamExc_.registerListener(() -> scanner.setBeamOn(cbxBeamExc_.isSelected()));
         }
 
         if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
@@ -90,17 +87,13 @@ public class ScannerPanel extends Panel implements ListeningPanel {
         }
     }
 
-    // TODO: only handles SCAPE for now
     @Override
     public void selected() {
-        final boolean isBeamOn = cbxBeamExc_.isSelected();
-
         if (isUsingPLogic_) {
-            final ASIScanner scanner =
-                    model_.devices().device("IllumSlice");
-            if (scanner != null && isBeamOn && !scanner.isBeamOn()) {
-                scanner.setBeamOn(true);
-            }
+//            final ASIScanner scanner = model_.devices().device("IllumSlice");
+//            if (scanner != null && !scanner.isBeamOn()) {
+//                scanner.setBeamOn(true);
+//            }
         }
     }
 

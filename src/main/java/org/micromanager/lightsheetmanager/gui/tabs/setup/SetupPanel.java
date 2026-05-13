@@ -52,7 +52,6 @@ public class SetupPanel extends Panel implements ListeningPanel {
         scannerPanel_ = new ScannerPanel(model_);
         cameraPanel_ = new CameraPanel(model_);
 
-        // TODO: add joystick panel back in
         leftPanel_.add(scannerPanel_, "growx, wrap");
         leftPanel_.add(joystickPanel_, "growx, wrap");
         if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
@@ -80,6 +79,7 @@ public class SetupPanel extends Panel implements ListeningPanel {
     @Override
     public void selected() {
         scannerPanel_.selected();
+        positionPanel_.selected();
     }
 
     @Override

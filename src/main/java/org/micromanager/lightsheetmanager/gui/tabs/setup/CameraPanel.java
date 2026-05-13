@@ -1,16 +1,16 @@
 package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
-import com.google.common.eventbus.Subscribe;
-import org.micromanager.events.LiveModeEvent;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
+import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.ToggleButton;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
+import javax.swing.JLabel;
 import java.util.Objects;
 
 
@@ -18,6 +18,8 @@ import java.util.Objects;
  * Select which camera is being used.
  */
 public class CameraPanel extends Panel {
+
+    public static final String CONFIG_GROUP = "Path Select";
 
     private boolean isPreviewPressed = false;
     private boolean isLivePressed = false;
@@ -28,6 +30,9 @@ public class CameraPanel extends Panel {
 
     private ToggleButton btnInvertedPath_;
     private ToggleButton btnLiveMode_;
+
+    // path selection for SCAPE
+    private ComboBox<String> cmbPreset_;
 
     private final LightSheetManager model_;
 
@@ -62,6 +67,19 @@ public class CameraPanel extends Panel {
                 Icons.CAMERA, Icons.CANCEL
         );
 
+        // populate the combo box if the group exists
+        String selected = "";
+        String[] presets = {""};
+        if (model_.core().isGroupDefined(CONFIG_GROUP)) {
+            presets = model_.core().getAvailableConfigs(CONFIG_GROUP).toArray();
+            try {
+                selected = model_.core().getCurrentConfig(CONFIG_GROUP);
+            } catch (Exception e) {
+                // ignore => use default value
+            }
+        }
+        cmbPreset_ = new ComboBox<>(presets, selected, 165, 26);
+
         switch (geometryType) {
             case DISPIM:
                 add(btnImagingPath_, "");
@@ -72,7 +90,9 @@ public class CameraPanel extends Panel {
                 break;
             case SCAPE:
                 add(btnInvertedPath_, "wrap");
-                add(btnLiveMode_, "");
+                add(btnLiveMode_, "wrap");
+                add(new JLabel("Path Preset:"), "wrap");
+                add(cmbPreset_, "");
                 break;
             default:
                 break;
@@ -85,23 +105,18 @@ public class CameraPanel extends Panel {
         switch (geometryType) {
             case DISPIM:
                 btnImagingPath_.registerListener(() -> {
-
                 });
 
                 btnMultiPath_.registerListener(() -> {
-
                 });
 
                 btnEpiPath_.registerListener(() -> {
-
                 });
 
                 btnInvertedPath_.registerListener(() -> {
-
                 });
 
                 btnLiveMode_.registerListener(() -> {
-
                 });
                 break;
             case SCAPE:
@@ -157,6 +172,18 @@ public class CameraPanel extends Panel {
             default:
                 break;
         }
+
+        // select path preset
+        cmbPreset_.registerListener(() -> {
+            final String selected = cmbPreset_.getSelected();
+            try {
+                model_.core().setConfig(CONFIG_GROUP, selected);
+                model_.studio().app().refreshGUI();
+            } catch (Exception e) {
+                model_.studio().logs().showError("Failed to set configuration: " + e.getMessage());
+            }
+        });
+
     }
 
     /**

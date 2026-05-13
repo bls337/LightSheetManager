@@ -258,7 +258,7 @@ public class SettingsAdapter {
         }
 
         // build the settings from builder and update the ui
-        model_.acquisitions().updateAcquisitionSettings();
+        model_.acquisitions().updateSettings();
         model_.userSettings().notifyListeners(model_.acquisitions().settings());
     }
 

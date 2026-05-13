@@ -81,7 +81,7 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
             table_.updatePresetComboBoxes(channelGroup);
             // set the channel group to use when we get the channels
             model_.acquisitions().settingsBuilder().channelBuilder().group(channelGroup);
-            model_.acquisitions().updateAcquisitionSettings();
+            model_.acquisitions().updateSettings();
             // update the table data model and refresh ui
             table_.getData().setChannels(channelGroup, model_.acquisitions().settings().channels().used());
             table_.getData().setChannelGroup(channelGroup);

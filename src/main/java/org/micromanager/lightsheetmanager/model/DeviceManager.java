@@ -404,7 +404,7 @@ public class DeviceManager {
         // update settings with default camera order
         model_.acquisitions().settingsBuilder()
                 .imagingCameraOrder(cameras.toArray(new CameraData[0]));
-        model_.acquisitions().updateAcquisitionSettings();
+        model_.acquisitions().updateSettings();
     }
 
     public DeviceAdapter adapter() {
