@@ -207,7 +207,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
         pnlLeft.add(pnlCameras_, "growx, span 2");
 
         pnlCenter.add(pnlChannelTable_, "wrap");
-        pnlCenter.add(new JLabel("Acquisition mode:"), "split 2");
+        pnlCenter.add(new JLabel("Acquisition Mode:"), "split 2");
         pnlCenter.add(cmbAcquisitionModes_, "");
 
         pnlRight_.add(pnlVolumeSettings_, "growx, wrap");

@@ -43,8 +43,8 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
     }
 
     private void createUserInterface() {
-        lblChannelGroup_ = new JLabel("Channel group:");
-        lblChangeChannel_ = new JLabel("Change channel:");
+        lblChannelGroup_ = new JLabel("Channel Group:");
+        lblChangeChannel_ = new JLabel("Channel Mode:");
 
         btnAddChannel_ = new Button("Add", 74, 24);
         btnRemoveChannel_ = new Button("Remove", 74, 24);
