@@ -54,12 +54,10 @@ public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
             frame_.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
             WindowUtils.registerWindowClosingEvent(frame_, event -> {
-                // no need to clean up for the error ui
+                // only close when the main ui was loaded,
+                // the error ui does not need to call close
                 if (isLoaded) {
-                    if (model_.positions().isPolling()) {
-                        model_.positions().stopPolling();
-                    }
-                    model_.userSettings().save();
+                    model_.close();
                 }
             });
 

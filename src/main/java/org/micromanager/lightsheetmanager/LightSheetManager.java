@@ -18,7 +18,7 @@ import java.util.Objects;
 /**
  * This is the container for all the data needed to operate a microscope with light sheet manager.
  */
-public class LightSheetManager implements LightSheetManagerApi {
+public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
 
     private final Studio studio_;
     private final CMMCore core_;
@@ -35,7 +35,8 @@ public class LightSheetManager implements LightSheetManagerApi {
     //private final AcquisitionTableData acqTableData_;
 
     public LightSheetManager(final Studio studio) {
-        studio_ = Objects.requireNonNull(studio);
+        studio_ = Objects.requireNonNull(studio,
+                "Micro-Manager Studio context cannot be null!");
         core_ = studio_.core();
 
         pluginSettings_ = new PluginSettings();
@@ -101,15 +102,63 @@ public class LightSheetManager implements LightSheetManagerApi {
     }
 
     /**
-     * This sets the text to be displayed in the error ui when an error occurs during setup.
+     * Save the settings and stop polling, should be called before exiting.
+     */
+    @Override
+    public void close() {
+
+        // disable position polling
+        try {
+            if (positionUpdater_ != null) {
+                if (positionUpdater_.isPolling()) {
+                    positionUpdater_.stopPolling();
+                    if (studio_ != null) {
+                        studio_.logs().logMessage("Polling stopped.");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // Log the error but don't rethrow, so we can still try to save settings!
+            if (studio_ != null) {
+                studio_.logs().logError(e, "Failed to stop position updater polling during close.");
+            }
+        }
+
+        // save settings
+        try {
+            if (userSettings_ != null) {
+                userSettings_.save();
+                if (studio_ != null) {
+                    studio_.logs().logMessage("User settings saved.");
+                }
+            }
+        } catch (Exception e) {
+            if (studio_ != null) {
+                studio_.logs().logError(e, "Failed to save user settings during close.");
+            }
+        }
+
+        if (studio_ != null) {
+            studio_.logs().logMessage("Light Sheet Manager Shutdown");
+        }
+    }
+
+    /**
+     * Sets the text in the error ui when an error occurs during setup.
      *
      * @param text the error message
      */
-    public void setErrorText(final String text) {
+    public void setupErrorMessage(final String text) {
         errorText_ = text;
     }
 
-    public String getErrorText() {
+    /**
+     * Returns the error message from the setup method, it will be empty
+     * in the case of no errors detected.
+     *
+     * @return the error message
+     */
+    public String setupErrorMessage() {
         return errorText_;
     }
 

@@ -368,7 +368,7 @@ public class DeviceManager {
                 useDefaultImagingCameraOrder();
                 return true;
             } else {
-                model_.setErrorText(message);
+                model_.setupErrorMessage(message);
                 return false;
             }
         }
@@ -382,7 +382,7 @@ public class DeviceManager {
                 final String message = "Camera in settings not found in hardware: " + camera.name()
                         + ", consider creating a new user profile if the pre-init properties changed.";
                 model_.studio().logs().logError(message);
-                model_.setErrorText(message);
+                model_.setupErrorMessage(message);
                 return false;
             }
         }
@@ -457,7 +457,7 @@ public class DeviceManager {
                     deviceAdapterName_ = device;
                     count++;
                     if (count > 1) {
-                        model_.setErrorText("You have multiple instances of the LightSheetManager " +
+                        model_.setupErrorMessage("You have multiple instances of the LightSheetManager " +
                                 "device adapter in your hardware configuration.");
                         break; // exit loop because this a failure condition
                     }
@@ -469,7 +469,7 @@ public class DeviceManager {
         }
         // no device adapters found
         if (count == 0) {
-            model_.setErrorText("Please add the LightSheetManager device adapter to your " +
+            model_.setupErrorMessage("Please add the LightSheetManager device adapter to your " +
                     "hardware configuration to use this plugin.");
         }
         return count == 1;
