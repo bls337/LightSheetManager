@@ -110,15 +110,17 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
         // disable position polling
         try {
             if (positionUpdater_ != null) {
+                // message should always be printed
+                if (studio_ != null) {
+                    studio_.logs().logMessage("Stopping position updater polling...");
+                }
+
                 if (positionUpdater_.isPolling()) {
                     positionUpdater_.stopPolling();
-                    if (studio_ != null) {
-                        studio_.logs().logMessage("Polling stopped.");
-                    }
                 }
             }
         } catch (Exception e) {
-            // Log the error but don't rethrow, so we can still try to save settings!
+            // log the error so we can still try to save the settings!
             if (studio_ != null) {
                 studio_.logs().logError(e, "Failed to stop position updater polling during close.");
             }
