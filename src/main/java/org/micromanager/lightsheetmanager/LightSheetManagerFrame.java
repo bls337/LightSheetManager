@@ -43,18 +43,18 @@ public class LightSheetManagerFrame extends JFrame {
                     break;
                 case SCAPE:
                     if (model_.devices().adapter().numImagingPaths() > 1) {
-                        model_.setErrorText("SCAPE geometry does not support multiple imaging paths. "
+                        model_.setupErrorMessage("SCAPE geometry does not support multiple imaging paths. "
                                 + " Use the \"SimultaneousCameras\" property to support multiple cameras.");
                         createErrorUserInterface();
                         return;
                     }
                     if (model_.devices().adapter().numIlluminationPaths() > 1) {
-                        model_.setErrorText("SCAPE geometry can only have a single illumination path.");
+                        model_.setupErrorMessage("SCAPE geometry can only have a single illumination path.");
                         createErrorUserInterface();
                         return;
                     }
                     if (model_.devices().adapter().lightSheetType() == LightSheetType.SCANNED) {
-                        model_.setErrorText("Scanned light sheets are not implemented for SCAPE geometry, " +
+                        model_.setupErrorMessage("Scanned light sheets are not implemented for SCAPE geometry, " +
                                 "please contact the developers if you need this feature.");
                         createErrorUserInterface();
                         return;
@@ -64,7 +64,7 @@ public class LightSheetManagerFrame extends JFrame {
                     model_.acquisitions().updateDurationLabels();
                     break;
                 default:
-                    model_.setErrorText("Microscope geometry type " + geometry + " is not supported yet.");
+                    model_.setupErrorMessage("Microscope geometry type " + geometry + " is not supported yet.");
                     createErrorUserInterface();
                     break;
             }
@@ -86,7 +86,7 @@ public class LightSheetManagerFrame extends JFrame {
         ));
 
         final Label lblTitle = new Label(LightSheetManagerPlugin.menuName, Font.BOLD, 16);
-        final Label lblError = new Label(model_.getErrorText(), Font.BOLD, 14);
+        final Label lblError = new Label(model_.setupErrorMessage(), Font.BOLD, 14);
 
         add(lblTitle, "wrap");
         add(lblError, "");
