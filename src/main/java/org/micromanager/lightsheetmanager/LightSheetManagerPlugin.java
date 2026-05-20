@@ -53,14 +53,16 @@ public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
             frame_ = new LightSheetManagerFrame(model_, isLoaded);
             frame_.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+            // clean up resources before the window is fully closed
+            // call the shutdown code if the main ui was loaded, skip if error ui
             WindowUtils.registerWindowClosingEvent(frame_, event -> {
-                // only close when the main ui was loaded,
-                // the error ui does not need to call close
                 if (isLoaded) {
                     model_.close();
                 }
             });
 
+            // clear references after the window is fully closed
+            // prevent memory leaks from closed plugin instances
             WindowUtils.registerWindowClosedEvent(frame_, event -> {
                 frame_ = null;
                 model_ = null;
