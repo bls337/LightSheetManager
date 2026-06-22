@@ -105,6 +105,10 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         acqSettings_ = asb_.build();
     }
 
+    public Future<?> requestRun() {
+        return requestRun(false);
+    }
+
     @Override
     public Future<?> requestRun(boolean speedTest) {
         // Run on a new thread, so it doesn't block the EDT
