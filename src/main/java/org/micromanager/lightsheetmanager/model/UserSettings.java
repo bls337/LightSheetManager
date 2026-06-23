@@ -118,7 +118,7 @@ public class UserSettings {
     public void loadFromJson(final String json, final boolean notify) {
         // TODO: switch this based on microscope geometry type
         var settings = ScapeAcquisitionSettings.fromJson(json, ScapeAcquisitionSettings.class);
-        model_.acquisitions().setAcquisitionSettingsAndBuilder(settings);
+        model_.acquisitions().updateSettings(settings);
         if (notify) {
             notifyListeners(settings); // update the ui
         }

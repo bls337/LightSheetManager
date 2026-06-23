@@ -93,7 +93,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      *
      * @param acqSettings the {@code DefaultAcquisitionSettingsSCAPE} to use
      */
-    public void setAcquisitionSettingsAndBuilder(final ScapeAcquisitionSettings acqSettings) {
+    public void updateSettings(final ScapeAcquisitionSettings acqSettings) {
         asb_ = new ScapeAcquisitionSettings.Builder(acqSettings);
         acqSettings_ = acqSettings;
     }
