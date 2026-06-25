@@ -241,7 +241,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // TODO: put this in AcquisitionEngine base class, between setup and run once structure is better
         // save settings as JSON to the save directory
-        FileUtils.writeStringToFile(saveDir + File.separator + "acq_settings.json", settingsJson);
+        if (model_.acquisitions().settings().isSavingImagesDuringAcquisition()) {
+            FileUtils.writeStringToFile(saveDir + File.separator + "acq_settings.json", settingsJson);
+        }
 
         // write the position list if we are using multiple positions
         if (model_.acquisitions().settings().isUsingMultiplePositions()) {

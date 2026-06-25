@@ -164,6 +164,13 @@ public class SavePanel extends Panel implements SettingsListener {
                 () -> model_.acquisitions().settingsBuilder()
                         .saveNamePrefix(txtSaveFileName_.getText()));
 
+        txtSaveFileName_.registerFilenameValidationListener(isValid -> {
+            if (isValid) {
+                model_.acquisitions().settingsBuilder()
+                        .saveNamePrefix(txtSaveFileName_.getText());
+            }
+        });
+
         cbxSaveMode_.registerListener(
                 () -> model_.acquisitions().settingsBuilder()
                         .saveMode(cbxSaveMode_.getSelected()));
