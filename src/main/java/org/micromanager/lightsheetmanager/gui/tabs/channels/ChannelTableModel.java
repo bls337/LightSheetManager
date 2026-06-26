@@ -5,6 +5,7 @@ import org.micromanager.lightsheetmanager.model.channels.ChannelTableData;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class ChannelTableModel extends AbstractTableModel {
 
@@ -21,9 +22,11 @@ public class ChannelTableModel extends AbstractTableModel {
     };
 
     private final ChannelTableData data_;
+    private final Runnable onUseToggled_;
 
-    public ChannelTableModel(final ChannelTableData tableData) {
+    public ChannelTableModel(final ChannelTableData tableData, final Runnable onUseToggled) {
         data_ = Objects.requireNonNull(tableData);
+        onUseToggled_ = Objects.requireNonNull(onUseToggled);
     }
 
     public void addEmptyChannel() {
@@ -96,6 +99,7 @@ public class ChannelTableModel extends AbstractTableModel {
             case COLUMN_USE:
                 if (value instanceof Boolean) {
                     channelSpec.setUsed((boolean) value);
+                    onUseToggled_.run(); // update durations
                 } else {
                    return; // early exit => wrong type
                 }

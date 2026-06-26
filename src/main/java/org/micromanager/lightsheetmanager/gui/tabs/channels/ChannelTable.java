@@ -36,7 +36,8 @@ public class ChannelTable extends JScrollPane {
         final ChannelSpec[] channels = model_.acquisitions().settings().channels().used();
 
         tableData_ = new ChannelTableData(channelGroup, channels);
-        tableModel_ = new ChannelTableModel(tableData_);
+        tableModel_ = new ChannelTableModel(tableData_,
+                () -> model_.acquisitions().updateDurationLabels());
         table_ = new JTable(tableModel_);
 
         // init presets combo box
@@ -67,7 +68,8 @@ public class ChannelTable extends JScrollPane {
      */
     public void setTableData(final ChannelTableData data) {
         tableData_ = data;
-        tableModel_ = new ChannelTableModel(tableData_);
+        tableModel_ = new ChannelTableModel(tableData_,
+                () -> model_.acquisitions().updateDurationLabels());
         table_ = new JTable(tableModel_);
     }
 
