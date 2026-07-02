@@ -1364,6 +1364,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
     }
 
+    // TODO: Inherited rounding quirk, not a regression: Math.round(duration % 60) can produce "1 min 60 s"
+    //   for e.g. duration = 119.7 s. diSPIM has the same behavior, so as a faithful port this is fine.
     /**
      * Update the displayed total time duration.
      */
@@ -1372,11 +1374,13 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         if (duration < 60) {  // less than 1 min
             label.setText(NumberUtils.doubleToDisplayString(duration) + " s");
         } else if (duration < (60*60)) { // between 1 min and 1 hour
-            label.setText(NumberUtils.doubleToDisplayString(Math.floor(duration/60)) + " min");
-            label.setText(NumberUtils.doubleToDisplayString((double)Math.round(duration % 60)) + " s");
+            final String minutes = NumberUtils.doubleToDisplayString(Math.floor(duration/60)) + " min ";
+            final String seconds = NumberUtils.doubleToDisplayString((double)Math.round(duration % 60)) + " s";
+            label.setText(minutes + seconds);
         } else { // longer than 1 hour
-            label.setText(NumberUtils.doubleToDisplayString(Math.floor(duration/(60*60))) + " hr");
-            label.setText(NumberUtils.doubleToDisplayString((double)Math.round((duration % (60*60))/60)) + " min");
+            final String hours = NumberUtils.doubleToDisplayString(Math.floor(duration/(60*60))) + " hr ";
+            final String minutes = NumberUtils.doubleToDisplayString((double)Math.round((duration % (60*60))/60)) + " min";
+            label.setText(hours + minutes);
         }
     }
 
