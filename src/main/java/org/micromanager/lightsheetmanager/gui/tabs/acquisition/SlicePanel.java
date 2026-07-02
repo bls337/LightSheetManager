@@ -100,25 +100,25 @@ public class SlicePanel extends Panel implements SettingsListener {
             spnSlicePeriod_.setEnabled(!selected);
             model_.acquisitions().settingsBuilder()
                     .sliceBuilder().periodMinimized(selected);
-            // update slice timing
+            // update slice timing and duration labels
             model_.acquisitions().updateSettings();
-            model_.acquisitions().recalculateSliceTiming();
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnSlicePeriod_.registerListener(() -> {
             model_.acquisitions().settingsBuilder()
                     .sliceBuilder().period(spnSlicePeriod_.getDouble());
-            // update slice timing
+            // update slice timing and duration labels
             model_.acquisitions().updateSettings();
-            model_.acquisitions().recalculateSliceTiming();
+            model_.acquisitions().updateDurationLabels();
         });
 
         spnSampleExposure_.registerListener(() -> {
             model_.acquisitions().settingsBuilder()
                     .sliceBuilder().sampleExposure(spnSampleExposure_.getDouble());
-            // update slice timing
+            // update slice timing and duration labels
             model_.acquisitions().updateSettings();
-            model_.acquisitions().recalculateSliceTiming();
+            model_.acquisitions().updateDurationLabels();
         });
 
 //        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
