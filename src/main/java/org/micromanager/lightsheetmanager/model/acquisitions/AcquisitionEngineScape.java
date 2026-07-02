@@ -974,7 +974,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
-        if (acqSettings_.isUsingMultiplePositions() && acqSettings_.numTimePoints() > 1) {
+        final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
+        if (acqSettings_.isUsingMultiplePositions() && numTimePoints > 1) {
             if (timepointIntervalMs < volumeDuration) {
                 studio_.logs().showError("Time point interval shorter than the time to collect a single volume.");
                 return false;
