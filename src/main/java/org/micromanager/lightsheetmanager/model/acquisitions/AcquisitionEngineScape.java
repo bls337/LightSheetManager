@@ -1385,8 +1385,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     }
 
     private double computeTotalTimeDuration() {
-        return (acqSettings_.numTimePoints() - 1) * acqSettings_.timePointInterval()
-                + computeTimePointDuration() / 1000.0;
+        final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
+        return (numTimePoints - 1) * acqSettings_.timePointInterval() + computeTimePointDuration() / 1000.0;
     }
 
     /**
