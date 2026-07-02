@@ -291,10 +291,10 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
             swapTimingSettingsPanels(selected);
             if (selected) {
                 pnlAdvancedTiming_.updateSpinners();
-            } else {
-                model_.acquisitions().updateSettings();
-                model_.acquisitions().recalculateSliceTiming();
             }
+            // update slice timing and duration labels
+            model_.acquisitions().updateSettings();
+            model_.acquisitions().updateDurationLabels();
         });
     }
 

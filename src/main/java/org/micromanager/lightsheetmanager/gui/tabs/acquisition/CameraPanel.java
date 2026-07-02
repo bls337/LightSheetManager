@@ -113,6 +113,9 @@ public class CameraPanel extends Panel implements SettingsListener {
         cmbCameraMode_.registerListener(() -> {
             final CameraMode cameraMode = cmbCameraMode_.getSelected();
             model_.acquisitions().settingsBuilder().cameraMode(cameraMode);
+            // update slice timing and duration labels
+            model_.acquisitions().updateSettings();
+            model_.acquisitions().updateDurationLabels();
         });
 
         // select primary camera

@@ -116,11 +116,13 @@ public class VolumePanel extends Panel implements SettingsListener {
             cmbNumViews_.registerListener(() -> {
                 model_.acquisitions().settingsBuilder().volumeBuilder()
                         .numViews(cmbNumViews_.getSelected());
+                model_.acquisitions().updateDurationLabels();
             });
 
             cmbFirstView_.registerListener(() -> {
                 model_.acquisitions().settingsBuilder().volumeBuilder()
                         .firstView(cmbFirstView_.getSelected());
+                model_.acquisitions().updateDurationLabels();
             });
         }
 
@@ -139,6 +141,8 @@ public class VolumePanel extends Panel implements SettingsListener {
         spnSliceStepSize_.registerListener(() -> {
             model_.acquisitions().settingsBuilder().volumeBuilder()
                     .sliceStepSize(spnSliceStepSize_.getDouble());
+            // needed only for stage scanning b/c acceleration time related to speed
+            model_.acquisitions().updateDurationLabels();
         });
     }
 
