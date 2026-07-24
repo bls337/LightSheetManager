@@ -701,6 +701,12 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 //            }
 //        }
 
+        // FREEZE POINT: (mirror of AcquisitionEngineScape): rebuild the run-time snapshot from asb_
+        // before arming the controller, so the hardware is armed from the same settings the AcqEngJ event
+        // loop uses. See AcquisitionEngineScape.doHardwareCalculations() for the full rationale.
+        // TODO(IMMUTABLE-RUN): remove once acqSettings_ is the single run-time source of truth.
+        updateSettings();
+
         double extraChannelOffset = 0.0;
         plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
         return true;

@@ -1021,6 +1021,17 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
            camera.setExposure(exposureTime);
         }
 
+        // FREEZE POINT: rebuild the run-time snapshot from asb_ before arming the controller.
+        // run() reaches this method (via doHardwareCalculations) BEFORE it rebuilds acqSettings_ with
+        // updateSettings(). Without this rebuild the controller is armed from a stale acqSettings_, e.g.
+        // useHardwareTimePoints left true by a prior short-interval reject, while the AcqEngJ event loop
+        // later runs from the fresh (false) value, so the hardware is armed for hardware timepoints while
+        // the software issues software timepoints ("stopped at first timepoint"). Rebuilding here is
+        // strictly fresher: doHardwareCalculations only mutates asb_ (the flag reset above + recalculated
+        // timing), never acqSettings_ directly.
+        // TODO(IMMUTABLE-RUN): remove once acqSettings_ is the single run-time source of truth.
+        updateSettings();
+
         double extraChannelOffset = 0.0;
         return plc.prepareControllerForAcquisition(acqSettings_, extraChannelOffset);
     }
