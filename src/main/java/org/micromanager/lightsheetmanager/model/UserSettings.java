@@ -118,6 +118,11 @@ public class UserSettings {
     public void loadFromJson(final String json, final boolean notify) {
         // TODO: switch this based on microscope geometry type
         var settings = ScapeAcquisitionSettings.fromJson(json, ScapeAcquisitionSettings.class);
+        // useHardwareTimePoints is a DERIVED value. It is serialized as part of the acquisition settings,
+        // but must never be trusted when reloaded: a stale "true" persisted from an earlier short-interval run
+        // would otherwise seed acqSettings_ across a plugin restart and be read before the next run recomputes it.
+        // Force it false on load; the engine recomputes it each run.
+        settings = new ScapeAcquisitionSettings.Builder(settings).useHardwareTimePoints(false).build();
         model_.acquisitions().updateSettings(settings);
         if (notify) {
             notifyListeners(settings); // update the ui
