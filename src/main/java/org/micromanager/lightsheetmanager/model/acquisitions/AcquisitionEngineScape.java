@@ -1242,10 +1242,18 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // delay to start is (empirically) 0.07ms + 0.25/(freq in kHz)
         // delay to midpoint is empirically 0.38/(freq in kHz)
         // group delay for 5th-order Bessel filter ~0.39/freq from theory and ~0.4/freq from IC datasheet
-        final double scanFilterFreq = model_.devices()
-                .device2("IllumSlice", ASIScanner.class)
-                .map(ASIScanner::getFilterFreqX)
-                .orElse(0.4); // default value
+
+        // Only read the scanner's Bessel-filter freq when PLogic is in use (mirrors the isUsingPLogic
+        // gate below at the scanDelayFilter adjustment). Avoids device2() logging "IllumSlice not found"
+        // on demo / non-PLogic configs. Note: a non-PLogic-but-real-scanner (NIDAQ) config falls back
+        // to the 0.4 default here rather than reading the real freq. (Brandon 2026-07-24)
+        double scanFilterFreq = 0.4; // default value
+        if (model_.devices().isUsingPLogic()) {
+            scanFilterFreq = model_.devices()
+                    .device2("IllumSlice", ASIScanner.class)
+                    .map(ASIScanner::getFilterFreqX)
+                    .orElse(0.4);
+        }
 
         double scanDelayFilter = 0;
         if (scanFilterFreq != 0) {
