@@ -175,7 +175,92 @@ public final class LightSheetEventAdapter {
         return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
     }
 
+    /**
+     * Build events for ONE software channel's volume, as a self-contained iterator.
+     * <p>
+     * {@code run()} calls this once per used channel, so each channel is submitted as
+     * its own event iterator. AcqEngJ appends a SequenceEnd flush at the end of every
+     * submitted iterator, guaranteeing exactly one camera sequence + one controller fire per
+     * channel-volume regardless of whether the channel presets are identical, distinct, or
+     * property-sequenceable. Composing all channels into a single iterator (the old
+     * {@link #createChannelAcqEvents}) instead lets AcqEngJ merge identical-preset channels into one
+     * sequence, firing the controller once and collapsing the channel dimension.
+     *
+     * @param channelIndex zero-based index of this channel among the used channels
+     * @param channel      the channel to acquire
+     */
+    public static Iterator<AcquisitionEvent> createSingleChannelVolumeAcqEvents(
+            AcquisitionEvent baseEvent, AcquisitionSettings settings,
+            String[] cameraDeviceNames,
+            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor,
+            int channelIndex, ChannelSpec channel) {
+
+        // Bake this one channel's config into the base event (what channels().next() does per channel).
+        baseEvent.setConfigGroup(channel.getGroup());
+        baseEvent.setConfigPreset(channel.getName());
+        baseEvent.setChannelName(Integer.toString(channelIndex));
+
+        // Channel z-offset: mirror channels(), apply the offset to the current stage/z position.
+        double zPos;
+        if (baseEvent.getZPosition() == null) {
+            try {
+                zPos = Engine.getCore().getPosition() + channel.getOffset();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            zPos = baseEvent.getZPosition() + channel.getOffset();
+        }
+        baseEvent.setZ(baseEvent.getZIndex(), zPos);
+
+        // Pass this channel's channel-axis base to cameras() EXPLICITLY It cannot come from
+        // currentChannelIndex_: that static is assigned only by channels(), which this path does not
+        // use, and submission here is eager while iterator consumption is lazy, by the time AcqEngJ
+        // pulls these events the loop in run() has already advanced, so every channel would observe
+        // the last one. It also must not be smuggled onto the event: CAMERA_AXIS is literally AcqEngJ's
+        // "channel" axis (see cameras()), so a base written there is indistinguishable from the channel
+        // index setChannelName() just wrote, which is exactly how collapsed dual-camera
+        // coordinates on the channels()-composed paths.
+        final int channelAxisBase = isUsingMultipleCameras
+                ? channelIndex * cameraDeviceNames.length : channelIndex;
+
+        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras =
+                cameras(cameraDeviceNames, channelAxisBase);
+        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
+                zStack(0, settings.volume().slicesPerView());
+
+        ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
+        acqFunctions.add(cameras);
+        acqFunctions.add(zStack);
+        return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
+    }
+
+    /**
+     * Fan an event out over the cameras, deriving the channel-axis base the legacy way.
+     * <p>
+     * Used by the {@link #channels}-composed factories, whose behavior this leaves exactly as it was.
+     */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(String[] cameraDeviceNames) {
+        return cameras(cameraDeviceNames, null);
+    }
+
+    /**
+     * Fan an event out over the cameras, assigning each one a {@link #CAMERA_AXIS} coordinate.
+     * <p>
+     * <b>{@code CAMERA_AXIS} is AcqEngJ's {@code "channel"} axis</b> ({@code AcqEngMetadata.CHANNEL_AXIS}) --
+     * {@code AcquisitionEvent.setChannelName(s)} compiles to {@code setAxisPosition("channel", s)}. So the
+     * channel index and the camera index share one axis, and the coordinate written here is the combined
+     * slot {@code channelIndex * numCameras + cameraIndex} that {@code addMMSummaryMetadata} names and
+     * sizes the datastore for. Do not treat a value already present on that axis as a camera base unless
+     * you put it there: on the {@code channels()}-composed paths it is the raw channel index written by
+     * {@code setChannelName}.
+     *
+     * @param channelAxisBase the channel-axis base for this fan-out, or {@code null} to derive it the
+     *                        legacy way: {@code currentChannelIndex_ * numCameras} when using multiple
+     *                        cameras, else the channel index {@code channels()} left on the axis
+     */
+    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(
+            String[] cameraDeviceNames, Integer channelAxisBase) {
         return (AcquisitionEvent event) -> new Iterator<>() {
 
             private int cameraIndex_ = 0;
@@ -190,23 +275,29 @@ public final class LightSheetEventAdapter {
             public AcquisitionEvent next() {
                 AcquisitionEvent cameraEvent = event.copy();
                 cameraEvent.setCameraDeviceName(cameraDeviceNames_[cameraIndex_]);
-                if (isUsingMultipleCameras) {
-                    cameraEvent.setAxisPosition(CAMERA_AXIS, cameraIndex_
-                            + (currentChannelIndex_ * cameraDeviceNames_.length));
-                } else {
-                    Object position = event.getAxisPosition(CAMERA_AXIS);
-                    int baseIndex = 0;
 
+                final int baseIndex;
+                if (channelAxisBase != null) {
+                    // Caller-supplied base (createSingleChannelVolumeAcqEvents, per-channel path).
+                    baseIndex = channelAxisBase;
+                } else if (isUsingMultipleCameras) {
+                    baseIndex = currentChannelIndex_ * cameraDeviceNames_.length;
+                } else {
+                    // Single camera: the base is the channel index channels() wrote onto this axis via
+                    // setChannelName (absent => 0 when channels are disabled).
+                    Object position = event.getAxisPosition(CAMERA_AXIS);
+                    int parsed = 0;
                     if (position != null) {
                         try {
-                            baseIndex = Integer.parseInt(position.toString());
+                            parsed = Integer.parseInt(position.toString());
                         } catch (NumberFormatException e) {
                             // ignore => number already assigned
                         }
                     }
-
-                    cameraEvent.setAxisPosition(CAMERA_AXIS, baseIndex + cameraIndex_);
+                    baseIndex = parsed;
                 }
+
+                cameraEvent.setAxisPosition(CAMERA_AXIS, baseIndex + cameraIndex_);
                 cameraIndex_++;
                 return cameraEvent;
             }

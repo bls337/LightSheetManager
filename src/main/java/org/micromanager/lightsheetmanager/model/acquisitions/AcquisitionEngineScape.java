@@ -624,9 +624,30 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
                     // Loop 3: Channels; Loop 4: Z slices
                     if (acqSettings_.channels().enabled()) {
-                        currentAcquisition_.submitEventIterator(
-                                LightSheetEventAdapter.createChannelAcqEvents(
-                                        baseEvent.copy(), acqSettings_, cameraNames, null));
+                        if (acqSettings_.channels().mode() == ChannelMode.VOLUME) {
+                            // software "Every Volume" multichannel submits ONE event
+                            // iterator PER channel, so AcqEngJ flushes a SequenceEnd between
+                            // channels (Engine.java:187) and the controller re-fires once per
+                            // channel-volume -- mirroring 1.4's per-channel loop and LSM's own
+                            // per-timepoint loop. Submitting all channels in a single iterator lets
+                            // AcqEngJ merge identical-preset channels into one sequence that fires the
+                            // controller once, collapsing the channel dimension (hang on hardware,
+                            // silent wrong data in demo).
+                            final var used = acqSettings_.channels().used();
+                            for (int channelIndex = 0; channelIndex < used.length; channelIndex++) {
+                                currentAcquisition_.submitEventIterator(
+                                        LightSheetEventAdapter.createSingleChannelVolumeAcqEvents(
+                                                baseEvent.copy(), acqSettings_, cameraNames, null,
+                                                channelIndex, used[channelIndex]));
+                            }
+                        } else {
+                            // Hardware channel modes (SLICE_HW / VOLUME_HW with hardware timepoints
+                            // off): the controller emits all channels in one trigger, so a single
+                            // merged iterator is correct here -- unchanged.
+                            currentAcquisition_.submitEventIterator(
+                                    LightSheetEventAdapter.createChannelAcqEvents(
+                                            baseEvent.copy(), acqSettings_, cameraNames, null));
+                        }
                     } else {
                         currentAcquisition_.submitEventIterator(
                                 LightSheetEventAdapter.createAcqEvents(
