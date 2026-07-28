@@ -95,10 +95,11 @@ public class UserSettings {
         } else {
             // validate user settings and create AcquisitionSettings object
             final Optional<JSONObject> settingsJson = validateUserSettings(json);
-            settingsJson.ifPresent(jsonObject ->
-                    loadFromJson(jsonObject.toString(), false));
-            model_.studio().logs().logDebugMessage("loaded JSON from " + key + ": "
-                    + model_.acquisitions().settings().toPrettyJson());
+            settingsJson.ifPresent(jsonObject -> {
+                loadFromJson(jsonObject.toString(), false);
+                model_.studio().logs().logDebugMessage("loaded JSON from " + key + ": "
+                        + model_.acquisitions().settings().toPrettyJson());
+            });
         }
 
         // load plugin settings or default plugin settings
