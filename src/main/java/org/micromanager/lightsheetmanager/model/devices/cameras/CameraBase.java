@@ -7,12 +7,14 @@ import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 
 import java.awt.Rectangle;
 
-// TODO: consider removing implements LightSheetCamera so no default methods for subclasses
-
 /**
  * This is the base camera class.
+ *
+ * <p>Methods that need per-vendor knowledge are abstract on purpose: a camera class that
+ * forgets one fails to compile. Cameras whose device library resolves to
+ * {@code CameraLibrary.UNKNOWN} use {@link UnknownCamera}.
  */
-public class CameraBase extends DeviceBase implements LightSheetCamera {
+public abstract class CameraBase extends DeviceBase implements LightSheetCamera {
 
     protected CameraMode mode_;
 
@@ -96,32 +98,20 @@ public class CameraBase extends DeviceBase implements LightSheetCamera {
     }
 
     @Override
-    public void setBinning() {
-
-    }
+    public abstract void setBinning();
 
     @Override
-    public int getBinning() {
-        return 0;
-    }
+    public abstract int getBinning();
 
     @Override
-    public Rectangle getResolution() {
-        return new Rectangle();
-    }
+    public abstract Rectangle getResolution();
 
     @Override
-    public double getRowReadoutTime() {
-        return 0;
-    }
+    public abstract double getRowReadoutTime();
 
     @Override
-    public double getReadoutTime(CameraMode cameraMode) {
-        return 0;
-    }
+    public abstract double getReadoutTime(CameraMode cameraMode);
 
     @Override
-    public double getResetTime(CameraMode cameraMode) {
-        return 0;
-    }
+    public abstract double getResetTime(CameraMode cameraMode);
 }
