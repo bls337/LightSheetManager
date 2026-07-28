@@ -641,7 +641,8 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         // TODO: code that doubles nrSlicesSoftware if (twoSided && acqBothCameras) missing
 
         CameraBase camera = model_.devices().device("Imaging1Camera");
-        CameraMode camMode = camera.getTriggerMode();
+        // settings are the source of truth for camera mode
+        CameraMode camMode = acqSettings_.cameraMode();
         final double cameraReadoutTime = camera.getReadoutTime(camMode);
         final double exposureTime = acqSettings_.timing().cameraExposure();
 
@@ -767,9 +768,8 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         // TODO: do this in ui?
         camera.setTriggerMode(acqSettings_.cameraMode());
 
-        //System.out.println(camera.getDeviceName());
-        CameraMode camMode = camera.getTriggerMode();
-        //System.out.println(camMode);
+        // settings are the source of truth for camera mode
+        CameraMode camMode = acqSettings_.cameraMode();
 
         DefaultTimingSettings.Builder tsb = DefaultTimingSettings.builder();
 

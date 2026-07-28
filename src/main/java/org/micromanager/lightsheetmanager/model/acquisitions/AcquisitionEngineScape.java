@@ -1247,10 +1247,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             cam.setTriggerMode(acqSettings_.cameraMode());
         }
 
-        // TODO: camera.getTriggerMode(); does not match up with actual selected trigger mode for PVCAM (pseudo overlap reads as edge trigger)
-        //System.out.println(camera.getDeviceName());
-        CameraMode camMode = acqSettings_.cameraMode(); // camera.getTriggerMode();
-        //System.out.println(camMode);
+        // settings are the source of truth for camera mode
+        CameraMode camMode = acqSettings_.cameraMode();
 
         final double scanLaserBufferTime = NumberUtils.roundToQuarterMs(0.25);  // below assumed to be multiple of 0.25ms
 
