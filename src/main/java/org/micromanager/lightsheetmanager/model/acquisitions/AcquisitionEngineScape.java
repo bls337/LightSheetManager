@@ -321,7 +321,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         ////////////  Acquisition hooks ////////////////////
         // These functions will be run on different threads during the acquisition process
-        //    Hooks will run on the Acquisition Engine thread--the one that controls all hardware
+        //    Hooks will run on the Acquisition Engine thread, the one that controls all hardware
 
         // TODO add any code that needs to be executed on the acquisition thread (i.e. the one
         //  that controls hardware)
@@ -628,7 +628,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                             // software "Every Volume" multichannel submits ONE event
                             // iterator PER channel, so AcqEngJ flushes a SequenceEnd between
                             // channels (Engine.java:187) and the controller re-fires once per
-                            // channel-volume -- mirroring 1.4's per-channel loop and LSM's own
+                            // channel-volume, mirroring 1.4's per-channel loop and LSM's own
                             // per-timepoint loop. Submitting all channels in a single iterator lets
                             // AcqEngJ merge identical-preset channels into one sequence that fires the
                             // controller once, collapsing the channel dimension (hang on hardware,
@@ -643,7 +643,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         } else {
                             // Hardware channel modes (SLICE_HW / VOLUME_HW with hardware timepoints
                             // off): the controller emits all channels in one trigger, so a single
-                            // merged iterator is correct here -- unchanged.
+                            // merged iterator is correct here, unchanged.
                             currentAcquisition_.submitEventIterator(
                                     LightSheetEventAdapter.createChannelAcqEvents(
                                             baseEvent.copy(), acqSettings_, cameraNames, null));
@@ -959,10 +959,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // TODO: implement multiple positions using hardware time points, currently
         //  set hardware time points to false if using multiple positions
         if (acqSettings_.isUsingMultiplePositions()) {
-            if (acqSettings_.isUsingHardwareTimePoints()) {
+            if (isUsingHardwareTimePoints) {
 //                    || acqSettings_.numTimePoints() > 1)
 //                    && (timepointIntervalMs < timepointDuration*1.2)) {
                 asb_.useHardwareTimePoints(false);
+                isUsingHardwareTimePoints = false;
 //                studio_.logs().showError("Time point interval may not be sufficient "
 //                        + "depending on actual time required to change positions. "
 //                        + "Proceed at your own risk.");
@@ -970,9 +971,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         // only use hardware time points when use time points is checked
-        if (acqSettings_.isUsingHardwareTimePoints()) {
+        if (isUsingHardwareTimePoints) {
             if (!acqSettings_.isUsingTimePoints()) {
                 asb_.useHardwareTimePoints(false);
+                isUsingHardwareTimePoints = false;
             }
         }
 
