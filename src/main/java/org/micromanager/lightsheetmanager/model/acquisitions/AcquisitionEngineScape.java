@@ -475,8 +475,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         xyStage.setSpeedX(scanSpeedX_);
                         xyStage.setAccelerationX(scanAccelX_);
                         controllerInstance.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
-                        controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(),
-                            acqSettings_.volume().firstView());
+                        controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode());
                         return event;
                     }
 
@@ -500,11 +499,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         }
                     }
 
-                    int side = 0;
                     // NOTE: not sure why this is being triggered twice with only 1 camera; so we need guard
                     // TODO: enable 2 sided acquisition
                     if (scanner.getSPIMState().equals(ASIScanner.SPIMState.IDLE)) {
-                        controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(), side);
+                        controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode());
                     }
                 }
                 return event;
