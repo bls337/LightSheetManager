@@ -53,19 +53,11 @@ public class PLogicDispim {
     private double scanDistance_;      // in microns; cached value from last call to prepareControllerForAcquisition()
     private double actualStepSizeUm_;  // cached value from last call to prepareControllerForAcquisition()
     private boolean zSpeedZero_;       // cached value from last call to prepareStageScanForAcquisition()
-    private String lastDistanceStr_;   // cached value from last call to prepareControllerForAcquisition()
-    private String lastPosStr_;        // cached value from last call to prepareControllerForAcquisition()
 
     // PLC
-    private static final int triggerStepDurationTics = 10;  // 2.5ms with 0.25ms tics
     private static final int acquisitionFlagAddr = 1;
     private static final int counterLSBAddr = 3;
     private static final int counterMSBAddr = 4;
-    private static final int triggerStepEdgeAddr = 6;
-    private static final int triggerStepPulseAddr = 7;
-    private static final int triggerStepOutputAddr = 40;  // BNC #8
-    private static final int triggerInAddr = 35;  // BNC #3
-    private static final int triggerSPIMAddr = 46;  // backplane signal, same as XY card's TTL output
     private static final int laserTriggerAddress = 10;  // this should be set to (42 || 8) = (TTL1 || manual laser on)
 
     private final DispimAcquisitionSettings acqSettings_;
@@ -86,8 +78,6 @@ public class PLogicDispim {
         scanDistance_ = 0;
         actualStepSizeUm_ = 0;
         zSpeedZero_ = true;
-        lastDistanceStr_ = "";
-        lastPosStr_ = "";
 
         final GeometryType geometryType = model_.devices().adapter().geometry();
 
@@ -952,31 +942,6 @@ public class PLogicDispim {
         return true;
     }
 
-    public boolean triggerControllerStartAcquisitionSCAPE(final AcquisitionMode acqMode, int side) {
-        switch (acqMode) {
-            case STAGE_SCAN:
-            case STAGE_SCAN_INTERLEAVED:
-            case STAGE_SCAN_UNIDIRECTIONAL:
-                // for stage scan we send trigger to stage card, which sends
-                // hardware trigger to the micro-mirror card
-                scanner_.setSPIMState(ASIScanner.SPIMState.ARMED);
-                xyStage_.setScanState(ASIXYStage.ScanState.RUNNING);
-                break;
-            case PIEZO_SLICE_SCAN:
-            case SLICE_SCAN_ONLY:
-            case PIEZO_SCAN_ONLY:
-            case NO_SCAN:
-                // in actuality only matters which device we trigger if there are
-                // two micro-mirror cards, which hasn't ever been done in practice yet
-                scanner_.setSPIMState(ASIScanner.SPIMState.RUNNING);
-                break;
-            default:
-                studio_.logs().showError("Unknown acquisition mode");
-                return false;
-        }
-        return true;
-    }
-
     // TODO: "output 5 only" needs to be added to ASIPLogic
     private int getPLogicOutputFromChannel(final ChannelSpec channel, final String channelGroup) {
         try {
@@ -1163,19 +1128,6 @@ public class PLogicDispim {
             scanner2_.setSPIMState(ASIScanner.SPIMState.IDLE);
         }
     }
-
-    //    private void stopSPIMStateMachines(DefaultAcquisitionSettingsDISPIM acqSettings) {
-//        final int numViews = acqSettings_.volumeSettings().numViews();
-//        if (numViews == 1) {
-//            ASIScanner scanner = model_.devices().getDevice("IllumBeam");
-//            scanner.setSPIMState(ASIScanner.SPIMState.IDLE);
-//        }
-//        for (int i = 1; i <= numViews; i++) {
-//            ASIScanner scanner = model_.devices().getDevice("Illum" + i + "Beam");
-//            scanner.setSPIMState(ASIScanner.SPIMState.IDLE);
-//        }
-//        // TODO: ASI stage scanning conditionals
-//    }
 
 }
 
