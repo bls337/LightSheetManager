@@ -1352,9 +1352,17 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 break;
             case PSEUDO_OVERLAP:// PCO or Photometrics, enforce 0.25ms between end exposure and start of next exposure by triggering camera 0.25ms into the slice
                 // cameraTriggerDuration: doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
-                // leave cameraExposure alone if using PVCAM device library
-                if (!camera.getDeviceLibrary().equals("PVCAM")) {
-                    cameraExposure = tsb.sliceDuration() - delayBeforeCamera;  // delayBeforeCamera should be 0.25ms for PCO
+                switch (CameraLibrary.fromString(camera.getDeviceLibrary())) {
+                    case PVCAM:
+                        // leave cameraExposure alone
+                        break;
+                    case PCOCAMERA:
+                        cameraExposure = tsb.sliceDuration() - delayBeforeCamera;  // delayBeforeCamera should be 0.25ms for PCO
+                        break;
+                    default:
+                        studio_.logs().showError("Unknown camera library for pseudo-overlap "
+                                + "calculations: " + camera.getDeviceLibrary());
+                        break;
                 }
                 if (cameraReadoutMax < 0.24) {
                     studio_.logs().showError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
