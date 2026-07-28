@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.model.devices.cameras;
 
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.api.LightSheetCamera;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
@@ -11,7 +10,7 @@ import java.awt.Rectangle;
  * <p>Device Adapter: PVCAM
  * <p>Camera Support: Kinetix, Prime 95B, Prime
  */
-public class PvCamera extends CameraBase implements LightSheetCamera {
+public class PvCamera extends CameraBase {
 
     public static class Models {
         public static final String PRIME = "CIS2020F";

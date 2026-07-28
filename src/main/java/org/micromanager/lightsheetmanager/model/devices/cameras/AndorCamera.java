@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.model.devices.cameras;
 
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.api.LightSheetCamera;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
@@ -11,7 +10,7 @@ import java.awt.Rectangle;
  * <p>Device Adapter: AndorSDK3
  * <p>Camera Support: Andor Zyla 4.2, Andor Zyla 5.5
  */
-public class AndorCamera extends CameraBase implements LightSheetCamera {
+public class AndorCamera extends CameraBase {
 
     public static class Models {
         public static final String ZYLA55 = "Zyla 5.5";

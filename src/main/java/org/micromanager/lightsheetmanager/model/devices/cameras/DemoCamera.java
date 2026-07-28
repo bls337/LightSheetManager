@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.model.devices.cameras;
 
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.api.LightSheetCamera;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
@@ -12,7 +11,7 @@ import java.awt.Rectangle;
  * <p>Device Adapter: DHub
  * <p>Camera Support: DemoCamera
  */
-public class DemoCamera extends CameraBase implements LightSheetCamera {
+public class DemoCamera extends CameraBase {
 
     public static class Properties {
         public static final String BINNING = "Binning";
