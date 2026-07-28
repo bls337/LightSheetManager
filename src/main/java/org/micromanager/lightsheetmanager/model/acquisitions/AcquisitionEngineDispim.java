@@ -15,6 +15,7 @@ import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.ndtiff.NDTiffAdapter;
 import org.micromanager.internal.MMStudio;
+import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
@@ -640,7 +641,8 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         // TODO: code that doubles nrSlicesSoftware if (twoSided && acqBothCameras) missing
 
         CameraBase camera = model_.devices().device("Imaging1Camera");
-        CameraMode camMode = camera.getTriggerMode();
+        // settings are the source of truth for camera mode
+        CameraMode camMode = acqSettings_.cameraMode();
         final double cameraReadoutTime = camera.getReadoutTime(camMode);
         final double exposureTime = acqSettings_.timing().cameraExposure();
 
@@ -766,9 +768,8 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         // TODO: do this in ui?
         camera.setTriggerMode(acqSettings_.cameraMode());
 
-        //System.out.println(camera.getDeviceName());
-        CameraMode camMode = camera.getTriggerMode();
-        //System.out.println(camMode);
+        // settings are the source of truth for camera mode
+        CameraMode camMode = acqSettings_.cameraMode();
 
         DefaultTimingSettings.Builder tsb = DefaultTimingSettings.builder();
 
@@ -849,9 +850,20 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                 break;
             case PSEUDO_OVERLAP:// PCO or Photometrics, enforce 0.25ms between end exposure and start of next exposure by triggering camera 0.25ms into the slice
                 cameraDuration = 1;  // doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
-                // TODO: not dealing with PVCAM (maybe throw error on unknown cam lib)
-                sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice, delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
-                cameraExposure = sliceDuration - delayBeforeCamera;  // s.cameraDelay should be 0.25ms for PCO
+                switch (CameraLibrary.fromString(camera.getDeviceLibrary())) {
+                    case PVCAM:
+                        // leave cameraExposure alone
+                        break;
+                    case PCOCAMERA:
+                        sliceDuration = getSliceDuration(delayBeforeScan, scanDuration, scansPerSlice,
+                                delayBeforeLaser, laserDuration, delayBeforeCamera, cameraDuration);
+                        cameraExposure = sliceDuration - delayBeforeCamera;  // delayBeforeCamera should be 0.25ms for PCO
+                        break;
+                    default:
+                        studio_.logs().showError("Unknown camera library for pseudo-overlap "
+                                + "calculations: " + camera.getDeviceLibrary());
+                        break;
+                }
                 if (cameraReadoutMax < 0.24) {
                     studio_.logs().showError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
                 }

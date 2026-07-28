@@ -21,6 +21,7 @@ import org.micromanager.lightsheetmanager.model.devices.cameras.DemoCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.HamamatsuCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.PcoCamera;
 import org.micromanager.lightsheetmanager.model.devices.cameras.PvCamera;
+import org.micromanager.lightsheetmanager.model.devices.cameras.UnknownCamera;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -222,10 +223,10 @@ public class DeviceManager {
                 addDevice(propertyName, deviceName, demoCamera);
                 break;
             default:
-                CameraBase camera = new CameraBase(studio_, deviceName);
+                UnknownCamera camera = new UnknownCamera(studio_, deviceName);
                 addDevice(propertyName, deviceName, camera);
-                studio_.logs().logError(
-                        "Camera device library \"" + cameraLibrary + "\" not supported, using basic camera.");
+                studio_.logs().logError("Camera device library \"" + cameraLibrary
+                        + "\" not supported; exposure and ROI will work but timing values are unknown.");
                 break;
         }
     }

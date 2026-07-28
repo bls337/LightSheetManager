@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.model.devices.cameras;
 
 import org.micromanager.Studio;
-import org.micromanager.lightsheetmanager.api.LightSheetCamera;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 
 import java.awt.Rectangle;
@@ -11,7 +10,7 @@ import java.awt.Rectangle;
  * <p>Device Adapter: HamamatsuHam
  * <p>Camera Support: ORCA-Flash4, ORCA-Fusion, ORCA-Fusion BT
  */
-public class HamamatsuCamera extends CameraBase implements LightSheetCamera {
+public class HamamatsuCamera extends CameraBase {
     public static class Models {
         public static final String FUSION_BT = "C15440";
         public static final String FUSION = "C14440";

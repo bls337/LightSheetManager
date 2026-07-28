@@ -179,6 +179,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                                     "stage scanning previously. Do you want to set it to 1 mm/s now?");
                     if (result) {
                         xyStage.setSpeedX(1.0);
+                        // origSpeedX_ is the value finish() restores, so it has to track the change we
+                        // just made; otherwise we put the small speed straight back at the end of the run
+                        origSpeedX_ = 1.0;
                     }
                 }
                 // TODO: add more checks from original plugin here... Z speed?
@@ -1244,10 +1247,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             cam.setTriggerMode(acqSettings_.cameraMode());
         }
 
-        // TODO: camera.getTriggerMode(); does not match up with actual selected trigger mode for PVCAM (pseudo overlap reads as edge trigger)
-        //System.out.println(camera.getDeviceName());
-        CameraMode camMode = acqSettings_.cameraMode(); // camera.getTriggerMode();
-        //System.out.println(camMode);
+        // settings are the source of truth for camera mode
+        CameraMode camMode = acqSettings_.cameraMode();
 
         final double scanLaserBufferTime = NumberUtils.roundToQuarterMs(0.25);  // below assumed to be multiple of 0.25ms
 
@@ -1349,9 +1350,17 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 break;
             case PSEUDO_OVERLAP:// PCO or Photometrics, enforce 0.25ms between end exposure and start of next exposure by triggering camera 0.25ms into the slice
                 // cameraTriggerDuration: doesn't really matter, 1ms should be plenty fast yet easy to see for debugging
-                // leave cameraExposure alone if using PVCAM device library
-                if (!camera.getDeviceLibrary().equals("PVCAM")) {
-                    cameraExposure = tsb.sliceDuration() - delayBeforeCamera;  // delayBeforeCamera should be 0.25ms for PCO
+                switch (CameraLibrary.fromString(camera.getDeviceLibrary())) {
+                    case PVCAM:
+                        // leave cameraExposure alone
+                        break;
+                    case PCOCAMERA:
+                        cameraExposure = tsb.sliceDuration() - delayBeforeCamera;  // delayBeforeCamera should be 0.25ms for PCO
+                        break;
+                    default:
+                        studio_.logs().showError("Unknown camera library for pseudo-overlap "
+                                + "calculations: " + camera.getDeviceLibrary());
+                        break;
                 }
                 if (cameraReadoutMax < 0.24) {
                     studio_.logs().showError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
