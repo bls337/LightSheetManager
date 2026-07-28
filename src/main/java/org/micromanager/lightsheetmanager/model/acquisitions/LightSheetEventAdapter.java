@@ -22,12 +22,16 @@ import java.util.function.Function;
  */
 public final class LightSheetEventAdapter {
 
+    // These strings are MM's, not ours: AcqEngJ keys event coordinates on them and the datastore and
+    // viewer size/display dimensions by them, so the VALUES cannot be changed; an axis MM does not
+    // know is dropped by TIFF storage and never displayed.
+    // CAMERA_AXIS is deliberately AcqEngJ's "channel" axis: LSM packs the combined
+    // (channelIndex * numCameras + cameraIndex) slot into it, which is why the name here says camera
+    // while the value says channel. Note setChannelName() writes this same axis.
     public static final String TIME_AXIS = "time";
     public static final String POSITION_AXIS = "position";
     public static final String CAMERA_AXIS = "channel";
 
-    // TODO: put this in the channel iterator (should not be global)
-    public static int currentChannelIndex_ = 0;
     public static boolean isUsingMultipleCameras = false;
 
     /**
@@ -213,14 +217,8 @@ public final class LightSheetEventAdapter {
         }
         baseEvent.setZ(baseEvent.getZIndex(), zPos);
 
-        // Pass this channel's channel-axis base to cameras() EXPLICITLY It cannot come from
-        // currentChannelIndex_: that static is assigned only by channels(), which this path does not
-        // use, and submission here is eager while iterator consumption is lazy, by the time AcqEngJ
-        // pulls these events the loop in run() has already advanced, so every channel would observe
-        // the last one. It also must not be smuggled onto the event: CAMERA_AXIS is literally AcqEngJ's
-        // "channel" axis (see cameras()), so a base written there is indistinguishable from the channel
-        // index setChannelName() just wrote, which is exactly how collapsed dual-camera
-        // coordinates on the channels()-composed paths.
+        // cameras() would now derive the same base from CAMERA_AXIS (setChannelName above put the
+        // channel index there); passing it explicitly keeps this path independent of that coupling.
         final int channelAxisBase = isUsingMultipleCameras
                 ? channelIndex * cameraDeviceNames.length : channelIndex;
 
@@ -236,9 +234,9 @@ public final class LightSheetEventAdapter {
     }
 
     /**
-     * Fan an event out over the cameras, deriving the channel-axis base the legacy way.
+     * Fan an event out over the cameras, deriving the channel-axis base from the event.
      * <p>
-     * Used by the {@link #channels}-composed factories, whose behavior this leaves exactly as it was.
+     * Used by the {@link #channels}-composed factories.
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(String[] cameraDeviceNames) {
         return cameras(cameraDeviceNames, null);
@@ -247,7 +245,7 @@ public final class LightSheetEventAdapter {
     /**
      * Fan an event out over the cameras, assigning each one a {@link #CAMERA_AXIS} coordinate.
      * <p>
-     * <b>{@code CAMERA_AXIS} is AcqEngJ's {@code "channel"} axis</b> ({@code AcqEngMetadata.CHANNEL_AXIS}) --
+     * <b>{@code CAMERA_AXIS} is AcqEngJ's {@code "channel"} axis</b> ({@code AcqEngMetadata.CHANNEL_AXIS}):
      * {@code AcquisitionEvent.setChannelName(s)} compiles to {@code setAxisPosition("channel", s)}. So the
      * channel index and the camera index share one axis, and the coordinate written here is the combined
      * slot {@code channelIndex * numCameras + cameraIndex} that {@code addMMSummaryMetadata} names and
@@ -255,9 +253,9 @@ public final class LightSheetEventAdapter {
      * you put it there: on the {@code channels()}-composed paths it is the raw channel index written by
      * {@code setChannelName}.
      *
-     * @param channelAxisBase the channel-axis base for this fan-out, or {@code null} to derive it the
-     *                        legacy way: {@code currentChannelIndex_ * numCameras} when using multiple
-     *                        cameras, else the channel index {@code channels()} left on the axis
+     * @param channelAxisBase the channel-axis base for this fan-out, or {@code null} to derive it from
+     *                        the event: the channel index {@code channels()} left on the axis, times
+     *                        the camera count when using multiple cameras
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(
             String[] cameraDeviceNames, Integer channelAxisBase) {
@@ -280,11 +278,11 @@ public final class LightSheetEventAdapter {
                 if (channelAxisBase != null) {
                     // Caller-supplied base (createSingleChannelVolumeAcqEvents, per-channel path).
                     baseIndex = channelAxisBase;
-                } else if (isUsingMultipleCameras) {
-                    baseIndex = currentChannelIndex_ * cameraDeviceNames_.length;
                 } else {
-                    // Single camera: the base is the channel index channels() wrote onto this axis via
-                    // setChannelName (absent => 0 when channels are disabled).
+                    // The base is the channel index channels() wrote onto this axis via
+                    // setChannelName (absent => 0 when channels are disabled). Read it off the event
+                    // rather than from shared state: run() submits one iterator per position per
+                    // timepoint eagerly, and AcqEngJ consumes them lazily and interleaved.
                     Object position = event.getAxisPosition(CAMERA_AXIS);
                     int parsed = 0;
                     if (position != null) {
@@ -294,7 +292,8 @@ public final class LightSheetEventAdapter {
                             // ignore => number already assigned
                         }
                     }
-                    baseIndex = parsed;
+                    baseIndex = isUsingMultipleCameras
+                            ? parsed * cameraDeviceNames_.length : parsed;
                 }
 
                 cameraEvent.setAxisPosition(CAMERA_AXIS, baseIndex + cameraIndex_);
@@ -373,7 +372,6 @@ public final class LightSheetEventAdapter {
                 channelEvent.setConfigGroup(channelList[index].getGroup());
                 channelEvent.setConfigPreset(channelList[index].getName());
                 channelEvent.setChannelName(Integer.toString(index));
-                currentChannelIndex_ = index;
 
                 double zPos;
                 if (channelEvent.getZPosition() == null) {

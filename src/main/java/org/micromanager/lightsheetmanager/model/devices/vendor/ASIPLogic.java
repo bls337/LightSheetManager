@@ -261,7 +261,7 @@ public class ASIPLogic extends ASITigerBase {
         D_FLOP("1 - D flop"),
         OUTPUT_OPEN_DRAIN("1 - output (open-drain)"),
         LUT2("2 - 2-input LUT"),
-        OUTPUT_PUSH_PULL("2 - output (push-pull"),
+        OUTPUT_PUSH_PULL("2 - output (push-pull)"),
         LUT3("3 - 3-input LUT"),
         LUT4("4 - 4-input LUT"),
         AND2("5 - 2-input AND"),

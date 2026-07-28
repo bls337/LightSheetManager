@@ -65,6 +65,12 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         // make settings current
         updateSettings();
 
+        // fail before touching any hardware: the datastore is written by finish(), so an unusable
+        // save location would otherwise cost a full acquisition before it is discovered
+        if (!validateSaveLocation()) {
+            return false; // early exit => save location unusable
+        }
+
         return true;
     }
 
@@ -248,7 +254,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
         ////////////  Acquisition hooks ////////////////////
         // These functions will be run on different threads during the acquisition process
-        //    Hooks will run on the Acquisition Engine thread--the one that controls all hardware
+        //    Hooks will run on the Acquisition Engine thread, the one that controls all hardware
 
         // TODO add any code that needs to be executed on the acquisition thread (i.e. the one
         //  that controls hardware)

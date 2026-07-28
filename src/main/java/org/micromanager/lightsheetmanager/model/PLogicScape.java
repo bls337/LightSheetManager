@@ -484,9 +484,9 @@ public class PLogicScape {
         // The galvo/sheet offset must always land on the true imaging plane. For a stage scan the
         // piezo convention parks piezoCenter at home (~0); using that here would place the sheet on
         // the home plane instead of the imaging center, so the acquired volume is offset from the
-        // stage sweep -- the #404 "scan not centered" symptom. diSPIM 1.4 SCOPE never writes the
-        // galvo offset during a stage scan (it holds the value the Setup tab computed from the
-        // imaging center); LSM writes it at acq time, so derive it from the imaging center here.
+        // stage sweep. diSPIM 1.4 SCOPE never writes the galvo offset during a stage scan (it holds
+        // the value the Setup tab computed from the imaging center); LSM writes it at acq time, so
+        // derive it from the imaging center here.
         final double galvoCenter = settings.stageScan().enabled() ? imagingCenter : piezoCenter;
         double sliceCenter = (galvoCenter - sliceOffset) / sliceRate;
 
@@ -727,7 +727,7 @@ public class PLogicScape {
         // 2. (newer) with 7-channel TTL-triggered on PLogic card shared with single camera trigger output (i.e. not dual-view system)
         // however they share some things like using cells 17-24 and building a 3-input LUT which code is just copy/paste right now
         final boolean isSevenChannelShutter = plcLaser_.getShutterMode() == ASIPLogic.ShutterMode.SEVEN_CHANNEL_SHUTTER;
-        final boolean isSevenChannelShutterTTL = plcLaser_.getShutterMode() == ASIPLogic.ShutterMode.SEVEN_CHANNEL_SHUTTER;
+        final boolean isSevenChannelShutterTTL = plcLaser_.getShutterMode() == ASIPLogic.ShutterMode.SEVEN_CHANNEL_TTL_SHUTTER;
 
         if (isSevenChannelShutter) {
             // original special 7-channel case
