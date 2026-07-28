@@ -68,6 +68,17 @@ public class TextField extends JTextField {
     }
 
     /**
+     * Marks the field valid or invalid by setting its background color.
+     * <p>
+     * The caller decides what valid means and owns any tooltip explaining it.
+     *
+     * @param isValid {@code false} to show the error color
+     */
+    public void setValid(final boolean isValid) {
+        setBackground(isValid ? defaultColor_ : ERROR_COLOR);
+    }
+
+    /**
      * Returns {@code true} if the filename is valid on Windows.
      *
      * @param name the name to check

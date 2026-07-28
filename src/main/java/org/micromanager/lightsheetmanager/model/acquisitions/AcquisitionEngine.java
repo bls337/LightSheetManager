@@ -24,6 +24,7 @@ import org.micromanager.lightsheetmanager.model.autofocus.AutofocusAdapter;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -55,6 +56,64 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     protected DurationPanel pnlDuration_;
 
     protected final LightSheetManager model_;
+
+    /**
+     * Validates that the acquisition can actually be written to disk, before anything is acquired.
+     * <p>
+     * The images are written by {@code finish()}, i.e. only AFTER the run completes, so without this
+     * check an unusable save location is discovered at the very end and the data is lost. Observed
+     * 2026-07-27: a 41 s dual-camera run ended in "could not save the acquisition data to:
+     * D:\SCOPE\test\Test" because {@code D:\SCOPE\test} did not exist. The same path also silently
+     * drops {@code acq_settings.json} and {@code position_list.pos}, which are written up front.
+     * <p>
+     * Called from both geometry engines' {@code setup()} before any hardware is touched, so a failure
+     * costs nothing and leaves the microscope untouched.
+     *
+     * @return true if saving is off, or the save location is usable; false to abort setup
+     */
+    protected boolean validateSaveLocation() {
+        if (!acqSettings_.isSavingImagesDuringAcquisition()) {
+            return true; // not saving => nothing to validate
+        }
+
+        final String saveNamePrefix = acqSettings_.saveNamePrefix();
+        if (saveNamePrefix == null || saveNamePrefix.trim().isEmpty()) {
+            studio_.logs().showError("The save name prefix is empty.\n\n"
+                    + "Set a name on the Datastore panel, or uncheck \"Save images during acquisition\".");
+            return false;
+        }
+
+        final String saveDirectory = acqSettings_.saveDirectory();
+        if (saveDirectory == null || saveDirectory.trim().isEmpty()) {
+            studio_.logs().showError("The save directory is not set.\n\n"
+                    + "Set a directory on the Datastore panel, or uncheck "
+                    + "\"Save images during acquisition\".");
+            return false;
+        }
+
+        final File directory = new File(saveDirectory);
+        if (!directory.exists()) {
+            studio_.logs().showError("The save directory does not exist:\n\n" + saveDirectory
+                    + "\n\nCreate it, or choose another directory on the Datastore panel.");
+            return false;
+        }
+        if (!directory.isDirectory()) {
+            studio_.logs().showError("The save directory is a file, not a directory:\n\n"
+                    + saveDirectory);
+            return false;
+        }
+        // canWrite() is advisory on Windows (it reports the read-only attribute, not the ACL), so it
+        // catches the common cases without being authoritative; a real write failure still surfaces
+        // at finish(). Cheap enough to be worth keeping.
+        if (!directory.canWrite()) {
+            studio_.logs().showError("The save directory is not writable:\n\n" + saveDirectory);
+            return false;
+        }
+
+        studio_.logs().logMessage("save location validated: " + saveDirectory
+                + File.separator + saveNamePrefix);
+        return true;
+    }
 
     public AcquisitionEngine(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
@@ -146,7 +205,9 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
                 try {
                     if (!setup()) {
-                        studio_.logs().showError("Error during setup!");
+                        // every setup() failure path already showed its own specific error,
+                        // so log this rather than stacking a second dialog on top of it
+                        studio_.logs().logMessage("Error during setup!");
                         return; // early exit => stop acquisition
                     }
                 } catch (Exception e) {

@@ -81,6 +81,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // make settings current
         updateSettings();
 
+        // fail before touching any hardware: the datastore is written by finish(), so an unusable
+        // save location would otherwise cost a full acquisition before it is discovered
+        if (!validateSaveLocation()) {
+            return false; // early exit => save location unusable
+        }
+
 //        // check pixel size
 //        if (core_.getPixelSizeUm() < 1e-6) {
 //            studio_.logs().showError(

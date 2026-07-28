@@ -118,6 +118,7 @@ public class SavePanel extends Panel implements SettingsListener {
         btnLoadSettings_ = new Button("Load", 60, 20);
         btnConvertSettings_ = new Button("Convert", 72, 20);
 
+        txtSaveDirectory_.setToolTipText("The directory to save images to.");
         btnBrowse_.setToolTipText("Select the save directory with the file browser.");
         btnOpen_.setToolTipText("Open the file explorer to the save directory.");
         btnSaveSettings_.setToolTipText("Save the current acquisition settings to JSON.");
@@ -149,8 +150,12 @@ public class SavePanel extends Panel implements SettingsListener {
             if (result != null) {
                 model_.acquisitions().settingsBuilder().saveDirectory(result.toString());
                 txtSaveDirectory_.setText(result.toString());
+                validateSaveDirectory();
             }
         });
+
+        // flag a saved directory that no longer exists as soon as the plugin opens
+        validateSaveDirectory();
 
         // use the text field so we don't need to update settings
         btnOpen_.registerListener(
@@ -214,6 +219,31 @@ public class SavePanel extends Panel implements SettingsListener {
         });
     }
 
+    // Colors the save directory field and explains why in its tooltip when the path is unusable.
+    // Only called where the value arrives from outside the field (plugin load, browse, settings
+    // change); this touches the filesystem, and checking a dead network path can block the EDT.
+    private void validateSaveDirectory() {
+        final String path = txtSaveDirectory_.getText();
+        final String problem;
+        if (path == null || path.trim().isEmpty()) {
+            problem = "The save directory is not set.";
+        } else {
+            final File directory = new File(path);
+            if (!directory.exists()) {
+                problem = "This directory does not exist: " + path;
+            } else if (!directory.isDirectory()) {
+                problem = "This is a file, not a directory: " + path;
+            } else if (!directory.canWrite()) {
+                problem = "This directory is not writable: " + path;
+            } else {
+                problem = null;
+            }
+        }
+        txtSaveDirectory_.setValid(problem == null);
+        txtSaveDirectory_.setToolTipText(
+                problem == null ? "The directory to save images to." : problem);
+    }
+
     // Opens the file explorer to the save directory
     private void openDirectory(final String path) {
         final File directory = new File(path);
@@ -223,21 +253,22 @@ public class SavePanel extends Panel implements SettingsListener {
                 try {
                     desktop.open(directory);
                 } catch (IOException e) {
-                    model_.studio().logs().logError(
-                            "Could not open the save directory.");
+                    model_.studio().logs().showError(
+                            "Could not open the save directory:\n\n" + path);
                 }
             } else {
-                model_.studio().logs().logError(
-                        "Desktop is not supported on this platform.");
+                model_.studio().logs().showError(
+                        "Opening a file explorer is not supported on this platform.");
             }
         } else {
-            model_.studio().logs().logError("Directory does not exist.");
+            model_.studio().logs().showError("The save directory does not exist:\n\n" + path);
         }
     }
 
     @Override
     public void onSettingsChanged(final AcquisitionSettings settings) {
         txtSaveDirectory_.setText(settings.saveDirectory());
+        validateSaveDirectory();
         txtSaveFileName_.setText(settings.saveNamePrefix());
         cbxSaveMode_.setSelected(settings.saveMode());
         cbxSaveWhileAcquiring_.setSelected(settings.isSavingImagesDuringAcquisition());
