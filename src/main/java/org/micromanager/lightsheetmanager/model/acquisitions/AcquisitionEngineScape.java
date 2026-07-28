@@ -179,6 +179,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                                     "stage scanning previously. Do you want to set it to 1 mm/s now?");
                     if (result) {
                         xyStage.setSpeedX(1.0);
+                        // origSpeedX_ is the value finish() restores, so it has to track the change we
+                        // just made; otherwise we put the small speed straight back at the end of the run
+                        origSpeedX_ = 1.0;
                     }
                 }
                 // TODO: add more checks from original plugin here... Z speed?
