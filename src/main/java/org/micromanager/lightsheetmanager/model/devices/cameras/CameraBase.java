@@ -103,6 +103,12 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
     @Override
     public abstract int getBinning();
 
+    /**
+     * Returns the physical sensor size in unbinned pixels.
+     *
+     * <p>Binning is not applied here because readout and reset times depend on the number of
+     * physical rows read, which does not change with binning.
+     */
     @Override
     public abstract Rectangle getResolution();
 
