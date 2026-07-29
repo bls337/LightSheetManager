@@ -42,8 +42,6 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
     PLogicDispim controller_;
     ArrayList<Double> savedExposures_ = new ArrayList<>();
-    private boolean isShutterOpen_;
-    private boolean autoShutter_;
 
 //    private DefaultAcquisitionSettingsDISPIM.Builder asb_;
    // TODO: remove this when a more generic method is available and get from base class
@@ -372,17 +370,16 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
         ///////////// Turn off autoshutter /////////////////
         try {
-            isShutterOpen_ = core_.getShutterOpen();
+            shutterState_ = new ShutterState(core_.getShutterOpen(), core_.getAutoShutter());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         // TODO: should the shutter be left open for the full duration of acquisition?
         //  because that's what this code currently does
-        autoShutter_ = core_.getAutoShutter();
-        if (autoShutter_) {
+        if (shutterState_.autoShutter) {
             core_.setAutoShutter(false);
-            if (!isShutterOpen_) {
+            if (!shutterState_.isOpen) {
                 try {
                     core_.setShutterOpen(true);
                 } catch (Exception e) {
@@ -531,12 +528,16 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
         // TODO: stage scan work pending (SCAPE finish() restores stage speed/position here)
 
-        // Restore shutter/autoshutter to original state
-        try {
-            core_.setShutterOpen(isShutterOpen_);
-            core_.setAutoShutter(autoShutter_);
-        } catch (Exception e) {
-            studio_.logs().logError("Couldn't restore shutter to original state");
+        // Restore shutter/autoshutter to original state; null means this run never captured it
+        if (shutterState_ != null) {
+            try {
+                core_.setShutterOpen(shutterState_.isOpen);
+                core_.setAutoShutter(shutterState_.autoShutter);
+            } catch (Exception e) {
+                studio_.logs().logError("Couldn't restore shutter to original state");
+            } finally {
+                shutterState_ = null;
+            }
         }
 
         // set the camera trigger modes back to internal for live mode
