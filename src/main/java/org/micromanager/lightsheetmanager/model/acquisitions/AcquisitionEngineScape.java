@@ -85,6 +85,16 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return false; // early exit => save location unusable
         }
 
+        // make sure that there are positions in the PositionList; a pure read, so it belongs
+        // above the hardware changes below for the same reason as the save location check
+        if (acqSettings_.isUsingMultiplePositions()) {
+            final int numPositions = studio_.positions().getPositionList().getNumberOfPositions();
+            if (numPositions == 0) {
+                studio_.logs().showError("XY positions expected but the position list is empty");
+                return false;
+            }
+        }
+
 //        // check pixel size
 //        if (core_.getPixelSizeUm() < 1e-6) {
 //            studio_.logs().showError(
@@ -120,14 +130,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return false;
         }
 
-        // make sure that there are positions in the PositionList
-        if (acqSettings_.isUsingMultiplePositions()) {
-            final int numPositions = studio_.positions().getPositionList().getNumberOfPositions();
-            if (numPositions == 0) {
-                studio_.logs().showError(("XY positions expected but the position list is empty"));
-                return false;
-            }
-        }
 
         return true;
     }

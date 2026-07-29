@@ -70,6 +70,16 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
             return false; // early exit => save location unusable
         }
 
+        // make sure that there are positions in the PositionList; a pure read, so it belongs
+        // above the hardware changes for the same reason as the save location check
+        if (acqSettings_.isUsingMultiplePositions()) {
+            final int numPositions = studio_.positions().getPositionList().getNumberOfPositions();
+            if (numPositions == 0) {
+                studio_.logs().showError("XY positions expected but the position list is empty");
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -401,9 +411,6 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
         // Loop 1: XY positions
         PositionList pl = MMStudio.getInstance().positions().getPositionList();
-        if (acqSettings_.isUsingMultiplePositions() && (pl.getNumberOfPositions() == 0)) {
-            throw new RuntimeException("XY positions expected but position list is empty");
-        }
 
         String[] cameraNames;
         if (demoMode) {
