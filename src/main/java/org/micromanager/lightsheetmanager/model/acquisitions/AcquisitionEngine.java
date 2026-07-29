@@ -53,6 +53,9 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     protected Pipeline curPipeline_;
     protected long nextWakeTime_ = -1;
 
+    // null until a run captures it, cleared by finish()
+    protected ShutterState shutterState_;
+
     protected DurationPanel pnlDuration_;
 
     protected final LightSheetManager model_;
@@ -437,6 +440,23 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     @Override
     public DataProvider getAcquisitionDatastore() {
         return datastore_;
+    }
+
+    /**
+     * Shutter state as it was before a run changed it.
+     *
+     * <p>finish() runs on paths that never reach the capture (setup failure, speed test), so the
+     * reference is null until a run has captured it and is cleared again once restored. Assigning
+     * it is the same statement as capturing it, so the two cannot disagree.
+     */
+    protected static final class ShutterState {
+        final boolean isOpen;
+        final boolean autoShutter;
+
+        ShutterState(final boolean isOpen, final boolean autoShutter) {
+            this.isOpen = isOpen;
+            this.autoShutter = autoShutter;
+        }
     }
 
 }
