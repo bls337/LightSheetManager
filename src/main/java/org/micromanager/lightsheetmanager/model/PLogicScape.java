@@ -620,7 +620,7 @@ public class PLogicScape {
         // make sure SPIM state machine is stopped
         scanner_.setSPIMState(ASIScanner.SPIMState.IDLE);
 
-        // NB: no sheet width/offset to restore here — SCAPE never writes the galvo x-axis
+        // NB: no sheet width/offset to restore here; SCAPE never writes the galvo x-axis
         // (see prepareControllerForAcquisitionSide), so nothing can have clobbered it.
 
         // move piezo back to desired position

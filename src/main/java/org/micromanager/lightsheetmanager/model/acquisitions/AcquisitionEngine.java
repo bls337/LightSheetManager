@@ -118,6 +118,33 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         return true;
     }
 
+    /**
+     * Validates that every imaging camera will deliver the same frame size, before anything is armed.
+     *
+     * <p>Cameras that disagree overrun the shared Core circular buffer and take the whole JVM with
+     * them: {@code EXCEPTION_ACCESS_VIOLATION} inside {@code popNextImageMD}, no Java exception, no
+     * recovery, no data. Refusing to arm is the only place this can be stopped from inside LSM.
+     * Observed in the field 2026-07-28 on a dual-Kinetix rig where a partly-applied ROI left one
+     * camera at 1200x1200 and the other at 600x600.
+     *
+     * <p>Called from both geometry engines' {@code setup()} before any hardware is touched, so a
+     * failure costs nothing and leaves the microscope untouched.
+     *
+     * @return true if the cameras agree, or there is only one; false to abort setup
+     */
+    protected boolean validateCameraFrameSizes() {
+        final CameraBase[] cameras = model_.devices().imagingCameras();
+        final String mismatch = CameraBase.describeFrameSizeMismatch(cameras);
+        if (mismatch == null) {
+            return true;
+        }
+        studio_.logs().showError("The imaging cameras have different frame sizes: " + mismatch
+                + "\n\nAcquiring with mismatched frame sizes crashes Micro-Manager outright, so this "
+                + "acquisition was not started.\n\nSet the same ROI and binning on every imaging "
+                + "camera from the Camera tab, then try again.");
+        return false;
+    }
+
     public AcquisitionEngine(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         studio_ = model.studio();
