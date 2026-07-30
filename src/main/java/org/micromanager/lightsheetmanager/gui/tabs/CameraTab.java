@@ -10,7 +10,10 @@ import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 public class CameraTab extends Panel implements ListeningPanel {
 
@@ -82,44 +85,19 @@ public class CameraTab extends Panel implements ListeningPanel {
     // TODO: should change roi for all cameras?
     private void createEventHandlers() {
         // roi is full camera
-        btnFullROI_.registerListener(() -> {
-            final CameraBase[] cameras = model_.devices().imagingCameras();
-            for (CameraBase camera : cameras) {
-                camera.setROI(camera.getResolution());
-            }
-        });
+        btnFullROI_.registerListener(() -> applyROI(this::binnedSensor));
 
         // roi 1/2
-        btnHalfROI_.registerListener(() -> {
-            final CameraBase[] cameras = model_.devices().imagingCameras();
-            for (CameraBase camera : cameras) {
-                camera.setROI(computeCenterRectangle(camera.getResolution(), 2));
-            }
-        });
+        btnHalfROI_.registerListener(() -> applyROI(c -> computeCenterRectangle(binnedSensor(c), 2)));
 
         // roi 1/4
-        btnQuarterROI_.registerListener(() -> {
-            final CameraBase[] cameras = model_.devices().imagingCameras();
-            for (CameraBase camera : cameras) {
-                camera.setROI(computeCenterRectangle(camera.getResolution(), 4));
-            }
-        });
+        btnQuarterROI_.registerListener(() -> applyROI(c -> computeCenterRectangle(binnedSensor(c), 4)));
 
         // roi 1/8
-        btnEigthROI_.registerListener(() -> {
-            final CameraBase[] cameras = model_.devices().imagingCameras();
-            for (CameraBase camera : cameras) {
-                camera.setROI(computeCenterRectangle(camera.getResolution(), 8));
-            }
-        });
+        btnEigthROI_.registerListener(() -> applyROI(c -> computeCenterRectangle(binnedSensor(c), 8)));
 
         // set custom roi
-        btnCustomROI_.registerListener(() -> {
-            final CameraBase[] cameras = model_.devices().imagingCameras();
-            for (CameraBase camera : cameras) {
-                camera.setROI(customROI());
-            }
-        });
+        btnCustomROI_.registerListener(() -> applyROI(c -> customROI()));
 
         // populate spinner with current roi
         btnCurrentROI_.registerListener(() -> {
@@ -135,6 +113,68 @@ public class CameraTab extends Panel implements ListeningPanel {
                         + "configuration and set as Active on the Acquisition tab.");
             }
         });
+    }
+
+    /**
+     * Applies a per-camera ROI to every imaging camera, then checks that they still agree.
+     *
+     * <p>The cameras must end up with the same frame size or the next acquisition kills the JVM, so
+     * a partial apply is reported rather than swallowed: the vendor adapter rejects an out-of-range
+     * ROI per camera, which is exactly how two cameras end up at different sizes. Failures are
+     * collected and shown once, after every camera has been tried; the previous per-camera modal
+     * dialog inside the loop froze the UI for seconds at a time.
+     *
+     * @param target computes the ROI to apply to a given camera, in binned pixels
+     */
+    private void applyROI(final Function<CameraBase, Rectangle> target) {
+        final CameraBase[] cameras = model_.devices().imagingCameras();
+        if (cameras.length == 0) {
+            model_.studio().logs().showError("No imaging camera available; check that a camera is "
+                    + "assigned in the hardware configuration and set as Active on the "
+                    + "Acquisition tab.");
+            return;
+        }
+
+        final List<String> rejected = new ArrayList<>();
+        for (final CameraBase camera : cameras) {
+            if (!camera.setROI(target.apply(camera))) {
+                rejected.add(camera.getDeviceName());
+            }
+        }
+
+        final String mismatch = CameraBase.describeFrameSizeMismatch(cameras);
+        if (rejected.isEmpty() && mismatch == null) {
+            return; // every camera accepted the roi and they all agree
+        }
+
+        final StringBuilder message = new StringBuilder();
+        if (!rejected.isEmpty()) {
+            message.append("The requested ROI was rejected by: ")
+                    .append(String.join(", ", rejected))
+                    .append(".\n\nROI coordinates are in binned pixels, so the largest usable "
+                            + "offset and size shrink as binning grows.\n\n");
+        }
+        if (mismatch != null) {
+            message.append("The imaging cameras no longer agree on frame size: ")
+                    .append(mismatch)
+                    .append(".\n\nAcquisitions are blocked until they match, because cameras with "
+                            + "different frame sizes crash Micro-Manager outright.");
+        }
+        model_.studio().logs().showError(message.toString().trim());
+    }
+
+    /**
+     * Returns this camera's sensor size in binned pixels, i.e. the largest ROI it can be given.
+     *
+     * <p>{@code core.setROI()} takes binned coordinates while
+     * {@link CameraBase#getResolution()} deliberately reports unbinned pixels, so the sensor has to
+     * be scaled down before it is used as an ROI. Skipping this made every preset out of range at
+     * binning above 1: a 2400 px sensor at 2x2 binning only addresses 1200.
+     */
+    private Rectangle binnedSensor(final CameraBase camera) {
+        final Rectangle sensor = camera.getResolution();
+        final int binning = Math.max(1, camera.getBinning());
+        return new Rectangle(0, 0, sensor.width / binning, sensor.height / binning);
     }
 
     // Returns the custom ROI set by the spinners.

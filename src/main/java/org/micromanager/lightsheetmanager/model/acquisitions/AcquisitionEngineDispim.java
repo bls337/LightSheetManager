@@ -80,6 +80,11 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
             }
         }
 
+        // mismatched camera frame sizes kill the JVM once acquisition starts, so refuse to arm
+        if (!validateCameraFrameSizes()) {
+            return false; // early exit => cameras disagree on frame size
+        }
+
         return true;
     }
 

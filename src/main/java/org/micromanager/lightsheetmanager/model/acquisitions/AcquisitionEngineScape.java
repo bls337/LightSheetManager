@@ -95,6 +95,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
+        // mismatched camera frame sizes kill the JVM once acquisition starts, so refuse to arm
+        if (!validateCameraFrameSizes()) {
+            return false; // early exit => cameras disagree on frame size
+        }
+
 //        // check pixel size
 //        if (core_.getPixelSizeUm() < 1e-6) {
 //            studio_.logs().showError(

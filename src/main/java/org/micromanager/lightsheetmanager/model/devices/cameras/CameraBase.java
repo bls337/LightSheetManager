@@ -41,18 +41,35 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
         return exposure;
     }
 
+    /**
+     * Returns this camera's ROI in binned pixels, the unit {@code core.setROI()} uses.
+     *
+     * <p>Device-scoped: the no-argument {@code core_.getROI()} reads whichever camera the Core is
+     * pointed at, which is the wrong camera on any dual-camera rig.
+     */
     // TODO: take binning into account
     public Rectangle getROI() {
         Rectangle roi = new Rectangle();
         try {
-            roi = core_.getROI();
+            roi = core_.getROI(deviceName_);
         } catch (Exception e) {
             studio_.logs().showError("could not get camera roi");
         }
         return roi;
     }
 
-    public void setROI(final Rectangle roi) {
+    /**
+     * Applies an ROI to this camera, in binned pixels.
+     *
+     * <p>Reports the outcome rather than showing it: callers apply ROIs to several cameras and must
+     * be able to tell a partial apply from a clean one, because a partial apply leaves the cameras
+     * disagreeing on frame size; see {@link #describeFrameSizeMismatch(CameraBase[])}. Showing a
+     * dialog here also blocked the EDT once per camera.
+     *
+     * @param roi the ROI in binned pixels
+     * @return true if the camera accepted the ROI
+     */
+    public boolean setROI(final Rectangle roi) {
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
             studio_.live().setLiveModeOn(false);
@@ -61,14 +78,60 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
                 studio_.live().getDisplay().close();
             }
         }
+        boolean accepted = true;
         try {
             core_.setROI(deviceName_, roi.x, roi.y, roi.width, roi.height);
         } catch (Exception e) {
-            studio_.logs().showError("could not set camera roi");
+            accepted = false;
+            studio_.logs().logError("could not set roi " + roi.width + "x" + roi.height + " at ("
+                    + roi.x + ", " + roi.y + ") on camera " + deviceName_ + ": " + e.getMessage());
         }
         if (isLiveModeOn) {
             studio_.live().setLiveModeOn(true);
         }
+        return accepted;
+    }
+
+    /**
+     * Describes how the given cameras disagree on frame size, or returns null when they agree.
+     *
+     * <p>Every camera's {@code StartSequenceAcquisition} re-initializes the <em>shared</em> Core
+     * circular buffer to its own frame size, while the JNI image pop sizes its copy from the
+     * Core-active camera's dimensions with no bounds check. Two cameras with different frame sizes
+     * therefore read past the end of a buffer slot and kill the JVM outright with an
+     * {@code EXCEPTION_ACCESS_VIOLATION}, not a Java exception, so nothing downstream can catch or
+     * recover from it.
+     *
+     * <p>Compares dimensions only: MMCore exposes no per-device bytes-per-pixel accessor, so a
+     * bit-depth mismatch between two cameras is not detected here.
+     *
+     * <p>A zero-area frame counts as a disagreement even if every camera reports one, because
+     * {@link #getROI()} returns an empty rectangle when the read itself fails. Two unreadable
+     * cameras would otherwise look like two matching ones and pass.
+     *
+     * @param cameras the cameras that will image together
+     * @return a description of the disagreement, or null if every camera reports the same frame size
+     */
+    public static String describeFrameSizeMismatch(final CameraBase[] cameras) {
+        if (cameras == null || cameras.length < 2) {
+            return null; // a single camera cannot disagree with itself
+        }
+        final Rectangle first = cameras[0].getROI();
+        boolean disagree = false;
+        final StringBuilder sizes = new StringBuilder();
+        for (final CameraBase camera : cameras) {
+            final Rectangle roi = camera.getROI();
+            if (roi.width <= 0 || roi.height <= 0
+                    || roi.width != first.width || roi.height != first.height) {
+                disagree = true;
+            }
+            if (sizes.length() > 0) {
+                sizes.append(", ");
+            }
+            sizes.append(camera.getDeviceName())
+                    .append(" = ").append(roi.width).append("x").append(roi.height);
+        }
+        return disagree ? sizes.toString() : null;
     }
 
     public void setROI() {
