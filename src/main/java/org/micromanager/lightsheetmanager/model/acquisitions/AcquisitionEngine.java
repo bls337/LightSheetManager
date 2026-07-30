@@ -139,7 +139,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             return true;
         }
         studio_.logs().showError("The imaging cameras have different frame sizes: " + mismatch
-                + "\n\nAcquiring with mismatched frame sizes crashes Micro-Manager outright, so this "
+                + ".\n\nAcquiring with mismatched frame sizes crashes Micro-Manager outright, so this "
                 + "acquisition was not started.\n\nSet the same ROI and binning on every imaging "
                 + "camera from the Camera tab, then try again.");
         return false;

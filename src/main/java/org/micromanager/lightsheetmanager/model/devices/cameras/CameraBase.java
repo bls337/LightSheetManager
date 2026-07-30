@@ -109,29 +109,72 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
      * {@link #getROI()} returns an empty rectangle when the read itself fails. Two unreadable
      * cameras would otherwise look like two matching ones and pass.
      *
+     * <p>Each camera's binning is reported alongside its frame size, and unequal binning is called
+     * out explicitly, because it is the usual cause and the one the ROI buttons cannot fix: the
+     * presets give every camera the largest ROI valid for its own binning, which is the same
+     * physical field of view but a different pixel count. No ROI makes two cameras match while
+     * their binning differs, so a user who just pressed a preset needs to be told to look at
+     * binning instead of pressing another one.
+     *
      * @param cameras the cameras that will image together
-     * @return a description of the disagreement, or null if every camera reports the same frame size
+     * @return a description of the disagreement with no trailing punctuation, so callers can embed
+     *     it in a sentence, or null if every camera reports the same frame size
      */
     public static String describeFrameSizeMismatch(final CameraBase[] cameras) {
         if (cameras == null || cameras.length < 2) {
             return null; // a single camera cannot disagree with itself
         }
         final Rectangle first = cameras[0].getROI();
+        final int firstBinning = binningOrUnknown(cameras[0]);
         boolean disagree = false;
+        boolean binningDiffers = false;
         final StringBuilder sizes = new StringBuilder();
         for (final CameraBase camera : cameras) {
             final Rectangle roi = camera.getROI();
+            final int binning = binningOrUnknown(camera);
             if (roi.width <= 0 || roi.height <= 0
                     || roi.width != first.width || roi.height != first.height) {
                 disagree = true;
+            }
+            if (binning != UNKNOWN_BINNING && firstBinning != UNKNOWN_BINNING
+                    && binning != firstBinning) {
+                binningDiffers = true;
             }
             if (sizes.length() > 0) {
                 sizes.append(", ");
             }
             sizes.append(camera.getDeviceName())
                     .append(" = ").append(roi.width).append("x").append(roi.height);
+            if (binning != UNKNOWN_BINNING) {
+                sizes.append(" at binning ").append(binning);
+            }
         }
-        return disagree ? sizes.toString() : null;
+        if (!disagree) {
+            return null;
+        }
+        if (binningDiffers) {
+            sizes.append(" (the binning differs, which is the usual cause; no ROI will make them "
+                    + "match until every camera uses the same binning)");
+        }
+        return sizes.toString();
+    }
+
+    private static final int UNKNOWN_BINNING = -1;
+
+    /**
+     * Reads a camera's binning for reporting, or returns {@link #UNKNOWN_BINNING} if it cannot.
+     *
+     * <p>Binning is diagnostic here, so a camera that cannot report it must not be able to break the
+     * frame-size check that protects against a JVM kill. It can throw for ordinary reasons:
+     * {@code UnknownCamera} throws deliberately, and every vendor's {@code getBinning()} takes
+     * {@code substring(0, 1)} of a property read that yields {@code ""} when it fails.
+     */
+    private static int binningOrUnknown(final CameraBase camera) {
+        try {
+            return camera.getBinning();
+        } catch (Exception e) {
+            return UNKNOWN_BINNING;
+        }
     }
 
     public void setROI() {
