@@ -31,10 +31,13 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
         }
     }
 
+    /**
+     * Returns this camera's exposure in milliseconds.
+     */
     public double getExposure() {
         double exposure = 0.0;
         try {
-            exposure = core_.getExposure();
+            exposure = core_.getExposure(deviceName_);
         } catch (Exception e) {
             studio_.logs().logError("could not get camera exposure");
         }
