@@ -31,10 +31,13 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
         }
     }
 
+    /**
+     * Returns this camera's exposure in milliseconds.
+     */
     public double getExposure() {
         double exposure = 0.0;
         try {
-            exposure = core_.getExposure();
+            exposure = core_.getExposure(deviceName_);
         } catch (Exception e) {
             studio_.logs().logError("could not get camera exposure");
         }
@@ -43,9 +46,6 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
 
     /**
      * Returns this camera's ROI in binned pixels, the unit {@code core.setROI()} uses.
-     *
-     * <p>Device-scoped: the no-argument {@code core_.getROI()} reads whichever camera the Core is
-     * pointed at, which is the wrong camera on any dual-camera rig.
      */
     // TODO: take binning into account
     public Rectangle getROI() {
