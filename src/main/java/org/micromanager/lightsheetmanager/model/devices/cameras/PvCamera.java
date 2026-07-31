@@ -88,7 +88,7 @@ public class PvCamera extends CameraBase {
 
     @Override
     public double getRowReadoutTime() {
-        Rectangle roi = getROI();
+        Rectangle roi = getUnbinnedROI();
         if (hasProperty(Properties.READOUT_TIME)) {
             final double readoutTimeMs = getPropertyFloat(Properties.READOUT_TIME) / 1e6;
             return (readoutTimeMs / roi.height);
