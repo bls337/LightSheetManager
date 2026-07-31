@@ -78,6 +78,15 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // make settings current
         updateSettings();
 
+        // initialize stage scanning so we can restore state
+        // set before any validation below can return early: finish() runs on every exit from setup(),
+        // including the refusals, and restores these unconditionally. Initialized further down they
+        // are still at their field defaults on those paths, so finish() writes 0.0. The stage rejects
+        // that for speed but ACCEPTS it for acceleration, leaving it unable to move properly.
+        xyPosUm_ = new Point2D.Double();
+        origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
+        origAccelX_ = 1.0; // don't want 0 in case something goes wrong
+
         // fail before touching any hardware: the datastore is written by finish(), so an unusable
         // save location would otherwise cost a full acquisition before it is discovered
         if (!validateSaveLocation()) {
@@ -156,11 +165,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // used to detect if the plugin is using ASI hardware
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
-
-        // initialize stage scanning so we can restore state
-        xyPosUm_ = new Point2D.Double();
-        origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
-        origAccelX_ = 1.0; // don't want 0 in case something goes wrong
 
         // make sure stage scan is supported if selected
         if (acqSettings_.stageScan().enabled()) {
