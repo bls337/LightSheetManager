@@ -1450,6 +1450,17 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
     @Override
     public void updateDurationLabels() {
+        // TODO(IMMUTABLE-RUN): sync the snapshot to the builder before recomputing; real fix = the
+        // derive/arm split so the timing math reads one source.
+        //
+        // Every caller has just written the user's edit to the BUILDER, but the timing math reads
+        // the frozen snapshot (getTimingFromExposure and getTimingFromPeriodAndLightExposure both
+        // take sampleExposure, cameraMode, period and stageScan.enabled off acqSettings_). Without
+        // this sync the recompute runs on the previous edit: for most controls that leaves the
+        // labels one edit stale, and for the acquisition-mode dropdown it selects the wrong branch
+        // outright, computing galvo timing for a stage-scan run. That pair is then frozen and the
+        // next Run fails validation comparing one mode's exposure against the other's duration.
+        model_.acquisitions().updateSettings();
         model_.acquisitions().recalculateSliceTiming();
         model_.acquisitions().updateSettings();
         // update durations now that settings are current
