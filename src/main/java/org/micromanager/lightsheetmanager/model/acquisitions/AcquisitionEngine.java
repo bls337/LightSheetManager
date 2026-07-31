@@ -81,14 +81,14 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
         final String saveNamePrefix = acqSettings_.saveNamePrefix();
         if (saveNamePrefix == null || saveNamePrefix.trim().isEmpty()) {
-            studio_.logs().showError("The save name prefix is empty.\n\n"
+            model_.logging().reportError("The save name prefix is empty.\n\n"
                     + "Set a name on the Datastore panel, or uncheck \"Save images during acquisition\".");
             return false;
         }
 
         final String saveDirectory = acqSettings_.saveDirectory();
         if (saveDirectory == null || saveDirectory.trim().isEmpty()) {
-            studio_.logs().showError("The save directory is not set.\n\n"
+            model_.logging().reportError("The save directory is not set.\n\n"
                     + "Set a directory on the Datastore panel, or uncheck "
                     + "\"Save images during acquisition\".");
             return false;
@@ -96,12 +96,12 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
         final File directory = new File(saveDirectory);
         if (!directory.exists()) {
-            studio_.logs().showError("The save directory does not exist:\n\n" + saveDirectory
+            model_.logging().reportError("The save directory does not exist:\n\n" + saveDirectory
                     + "\n\nCreate it, or choose another directory on the Datastore panel.");
             return false;
         }
         if (!directory.isDirectory()) {
-            studio_.logs().showError("The save directory is a file, not a directory:\n\n"
+            model_.logging().reportError("The save directory is a file, not a directory:\n\n"
                     + saveDirectory);
             return false;
         }
@@ -109,7 +109,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         // catches the common cases without being authoritative; a real write failure still surfaces
         // at finish(). Cheap enough to be worth keeping.
         if (!directory.canWrite()) {
-            studio_.logs().showError("The save directory is not writable:\n\n" + saveDirectory);
+            model_.logging().reportError("The save directory is not writable:\n\n" + saveDirectory);
             return false;
         }
 
@@ -138,7 +138,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         if (mismatch == null) {
             return true;
         }
-        studio_.logs().showError("The imaging cameras have different frame sizes: " + mismatch
+        model_.logging().reportError("The imaging cameras have different frame sizes: " + mismatch
                 + ".\n\nAcquiring with mismatched frame sizes crashes Micro-Manager outright, so this "
                 + "acquisition was not started.\n\nSet the same ROI and binning on every imaging "
                 + "camera from the Camera tab, then try again.");
@@ -156,6 +156,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         asb_ = ScapeAcquisitionSettings.builder();
         acqSettings_ = asb_.build();
     }
+
 
     //public abstract DefaultAcquisitionSettingsDISPIM settings();
 
@@ -203,7 +204,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         // Run on a new thread, so it doesn't block the EDT
         Future<?> acqFinished = acquisitionExecutor_.submit(() -> {
             if (currentAcquisition_ != null) {
-                studio_.logs().showError("Acquisition is already running.");
+                model_.logging().reportError("Acquisition is already running.");
                 return;
             }
 
@@ -220,7 +221,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                               acqSettings_.saveNamePrefix(),
                               core_, acqSettings_.numTimePoints(), true);
                     } catch (Exception e) {
-                        studio_.logs().showError(e);
+                        model_.logging().reportError(e);
                     }
                     return; // early exit => do speed test
                 }
@@ -241,17 +242,17 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                         return; // early exit => stop acquisition
                     }
                 } catch (Exception e) {
-                    studio_.logs().showError(e, "Error during acquisition setup");
+                    model_.logging().reportError(e, "Error during acquisition setup");
                     return; // early exit => stop acquisition
                 }
                 run(); // run the acquisition and block until complete
             } catch (Exception e) {
-                studio_.logs().showError(e);
+                model_.logging().reportError(e);
             } finally {
                 try {
                     finish(); // cleanup any resources
                 } catch (Exception e) {
-                    studio_.logs().showError(e, "Error during acquisition cleanup");
+                    model_.logging().reportError(e, "Error during acquisition cleanup");
                 } finally {
                     // must ALWAYS run: if currentAcquisition_ is left set, every future
                     // acquisition is rejected until the plugin restarts
@@ -273,7 +274,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     @Override
     public void requestStop() {
         if (currentAcquisition_ == null || currentAcquisition_.getDataSink().isFinished()) {
-            studio_.logs().showError("Acquisition is not running.");
+            model_.logging().reportError("Acquisition is not running.");
             return;
         }
         currentAcquisition_.abort();
@@ -282,7 +283,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     @Override
     public void requestPause() {
         if (currentAcquisition_ == null) {
-            studio_.logs().showError("Acquisition is not running.");
+            model_.logging().reportError("Acquisition is not running.");
         } else {
             currentAcquisition_.setPaused(true);
         }

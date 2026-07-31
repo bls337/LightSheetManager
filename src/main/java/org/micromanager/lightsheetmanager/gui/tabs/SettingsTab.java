@@ -31,6 +31,8 @@ public class SettingsTab extends Panel implements ListeningPanel {
 
     private Button btnCreateConfigGroup_;
 
+    private CheckBox cbxAcquireFailQuietly_;
+
     // changes the ui setup
     private boolean isUsingPLogic_;
     private boolean isUsingScanSettings_;
@@ -154,11 +156,17 @@ public class SettingsTab extends Panel implements ListeningPanel {
             pnlLightSheet.add(spnLiveScanPeriod_, "");
         }
 
+        cbxAcquireFailQuietly_ = new CheckBox("Acquisition failures are quiet",
+                model_.pluginSettings().isAcquireFailQuietly());
+        cbxAcquireFailQuietly_.setToolTipText("Log acquisition errors instead of showing dialog " +
+                "boxes, so unattended runs (playlist or scripting) can never hang on an error dialog.");
+
         add(pnlScanSettings, "wrap");
         if (isUsingPLogic_) {
             add(pnlLightSheet, "growx, wrap");
         }
 
+        add(cbxAcquireFailQuietly_, "wrap");
         add(btnCreateConfigGroup_, "");
     }
 
@@ -200,6 +208,9 @@ public class SettingsTab extends Panel implements ListeningPanel {
             spnSliceAxisFilterFreq_.registerListener(
                     () -> scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble()));
         }
+
+        cbxAcquireFailQuietly_.registerListener(() -> model_.pluginSettings()
+                .setAcquireFailQuietly(cbxAcquireFailQuietly_.isSelected()));
 
         btnCreateConfigGroup_.registerListener(() -> model_.devices().createConfigGroup());
 

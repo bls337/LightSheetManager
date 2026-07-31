@@ -10,6 +10,9 @@ public class PluginSettings {
 
     private boolean isPollingPositions_ = true;
 
+    // volatile: written from the EDT (Settings tab) and read from the acquisition thread
+    private volatile boolean acquireFailQuietly_ = false;
+
     private final JoystickData joystick_ = new JoystickData();
 
     private final XYZGrid xyzGrid_ = new XYZGrid();
@@ -28,6 +31,14 @@ public class PluginSettings {
 
     public boolean isPollingPositions() {
         return isPollingPositions_;
+    }
+
+    public void setAcquireFailQuietly(final boolean state) {
+        acquireFailQuietly_ = state;
+    }
+
+    public boolean isAcquireFailQuietly() {
+        return acquireFailQuietly_;
     }
 
     public String toJson() {

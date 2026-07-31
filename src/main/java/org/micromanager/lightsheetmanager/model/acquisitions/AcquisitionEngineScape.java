@@ -23,7 +23,6 @@ import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.api.data.SaveMode;
 import org.micromanager.lightsheetmanager.api.internal.DefaultTimingSettings;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
-import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.PLogicScape;
 import org.micromanager.lightsheetmanager.model.devices.DeviceAdapter;
@@ -179,9 +178,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
                 // if X speed is less than 0.2 mm/s then it probably wasn't restored to correct speed some other time
                 if (origSpeedX_ < 0.2) {
-                    final boolean result = DialogUtils.showYesNoDialog(null, "Change Speed",
+                    // quiet answer is "Yes": the small speed is residue of an interrupted scan, and
+                    // an unattended run should take the recovery path rather than hang on a dialog
+                    final boolean result = model_.logging().confirmOrDefault("Change Speed",
                             "Max speed of X axis is small, perhaps it was not correctly restored after " +
-                                    "stage scanning previously. Do you want to set it to 1 mm/s now?");
+                                    "stage scanning previously. Do you want to set it to 1 mm/s now?", true);
                     if (result) {
                         xyStage.setSpeedX(1.0);
                         // origSpeedX_ is the value finish() restores, so it has to track the change we
