@@ -17,6 +17,7 @@ import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
+import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.DurationPanel;
@@ -143,6 +144,74 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                 + "acquisition was not started.\n\nSet the same ROI and binning on every imaging "
                 + "camera from the Camera tab, then try again.");
         return false;
+    }
+
+    /**
+     * Refuses to arm when the computed slice timing is not physically realizable.
+     *
+     * <p>In EDGE mode the solver derives the camera exposure by subtracting the camera's reset and
+     * readout time from the sample exposure, and nothing stops the result going negative. A sample
+     * exposure shorter than the camera needs to reset and read out therefore yields a negative
+     * exposure, which is handed to {@code setExposure()} and accepted by the device without
+     * complaint, so the run proceeds and produces nothing usable.
+     *
+     * <p>Deliberately conservative: only the two values that are meaningless at or below zero are
+     * required to be positive. Delays and the remaining durations are allowed to be zero.
+     *
+     * <p>Note "minimize slice period" does not rescue this: it is only consulted on the galvo path
+     * ({@code getTimingFromPeriodAndLightExposure}), while the stage-scan path derives the exposure
+     * as sample exposure minus the camera's reset plus readout regardless.
+     *
+     * <p>Called from both geometry engines' {@code setup()} before any hardware is touched.
+     *
+     * @return true if the timing is usable; false to abort setup
+     */
+    protected boolean validateSliceTiming() {
+        final String problems = describeUnusableTiming(acqSettings_.timing());
+        if (problems == null) {
+            return true;
+        }
+        model_.logging().reportError("The computed slice timing cannot be used: " + problems
+                + ".\n\nThis happens when the sample exposure is shorter than the time the camera "
+                + "needs to reset and read out, so the acquisition was not started.\n\nRaise the "
+                + "sample exposure, or shorten the readout with a smaller camera ROI or higher "
+                + "binning, then try again.");
+        return false;
+    }
+
+    /**
+     * Describes what is wrong with a computed timing schedule, or returns null when it is usable.
+     *
+     * @param timing the computed timing settings
+     * @return a comma-separated description with no trailing punctuation, or null if usable
+     */
+    private static String describeUnusableTiming(final TimingSettings timing) {
+        if (timing == null) {
+            return "no timing has been computed";
+        }
+        final StringBuilder problems = new StringBuilder();
+        // must be strictly positive: a slice that exposes for zero time images nothing
+        appendTimingProblem(problems, "camera exposure", timing.cameraExposure(), true);
+        appendTimingProblem(problems, "slice duration", timing.sliceDuration(), true);
+        // may legitimately be zero, so only reject negatives
+        appendTimingProblem(problems, "scan duration", timing.scanDuration(), false);
+        appendTimingProblem(problems, "laser trigger duration", timing.laserTriggerDuration(), false);
+        appendTimingProblem(problems, "camera trigger duration", timing.cameraTriggerDuration(), false);
+        appendTimingProblem(problems, "delay before scan", timing.delayBeforeScan(), false);
+        appendTimingProblem(problems, "delay before laser", timing.delayBeforeLaser(), false);
+        appendTimingProblem(problems, "delay before camera", timing.delayBeforeCamera(), false);
+        return problems.length() == 0 ? null : problems.toString();
+    }
+
+    private static void appendTimingProblem(final StringBuilder problems, final String name,
+                                            final double valueMs, final boolean mustBePositive) {
+        if (mustBePositive ? valueMs > 0.0 : valueMs >= 0.0) {
+            return;
+        }
+        if (problems.length() > 0) {
+            problems.append(", ");
+        }
+        problems.append(name).append(" is ").append(valueMs).append(" ms");
     }
 
     public AcquisitionEngine(final LightSheetManager model) {
