@@ -78,6 +78,15 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // make settings current
         updateSettings();
 
+        // initialize stage scanning so we can restore state
+        // set before any validation below can return early: finish() runs on every exit from setup(),
+        // including the refusals, and restores these unconditionally. Initialized further down they
+        // are still at their field defaults on those paths, so finish() writes 0.0. The stage rejects
+        // that for speed but ACCEPTS it for acceleration, leaving it unable to move properly.
+        xyPosUm_ = new Point2D.Double();
+        origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
+        origAccelX_ = 1.0; // don't want 0 in case something goes wrong
+
         // fail before touching any hardware: the datastore is written by finish(), so an unusable
         // save location would otherwise cost a full acquisition before it is discovered
         if (!validateSaveLocation()) {
@@ -97,6 +106,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // mismatched camera frame sizes kill the JVM once acquisition starts, so refuse to arm
         if (!validateCameraFrameSizes()) {
             return false; // early exit => cameras disagree on frame size
+        }
+
+        // an impossible slice period yields a negative camera exposure, which the device accepts
+        // without complaint and then images nothing; refuse rather than run it
+        if (!validateSliceTiming()) {
+            return false; // early exit => computed timing is not realizable
         }
 
 //        // check pixel size
@@ -150,11 +165,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // used to detect if the plugin is using ASI hardware
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
-
-        // initialize stage scanning so we can restore state
-        xyPosUm_ = new Point2D.Double();
-        origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
-        origAccelX_ = 1.0; // don't want 0 in case something goes wrong
 
         // make sure stage scan is supported if selected
         if (acqSettings_.stageScan().enabled()) {
@@ -1450,6 +1460,17 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
     @Override
     public void updateDurationLabels() {
+        // TODO(IMMUTABLE-RUN): sync the snapshot to the builder before recomputing; real fix = the
+        // derive/arm split so the timing math reads one source.
+        //
+        // Every caller has just written the user's edit to the BUILDER, but the timing math reads
+        // the frozen snapshot (getTimingFromExposure and getTimingFromPeriodAndLightExposure both
+        // take sampleExposure, cameraMode, period and stageScan.enabled off acqSettings_). Without
+        // this sync the recompute runs on the previous edit: for most controls that leaves the
+        // labels one edit stale, and for the acquisition-mode dropdown it selects the wrong branch
+        // outright, computing galvo timing for a stage-scan run. That pair is then frozen and the
+        // next Run fails validation comparing one mode's exposure against the other's duration.
+        model_.acquisitions().updateSettings();
         model_.acquisitions().recalculateSliceTiming();
         model_.acquisitions().updateSettings();
         // update durations now that settings are current

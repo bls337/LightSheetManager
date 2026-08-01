@@ -85,6 +85,12 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
             return false; // early exit => cameras disagree on frame size
         }
 
+        // an impossible slice period yields a negative camera exposure, which the device accepts
+        // without complaint and then images nothing; refuse rather than run it
+        if (!validateSliceTiming()) {
+            return false; // early exit => computed timing is not realizable
+        }
+
         return true;
     }
 
