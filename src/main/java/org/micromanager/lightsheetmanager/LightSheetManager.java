@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager;
 import mmcorej.CMMCore;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.LightSheetManagerApi;
+import org.micromanager.lightsheetmanager.model.Logging;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.model.PluginSettings;
@@ -27,6 +28,7 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
 
     private PluginSettings pluginSettings_;
 
+    private final Logging logging_;
     private final UserSettings userSettings_;
     private final DeviceManager deviceManager_;
     private final PositionUpdater positionUpdater_;
@@ -40,6 +42,7 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
         core_ = studio_.core();
 
         pluginSettings_ = new PluginSettings();
+        logging_ = new Logging(this);
         userSettings_ = new UserSettings(this);
 
         deviceManager_ = new DeviceManager(studio_, this);
@@ -162,6 +165,18 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
      */
     public String setupErrorMessage() {
         return errorText_;
+    }
+
+    /**
+     * The plugin's logging and error-reporting service.
+     *
+     * <p>This lives on the model rather than the acquisition engine because callers like
+     * {@code DeviceManager} report errors during {@code setup()}, before the engine exists.
+     *
+     * @return the logging service
+     */
+    public Logging logging() {
+        return logging_;
     }
 
     public UserSettings userSettings() {

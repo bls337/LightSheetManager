@@ -46,8 +46,11 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
 
     /**
      * Returns this camera's ROI in binned pixels, the unit {@code core.setROI()} uses.
+     *
+     * <p>This is the right unit for talking to the Core and for describing the images the camera
+     * actually delivers. Anything that scales with the rows the sensor physically clocks out wants
+     * {@link #getUnbinnedROI()} instead.
      */
-    // TODO: take binning into account
     public Rectangle getROI() {
         Rectangle roi = new Rectangle();
         try {
@@ -56,6 +59,49 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
             studio_.logs().showError("could not get camera roi");
         }
         return roi;
+    }
+
+    /**
+     * Returns this camera's ROI in unbinned pixels, the physical rows the sensor reads out.
+     *
+     * <p>Use this for every value derived from how much of the sensor is read: readout time, reset
+     * time, and the auto sheet width. Binning does not change how many rows are clocked out, only
+     * how they are combined on the way off the chip, so a 2304-row sensor takes the same time to
+     * read at 2x2 as at 1x1. {@code core.getROI()} reports 1152 rows there, so using it directly
+     * halves every derived time and the slice ends up shorter than the camera can service.
+     *
+     * <p>A camera that cannot report its binning falls back to a factor of 1 and logs it. That
+     * reproduces the behaviour from before binning was handled at all rather than failing the run
+     * outright, which matters because this feeds timing on paths that otherwise work.
+     *
+     * @return the ROI in unbinned pixels
+     */
+    public Rectangle getUnbinnedROI() {
+        final Rectangle roi = getROI();
+        final int binning = binningOrOne();
+        if (binning <= 1) {
+            return roi;
+        }
+        // some cameras report a negative offset, so clamp before scaling it up
+        return new Rectangle(
+                Math.max(0, roi.x) * binning,
+                Math.max(0, roi.y) * binning,
+                roi.width * binning,
+                roi.height * binning);
+    }
+
+    /**
+     * Reads this camera's binning for scaling an ROI, or returns 1 and logs if it cannot.
+     */
+    private int binningOrOne() {
+        final int binning = binningOrUnknown(this);
+        if (binning == UNKNOWN_BINNING) {
+            studio_.logs().logError("could not read binning for camera " + deviceName_
+                    + "; treating its ROI as unbinned, which underestimates readout and reset "
+                    + "time whenever binning is actually in use");
+            return 1;
+        }
+        return binning;
     }
 
     /**

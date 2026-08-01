@@ -122,7 +122,7 @@ public class PcoCamera extends CameraBase {
         double readoutTimeMs = 10.0;
         switch (cameraMode) {
             case VIRTUAL_SLIT:
-                Rectangle roi = getROI();
+                Rectangle roi = getUnbinnedROI();
                 final double rowReadoutTime = getRowReadoutTime();
                 int speedFactor = 1; // props_.getPropValueInteger(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SHUTTER_SPEED);
 //                if (speedFactor < 1) {
@@ -135,7 +135,7 @@ public class PcoCamera extends CameraBase {
                 double rowReadoutTime2 = getRowReadoutTime();
                 int numReadoutRows;
 
-                Rectangle roi2 = getROI();
+                Rectangle roi2 = getUnbinnedROI();
                 Rectangle sensorSize = getResolution();
 
                 numReadoutRows = roiReadoutRowsSplitReadout(roi2, sensorSize);

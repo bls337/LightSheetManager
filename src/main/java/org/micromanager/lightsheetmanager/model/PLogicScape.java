@@ -941,7 +941,8 @@ public class PLogicScape {
         } else {
             final boolean autoSheet = model_.acquisitions().settings().sheetCalibration().autoSheetWidthEnabled();
             if (autoSheet) {
-                Rectangle roi = camera.getROI();
+                // unbinned, so the sheet width stays the same regardless of binning
+                Rectangle roi = camera.getUnbinnedROI();
                 if (roi == null || roi.height == 0) {
                     studio_.logs().logDebugMessage("Could not get camera ROI for auto sheet mode");
                 }

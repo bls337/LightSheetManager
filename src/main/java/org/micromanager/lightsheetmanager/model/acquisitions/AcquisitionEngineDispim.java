@@ -367,6 +367,14 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                 // TODO: Cameras are now ready to receive triggers, so we can send (software) trigger
                 //  to the tiger to tell it to start outputting TTLs
 
+                // When the acquisition finishes, AcqEngJ runs every hook once more with the
+                // finished event so they can shut down. No cameras are armed for it, so triggering
+                // the controller here starts a scan whose frames nobody collects and leaves the
+                // scanner RUNNING as teardown begins.
+                if (event.isAcquisitionFinishedEvent()) {
+                    return event;
+                }
+
                 if (isUsingPLC && controllerInstance != null) { // if not in demo mode
                     int side = 0;
                     // TODO: enable 2 sided acquisition

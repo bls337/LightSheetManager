@@ -149,7 +149,7 @@ public class HamamatsuCamera extends CameraBase {
                 if (getProperty(Properties.CAMERA_BUS).equals(Values.USB3)) {
                     readoutTimeMs = 10000;  // absurdly large, light sheet mode over USB3 isn't supported by Flash4, but we are set up to decide available modes by device library and not a property
                 } else {
-                    Rectangle roi = getROI();
+                    Rectangle roi = getUnbinnedROI();
                     readoutTimeMs = getRowReadoutTime() * roi.height;
                 }
                 break;
@@ -158,7 +158,7 @@ public class HamamatsuCamera extends CameraBase {
                 double rowReadoutTime = getRowReadoutTime();
                 int numReadoutRows;
 
-                Rectangle roi = getROI();
+                Rectangle roi = getUnbinnedROI();
                 Rectangle sensorSize = getResolution();
 
                 if (getProperty(Properties.CAMERA_BUS).equals(Values.USB3)) {
