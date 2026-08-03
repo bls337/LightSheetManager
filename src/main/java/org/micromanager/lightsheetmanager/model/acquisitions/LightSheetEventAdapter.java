@@ -127,22 +127,6 @@ public final class LightSheetEventAdapter {
         return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
     }
 
-    public static Iterator<AcquisitionEvent> createVolumeAcqEvents(
-            AcquisitionEvent baseEvent, AcquisitionSettings settings,
-            String[] cameraDeviceNames,
-            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
-                zStack(0, settings.volume().slicesPerView());
-
-        ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
-        acqFunctions.add(cameras);
-        acqFunctions.add(zStack);
-        return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
-    }
-
     public static Iterator<AcquisitionEvent> createChannelAcqEvents(
             AcquisitionEvent baseEvent, AcquisitionSettings settings,
             String[] cameraDeviceNames,
