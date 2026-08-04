@@ -53,7 +53,7 @@ public class AutofocusAdapter {
         // TODO: is this correct?
         final double exposure = model_.acquisitions()
                 .settingsBuilder().timingBuilder().build()
-                .cameraExposure();
+                .cameraExposureMs();
 
         // convert numImages and stepSizeUm to OughtaFocus plugin
         // "SearchRange_um" and "Tolerance_um" properties

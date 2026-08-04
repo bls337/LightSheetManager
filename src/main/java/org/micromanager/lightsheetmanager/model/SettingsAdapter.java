@@ -70,7 +70,7 @@ public class SettingsAdapter {
 
         registry.put("timepointInterval",
                 value -> model_.acquisitions().settingsBuilder()
-                        .timePointInterval((double) value));
+                        .timePointIntervalSec((double) value));
 
         registry.put("useMultiPositions",
                 value -> model_.acquisitions().settingsBuilder()
@@ -163,7 +163,7 @@ public class SettingsAdapter {
                     switch (key) {
                         case "scanDelay":
                             model_.acquisitions().settingsBuilder()
-                                    .timingBuilder().delayBeforeScan((double) val);
+                                    .timingBuilder().delayBeforeScanMs((double) val);
                             break;
                         case "scanNum":
                             model_.acquisitions().settingsBuilder()
@@ -171,27 +171,27 @@ public class SettingsAdapter {
                             break;
                         case "scanPeriod":
                             model_.acquisitions().settingsBuilder()
-                                    .timingBuilder().scanDuration((double) val);
+                                    .timingBuilder().scanDurationMs((double) val);
                             break;
                         case "laserDelay":
                             model_.acquisitions().settingsBuilder()
-                                    .timingBuilder().delayBeforeLaser((double) val);
+                                    .timingBuilder().delayBeforeLaserMs((double) val);
                             break;
                         case "laserDuration":
                             model_.acquisitions().settingsBuilder()
-                                    .timingBuilder().laserTriggerDuration((double) val);
+                                    .timingBuilder().laserTriggerDurationMs((double) val);
                             break;
                         case "cameraDelay":
                             model_.acquisitions().settingsBuilder()
-                                    .timingBuilder().delayBeforeCamera((double) val);
+                                    .timingBuilder().delayBeforeCameraMs((double) val);
                             break;
                         case "cameraDuration":
                             model_.acquisitions().settingsBuilder()
-                                    .timingBuilder().cameraTriggerDuration((double) val);
+                                    .timingBuilder().cameraTriggerDurationMs((double) val);
                             break;
                         case "cameraExposure":
                             model_.acquisitions().settingsBuilder()
-                                    .timingBuilder().cameraExposure((double) val);
+                                    .timingBuilder().cameraExposureMs((double) val);
                             break;
                         default:
                             break; // skip key

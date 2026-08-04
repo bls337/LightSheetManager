@@ -14,7 +14,7 @@ public interface TimingSettings {
      *
      * @return the delay time in milliseconds
      */
-    double delayBeforeScan();
+    double delayBeforeScanMs();
 
     /**
      * Returns the number of one way beam scans per slice.
@@ -28,49 +28,49 @@ public interface TimingSettings {
      *
      * @return the time in milliseconds of one beam scan sweep
      */
-    double scanDuration();
+    double scanDurationMs();
 
     /**
      * Returns the delay time in milliseconds before the laser trigger.
      *
      * @return the delay time in milliseconds before the laser trigger
      */
-    double delayBeforeLaser();
+    double delayBeforeLaserMs();
 
     /**
      * Returns the laser trigger duration in milliseconds.
      *
      * @return the laser trigger duration in milliseconds
      */
-    double laserTriggerDuration();
+    double laserTriggerDurationMs();
 
     /**
      * Returns the delay time in milliseconds before the camera is triggered.
      *
      * @return the delay time in milliseconds before the camera is triggered
      */
-    double delayBeforeCamera();
+    double delayBeforeCameraMs();
 
     /**
      * Returns the camera trigger duration in milliseconds.
      *
      * @return the camera trigger duration in milliseconds
      */
-    double cameraTriggerDuration();
+    double cameraTriggerDurationMs();
 
     /**
      * Returns the duration in milliseconds that the camera shutter is open.
      *
      * @return the duration in milliseconds that the camera shutter is open
      */
-    double cameraExposure();
+    double cameraExposureMs();
 
     /**
      * Returns the duration in milliseconds of each slice.
      *
      * @return the duration in milliseconds of each slice
      */
-    double sliceDuration();
+    double sliceDurationMs();
 
     /**
      * Returns true if the scan direction is inverted.
@@ -86,7 +86,7 @@ public interface TimingSettings {
          *
          * @param delayMs the delay time in milliseconds
          */
-        Builder delayBeforeScan(final double delayMs);
+        Builder delayBeforeScanMs(final double delayMs);
 
         /**
          * Sets the number of one way beam scans per slice
@@ -100,42 +100,42 @@ public interface TimingSettings {
          *
          * @param durationMs the duration in milliseconds
          */
-        Builder scanDuration(final double durationMs);
+        Builder scanDurationMs(final double durationMs);
 
         /**
          * Sets the delay time before the laser trigger.
          *
          * @param delayMs the delay in milliseconds
          */
-        Builder delayBeforeLaser(final double delayMs);
+        Builder delayBeforeLaserMs(final double delayMs);
 
         /**
          * Sets the duration of the laser trigger.
          *
          * @param durationMs the duration in milliseconds
          */
-        Builder laserTriggerDuration(final double durationMs);
+        Builder laserTriggerDurationMs(final double durationMs);
 
         /**
          * Sets the delay before the camera trigger is fired.
          *
          * @param delayMs the delay in milliseconds
          */
-        Builder delayBeforeCamera(final double delayMs);
+        Builder delayBeforeCameraMs(final double delayMs);
 
         /**
          * Sets the duration of the camera trigger.
          *
          * @param durationMs the duration in milliseconds
          */
-        Builder cameraTriggerDuration(final double durationMs);
+        Builder cameraTriggerDurationMs(final double durationMs);
 
         /**
          * Sets the camera exposure time.
          *
          * @param exposureMs the exposure time in milliseconds
          */
-        Builder cameraExposure(final double exposureMs);
+        Builder cameraExposureMs(final double exposureMs);
 
         /**
          * Sets the scan direction.
@@ -147,7 +147,7 @@ public interface TimingSettings {
         /**
          * Computes the slice duration from the other timing settings.
          */
-        double sliceDuration();
+        double sliceDurationMs();
 
         /**
          * Creates an immutable instance of TimingSettings

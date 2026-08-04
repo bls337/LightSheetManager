@@ -64,21 +64,21 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
         final TimingSettings timingSettings = model_.acquisitions().settings().timing();
 
         spnDelayBeforeScan_ = Spinner.createDoubleSpinner(
-                timingSettings.delayBeforeScan(), 0.0, 10000.0, 0.25);
+                timingSettings.delayBeforeScanMs(), 0.0, 10000.0, 0.25);
         spnDelayBeforeLaser_ = Spinner.createDoubleSpinner(
-                timingSettings.delayBeforeLaser(), 0.0, 10000.0, 0.25);
+                timingSettings.delayBeforeLaserMs(), 0.0, 10000.0, 0.25);
         spnDelayBeforeCamera_ = Spinner.createDoubleSpinner(
-                timingSettings.delayBeforeCamera(), 0.0, 10000.0, 0.25);
+                timingSettings.delayBeforeCameraMs(), 0.0, 10000.0, 0.25);
         spnLaserTriggerDuration_ = Spinner.createDoubleSpinner(
-                timingSettings.laserTriggerDuration(), 0.0, 10000.0, 0.25);
+                timingSettings.laserTriggerDurationMs(), 0.0, 10000.0, 0.25);
         spnCameraTriggerDuration_ = Spinner.createDoubleSpinner(
-                timingSettings.cameraTriggerDuration(), 0.0, 1000.0, 0.25);
+                timingSettings.cameraTriggerDurationMs(), 0.0, 1000.0, 0.25);
         spnScanDuration_ = Spinner.createDoubleSpinner(
-                timingSettings.scanDuration(), 0.0, 10000.0, 0.25);
+                timingSettings.scanDurationMs(), 0.0, 10000.0, 0.25);
         spnScansPerSlice_ = Spinner.createIntegerSpinner(
                 timingSettings.scansPerSlice(), 1, 1000, 1);
         spnCameraExposure_ = Spinner.createDoubleSpinner(
-                timingSettings.cameraExposure(), 0.0, 1000.0, 0.25);
+                timingSettings.cameraExposureMs(), 0.0, 1000.0, 0.25);
 
         cbxAlternateScanDirection_ = new CheckBox(
                 "Alternate scan direction", false, CheckBox.LEFT);
@@ -113,7 +113,7 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
             }
 
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().delayBeforeScan(rounded);
+                    .timingBuilder().delayBeforeScanMs(rounded);
             model_.acquisitions().updateDurationLabels();
         });
 
@@ -132,7 +132,7 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
             }
 
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().scanDuration(rounded);
+                    .timingBuilder().scanDurationMs(rounded);
             model_.acquisitions().updateDurationLabels();
         });
 
@@ -145,7 +145,7 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
             }
 
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().delayBeforeLaser(rounded);
+                    .timingBuilder().delayBeforeLaserMs(rounded);
             model_.acquisitions().updateDurationLabels();
         });
 
@@ -158,7 +158,7 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
             }
 
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().laserTriggerDuration(rounded);
+                    .timingBuilder().laserTriggerDurationMs(rounded);
             model_.acquisitions().updateDurationLabels();
         });
 
@@ -171,7 +171,7 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
             }
 
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().delayBeforeCamera(rounded);
+                    .timingBuilder().delayBeforeCameraMs(rounded);
             model_.acquisitions().updateDurationLabels();
         });
 
@@ -184,13 +184,13 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
             }
 
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().cameraTriggerDuration(rounded);
+                    .timingBuilder().cameraTriggerDurationMs(rounded);
             model_.acquisitions().updateDurationLabels();
         });
 
         spnCameraExposure_.registerListener(() -> {
             model_.acquisitions().settingsBuilder()
-                    .timingBuilder().cameraExposure(spnCameraExposure_.getDouble());
+                    .timingBuilder().cameraExposureMs(spnCameraExposure_.getDouble());
             model_.acquisitions().updateDurationLabels();
         });
 
@@ -233,14 +233,14 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
     public void updateSpinners() {
         final TimingSettings timingSettings = model_.acquisitions()
                 .settingsBuilder().timingBuilder().build();
-        spnDelayBeforeScan_.setDouble(timingSettings.delayBeforeScan());
+        spnDelayBeforeScan_.setDouble(timingSettings.delayBeforeScanMs());
         spnScansPerSlice_.setInt(timingSettings.scansPerSlice());
-        spnScanDuration_.setDouble(timingSettings.scanDuration());
-        spnDelayBeforeLaser_.setDouble(timingSettings.delayBeforeLaser());
-        spnLaserTriggerDuration_.setDouble(timingSettings.laserTriggerDuration());
-        spnDelayBeforeCamera_.setDouble(timingSettings.delayBeforeCamera());
-        spnCameraTriggerDuration_.setDouble(timingSettings.cameraTriggerDuration());
-        spnCameraExposure_.setDouble(timingSettings.cameraExposure());
+        spnScanDuration_.setDouble(timingSettings.scanDurationMs());
+        spnDelayBeforeLaser_.setDouble(timingSettings.delayBeforeLaserMs());
+        spnLaserTriggerDuration_.setDouble(timingSettings.laserTriggerDurationMs());
+        spnDelayBeforeCamera_.setDouble(timingSettings.delayBeforeCameraMs());
+        spnCameraTriggerDuration_.setDouble(timingSettings.cameraTriggerDurationMs());
+        spnCameraExposure_.setDouble(timingSettings.cameraExposureMs());
         cbxAlternateScanDirection_.setSelected(timingSettings.useAlternateScanDirection());
     }
 
@@ -248,16 +248,16 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
     public void onSettingsChanged(final AcquisitionSettings settings) {
         if (settings instanceof ScapeAcquisitionSettings) {
             var settingsScape = (ScapeAcquisitionSettings) settings;
-            spnDelayBeforeScan_.setValue(settingsScape.timing().delayBeforeScan());
+            spnDelayBeforeScan_.setValue(settingsScape.timing().delayBeforeScanMs());
             spnScansPerSlice_.setValue(settingsScape.timing().scansPerSlice());
-            spnScanDuration_.setValue(settingsScape.timing().scanDuration());
-            spnDelayBeforeLaser_.setValue(settingsScape.timing().delayBeforeLaser());
-            spnLaserTriggerDuration_.setValue(settingsScape.timing().laserTriggerDuration());
-            spnDelayBeforeCamera_.setValue(settingsScape.timing().cameraTriggerDuration());
-            spnLaserTriggerDuration_.setValue(settingsScape.timing().cameraTriggerDuration());
-            spnDelayBeforeCamera_.setDouble(settingsScape.timing().cameraTriggerDuration());
-            spnCameraTriggerDuration_.setDouble(settingsScape.timing().cameraTriggerDuration());
-            spnCameraExposure_.setValue(settingsScape.timing().cameraExposure());
+            spnScanDuration_.setValue(settingsScape.timing().scanDurationMs());
+            spnDelayBeforeLaser_.setValue(settingsScape.timing().delayBeforeLaserMs());
+            spnLaserTriggerDuration_.setValue(settingsScape.timing().laserTriggerDurationMs());
+            spnDelayBeforeCamera_.setValue(settingsScape.timing().cameraTriggerDurationMs());
+            spnLaserTriggerDuration_.setValue(settingsScape.timing().cameraTriggerDurationMs());
+            spnDelayBeforeCamera_.setDouble(settingsScape.timing().cameraTriggerDurationMs());
+            spnCameraTriggerDuration_.setDouble(settingsScape.timing().cameraTriggerDurationMs());
+            spnCameraExposure_.setValue(settingsScape.timing().cameraExposureMs());
             cbxAlternateScanDirection_.setSelected(settingsScape.timing().useAlternateScanDirection());
         }
     }

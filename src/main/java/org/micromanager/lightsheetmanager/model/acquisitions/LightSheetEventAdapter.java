@@ -50,7 +50,7 @@ public final class LightSheetEventAdapter {
             throw new RuntimeException("timelapse selected but only one timepoint");
         }
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> timelapse =
-                timelapse(settings.numTimePoints(), settings.timePointInterval());
+                timelapse(settings.numTimePoints(), settings.timePointIntervalSec());
 
         if (settings.channels().count() == 1) {
             throw new RuntimeException("Expected multiple channels but only one found");

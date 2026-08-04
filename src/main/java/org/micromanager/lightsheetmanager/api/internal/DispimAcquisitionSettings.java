@@ -127,7 +127,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 useHardwareTimePoints_ == other.useHardwareTimePoints_ &&
                 useAdvancedTiming_ == other.useAdvancedTiming_ &&
                 numTimePoints() == other.numTimePoints() &&
-                Double.compare(other.timePointInterval(), timePointInterval()) == 0 &&
+                Double.compare(other.timePointIntervalSec(), timePointIntervalSec()) == 0 &&
                 postMoveDelay() == other.postMoveDelay();
     }
 
@@ -151,7 +151,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 useHardwareTimePoints_,
                 useAdvancedTiming_,
                 numTimePoints(),
-                timePointInterval(),
+                timePointIntervalSec(),
                 postMoveDelay()
         );
     }

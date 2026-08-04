@@ -34,7 +34,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         private int postMoveDelay_ = 0;
         private boolean useTimePoints_ = false;
         private int numTimePoints_ = 1;
-        private double timePointInterval_ = 0.0;
+        private double timePointIntervalSec_ = 0.0;
         private AcquisitionMode acquisitionMode_ = AcquisitionMode.NO_SCAN;
 
         private DefaultAutofocusSettings.Builder afBuilder_ = DefaultAutofocusSettings.builder();
@@ -56,7 +56,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
             postMoveDelay_ = settings.postMoveDelay();
             useTimePoints_ = settings.isUsingTimePoints();
             numTimePoints_ = settings.numTimePoints();
-            timePointInterval_ = settings.timePointInterval();
+            timePointIntervalSec_ = settings.timePointIntervalSec();
             acquisitionMode_ = settings.acquisitionMode();
             afBuilder_ = settings.autofocus().copyBuilder();
             channelBuilder_ = settings.channels().copyBuilder();
@@ -193,12 +193,12 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         /**
          * Sets the time point interval between time points in seconds.
          *
-         * @param timePointInterval the time point interval in seconds
+         * @param timePointIntervalSec the time point interval in seconds
          * @return {@code this} builder
          */
         @Override
-        public T timePointInterval(final double timePointInterval) {
-            timePointInterval_ = timePointInterval;
+        public T timePointIntervalSec(final double timePointIntervalSec) {
+            timePointIntervalSec_ = timePointIntervalSec;
             return self();
         }
 
@@ -277,7 +277,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
     private final int postMoveDelay_;
     private final boolean useTimePoints_;
     private final int numTimePoints_;
-    private final double timePointInterval_;
+    private final double timePointIntervalSec_;
     private final AcquisitionMode acquisitionMode_;
 
     private final DefaultAutofocusSettings autofocus_;
@@ -302,7 +302,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         postMoveDelay_ = builder.postMoveDelay_;
         useTimePoints_ = builder.useTimePoints_;
         numTimePoints_ = builder.numTimePoints_;
-        timePointInterval_ = builder.timePointInterval_;
+        timePointIntervalSec_ = builder.timePointIntervalSec_;
         acquisitionMode_ = builder.acquisitionMode_;
         autofocus_ = builder.afBuilder_.build();
         channels_ = builder.channelBuilder_.build();
@@ -425,8 +425,8 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      * @return the time point interval in seconds.
      */
     @Override
-    public double timePointInterval() {
-        return timePointInterval_;
+    public double timePointIntervalSec() {
+        return timePointIntervalSec_;
     }
 
     /**

@@ -43,7 +43,7 @@ public class TimePointsPanel extends Panel implements SettingsListener {
         spnNumTimePoints_ = Spinner.createIntegerSpinner(
                 acqSettings.numTimePoints(), 1, Integer.MAX_VALUE, 1, 6);
         spnTimePointInterval_ = Spinner.createDoubleSpinner(
-                acqSettings.timePointInterval(), 0.1, Double.MAX_VALUE, 0.1, 6);
+                acqSettings.timePointIntervalSec(), 0.1, Double.MAX_VALUE, 0.1, 6);
 
         add(lblNumTimePoints_, "");
         add(spnNumTimePoints_, "wrap");
@@ -60,7 +60,7 @@ public class TimePointsPanel extends Panel implements SettingsListener {
         });
 
         spnTimePointInterval_.registerListener(() -> {
-            model_.acquisitions().settingsBuilder().timePointInterval(spnTimePointInterval_.getDouble());
+            model_.acquisitions().settingsBuilder().timePointIntervalSec(spnTimePointInterval_.getDouble());
             model_.acquisitions().updateDurationLabels();
         });
     }
@@ -78,7 +78,7 @@ public class TimePointsPanel extends Panel implements SettingsListener {
         if (settings instanceof ScapeAcquisitionSettings) {
             var settingsScape = (ScapeAcquisitionSettings) settings;
             spnNumTimePoints_.setValue(settingsScape.numTimePoints());
-            spnTimePointInterval_.setValue(settingsScape.timePointInterval());
+            spnTimePointInterval_.setValue(settingsScape.timePointIntervalSec());
         }
     }
 }
