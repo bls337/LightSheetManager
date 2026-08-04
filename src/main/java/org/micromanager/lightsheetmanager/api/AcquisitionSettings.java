@@ -99,10 +99,10 @@ public interface AcquisitionSettings {
         /**
          * Sets the time point interval between time points in seconds.
          *
-         * @param timePointInterval the time point interval in seconds
+         * @param timePointIntervalSec the time point interval in seconds
          * @return {@code this} builder
          */
-        T timePointInterval(final double timePointInterval);
+        T timePointIntervalSec(final double timePointIntervalSec);
 
         /**
          * Sets the acquisition mode.
@@ -229,7 +229,7 @@ public interface AcquisitionSettings {
      *
      * @return the time point interval in seconds.
      */
-    double timePointInterval();
+    double timePointIntervalSec();
 
     /**
      * Returns the acquisition mode.

@@ -503,7 +503,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     @Override
     public double getFrameIntervalMs() {
-        return acqSettings_.timePointInterval();
+        return acqSettings_.timePointIntervalSec();
     }
 
     @Override

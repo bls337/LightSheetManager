@@ -639,7 +639,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
                 if (acqSettings_.isUsingTimePoints()) {
                     baseEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
-                    baseEvent.setMinimumStartTime((long) (timeIndex * (model_.acquisitions().settings().timePointInterval() * 1000.0)));
+                    baseEvent.setMinimumStartTime((long) (timeIndex * (model_.acquisitions().settings().timePointIntervalSec() * 1000.0)));
                 }
                 // Loop 2: XY positions
                 for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
@@ -988,7 +988,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         final double volumeDuration = computeVolumeDuration();
         final double timepointDuration = computeTimePointDuration();
-        final long timepointIntervalMs = Math.round(acqSettings_.timePointInterval() * 1000.0);
+        final long timepointIntervalMs = Math.round(acqSettings_.timePointIntervalSec() * 1000.0);
 
         // use hardware timing if < 1 second between time points
         // experimentally need ~0.5 sec to set up acquisition, this gives a bit of cushion
@@ -1511,7 +1511,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
     private double computeTotalTimeDuration() {
         final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
-        return (numTimePoints - 1) * acqSettings_.timePointInterval() + computeTimePointDuration() / 1000.0;
+        return (numTimePoints - 1) * acqSettings_.timePointIntervalSec() + computeTimePointDuration() / 1000.0;
     }
 
     /**

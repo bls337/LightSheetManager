@@ -70,7 +70,7 @@ public class SettingsAdapter {
 
         registry.put("timepointInterval",
                 value -> model_.acquisitions().settingsBuilder()
-                        .timePointInterval((double) value));
+                        .timePointIntervalSec((double) value));
 
         registry.put("useMultiPositions",
                 value -> model_.acquisitions().settingsBuilder()

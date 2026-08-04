@@ -529,7 +529,7 @@ public class PLogicDispim {
                 double delayRepeats = 0.0;
                 if (settings.isUsingHardwareTimePoints() && settings.isUsingTimePoints()) {
                     double volumeDurationMs = 1.0;
-                    double volumeIntervalMs = settings.timePointInterval();
+                    double volumeIntervalMs = settings.timePointIntervalSec();
                     delayRepeats = volumeIntervalMs - volumeDurationMs;
                     numVolumesPerTrigger = settings.numTimePoints();
                 }

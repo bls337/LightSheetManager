@@ -677,7 +677,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
 
         double volumeDuration = computeActualVolumeDuration(acqSettings_);
         double timepointDuration = computeTimePointDuration();
-        long timepointIntervalMs = Math.round(acqSettings_.timePointInterval() * 1000.0);
+        long timepointIntervalMs = Math.round(acqSettings_.timePointIntervalSec() * 1000.0);
 
         // use hardware timing if < 1 second between time points
         // experimentally need ~0.5 sec to set up acquisition, this gives a bit of cushion
