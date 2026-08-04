@@ -9,6 +9,7 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
+import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineScape;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
@@ -396,10 +397,24 @@ public class PLogicScape {
             //  or let plugin send trigger for each time point (software timing)
             double delayRepeats = 0.0;
             if (settings.isUsingHardwareTimePoints() && settings.isUsingTimePoints()) {
-                double volumeDurationMs = 1.0;
-                double volumeIntervalMs = settings.timePointIntervalSec();
+                // delayRepeats is the gap between volumes, so the controller's period is
+                // volumeDuration + delayRepeats. The engine holds the settings this method was
+                // called with, so its volume duration matches the settings here.
+                final double volumeDurationMs =
+                        ((AcquisitionEngineScape) model_.acquisitions()).computeVolumeDuration();
+                final double volumeIntervalMs = settings.timePointIntervalSec() * 1000.0;
                 delayRepeats = volumeIntervalMs - volumeDurationMs;
                 numVolumesPerTrigger = settings.numTimePoints();
+            }
+            // TODO: ported from 1.4 but unreachable in both plugins. Hardware time points only
+            // engage when the interval is under volumeDuration + 750 ms, and the timepoint
+            // duration equals the volume duration outside multiple positions, which hardware
+            // time points disable. That bounds delayRepeats below 750. This becomes reachable
+            // only if something lets the user force hardware time points at any interval.
+            if (delayRepeats > 32000) {
+                studio_.logs().showError("Cannot use hardware time points with a time point "
+                        + "interval this large; the controller cannot hold the delay.");
+                return false;
             }
             scanner_.setSPIMDelayBeforeRepeat(delayRepeats);
             scanner_.setSPIMNumRepeats(numVolumesPerTrigger);
