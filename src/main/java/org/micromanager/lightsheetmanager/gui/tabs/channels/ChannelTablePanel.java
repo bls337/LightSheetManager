@@ -8,6 +8,7 @@ import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
@@ -31,6 +32,10 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
     private ComboBox<String> cmbChannelGroup_;
     private ComboBox<ChannelMode> cmbChannelMode_;
 
+    // The last mode actually written to the settings, used to put the combo back when a mode is
+    // refused. Tracked here rather than read back from the settings, which lag the builder.
+    private ChannelMode lastChannelMode_;
+
     private final ChannelTable table_;
     private final LightSheetManager model_;
 
@@ -41,6 +46,16 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
         createUserInterface();
         createEventHandlers();
         model.userSettings().addChangeListener(this);
+    }
+
+    /**
+     * Returns true when the geometry cannot use per-volume hardware channel switching.
+     * <p>
+     * The controller clocks that channel counter from the view select signal, which does not
+     * alternate on a single view geometry, so the mode is only usable with two views.
+     */
+    private boolean isVolumeHwRefused() {
+        return model_.devices().adapter().geometry() == GeometryType.SCAPE;
     }
 
     private void createUserInterface() {
@@ -60,9 +75,12 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
                 model_.acquisitions().settings().channels().group(),
                 120, 22);
 
-        cmbChannelMode_ = new ComboBox<>(ChannelMode.values(),
-                model_.acquisitions().settings().channels().mode(),
-                140, 22);
+        lastChannelMode_ = model_.acquisitions().settings().channels().mode();
+        if (lastChannelMode_ == ChannelMode.VOLUME_HW && isVolumeHwRefused()) {
+            // Settings loaded from an earlier build could hold a mode that is refused below.
+            lastChannelMode_ = ChannelMode.VOLUME;
+        }
+        cmbChannelMode_ = new ComboBox<>(ChannelMode.values(), lastChannelMode_, 140, 22);
 
         add(lblChannelGroup_, "split 2");
         add(cmbChannelGroup_, "wrap");
@@ -128,12 +146,15 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
         // select channel mode
         cmbChannelMode_.registerListener(() -> {
             final ChannelMode selected = cmbChannelMode_.getSelected();
-            model_.acquisitions().settingsBuilder().channelBuilder().mode(selected);
-            if (selected == ChannelMode.VOLUME_HW) {
+            if (selected == ChannelMode.VOLUME_HW && isVolumeHwRefused()) {
                 SwingUtilities.invokeLater(() -> {
                     DialogUtils.showErrorMessage(cmbChannelMode_, "Not Implemented",
                             "Not implemented in SCAPE, please contact ASI to request this feature.");
+                    cmbChannelMode_.setSelected(lastChannelMode_);
                 });
+            } else {
+                model_.acquisitions().settingsBuilder().channelBuilder().mode(selected);
+                lastChannelMode_ = selected;
             }
         });
 
