@@ -931,6 +931,14 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 //            nrSlicesSoftware *= 2;
 //        }
 
+        // 1.4 adjusts nrSlicesSoftware at this point when hardware timepoints are in use: one
+        // controller trigger covers every timepoint, so the camera sequence has to be sized for
+        // the whole burst rather than one volume. There is no counterpart here, and
+        // nrSlicesSoftware is never read below because AcqEngJ sizes the sequence from however
+        // many events it merges. It will not merge across a timepoint boundary while the events
+        // carry per-timepoint start times, so under hardware timepoints the camera sequence
+        // covers one timepoint while the controller runs all of them.
+
         // TODO: make this more robust, should this be the first imaging camera?
         String cameraName;
         if (model_.devices().adapter().numSimultaneousCameras() > 1) {
@@ -1018,24 +1026,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 isUsingHardwareTimePoints = false;
             }
         }
-
-        // TODO: this is not necessary below
-//        if (acqSettings_.isUsingHardwareTimePoints()) {
-//            final int numTimePoints = acqSettings_.numTimePoints();
-//            final int numChannels = acqSettings_.numChannels();
-//            final int slicePerView = acqSettings_.volumeSettings().slicesPerView();
-//            // in hardwareTimepoints case we trigger controller once for all timepoints => need to
-//            //   adjust number of frames we expect back from the camera during MM's SequenceAcquisition
-//            if (acqSettings_.cameraMode() == CameraMode.OVERLAP) {
-//                // For overlap mode we are send one extra trigger per channel per side for volume-switching (both PLogic and not)
-//                // This holds for all multichannel modes, just the order in which the extra trigger comes varies
-//                // Very last trigger won't ever return a frame so subtract 1.
-//                final int hardwareSlicesPerView = (slicePerView + 1) * numChannels * numTimePoints;
-//                asb_.volumeSettingsBuilder().slicesPerView(hardwareSlicesPerView - 1);
-//            } else {
-//                asb_.volumeSettingsBuilder().slicesPerView(slicePerView * numTimePoints);
-//            }
-//        }
 
         final double sliceDuration = asb_.timingBuilder().sliceDuration();
         if (exposureTime + cameraReadoutTime > sliceDuration) {
