@@ -191,15 +191,15 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         }
         final StringBuilder problems = new StringBuilder();
         // must be strictly positive: a slice that exposes for zero time images nothing
-        appendTimingProblem(problems, "camera exposure", timing.cameraExposure(), true);
-        appendTimingProblem(problems, "slice duration", timing.sliceDuration(), true);
+        appendTimingProblem(problems, "camera exposure", timing.cameraExposureMs(), true);
+        appendTimingProblem(problems, "slice duration", timing.sliceDurationMs(), true);
         // may legitimately be zero, so only reject negatives
-        appendTimingProblem(problems, "scan duration", timing.scanDuration(), false);
-        appendTimingProblem(problems, "laser trigger duration", timing.laserTriggerDuration(), false);
-        appendTimingProblem(problems, "camera trigger duration", timing.cameraTriggerDuration(), false);
-        appendTimingProblem(problems, "delay before scan", timing.delayBeforeScan(), false);
-        appendTimingProblem(problems, "delay before laser", timing.delayBeforeLaser(), false);
-        appendTimingProblem(problems, "delay before camera", timing.delayBeforeCamera(), false);
+        appendTimingProblem(problems, "scan duration", timing.scanDurationMs(), false);
+        appendTimingProblem(problems, "laser trigger duration", timing.laserTriggerDurationMs(), false);
+        appendTimingProblem(problems, "camera trigger duration", timing.cameraTriggerDurationMs(), false);
+        appendTimingProblem(problems, "delay before scan", timing.delayBeforeScanMs(), false);
+        appendTimingProblem(problems, "delay before laser", timing.delayBeforeLaserMs(), false);
+        appendTimingProblem(problems, "delay before camera", timing.delayBeforeCameraMs(), false);
         return problems.length() == 0 ? null : problems.toString();
     }
 

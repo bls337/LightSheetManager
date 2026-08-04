@@ -255,16 +255,16 @@ public class PLogicScape {
 
     // Compute appropriate motor speed in mm/s for the given stage scanning settings
     public double computeScanSpeed(final ScapeAcquisitionSettings settings) {
-        double sliceDuration = settings.timing().sliceDuration();
+        double sliceDurationMs = settings.timing().sliceDurationMs();
         if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             // pretend like our slice takes twice as long so that we move the correct speed
             // this has the effect of halving the motor speed, but keeping the scan distance the same
-            sliceDuration *= 2;
+            sliceDurationMs *= 2;
         }
         final int channelsPerPass = computeScanChannelsPerPass(settings);
         final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
                 settings.stageScan().firstViewAngle(), settings.volume().firstView() == 1);
-        return settings.volume().sliceStepSize() * speedFactor / sliceDuration / channelsPerPass;
+        return settings.volume().sliceStepSize() * speedFactor / sliceDurationMs / channelsPerPass;
     }
 
     // compute how many channels we do in each one-way scan
@@ -493,16 +493,16 @@ public class PLogicScape {
 
             scanner_.setSPIMAlternateDirections(oppositeDirections);
             scanner_.setSPIMScanDuration(
-                  settings.timing().sliceDuration() - settings.timing().delayBeforeScan());
+                  settings.timing().sliceDurationMs() - settings.timing().delayBeforeScanMs());
             // program the remaining per-slice timing onto the scanner card; diSPIM 1.4 wrote
             // these through the advanced-timing GUI spinner bindings, a path lost in the port,
             // so galvo scans ran on whatever stale timing was left on the card (issue #417)
-            scanner_.setSPIMDelayBeforeScan(settings.timing().delayBeforeScan());
+            scanner_.setSPIMDelayBeforeScan(settings.timing().delayBeforeScanMs());
             scanner_.setSPIMNumScansPerSlice(settings.timing().scansPerSlice());
-            scanner_.setSPIMDelayBeforeLaser(settings.timing().delayBeforeLaser());
-            scanner_.setSPIMLaserDuration(settings.timing().laserTriggerDuration());
-            scanner_.setSPIMDelayBeforeCamera(settings.timing().delayBeforeCamera());
-            scanner_.setSPIMCameraDuration(settings.timing().cameraTriggerDuration());
+            scanner_.setSPIMDelayBeforeLaser(settings.timing().delayBeforeLaserMs());
+            scanner_.setSPIMLaserDuration(settings.timing().laserTriggerDurationMs());
+            scanner_.setSPIMDelayBeforeCamera(settings.timing().delayBeforeCameraMs());
+            scanner_.setSPIMCameraDuration(settings.timing().cameraTriggerDurationMs());
             scanner_.sa().setAmplitudeY(sliceAmplitude);
             scanner_.sa().setOffsetY(sliceCenter);
             scanner_.setSPIMNumSlices(numSlicesHW);
@@ -599,7 +599,7 @@ public class PLogicScape {
                 // FIXME: !!!
                 //final float settleTime = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SCAN_SETTLE);
                 // infer the main scan time (during imaging) from the laser duration
-//                    final float readoutTime = settings.timingSettings().laserTriggerDuration() - 0.25;  // -0.25 is for scanLaserBufferTime
+//                    final float readoutTime = settings.timingSettings().laserTriggerDurationMs() - 0.25;  // -0.25 is for scanLaserBufferTime
 //                    // offset should be decreased by half of the distance traveled during settle time (instead of re-extracting slope use existing sheetWidth/readoutTime)
 //                    sheetOffset -= (sheetWidth * settleTime/readoutTime)/2;
 //                    // width should be increased by ratio (1 + settle_fraction)
