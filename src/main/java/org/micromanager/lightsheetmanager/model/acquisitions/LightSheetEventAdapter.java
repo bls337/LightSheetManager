@@ -95,54 +95,6 @@ public final class LightSheetEventAdapter {
         return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
     }
 
-    /**
-     *
-     * @param interleaved true: do we want to do every channel at each z slice before moving to
-     *                    the next z slice
-     *                    false: do an entire volume in one channel, then the next one
-     */
-    public static Iterator<AcquisitionEvent> createMultiChannelVolumeAcqEvents(
-            AcquisitionEvent baseEvent, AcquisitionSettings settings,
-            String[] cameraDeviceNames,
-            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor, boolean interleaved) {
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
-                channels(settings.channels().used());
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
-                zStack(0, settings.volume().slicesPerView());
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
-
-        ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
-        if (interleaved) {
-            acqFunctions.add(cameras);
-            acqFunctions.add(zStack);
-            acqFunctions.add(channels);
-        } else {
-            acqFunctions.add(channels);
-            acqFunctions.add(cameras);
-            acqFunctions.add(zStack);
-        }
-        return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
-    }
-
-    public static Iterator<AcquisitionEvent> createVolumeAcqEvents(
-            AcquisitionEvent baseEvent, AcquisitionSettings settings,
-            String[] cameraDeviceNames,
-            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
-                zStack(0, settings.volume().slicesPerView());
-
-        ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
-        acqFunctions.add(cameras);
-        acqFunctions.add(zStack);
-        return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
-    }
-
     public static Iterator<AcquisitionEvent> createChannelAcqEvents(
             AcquisitionEvent baseEvent, AcquisitionSettings settings,
             String[] cameraDeviceNames,
@@ -231,6 +183,148 @@ public final class LightSheetEventAdapter {
         acqFunctions.add(cameras);
         acqFunctions.add(zStack);
         return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
+    }
+
+    /**
+     * Build events for one volume whose channels the controller switches slice by slice.
+     * <p>
+     * <b>Slice-by-slice switching only.</b> Volume-by-volume switching changes channel once per
+     * volume and needs the opposite axis order; see {@link #createChannelPerVolumeAcqEvents}. Using
+     * this factory for it would not fail, since the event count still matches; the images would
+     * simply be filed against the wrong coordinates.
+     * <p>
+     * The controller emits every channel within a single armed run, so the event stream has to
+     * describe one sequence rather than one per channel. Two things follow from that.
+     * <p>
+     * The events carry no per-channel config preset. A preset that differs between consecutive events
+     * makes AcqEngJ break the merge and start one more camera sequence than the controller was armed
+     * to deliver, so the extra sequence waits for frames that never arrive. Presets also move whatever
+     * devices they name, such as filter wheels, which cannot follow a controller switching channels
+     * at slice rate.
+     * <p>
+     * The channel axis is innermost because the controller interleaves channels within a slice, and
+     * AcqEngJ assigns each image to the first event matching that camera in sequence order, so the
+     * event order per camera has to match the order the camera delivers frames.
+     * <p>
+     * A single channel is the exception. Hardware channel switching is not set up at all for one
+     * channel, so that channel's own preset and offset apply, as they do on the software path.
+     * Baking them into the base event leaves every event carrying the same preset, which cannot
+     * split the merge, since a sequence only breaks where consecutive presets differ.
+     *
+     * @param usedChannels the channels the controller was programmed for
+     */
+    public static Iterator<AcquisitionEvent> createChannelPerSliceAcqEvents(
+            AcquisitionEvent baseEvent, AcquisitionSettings settings,
+            String[] cameraDeviceNames, ChannelSpec[] usedChannels,
+            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
+
+        if (usedChannels.length == 1) {
+            final ChannelSpec channel = usedChannels[0];
+            baseEvent.setConfigGroup(channel.getGroup());
+            baseEvent.setConfigPreset(channel.getName());
+
+            // Channel z-offset: mirror channels(), apply the offset to the current stage/z position.
+            double zPos;
+            if (baseEvent.getZPosition() == null) {
+                try {
+                    zPos = Engine.getCore().getPosition() + channel.getOffset();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                zPos = baseEvent.getZPosition() + channel.getOffset();
+            }
+            baseEvent.setZ(baseEvent.getZIndex(), zPos);
+        }
+
+        // Base 0 so cameras() leaves the plain camera index on the axis; channelAxis() runs
+        // innermost and folds it into the combined slot.
+        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras =
+                cameras(cameraDeviceNames, 0);
+        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
+                zStack(0, settings.volume().slicesPerView());
+        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
+                channelAxis(usedChannels.length, cameraDeviceNames.length);
+
+        ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
+        acqFunctions.add(cameras);
+        acqFunctions.add(zStack);
+        acqFunctions.add(channels);
+        return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
+    }
+
+    /**
+     * Build events for a volume whose channels the controller switches volume by volume.
+     * <p>
+     * <b>Not implemented.</b> Present so the gap is visible next to
+     * {@link #createChannelPerSliceAcqEvents} rather than being rediscovered.
+     * <p>
+     * This mode switches channel once per volume instead of once per slice, so the controller
+     * delivers every slice of one channel before it starts the next channel. The channel axis
+     * therefore has to sit <b>outside</b> the z axis, the opposite of the slice-by-slice factory,
+     * and the combined axis slot cannot be derived the way {@link #channelAxis} derives it, since
+     * the cameras fan out below the channels rather than above them. Getting the order wrong does
+     * not fail: the event count still matches, so the images are simply filed against the wrong
+     * coordinates.
+     * <p>
+     * A single view geometry cannot use this at all, because the controller clocks its channel
+     * counter from the view select signal, which never alternates with one view. The two view
+     * geometry is what this is for, and its event submission is currently disabled, so nothing
+     * calls this yet. Implement it against two view hardware rather than from this description.
+     */
+    public static Iterator<AcquisitionEvent> createChannelPerVolumeAcqEvents(
+            AcquisitionEvent baseEvent, AcquisitionSettings settings,
+            String[] cameraDeviceNames, ChannelSpec[] usedChannels,
+            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
+        throw new UnsupportedOperationException(
+                "volume-by-volume hardware channel switching is not implemented; "
+                        + "it needs the channel axis outside the z axis, unlike "
+                        + "createChannelPerSliceAcqEvents");
+    }
+
+    /**
+     * Fan an event out over controller-switched channels, writing only the {@link #CAMERA_AXIS}
+     * coordinate.
+     * <p>
+     * Deliberately sets no config group or preset, and no channel z-offset: the controller owns
+     * channel switching here, and the offset stays wherever the user's own preset left it.
+     * Runs innermost, after {@link #cameras}, so the value already on the axis is the camera index;
+     * it is replaced with the combined slot {@code channelIndex * numCameras + cameraIndex} that
+     * sizes and names the datastore.
+     *
+     * @param numChannels the number of channels the controller was programmed for
+     * @param numCameras  the number of cameras this event fans out over
+     */
+    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channelAxis(
+            int numChannels, int numCameras) {
+        return (AcquisitionEvent event) -> new Iterator<>() {
+
+            private int channelIndex_ = 0;
+
+            @Override
+            public boolean hasNext() {
+                return channelIndex_ < numChannels;
+            }
+
+            @Override
+            public AcquisitionEvent next() {
+                AcquisitionEvent channelEvent = event.copy();
+
+                Object position = event.getAxisPosition(CAMERA_AXIS);
+                int cameraIndex = 0;
+                if (position != null) {
+                    try {
+                        cameraIndex = Integer.parseInt(position.toString());
+                    } catch (NumberFormatException e) {
+                        // ignore => number already assigned
+                    }
+                }
+
+                channelEvent.setAxisPosition(CAMERA_AXIS, channelIndex_ * numCameras + cameraIndex);
+                channelIndex_++;
+                return channelEvent;
+            }
+        };
     }
 
     /**

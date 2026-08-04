@@ -673,12 +673,17 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                                                 channelIndex, used[channelIndex]));
                             }
                         } else {
-                            // Hardware channel modes (SLICE_HW / VOLUME_HW with hardware timepoints
-                            // off): the controller emits all channels in one trigger, so a single
-                            // merged iterator is correct here, unchanged.
+                            // SLICE_HW with hardware timepoints off: the controller emits all
+                            // channels within one armed run, so this submits a single iterator
+                            // carrying no per-channel presets. Stamping a preset per channel made
+                            // AcqEngJ split the merge and start one more camera sequence than the
+                            // controller was armed to deliver, which then waited for frames that
+                            // never arrived. VOLUME_HW reaches this branch too, but needs the
+                            // opposite channel axis order and is refused on SCAPE.
                             currentAcquisition_.submitEventIterator(
-                                    LightSheetEventAdapter.createChannelAcqEvents(
-                                            baseEvent.copy(), acqSettings_, cameraNames, null));
+                                    LightSheetEventAdapter.createChannelPerSliceAcqEvents(
+                                            baseEvent.copy(), acqSettings_, cameraNames,
+                                            acqSettings_.channels().used(), null));
                         }
                     } else {
                         currentAcquisition_.submitEventIterator(
