@@ -95,38 +95,6 @@ public final class LightSheetEventAdapter {
         return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
     }
 
-    /**
-     *
-     * @param interleaved true: do we want to do every channel at each z slice before moving to
-     *                    the next z slice
-     *                    false: do an entire volume in one channel, then the next one
-     */
-    public static Iterator<AcquisitionEvent> createMultiChannelVolumeAcqEvents(
-            AcquisitionEvent baseEvent, AcquisitionSettings settings,
-            String[] cameraDeviceNames,
-            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor, boolean interleaved) {
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
-                channels(settings.channels().used());
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
-                zStack(0, settings.volume().slicesPerView());
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
-
-        ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
-        if (interleaved) {
-            acqFunctions.add(cameras);
-            acqFunctions.add(zStack);
-            acqFunctions.add(channels);
-        } else {
-            acqFunctions.add(channels);
-            acqFunctions.add(cameras);
-            acqFunctions.add(zStack);
-        }
-        return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
-    }
-
     public static Iterator<AcquisitionEvent> createChannelAcqEvents(
             AcquisitionEvent baseEvent, AcquisitionSettings settings,
             String[] cameraDeviceNames,
