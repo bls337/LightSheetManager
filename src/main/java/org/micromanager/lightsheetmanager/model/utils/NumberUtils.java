@@ -48,6 +48,7 @@ public final class NumberUtils {
     /**
      * Return the double value rounded up to the nearest increment of 0.25.
      * <p>Example: 0.0 goes to 0.0 but 0.01 goes to 0.25
+     * <p>Quarter milliseconds are the timing quantum because the PLogic evaluates its cells at 4kHz.
      *
      * @param value the value to round up
      * @return the value rounded up
@@ -58,6 +59,7 @@ public final class NumberUtils {
 
     /**
      * Return the double value rounded to the nearest increment of 0.25.
+     * <p>Quarter milliseconds are the timing quantum because the PLogic evaluates its cells at 4kHz.
      *
      * @param value the value to round
      * @return the rounded value

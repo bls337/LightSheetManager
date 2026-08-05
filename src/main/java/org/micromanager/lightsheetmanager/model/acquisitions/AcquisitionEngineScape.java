@@ -174,13 +174,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     studio_.logs().showError("Must have stage with scan-enabled firmware for stage scanning.");
                     return false;
                 }
-                if (acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
-                    if (acqSettings_.volume().numViews() < 2) {
-                        studio_.logs().showError("Interleaved stage scan requires two sides.");
-                    }
-                    return false;
-                }
-
                 // second part: initialize stage scanning, so we can restore state later
                 xyPosUm_ = xyStage.getXYPosition();
                 origSpeedX_ = xyStage.getSpeedX();
@@ -873,7 +866,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         for (CameraBase camera : cameras) {
             camera.setTriggerMode(acqSettings_.cameraMode());
             studio_.logs().logMessage("camera \"" + camera.getDeviceName()
-                 + "\" set to mode: " + camera.getTriggerMode());
+                 + "\" requested mode: " + camera.getTriggerMode());
         }
 
         // make sure slice timings are up-to-date

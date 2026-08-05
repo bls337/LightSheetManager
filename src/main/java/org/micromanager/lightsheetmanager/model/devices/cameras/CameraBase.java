@@ -11,8 +11,14 @@ import java.awt.Rectangle;
  * This is the base camera class.
  *
  * <p>Methods that need per-vendor knowledge are abstract on purpose: a camera class that
- * forgets one fails to compile. Cameras whose device library resolves to
- * {@code CameraLibrary.UNKNOWN} use {@link UnknownCamera}.
+ * forgets one fails to compile.
+ *
+ * <p>Trigger mode is the exception: implement {@link #applyTriggerMode}, which only has to write
+ * the mode to the device. {@link #setTriggerMode} is final and records it here for
+ * {@link #getTriggerMode}, so no vendor has to maintain it.
+ *
+ * <p>Cameras whose device library resolves to {@code CameraLibrary.UNKNOWN} use
+ * {@link UnknownCamera}.
  */
 public abstract class CameraBase extends DeviceBase implements LightSheetCamera {
 
@@ -239,13 +245,32 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
 
     // needed for subclasses
 
+    /**
+     * Sets the camera trigger mode and records it.
+     *
+     * <p>Final because the recorded mode is base state, which a vendor override would have to
+     * remember to maintain. Vendors implement {@link #applyTriggerMode} instead.
+     */
     @Override
-    public void setTriggerMode(CameraMode cameraMode) {
+    public final void setTriggerMode(final CameraMode cameraMode) {
+        applyTriggerMode(cameraMode);
         mode_ = cameraMode;
     }
 
+    /**
+     * Writes the trigger mode to the device.
+     */
+    protected abstract void applyTriggerMode(final CameraMode cameraMode);
+
+    /**
+     * Returns the last mode requested through {@link #setTriggerMode}.
+     *
+     * <p>This is not a device readback because the vendor mapping from camera mode to device
+     * properties is not always reversible, so the requested mode is the only answer every camera
+     * can give.
+     */
     @Override
-    public CameraMode getTriggerMode() {
+    public final CameraMode getTriggerMode() {
         return mode_;
     }
 

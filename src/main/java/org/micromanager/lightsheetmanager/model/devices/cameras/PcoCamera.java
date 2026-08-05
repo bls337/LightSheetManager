@@ -38,8 +38,7 @@ public class PcoCamera extends CameraBase {
     }
 
     @Override
-    public void setTriggerMode(CameraMode cameraMode) {
-        mode_ = cameraMode;
+    protected void applyTriggerMode(CameraMode cameraMode) {
         switch (cameraMode) {
             case EDGE:
             case PSEUDO_OVERLAP:

@@ -25,7 +25,7 @@ public class DemoCamera extends CameraBase {
     }
 
     @Override
-    public void setTriggerMode(final CameraMode cameraMode) {
+    protected void applyTriggerMode(final CameraMode cameraMode) {
         // do nothing - no camera trigger modes - always internal - log for debug convenience
         studio_.logs().logMessage(
                 "setTriggerMode(" + cameraMode + ") called but the DemoCamera is always in internal mode.");
