@@ -633,7 +633,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         boolean changeChannelPerVolumeSoftware = false;
         boolean changeChannelPerVolumeDoneFirst = false;
         if (acqSettings_.channels().enabled()) {
-            if (acqSettings_.channels().count() > 1) {
+            if (acqSettings_.channels().count() == 0) {
                 studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
                 return false; // early exit
             }
@@ -650,14 +650,14 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                         // we have at least 2 channels
                         // intentionally leave extraChannelOffset_ untouched so that it can be specified by user by choosing a preset
                         //   for the channel in the main Micro-Manager window
+                        final boolean success = plc.setupHardwareChannelSwitching(acqSettings_);
+                        if (!success) {
+                            studio_.logs().showError("Couldn't set up slice hardware channel switching.");
+                            return false; // early exit
+                        }
+                        nrChannelsSoftware = 1;
+                        nrSlicesSoftware = acqSettings_.volume().slicesPerView() * acqSettings_.channels().count();
                     }
-                    final boolean success = plc.setupHardwareChannelSwitching(acqSettings_);
-                    if (!success) {
-                        studio_.logs().showError("Couldn't set up slice hardware channel switching.");
-                        return false; // early exit
-                    }
-                    nrChannelsSoftware = 1;
-                    nrSlicesSoftware = acqSettings_.volume().slicesPerView() * acqSettings_.channels().count();
                     break;
                 default:
                     studio_.logs().showError(
