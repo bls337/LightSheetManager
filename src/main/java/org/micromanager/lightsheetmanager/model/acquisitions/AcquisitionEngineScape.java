@@ -664,7 +664,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                                 currentAcquisition_.submitEventIterator(
                                         LightSheetEventAdapter.createSingleChannelVolumeAcqEvents(
                                                 baseEvent.copy(), acqSettings_, cameraNames, null,
-                                                channelIndex, used[channelIndex]));
+                                                channelIndex, used[channelIndex], used.length));
                             }
                         } else {
                             // SLICE_HW with hardware timepoints off: the controller emits all

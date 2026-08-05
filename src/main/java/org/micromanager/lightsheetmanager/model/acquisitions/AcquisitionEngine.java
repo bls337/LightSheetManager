@@ -380,8 +380,9 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             summaryMetadata.put(PropertyKey.CHANNEL_GROUP.key(), acqSettings_.channels().group());
 
             // one name per position on the store's channel axis; with simultaneous cameras the
-            // camera index varies fastest (LightSheetEventAdapter.cameras assigns
-            // channelIndex * numCameras + cameraIndex), so repeat each channel name per camera
+            // channel index varies fastest, so walk cameras outermost and repeat the whole channel
+            // list per camera. This loop order is the slot order: reverse one and every image gets
+            // the wrong name.
             final List<String> channelNames = new ArrayList<>();
             final List<String> baseChannelNames = new ArrayList<>();
             if (acqSettings_.channels().enabled() && acqSettings_.channels().count() > 0) {
@@ -392,8 +393,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                 baseChannelNames.add("Default");
             }
             if (model_.devices().adapter().numSimultaneousCameras() > 1) {
-                for (String channelName : baseChannelNames) {
-                    for (CameraBase camera : model_.devices().imagingCameras()) {
+                for (CameraBase camera : model_.devices().imagingCameras()) {
+                    for (String channelName : baseChannelNames) {
                         channelNames.add(acqSettings_.channels().enabled()
                                 ? channelName + "-" + camera.getDeviceName()
                                 : camera.getDeviceName());

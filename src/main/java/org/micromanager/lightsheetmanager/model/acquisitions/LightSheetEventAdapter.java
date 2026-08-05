@@ -26,8 +26,12 @@ public final class LightSheetEventAdapter {
     // viewer size/display dimensions by them, so the VALUES cannot be changed; an axis MM does not
     // know is dropped by TIFF storage and never displayed.
     // CAMERA_AXIS is deliberately AcqEngJ's "channel" axis: LSM packs the combined
-    // (channelIndex * numCameras + cameraIndex) slot into it, which is why the name here says camera
+    // (channelIndex + cameraIndex * numChannels) slot into it, which is why the name here says camera
     // while the value says channel. Note setChannelName() writes this same axis.
+    // Channel varies fastest, matching what 1.4 writes for one-sided dual-camera acquisitions, so a
+    // pipeline built to read 1.4 datasets reads ours without re-indexing. The slot naming in
+    // AcquisitionEngine.addMMSummaryMetadata walks the same order; the two must change together or
+    // the names label the wrong images.
     public static final String TIME_AXIS = "time";
     public static final String POSITION_AXIS = "position";
     public static final String CAMERA_AXIS = "channel";
@@ -79,7 +83,7 @@ public final class LightSheetEventAdapter {
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
                 zStack(0, settings.volume().slicesPerView());
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
-                channelAxis(usedChannels.length, cameraDeviceNames.length);
+                channelAxis(usedChannels.length);
 
         ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
         acqFunctions.add(timelapse);
@@ -161,12 +165,15 @@ public final class LightSheetEventAdapter {
      *
      * @param channelIndex zero-based index of this channel among the used channels
      * @param channel      the channel to acquire
+     * @param numUsedChannels how many channels the submitting loop is iterating; taken from the
+     *                        caller's captured array rather than re-read here, so the slot stride
+     *                        cannot change between one channel's submission and the next
      */
     public static Iterator<AcquisitionEvent> createSingleChannelVolumeAcqEvents(
             AcquisitionEvent baseEvent, AcquisitionSettings settings,
             String[] cameraDeviceNames,
             Function<AcquisitionEvent, AcquisitionEvent> eventMonitor,
-            int channelIndex, ChannelSpec channel) {
+            int channelIndex, ChannelSpec channel, int numUsedChannels) {
 
         // Bake this one channel's config into the base event (what channels().next() does per channel).
         baseEvent.setConfigGroup(channel.getGroup());
@@ -186,13 +193,14 @@ public final class LightSheetEventAdapter {
         }
         baseEvent.setZ(baseEvent.getZIndex(), zPos);
 
-        // cameras() would now derive the same base from CAMERA_AXIS (setChannelName above put the
-        // channel index there); passing it explicitly keeps this path independent of that coupling.
-        final int channelAxisBase = isUsingMultipleCameras
-                ? channelIndex * cameraDeviceNames.length : channelIndex;
+        // No channel stage follows here, so cameras() writes the finished slot: this channel's index
+        // as the base, stepping a whole channel count per camera. cameras() would otherwise derive
+        // the base from CAMERA_AXIS (setChannelName above put the channel index there); passing it
+        // explicitly keeps this path independent of that coupling.
+        final int cameraStride = isUsingMultipleCameras ? numUsedChannels : 1;
 
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras =
-                cameras(cameraDeviceNames, channelAxisBase);
+                cameras(cameraDeviceNames, channelIndex, cameraStride);
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
                 zStack(0, settings.volume().slicesPerView());
 
@@ -246,7 +254,7 @@ public final class LightSheetEventAdapter {
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
                 zStack(0, settings.volume().slicesPerView());
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
-                channelAxis(usedChannels.length, cameraDeviceNames.length);
+                channelAxis(usedChannels.length);
 
         ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
         acqFunctions.add(cameras);
@@ -313,14 +321,13 @@ public final class LightSheetEventAdapter {
      * Deliberately sets no config group or preset, and no channel z-offset: the controller owns
      * channel switching here, and the offset stays wherever the user's own preset left it.
      * Runs innermost, after {@link #cameras}, so the value already on the axis is the camera index;
-     * it is replaced with the combined slot {@code channelIndex * numCameras + cameraIndex} that
+     * it is replaced with the combined slot {@code channelIndex + cameraIndex * numChannels} that
      * sizes and names the datastore.
      *
      * @param numChannels the number of channels the controller was programmed for
-     * @param numCameras  the number of cameras this event fans out over
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channelAxis(
-            int numChannels, int numCameras) {
+            int numChannels) {
         return (AcquisitionEvent event) -> new Iterator<>() {
 
             private int channelIndex_ = 0;
@@ -344,7 +351,7 @@ public final class LightSheetEventAdapter {
                     }
                 }
 
-                channelEvent.setAxisPosition(CAMERA_AXIS, channelIndex_ * numCameras + cameraIndex);
+                channelEvent.setAxisPosition(CAMERA_AXIS, channelIndex_ + cameraIndex * numChannels);
                 channelIndex_++;
                 return channelEvent;
             }
@@ -366,17 +373,40 @@ public final class LightSheetEventAdapter {
      * <b>{@code CAMERA_AXIS} is AcqEngJ's {@code "channel"} axis</b> ({@code AcqEngMetadata.CHANNEL_AXIS}):
      * {@code AcquisitionEvent.setChannelName(s)} compiles to {@code setAxisPosition("channel", s)}. So the
      * channel index and the camera index share one axis, and the coordinate written here is the combined
-     * slot {@code channelIndex * numCameras + cameraIndex} that {@code addMMSummaryMetadata} names and
+     * slot {@code channelIndex + cameraIndex * numChannels} that {@code addMMSummaryMetadata} names and
      * sizes the datastore for. Do not treat a value already present on that axis as a camera base unless
      * you put it there: on the {@code channels()}-composed paths it is the raw channel index written by
      * {@code setChannelName}.
+     * <p>
+     * This overload steps one slot per camera, which is only the whole coordinate where a single
+     * channel is in play; a multi-channel caller wants the stride overload below.
      *
      * @param channelAxisBase the channel-axis base for this fan-out, or {@code null} to derive it from
-     *                        the event: the channel index {@code channels()} left on the axis, times
-     *                        the camera count when using multiple cameras
+     *                        the event: the channel index {@code channels()} left on the axis
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(
             String[] cameraDeviceNames, Integer channelAxisBase) {
+        return cameras(cameraDeviceNames, channelAxisBase, 1);
+    }
+
+    /**
+     * Fan an event out over the cameras, advancing the {@link #CAMERA_AXIS} coordinate by
+     * {@code cameraStride} per camera.
+     * <p>
+     * Channel varies fastest on that axis, so a camera step is a step of {@code numChannels}, not of
+     * one. Two shapes use this:
+     * <ul>
+     *   <li>composed with {@link #channelAxis}, which supplies the channel term itself: pass base 0
+     *       and stride 1, leaving the plain camera index for it to fold in.</li>
+     *   <li>alone, on the per-channel software path, where no channel stage follows: pass the channel
+     *       index as the base and {@code numChannels} as the stride, giving the whole slot here.</li>
+     * </ul>
+     *
+     * @param cameraStride how far the slot advances per camera; {@code numChannels} when this call
+     *                     produces the finished coordinate, {@code 1} when {@link #channelAxis} does
+     */
+    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(
+            String[] cameraDeviceNames, Integer channelAxisBase, int cameraStride) {
         return (AcquisitionEvent event) -> new Iterator<>() {
 
             private int cameraIndex_ = 0;
@@ -410,11 +440,14 @@ public final class LightSheetEventAdapter {
                             // ignore => number already assigned
                         }
                     }
-                    baseIndex = isUsingMultipleCameras
-                            ? parsed * cameraDeviceNames_.length : parsed;
+                    // The channel index is the base as it stands: channel varies fastest, so it is
+                    // the camera step that scales, and that is cameraStride's job. A multi-channel
+                    // caller of this derive path must therefore pass numChannels as the stride;
+                    // today every caller that reaches it has channels disabled, so this is 0.
+                    baseIndex = parsed;
                 }
 
-                cameraEvent.setAxisPosition(CAMERA_AXIS, baseIndex + cameraIndex_);
+                cameraEvent.setAxisPosition(CAMERA_AXIS, baseIndex + cameraIndex_ * cameraStride);
                 cameraIndex_++;
                 return cameraEvent;
             }
