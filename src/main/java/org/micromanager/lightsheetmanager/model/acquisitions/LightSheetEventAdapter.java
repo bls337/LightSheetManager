@@ -41,34 +41,51 @@ public final class LightSheetEventAdapter {
         throw new AssertionError("Utility class; do not instantiate.");
     }
 
+    /**
+     * Build events for a timelapse of volumes whose channels the controller switches slice by slice.
+     * <p>
+     * The controller free-runs the time points here, so the axis order below the time axis has to be
+     * the interleaved order {@link #createChannelPerSliceAcqEvents} describes: the channel axis
+     * innermost, because the controller switches channel within a slice and AcqEngJ assigns each
+     * image to the first event matching that camera in sequence order. Ordering the channels above
+     * the slices instead does not fail, since the event count still matches; nearly every frame is
+     * filed against the wrong channel and slice.
+     * <p>
+     * A single channel takes the same exception as that factory: hardware channel switching is not
+     * set up for one channel, so its own preset and offset apply and are baked onto the base event,
+     * where they cannot split the merge.
+     *
+     * @param usedChannels the channels the controller was programmed for
+     */
     public static Iterator<AcquisitionEvent> createTimelapseMultiChannelVolumeAcqEvents(
             AcquisitionEvent baseEvent, AcquisitionSettings settings,
-            String[] cameraDeviceNames,
+            String[] cameraDeviceNames, ChannelSpec[] usedChannels,
             Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
         if (settings.numTimePoints() <= 1) {
             throw new RuntimeException("timelapse selected but only one timepoint");
         }
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> timelapse =
-                timelapse(settings.numTimePoints(), settings.timePointIntervalSec());
 
-        if (settings.channels().count() == 1) {
-            throw new RuntimeException("Expected multiple channels but only one found");
+        if (usedChannels.length == 1) {
+            applySingleChannel(baseEvent, usedChannels[0]);
         }
 
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
-                channels(settings.channels().used());
-
+        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> timelapse =
+                timelapse(settings.numTimePoints(), settings.timePointIntervalSec());
+        // Base 0 so cameras() leaves the plain camera index on the axis; channelAxis() runs
+        // innermost and folds it into the combined slot.
+        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras =
+                cameras(cameraDeviceNames, 0);
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
                 zStack(0, settings.volume().slicesPerView());
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
+        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
+                channelAxis(usedChannels.length, cameraDeviceNames.length);
 
         ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
         acqFunctions.add(timelapse);
-        acqFunctions.add(channels);
         acqFunctions.add(cameras);
         acqFunctions.add(zStack);
+        acqFunctions.add(channels);
         return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
     }
 
@@ -219,22 +236,7 @@ public final class LightSheetEventAdapter {
             Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
 
         if (usedChannels.length == 1) {
-            final ChannelSpec channel = usedChannels[0];
-            baseEvent.setConfigGroup(channel.getGroup());
-            baseEvent.setConfigPreset(channel.getName());
-
-            // Channel z-offset: mirror channels(), apply the offset to the current stage/z position.
-            double zPos;
-            if (baseEvent.getZPosition() == null) {
-                try {
-                    zPos = Engine.getCore().getPosition() + channel.getOffset();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                zPos = baseEvent.getZPosition() + channel.getOffset();
-            }
-            baseEvent.setZ(baseEvent.getZIndex(), zPos);
+            applySingleChannel(baseEvent, usedChannels[0]);
         }
 
         // Base 0 so cameras() leaves the plain camera index on the axis; channelAxis() runs
@@ -251,6 +253,28 @@ public final class LightSheetEventAdapter {
         acqFunctions.add(zStack);
         acqFunctions.add(channels);
         return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
+    }
+
+    /**
+     * Bake one channel's preset and z-offset onto the base event, as {@link #channels} stamps them
+     * per event on the software path.
+     */
+    private static void applySingleChannel(AcquisitionEvent baseEvent, ChannelSpec channel) {
+        baseEvent.setConfigGroup(channel.getGroup());
+        baseEvent.setConfigPreset(channel.getName());
+
+        // Channel z-offset: mirror channels(), apply the offset to the current stage/z position.
+        double zPos;
+        if (baseEvent.getZPosition() == null) {
+            try {
+                zPos = Engine.getCore().getPosition() + channel.getOffset();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            zPos = baseEvent.getZPosition() + channel.getOffset();
+        }
+        baseEvent.setZ(baseEvent.getZIndex(), zPos);
     }
 
     /**

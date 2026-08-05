@@ -614,7 +614,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             if (acqSettings_.channels().enabled()) {
                 currentAcquisition_.submitEventIterator(
                         LightSheetEventAdapter.createTimelapseMultiChannelVolumeAcqEvents(
-                                baseEvent.copy(), acqSettings_, cameraNames, null));
+                                baseEvent.copy(), acqSettings_, cameraNames,
+                                acqSettings_.channels().used(), null));
             } else {
                 currentAcquisition_.submitEventIterator(
                         LightSheetEventAdapter.createTimelapseVolumeAcqEvents(
