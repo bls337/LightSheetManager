@@ -50,8 +50,7 @@ public class AndorCamera extends CameraBase {
     }
 
     @Override
-    public void setTriggerMode(CameraMode cameraMode) {
-        mode_ = cameraMode;
+    protected void applyTriggerMode(CameraMode cameraMode) {
         // work-around a bug in SDK3 device adapter, can't switch from light sheet mode
         //  to "normal" center out simultaneous but works if we always go through the in-between mode
         if (hasProperty(Properties.SENSOR_READOUT_MODE)) {

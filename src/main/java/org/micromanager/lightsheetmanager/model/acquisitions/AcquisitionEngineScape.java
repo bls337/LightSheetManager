@@ -866,7 +866,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         for (CameraBase camera : cameras) {
             camera.setTriggerMode(acqSettings_.cameraMode());
             studio_.logs().logMessage("camera \"" + camera.getDeviceName()
-                 + "\" set to mode: " + camera.getTriggerMode());
+                 + "\" requested mode: " + camera.getTriggerMode());
         }
 
         // make sure slice timings are up-to-date

@@ -55,8 +55,7 @@ public class HamamatsuCamera extends CameraBase {
     }
 
     @Override
-    public void setTriggerMode(final CameraMode cameraMode) {
-        mode_ = cameraMode;
+    protected void applyTriggerMode(final CameraMode cameraMode) {
         setProperty(Properties.TRIGGER_SOURCE, (cameraMode == CameraMode.INTERNAL) ? Values.INTERNAL : Values.EXTERNAL);
         setProperty(Properties.SENSOR_MODE, (cameraMode == CameraMode.VIRTUAL_SLIT) ? Values.PROGRESSIVE : Values.AREA);
         switch (cameraMode) {

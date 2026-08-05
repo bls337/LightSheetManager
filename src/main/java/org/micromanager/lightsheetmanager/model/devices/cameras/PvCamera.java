@@ -43,7 +43,7 @@ public class PvCamera extends CameraBase {
     }
 
     @Override
-    public void setTriggerMode(final CameraMode cameraMode) {
+    protected void applyTriggerMode(final CameraMode cameraMode) {
         switch (cameraMode) {
             case EDGE:
             case PSEUDO_OVERLAP:
@@ -56,11 +56,6 @@ public class PvCamera extends CameraBase {
             default:
                 break;
         }
-    }
-
-    @Override
-    public CameraMode getTriggerMode() {
-        return CameraMode.fromString(getProperty(Properties.TRIGGER_MODE));
     }
 
     @Override

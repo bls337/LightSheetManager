@@ -762,7 +762,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                 CameraBase camera = model_.devices().device("ImagingCamera");
                 camera.setTriggerMode(acqSettings_.cameraMode());
                 studio_.logs().logDebugMessage(
-                        "camera \"" + camera.getDeviceName() + "\" set to mode: " + camera.getTriggerMode());
+                        "camera \"" + camera.getDeviceName() + "\" requested mode: " + camera.getTriggerMode());
             }
             return;
         }

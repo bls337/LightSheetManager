@@ -27,6 +27,11 @@ public class UnknownCamera extends CameraBase {
     }
 
     @Override
+    protected void applyTriggerMode(final CameraMode cameraMode) {
+        throw unsupported("trigger mode");
+    }
+
+    @Override
     public void setBinning() {
         throw unsupported("binning");
     }
