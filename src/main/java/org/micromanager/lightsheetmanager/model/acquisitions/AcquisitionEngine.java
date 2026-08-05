@@ -487,6 +487,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         return autofocus_;
     }
 
+    @Override
+    public Acquisition current() {
+        return currentAcquisition_;
+    }
+
 //////////////////////// AcquisitionControl Callback methods ////////////////////////
     @Override
     public void stop(boolean interrupted) {
