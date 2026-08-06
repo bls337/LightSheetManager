@@ -37,9 +37,9 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
             sheetCalibrations[i] = builder.shcb[i].build();
             sliceCalibrations[i] = builder.slcb[i].build();
         }
-        useHardwareTimePoints = builder.useHardwareTimePoints_;
-        useAdvancedTiming = builder.useAdvancedTiming_;
-        liveScanPeriod = builder.liveScanPeriod_;
+        useHardwareTimePoints = builder.useHardwareTimePoints;
+        useAdvancedTiming = builder.useAdvancedTiming;
+        liveScanPeriod = builder.liveScanPeriod;
     }
 
     public static Builder builder() {
@@ -174,10 +174,10 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         private SheetCalibration.Builder[] shcb = new DefaultSheetCalibration.Builder[2];
         private SliceCalibration.Builder[] slcb = new DefaultSliceCalibration.Builder[2];
 
-        private boolean useHardwareTimePoints_ = false;
-        private boolean useAdvancedTiming_ = false;
+        private boolean useHardwareTimePoints = false;
+        private boolean useAdvancedTiming = false;
 
-        private double liveScanPeriod_ = 20.0; // TODO: this could go in user settings since it has to do with the live view
+        private double liveScanPeriod = 20.0; // TODO: this could go in user settings since it has to do with the live view
 
         private Builder() {
             for (int i = 0; i < 2; i++) {
@@ -196,26 +196,26 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 slcb[i] = settings.sliceCalibrations[i].copyBuilder();
                 shcb[i] = settings.sheetCalibrations[i].copyBuilder();
             }
-            useHardwareTimePoints_ = settings.isUsingHardwareTimePoints();
-            useAdvancedTiming_ =  settings.isUsingAdvancedTiming();
-            liveScanPeriod_ = settings.liveScanPeriod();
+            useHardwareTimePoints = settings.isUsingHardwareTimePoints();
+            useAdvancedTiming =  settings.isUsingAdvancedTiming();
+            liveScanPeriod = settings.liveScanPeriod();
         }
 
         @Override
         public Builder useHardwareTimePoints(final boolean state) {
-            useHardwareTimePoints_ = state;
+            useHardwareTimePoints = state;
             return this;
         }
 
         @Override
         public Builder useAdvancedTiming(final boolean state) {
-            useAdvancedTiming_ = state;
+            useAdvancedTiming = state;
             return this;
         }
 
         @Override
         public Builder liveScanPeriod(double liveScanPeriod) {
-            liveScanPeriod_ = liveScanPeriod;
+            this.liveScanPeriod = liveScanPeriod;
             return this;
         }
 

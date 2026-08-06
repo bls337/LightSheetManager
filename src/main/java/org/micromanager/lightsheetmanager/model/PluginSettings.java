@@ -11,18 +11,18 @@ public class PluginSettings {
     private boolean isPollingPositions_ = true;
 
     // volatile: written from the EDT (Settings tab) and read from the acquisition thread
-    private volatile boolean acquireFailQuietly_ = false;
+    private volatile boolean acquireFailQuietly = false;
 
-    private final JoystickData joystick_ = new JoystickData();
+    private final JoystickData joystick = new JoystickData();
 
-    private final XYZGrid xyzGrid_ = new XYZGrid();
+    private final XYZGrid xyzGrid = new XYZGrid();
 
     public JoystickData joystickPanel() {
-        return joystick_;
+        return joystick;
     }
 
     public XYZGrid xyzGrid() {
-        return xyzGrid_;
+        return xyzGrid;
     }
 
     public void setPollingPositions(final boolean state) {
@@ -34,11 +34,11 @@ public class PluginSettings {
     }
 
     public void setAcquireFailQuietly(final boolean state) {
-        acquireFailQuietly_ = state;
+        acquireFailQuietly = state;
     }
 
     public boolean isAcquireFailQuietly() {
-        return acquireFailQuietly_;
+        return acquireFailQuietly;
     }
 
     public String toJson() {
@@ -56,38 +56,38 @@ public class PluginSettings {
 
     public static class JoystickData {
 
-        private String joystick_;
-        private String leftWheel_;
-        private String rightWheel_;
+        private String joystick;
+        private String leftWheel;
+        private String rightWheel;
 
         JoystickData() {
-            joystick_ = "None";
-            leftWheel_ = "None";
-            rightWheel_ = "None";
+            joystick = "None";
+            leftWheel = "None";
+            rightWheel = "None";
         }
 
         public String joystick() {
-            return joystick_;
+            return joystick;
         }
 
         public String leftWheel() {
-            return leftWheel_;
+            return leftWheel;
         }
 
         public String rightWheel() {
-            return rightWheel_;
+            return rightWheel;
         }
 
         public void joystick(final String joystick) {
-            joystick_ = joystick;
+            this.joystick = joystick;
         }
 
         public void leftWheel(final String leftWheel) {
-            leftWheel_ = leftWheel;
+            this.leftWheel = leftWheel;
         }
 
         public void rightWheel(final String rightWheel) {
-            rightWheel_ = rightWheel;
+            this.rightWheel = rightWheel;
         }
     }
 }

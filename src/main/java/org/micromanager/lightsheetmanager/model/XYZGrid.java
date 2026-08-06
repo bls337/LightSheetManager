@@ -16,31 +16,31 @@ import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
  */
 public class XYZGrid {
 
-    private boolean useX_;
-    private boolean useY_;
-    private boolean useZ_;
+    private boolean useX;
+    private boolean useY;
+    private boolean useZ;
 
-    private double startX_;
-    private double startY_;
-    private double startZ_;
+    private double startX;
+    private double startY;
+    private double startZ;
 
-    private double stopX_;
-    private double stopY_;
-    private double stopZ_;
+    private double stopX;
+    private double stopY;
+    private double stopZ;
 
-    private double deltaX_;
-    private double deltaY_;
-    private double deltaZ_;
+    private double deltaX;
+    private double deltaY;
+    private double deltaZ;
 
-    private int overlapPercentYZ_;
-    private boolean clearPositions_;
+    private int overlapPercentYZ;
+    private boolean clearPositions;
 
     public XYZGrid() {
     }
 
     private int updateGridXCount() {
-        double delta = deltaX_;
-        final double range = startX_ - stopX_;
+        double delta = deltaX;
+        final double range = startX - stopX;
         if (Math.signum(range) != Math.signum(delta) &&
                 !NumberUtils.doublesEqual(Math.abs(range), 0.0)) {
             delta *= -1;
@@ -52,8 +52,8 @@ public class XYZGrid {
     }
 
     private int updateGridYCount() {
-        double delta = deltaY_;
-        final double range = startY_ - stopY_;
+        double delta = deltaY;
+        final double range = startY - stopY;
         if (Math.signum(range) != Math.signum(delta) &&
                 !NumberUtils.doublesEqual(Math.abs(range), 0.0)) {
             delta *= -1;
@@ -65,8 +65,8 @@ public class XYZGrid {
     }
 
     private int updateGridZCount() {
-        double delta = deltaZ_;
-        final double range = startX_ - stopX_;
+        double delta = deltaZ;
+        final double range = startX - stopX;
         if (Math.signum(range) != Math.signum(delta) &&
                 !NumberUtils.doublesEqual(Math.abs(range), 0.0)) {
             delta *= -1;
@@ -85,26 +85,26 @@ public class XYZGrid {
         XYStage xyStage = model.devices().device("SampleXY");
         Stage zStage = model.devices().device("SampleZ");
 
-        final int numX = useX_ ? updateGridXCount() : 1;
-        final int numY = useY_ ? updateGridYCount() : 1;
-        final int numZ = useZ_ ? updateGridZCount() : 1;
+        final int numX = useX ? updateGridXCount() : 1;
+        final int numY = useY ? updateGridYCount() : 1;
+        final int numZ = useZ ? updateGridZCount() : 1;
 
         // computer the center of each range
-        double centerX = (startX_ + stopX_) / 2;
-        double centerY = (startY_ + stopY_) / 2;
-        double centerZ = (startZ_ + stopZ_) / 2;
+        double centerX = (startX + stopX) / 2;
+        double centerY = (startY + stopY) / 2;
+        double centerZ = (startZ + stopZ) / 2;
 
-        double startY = centerY - deltaY_ * (numY-1) / 2;
-        double startZ = centerZ - deltaZ_ * (numZ-1) / 2;
+        double startY = centerY - deltaY * (numY-1) / 2;
+        double startZ = centerZ - deltaZ * (numZ-1) / 2;
 
-        if (useX_) {
+        if (useX) {
             // TODO: update GUI with values, aliases for asb and vsb?
             final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
                     model.acquisitions().settings().stageScan().firstViewAngle(),true);
-            model.acquisitions().settingsBuilder().volumeBuilder().sliceStepSize(Math.abs(deltaX_)/speedFactor);
+            model.acquisitions().settingsBuilder().volumeBuilder().sliceStepSize(Math.abs(deltaX)/speedFactor);
             model.acquisitions().settingsBuilder().volumeBuilder().slicesPerView(numX);
             // move to X center if we aren't generating a position list with it
-            if (!useY_ && !useZ_) {
+            if (!useY && !useZ) {
                 xyStage.setXYPosition(centerX, xyStage.getXYPosition().y); // TODO: make convenience method?
                 xyStage.waitForDevice();
             }
@@ -114,14 +114,14 @@ public class XYZGrid {
         }
 
         // if we aren't using one axis, use the current position instead of GUI position
-        if (useY_ && !useZ_) {
+        if (useY && !useZ) {
             startZ = zStage.getPosition();
         }
-        if (useZ_ && !useY_) {
+        if (useZ && !useY) {
             startY = xyStage.getXYPosition().y; // Note: only the Y coordinate
         }
 
-        if (!useY_ && !useZ_ && !clearPositions_) {
+        if (!useY && !useZ && !clearPositions) {
             return; // early exit => YZ unused
         }
 
@@ -135,20 +135,20 @@ public class XYZGrid {
 //            }
 //        }
         PositionList positionList = new PositionList();
-        if (useY_ || useZ_) {
+        if (useY || useZ) {
             for (int iz = 0; iz < numZ; ++iz) {
                 for (int iy = 0; iy < numY; ++iy) {
                     MultiStagePosition msp = new MultiStagePosition();
-                    if (useY_) {
+                    if (useY) {
                         msp.add(StagePosition.create2D(
                                 xyStage.getDeviceName(),
                                 centerX,
-                                startY + iy * deltaY_));
+                                startY + iy * deltaY));
                     }
-                    if (useZ_) {
+                    if (useZ) {
                         msp.add(StagePosition.create1D(
                                 zStage.getDeviceName(),
-                                startZ + iz * deltaZ_));
+                                startZ + iz * deltaZ));
                     }
                     msp.setLabel("Pos_" + iz + "_" + iy);
                     positionList.addPosition(msp);
@@ -159,115 +159,115 @@ public class XYZGrid {
     }
 
     public boolean getUseX() {
-        return useX_;
+        return useX;
     }
 
     public void setUseX(final boolean state) {
-        useX_ = state;
+        useX = state;
     }
 
     public boolean getUseY() {
-        return useY_;
+        return useY;
     }
 
     public void setUseY(final boolean state) {
-        useY_ = state;
+        useY = state;
     }
 
     public boolean getUseZ() {
-        return useZ_;
+        return useZ;
     }
 
     public void setUseZ(final boolean state) {
-        useZ_ = state;
+        useZ = state;
     }
 
     public boolean getClearYZ() {
-        return clearPositions_;
+        return clearPositions;
     }
 
     public void setClearYZ(final boolean state) {
-        clearPositions_ = state;
+        clearPositions = state;
     }
 
     public void setOverlapYZ(final int value) {
-        overlapPercentYZ_ = value;
+        overlapPercentYZ = value;
     }
 
     public int getOverlapYZ() {
-        return overlapPercentYZ_;
+        return overlapPercentYZ;
     }
 
     public double getStartX() {
-        return startX_;
+        return startX;
     }
 
     public void setStartX(final double value) {
-        startX_ = value;
+        startX = value;
     }
 
     public double getStopX() {
-        return stopX_;
+        return stopX;
     }
 
     public void setStopX(final double value) {
-        stopX_ = value;
+        stopX = value;
     }
 
     public double getDeltaX() {
-        return deltaX_;
+        return deltaX;
     }
 
     public void setDeltaX(final double value) {
-        deltaX_ = value;
+        deltaX = value;
     }
 
     public double getStartY() {
-        return startY_;
+        return startY;
     }
 
     public void setStartY(final double value) {
-        startY_ = value;
+        startY = value;
     }
 
     public double getStopY() {
-        return stopY_;
+        return stopY;
     }
 
     public void setStopY(final double value) {
-        stopY_ = value;
+        stopY = value;
     }
 
     public double getDeltaY() {
-        return deltaY_;
+        return deltaY;
     }
 
     public void setDeltaY(final double value) {
-        deltaY_ = value;
+        deltaY = value;
     }
 
     public double getStartZ() {
-        return startZ_;
+        return startZ;
     }
 
     public void setStartZ(final double value) {
-        startZ_ = value;
+        startZ = value;
     }
 
     public double getStopZ() {
-        return stopZ_;
+        return stopZ;
     }
 
     public void setStopZ(final double value) {
-        stopZ_ = value;
+        stopZ = value;
     }
 
     public double getDeltaZ() {
-        return deltaZ_;
+        return deltaZ;
     }
 
     public void setDeltaZ(final double value) {
-        deltaZ_ = value;
+        deltaZ = value;
     }
 
 }
