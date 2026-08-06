@@ -3,28 +3,28 @@ package org.micromanager.lightsheetmanager.api.data;
 // Used to track imaging camera order for simultaneous imaging cameras.
 public class CameraData {
 
-    private String name_;
-    private boolean isActive_;
+    private String name;
+    private boolean isActive;
 
     public CameraData(final String name, final boolean isActive) {
-        name_ = name;
-        isActive_ = isActive;
+        this.name = name;
+        this.isActive = isActive;
     }
 
     public String name() {
-        return name_;
+        return name;
     }
 
     public void name(final String name) {
-        name_ = name;
+        this.name = name;
     }
 
     public boolean isActive() {
-        return isActive_;
+        return isActive;
     }
 
     public void isActive(final boolean isActive) {
-        isActive_ = isActive;
+        this.isActive = isActive;
     }
 
     public static boolean isCameraActive(final CameraData[] cameras, final String cameraName) {
@@ -38,7 +38,7 @@ public class CameraData {
 
     @Override
     public String toString() {
-        return String.format("%s[name=%s]", getClass().getSimpleName(), name_);
+        return String.format("%s[name=%s]", getClass().getSimpleName(), name);
     }
 
 }

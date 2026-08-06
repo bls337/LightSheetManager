@@ -266,23 +266,23 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
 //        );
 //    }
 
-    private final String saveNamePrefix_;
-    private final String saveDirectory_;
-    private final boolean saveDuringAcq_;
-    private final boolean demoMode_;
-    private final SaveMode saveMode_;
-    private final CameraMode cameraMode_;
-    private final CameraData[] imagingCameraOrder_;
-    private final boolean useMultiplePositions_;
-    private final int postMoveDelay_;
-    private final boolean useTimePoints_;
-    private final int numTimePoints_;
-    private final double timePointIntervalSec_;
-    private final AcquisitionMode acquisitionMode_;
+    private final String saveNamePrefix;
+    private final String saveDirectory;
+    private final boolean saveDuringAcq;
+    private final boolean demoMode;
+    private final SaveMode saveMode;
+    private final CameraMode cameraMode;
+    private final CameraData[] imagingCameraOrder;
+    private final boolean useMultiplePositions;
+    private final int postMoveDelay;
+    private final boolean useTimePoints;
+    private final int numTimePoints;
+    private final double timePointIntervalSec;
+    private final AcquisitionMode acquisitionMode;
 
-    private final DefaultAutofocusSettings autofocus_;
-    private final ChannelSettings channels_;
-    private final VolumeSettings volume_;
+    private final DefaultAutofocusSettings autofocus;
+    private final ChannelSettings channels;
+    private final VolumeSettings volume;
 
 //    public DefaultAcquisitionSettings() {
 //        saveNamePrefix_ = "";
@@ -291,22 +291,22 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
 //    }
 
     protected BaseAcquisitionSettings(Builder<?> builder) {
-        saveDirectory_ = builder.saveDirectory;
-        saveNamePrefix_ = builder.saveNamePrefix;
-        saveDuringAcq_ = builder.saveDuringAcq;
-        demoMode_ = builder.demoMode;
-        saveMode_ = builder.saveMode;
-        cameraMode_ = builder.cameraMode;
-        imagingCameraOrder_ = builder.imagingCameraOrder.clone();
-        useMultiplePositions_ = builder.useMultiplePositions;
-        postMoveDelay_ = builder.postMoveDelay;
-        useTimePoints_ = builder.useTimePoints;
-        numTimePoints_ = builder.numTimePoints;
-        timePointIntervalSec_ = builder.timePointIntervalSec;
-        acquisitionMode_ = builder.acquisitionMode;
-        autofocus_ = builder.afBuilder.build();
-        channels_ = builder.channelBuilder.build();
-        volume_ = builder.volumeBuilder_.build();
+        saveDirectory = builder.saveDirectory;
+        saveNamePrefix = builder.saveNamePrefix;
+        saveDuringAcq = builder.saveDuringAcq;
+        demoMode = builder.demoMode;
+        saveMode = builder.saveMode;
+        cameraMode = builder.cameraMode;
+        imagingCameraOrder = builder.imagingCameraOrder.clone();
+        useMultiplePositions = builder.useMultiplePositions;
+        postMoveDelay = builder.postMoveDelay;
+        useTimePoints = builder.useTimePoints;
+        numTimePoints = builder.numTimePoints;
+        timePointIntervalSec = builder.timePointIntervalSec;
+        acquisitionMode = builder.acquisitionMode;
+        autofocus = builder.afBuilder.build();
+        channels = builder.channelBuilder.build();
+        volume = builder.volumeBuilder_.build();
     }
 
     /**
@@ -316,7 +316,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public String saveNamePrefix() {
-        return saveNamePrefix_;
+        return saveNamePrefix;
     }
 
     /**
@@ -326,7 +326,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public String saveDirectory() {
-        return saveDirectory_;
+        return saveDirectory;
     }
 
     /**
@@ -336,7 +336,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public boolean isSavingImagesDuringAcquisition() {
-        return saveDuringAcq_;
+        return saveDuringAcq;
     }
 
     /**
@@ -346,7 +346,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public boolean demoMode() {
-        return demoMode_;
+        return demoMode;
     }
 
     /**
@@ -356,7 +356,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public SaveMode saveMode() {
-        return saveMode_;
+        return saveMode;
     }
 
     /**
@@ -366,7 +366,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public CameraMode cameraMode() {
-        return cameraMode_;
+        return cameraMode;
     }
 
     /**
@@ -376,7 +376,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public CameraData[] imagingCameraOrder() {
-        return imagingCameraOrder_;
+        return imagingCameraOrder;
     }
 
     /**
@@ -386,7 +386,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public boolean isUsingMultiplePositions() {
-        return useMultiplePositions_;
+        return useMultiplePositions;
     }
 
     /**
@@ -396,7 +396,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public int postMoveDelay() {
-        return postMoveDelay_;
+        return postMoveDelay;
     }
 
     /**
@@ -406,7 +406,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public boolean isUsingTimePoints() {
-        return useTimePoints_;
+        return useTimePoints;
     }
 
     /**
@@ -416,7 +416,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public int numTimePoints() {
-        return numTimePoints_;
+        return numTimePoints;
     }
 
     /**
@@ -426,7 +426,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public double timePointIntervalSec() {
-        return timePointIntervalSec_;
+        return timePointIntervalSec;
     }
 
     /**
@@ -436,7 +436,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public AcquisitionMode acquisitionMode() {
-        return acquisitionMode_;
+        return acquisitionMode;
     }
 
     /**
@@ -446,7 +446,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public DefaultAutofocusSettings autofocus() {
-        return autofocus_;
+        return autofocus;
     }
 
     /**
@@ -456,7 +456,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public ChannelSettings channels() {
-        return channels_;
+        return channels;
     }
 
     /**
@@ -466,14 +466,14 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
      */
     @Override
     public VolumeSettings volume() {
-        return volume_;
+        return volume;
     }
 
     @Override
     public String toString() {
         return String.format(
                 "%s[saveDirectory=%s, saveNamePrefix=%s, saveDuringAcq=%s, demoMode=%s, saveMode=%s]",
-                getClass().getSimpleName(), saveDirectory_, saveNamePrefix_, saveDuringAcq_, demoMode_, saveMode_
+                getClass().getSimpleName(), saveDirectory, saveNamePrefix, saveDuringAcq, demoMode, saveMode
         );
     }
 

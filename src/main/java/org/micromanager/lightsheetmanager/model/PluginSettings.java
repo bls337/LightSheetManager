@@ -8,7 +8,7 @@ import com.google.gson.GsonBuilder;
  */
 public class PluginSettings {
 
-    private boolean isPollingPositions_ = true;
+    private boolean isPollingPositions = true;
 
     // volatile: written from the EDT (Settings tab) and read from the acquisition thread
     private volatile boolean acquireFailQuietly = false;
@@ -26,11 +26,11 @@ public class PluginSettings {
     }
 
     public void setPollingPositions(final boolean state) {
-        isPollingPositions_ = state;
+        isPollingPositions = state;
     }
 
     public boolean isPollingPositions() {
-        return isPollingPositions_;
+        return isPollingPositions;
     }
 
     public void setAcquireFailQuietly(final boolean state) {
