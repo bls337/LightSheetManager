@@ -116,26 +116,6 @@ public final class LightSheetEventAdapter {
         return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
     }
 
-    public static Iterator<AcquisitionEvent> createChannelAcqEvents(
-            AcquisitionEvent baseEvent, AcquisitionSettings settings,
-            String[] cameraDeviceNames,
-            Function<AcquisitionEvent, AcquisitionEvent> eventMonitor) {
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
-                channels(settings.channels().used());
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
-
-        Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
-                zStack(0, settings.volume().slicesPerView());
-
-        ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
-        acqFunctions.add(channels);
-        acqFunctions.add(cameras);
-        acqFunctions.add(zStack);
-        return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
-    }
-
     public static Iterator<AcquisitionEvent> createAcqEvents(
             AcquisitionEvent baseEvent, AcquisitionSettings settings,
             String[] cameraDeviceNames,
@@ -159,9 +139,9 @@ public final class LightSheetEventAdapter {
      * its own event iterator. AcqEngJ appends a SequenceEnd flush at the end of every
      * submitted iterator, guaranteeing exactly one camera sequence + one controller fire per
      * channel-volume regardless of whether the channel presets are identical, distinct, or
-     * property-sequenceable. Composing all channels into a single iterator (the old
-     * {@link #createChannelAcqEvents}) instead lets AcqEngJ merge identical-preset channels into one
-     * sequence, firing the controller once and collapsing the channel dimension.
+     * property-sequenceable. Composing all channels into a single iterator instead lets AcqEngJ merge
+     * identical-preset channels into one sequence, firing the controller once and collapsing the
+     * channel dimension.
      *
      * @param channelIndex zero-based index of this channel among the used channels
      * @param channel      the channel to acquire
