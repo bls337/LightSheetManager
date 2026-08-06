@@ -11,14 +11,26 @@ import javax.swing.JFrame;
 
 @Plugin(type = MenuPlugin.class)
 public class LightSheetManagerPlugin implements MenuPlugin, SciJavaPlugin {
+
     public static final String copyright = "Applied Scientific Instrumentation (ASI), 2022-2026";
     public static final String description = "A plugin to control various types of light sheet microscopes.";
     public static final String menuName = "Light Sheet Manager";
     public static final String version = "0.7.8";
 
     private Studio studio_;
-    private LightSheetManager model_;
+
+    // volatile for visibility: written on the edt, read from the pycromanager server thread
+    private volatile LightSheetManager model_;
     private LightSheetManagerFrame frame_;
+
+    /**
+     * Returns the model the plugin is currently running.
+     *
+     * @return the model, or null if the plugin is not open
+     */
+    public LightSheetManager getModel() {
+        return model_;
+    }
 
     @Override
     public void setContext(final Studio studio) {
