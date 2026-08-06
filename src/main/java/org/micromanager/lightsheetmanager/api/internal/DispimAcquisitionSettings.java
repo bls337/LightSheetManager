@@ -13,33 +13,33 @@ import java.util.Objects;
 
 public class DispimAcquisitionSettings extends BaseAcquisitionSettings implements AcquisitionSettingsDispim {
 
-    private final TimingSettings timing_;
-    private final SliceSettings slice_;
-    private final SliceSettingsLightSheet sliceLS_;
-    private final StageScanSettings stageScan_;
-    private final SheetCalibration[] sheetCalibrations_;
-    private final SliceCalibration[] sliceCalibrations_;
+    private final TimingSettings timing;
+    private final SliceSettings slice;
+    private final SliceSettingsLightSheet sliceLS;
+    private final StageScanSettings stageScan;
+    private final SheetCalibration[] sheetCalibrations;
+    private final SliceCalibration[] sliceCalibrations;
 
-    private final boolean useHardwareTimePoints_;
-    private final boolean useAdvancedTiming_;
+    private final boolean useHardwareTimePoints;
+    private final boolean useAdvancedTiming;
 
-    private final double liveScanPeriod_;
+    private final double liveScanPeriod;
 
     private DispimAcquisitionSettings(Builder builder) {
         super(builder);
-        timing_ = builder.timingBuilder().build();
-        slice_ = builder.sliceBuilder().build();
-        sliceLS_ = builder.sliceLSBuilder().build();
-        stageScan_ = builder.stageScanBuilder().build();
-        sheetCalibrations_ = new DefaultSheetCalibration[2];
-        sliceCalibrations_ = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
+        timing = builder.timingBuilder().build();
+        slice = builder.sliceBuilder().build();
+        sliceLS = builder.sliceLSBuilder().build();
+        stageScan = builder.stageScanBuilder().build();
+        sheetCalibrations = new DefaultSheetCalibration[2];
+        sliceCalibrations = new DefaultSliceCalibration[2]; // TODO: populate with numViews instead of magic number
         for (int i = 0; i < 2; i++) {
-            sheetCalibrations_[i] = builder.shcb_[i].build();
-            sliceCalibrations_[i] = builder.slcb_[i].build();
+            sheetCalibrations[i] = builder.shcb[i].build();
+            sliceCalibrations[i] = builder.slcb[i].build();
         }
-        useHardwareTimePoints_ = builder.useHardwareTimePoints_;
-        useAdvancedTiming_ = builder.useAdvancedTiming_;
-        liveScanPeriod_= builder.liveScanPeriod_;
+        useHardwareTimePoints = builder.useHardwareTimePoints_;
+        useAdvancedTiming = builder.useAdvancedTiming_;
+        liveScanPeriod = builder.liveScanPeriod_;
     }
 
     public static Builder builder() {
@@ -58,47 +58,47 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
     @Override
     public TimingSettings timing() {
-        return timing_;
+        return timing;
     }
 
     @Override
     public SliceSettings slice() {
-        return slice_;
+        return slice;
     }
 
     @Override
     public SliceSettingsLightSheet sliceLS() {
-        return sliceLS_;
+        return sliceLS;
     }
 
     @Override
     public StageScanSettings stageScan() {
-        return stageScan_;
+        return stageScan;
     }
 
     @Override
     public SheetCalibration sheetCalibration(final int view) {
-        return sheetCalibrations_[view-1];
+        return sheetCalibrations[view-1];
     }
 
     @Override
     public SliceCalibration sliceCalibration(final int view) {
-        return sliceCalibrations_[view-1];
+        return sliceCalibrations[view-1];
     }
 
     @Override
     public boolean isUsingHardwareTimePoints() {
-        return useHardwareTimePoints_;
+        return useHardwareTimePoints;
     }
 
     @Override
     public boolean isUsingAdvancedTiming() {
-        return useAdvancedTiming_;
+        return useAdvancedTiming;
     }
 
     @Override
     public double liveScanPeriod() {
-        return liveScanPeriod_;
+        return liveScanPeriod;
     }
 
     // TODO: finish this
@@ -112,11 +112,11 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         }
         DispimAcquisitionSettings other = (DispimAcquisitionSettings) obj;
         return Objects.equals(channels(), other.channels()) &&
-                Objects.equals(timing_, other.timing_) &&
+                Objects.equals(timing, other.timing) &&
                 Objects.equals(volume(), other.volume()) &&
-                Objects.equals(slice_, other.slice_) &&
-                Objects.equals(sliceLS_, other.sliceLS_) &&
-                Objects.equals(stageScan_, other.stageScan_) &&
+                Objects.equals(slice, other.slice) &&
+                Objects.equals(sliceLS, other.sliceLS) &&
+                Objects.equals(stageScan, other.stageScan) &&
                 // Objects.equals(sheetCalibration_, other.sheetCalibration_) &&
                 // Objects.equals(sliceCalibration_, other.sliceCalibration_) &&
                 acquisitionMode() == other.acquisitionMode() &&
@@ -124,8 +124,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 Arrays.equals(imagingCameraOrder(), other.imagingCameraOrder()) &&
                 isUsingTimePoints() == other.isUsingTimePoints() &&
                 isUsingMultiplePositions() == other.isUsingMultiplePositions() &&
-                useHardwareTimePoints_ == other.useHardwareTimePoints_ &&
-                useAdvancedTiming_ == other.useAdvancedTiming_ &&
+                useHardwareTimePoints == other.useHardwareTimePoints &&
+                useAdvancedTiming == other.useAdvancedTiming &&
                 numTimePoints() == other.numTimePoints() &&
                 Double.compare(other.timePointIntervalSec(), timePointIntervalSec()) == 0 &&
                 postMoveDelay() == other.postMoveDelay();
@@ -136,11 +136,11 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     public int hashCode() {
         return Objects.hash(
                 channels(),
-                timing_,
+                timing,
                 volume(),
-                slice_,
-                sliceLS_,
-                stageScan_,
+                slice,
+                sliceLS,
+                stageScan,
                 // sheetCalibration_,
                 // sliceCalibration_,
                 acquisitionMode(),
@@ -148,8 +148,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 Arrays.hashCode(imagingCameraOrder()),
                 isUsingTimePoints(),
                 isUsingMultiplePositions(),
-                useHardwareTimePoints_,
-                useAdvancedTiming_,
+                useHardwareTimePoints,
+                useAdvancedTiming,
                 numTimePoints(),
                 timePointIntervalSec(),
                 postMoveDelay()
@@ -160,19 +160,19 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
     @Override
     public String toString() {
         return String.format("%s[channels=%s, timing=%s, volume=%s, slice=%s, sliceLS=%s, stageScan=%s]",
-                getClass().getSimpleName(), channels(), timing_, volume(), slice_, sliceLS_, stageScan_);
+                getClass().getSimpleName(), channels(), timing, volume(), slice, sliceLS, stageScan);
     }
 
     public static class Builder
             extends BaseAcquisitionSettings.Builder<Builder>
             implements AcquisitionSettingsDispim.Builder<Builder> {
 
-        private TimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
-        private SliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
-        private SliceSettingsLightSheet.Builder ssbLS_ = DefaultSliceSettingsLS.builder(); // maybe this should be LightSheetSliceSettings? replace ssb_?
-        private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
-        private SheetCalibration.Builder[] shcb_ = new DefaultSheetCalibration.Builder[2];
-        private SliceCalibration.Builder[] slcb_ = new DefaultSliceCalibration.Builder[2];
+        private TimingSettings.Builder timingBuilder = DefaultTimingSettings.builder();
+        private SliceSettings.Builder sliceBuilder = DefaultSliceSettings.builder();
+        private SliceSettingsLightSheet.Builder ssbLS = DefaultSliceSettingsLS.builder(); // maybe this should be LightSheetSliceSettings? replace ssb_?
+        private StageScanSettings.Builder stageScanBuilder = DefaultStageScanSettings.builder();
+        private SheetCalibration.Builder[] shcb = new DefaultSheetCalibration.Builder[2];
+        private SliceCalibration.Builder[] slcb = new DefaultSliceCalibration.Builder[2];
 
         private boolean useHardwareTimePoints_ = false;
         private boolean useAdvancedTiming_ = false;
@@ -181,20 +181,20 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
         private Builder() {
             for (int i = 0; i < 2; i++) {
-                shcb_[i] = DefaultSheetCalibration.builder();
-                slcb_[i] = DefaultSliceCalibration.builder();
+                shcb[i] = DefaultSheetCalibration.builder();
+                slcb[i] = DefaultSliceCalibration.builder();
             }
         }
 
         public Builder(final DispimAcquisitionSettings settings) {
             super(settings);
-            timingBuilder_ = settings.timing().copyBuilder();
-            sliceBuilder_ = settings.slice().copyBuilder();
-            ssbLS_ = settings.sliceLS_.copyBuilder();
-            stageScanBuilder_ = settings.stageScan().copyBuilder();
+            timingBuilder = settings.timing().copyBuilder();
+            sliceBuilder = settings.slice().copyBuilder();
+            ssbLS = settings.sliceLS.copyBuilder();
+            stageScanBuilder = settings.stageScan().copyBuilder();
             for (int i = 0; i < 2; i++) {
-                slcb_[i] = settings.sliceCalibrations_[i].copyBuilder();
-                shcb_[i] = settings.sheetCalibrations_[i].copyBuilder();
+                slcb[i] = settings.sliceCalibrations[i].copyBuilder();
+                shcb[i] = settings.sheetCalibrations[i].copyBuilder();
             }
             useHardwareTimePoints_ = settings.isUsingHardwareTimePoints();
             useAdvancedTiming_ =  settings.isUsingAdvancedTiming();
@@ -221,32 +221,32 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
 
         // getters for sub-builders
         public TimingSettings.Builder timingBuilder() {
-            return timingBuilder_;
+            return timingBuilder;
         }
 
         public SliceSettings.Builder sliceBuilder() {
-            return sliceBuilder_;
+            return sliceBuilder;
         }
 
         public SliceSettingsLightSheet.Builder sliceLSBuilder() {
-            return ssbLS_;
+            return ssbLS;
         }
 
         @Override
         public StageScanSettings.Builder stageScanBuilder() {
-            return stageScanBuilder_;
+            return stageScanBuilder;
         }
 
         public SheetCalibration.Builder sheetCalibrationBuilder(final int view) {
-            return shcb_[view-1];
+            return shcb[view-1];
         }
 
         public SliceCalibration.Builder sliceCalibrationBuilder(final int view) {
-            return slcb_[view-1];
+            return slcb[view-1];
         }
 
         public void timingBuilder(DefaultTimingSettings.Builder builder) {
-            timingBuilder_ = builder;
+            timingBuilder = builder;
         }
 
         @Override
@@ -262,7 +262,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
         // TODO: finish toString with rest of properties
         @Override
         public String toString() {
-            return String.format("[timingBuilder_=%s]", timingBuilder_);
+            return String.format("[timingBuilder_=%s]", timingBuilder);
         }
 
     }
