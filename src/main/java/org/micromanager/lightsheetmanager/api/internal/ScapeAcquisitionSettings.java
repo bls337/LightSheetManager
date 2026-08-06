@@ -12,24 +12,24 @@ import java.util.Objects;
 
 public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements AcquisitionSettingsScape {
 
-    private final TimingSettings timing_;
-    private final SliceSettings slice_;
-    private final StageScanSettings stageScan_;
-    private final SheetCalibration sheetCalibration_;
-    private final SliceCalibration sliceCalibration_;
+    private final TimingSettings timing;
+    private final SliceSettings slice;
+    private final StageScanSettings stageScan;
+    private final SheetCalibration sheetCalibration;
+    private final SliceCalibration sliceCalibration;
 
-    private final boolean useHardwareTimePoints_;
-    private final boolean useAdvancedTiming_;
+    private final boolean useHardwareTimePoints;
+    private final boolean useAdvancedTiming;
 
     private ScapeAcquisitionSettings(Builder builder) {
         super(builder);
-        timing_ = builder.timingBuilder().build();
-        slice_ = builder.sliceBuilder().build();
-        stageScan_ = builder.stageScanBuilder().build();
-        sheetCalibration_ = builder.sheetCalibrationBuilder().build();
-        sliceCalibration_ = builder.sliceCalibrationBuilder().build();
-        useHardwareTimePoints_ = builder.useHardwareTimePoints_;
-        useAdvancedTiming_ = builder.useAdvancedTiming_;
+        timing = builder.timingBuilder().build();
+        slice = builder.sliceBuilder().build();
+        stageScan = builder.stageScanBuilder().build();
+        sheetCalibration = builder.sheetCalibrationBuilder().build();
+        sliceCalibration = builder.sliceCalibrationBuilder().build();
+        useHardwareTimePoints = builder.useHardwareTimePoints;
+        useAdvancedTiming = builder.useAdvancedTiming;
     }
 
     public static Builder builder() {
@@ -48,37 +48,37 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
     @Override
     public TimingSettings timing() {
-        return timing_;
+        return timing;
     }
 
     @Override
     public SliceSettings slice() {
-        return slice_;
+        return slice;
     }
 
     @Override
     public StageScanSettings stageScan() {
-        return stageScan_;
+        return stageScan;
     }
 
     @Override
     public SheetCalibration sheetCalibration() {
-        return sheetCalibration_;
+        return sheetCalibration;
     }
 
     @Override
     public SliceCalibration sliceCalibration() {
-        return sliceCalibration_;
+        return sliceCalibration;
     }
 
     @Override
     public boolean isUsingHardwareTimePoints() {
-        return useHardwareTimePoints_;
+        return useHardwareTimePoints;
     }
 
     @Override
     public boolean isUsingAdvancedTiming() {
-        return useAdvancedTiming_;
+        return useAdvancedTiming;
     }
 
     @Override
@@ -91,19 +91,19 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         }
         ScapeAcquisitionSettings other = (ScapeAcquisitionSettings) obj;
         return Objects.equals(channels(), other.channels()) &&
-                Objects.equals(timing_, other.timing_) &&
+                Objects.equals(timing, other.timing) &&
                 Objects.equals(volume(), other.volume()) &&
-                Objects.equals(slice_, other.slice_) &&
-                Objects.equals(stageScan_, other.stageScan_) &&
-                Objects.equals(sheetCalibration_, other.sheetCalibration_) &&
-                Objects.equals(sliceCalibration_, other.sliceCalibration_) &&
+                Objects.equals(slice, other.slice) &&
+                Objects.equals(stageScan, other.stageScan) &&
+                Objects.equals(sheetCalibration, other.sheetCalibration) &&
+                Objects.equals(sliceCalibration, other.sliceCalibration) &&
                 acquisitionMode() == other.acquisitionMode() &&
                 cameraMode() == other.cameraMode() &&
                 Arrays.equals(imagingCameraOrder(), other.imagingCameraOrder()) &&
                 isUsingTimePoints() == other.isUsingTimePoints() &&
                 isUsingMultiplePositions() == other.isUsingMultiplePositions() &&
-                useHardwareTimePoints_ == other.useHardwareTimePoints_ &&
-                useAdvancedTiming_ == other.useAdvancedTiming_ &&
+                useHardwareTimePoints == other.useHardwareTimePoints &&
+                useAdvancedTiming == other.useAdvancedTiming &&
                 numTimePoints() == other.numTimePoints() &&
                 Double.compare(other.timePointIntervalSec(), timePointIntervalSec()) == 0 &&
                 postMoveDelay() == other.postMoveDelay();
@@ -113,19 +113,19 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     public int hashCode() {
         return Objects.hash(
                 channels(),
-                timing_,
+                timing,
                 volume(),
-                slice_,
-                stageScan_,
-                sheetCalibration_,
-                sliceCalibration_,
+                slice,
+                stageScan,
+                sheetCalibration,
+                sliceCalibration,
                 acquisitionMode(),
                 cameraMode(),
                 Arrays.hashCode(imagingCameraOrder()),
                 isUsingTimePoints(),
                 isUsingMultiplePositions(),
-                useHardwareTimePoints_,
-                useAdvancedTiming_,
+                useHardwareTimePoints,
+                useAdvancedTiming,
                 numTimePoints(),
                 timePointIntervalSec(),
                 postMoveDelay()
@@ -136,72 +136,72 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     @Override
     public String toString() {
         return String.format("%s[channels=%s, timing=%s, volume=%s, slice=%s]",
-                getClass().getSimpleName(), channels(), timing_, volume(), slice_);
+                getClass().getSimpleName(), channels(), timing, volume(), slice);
     }
 
     public static class Builder
             extends BaseAcquisitionSettings.Builder<Builder>
             implements AcquisitionSettingsScape.Builder<Builder> {
 
-        private TimingSettings.Builder timingBuilder_ = DefaultTimingSettings.builder();
-        private SliceSettings.Builder sliceBuilder_ = DefaultSliceSettings.builder();
-        private StageScanSettings.Builder stageScanBuilder_ = DefaultStageScanSettings.builder();
-        private SheetCalibration.Builder sheetCalibBuilder_ = DefaultSheetCalibration.builder();
-        private SliceCalibration.Builder sliceCalibBuilder_ = DefaultSliceCalibration.builder();
+        private TimingSettings.Builder timingBuilder = DefaultTimingSettings.builder();
+        private SliceSettings.Builder sliceBuilder = DefaultSliceSettings.builder();
+        private StageScanSettings.Builder stageScanBuilder = DefaultStageScanSettings.builder();
+        private SheetCalibration.Builder sheetCalibBuilder = DefaultSheetCalibration.builder();
+        private SliceCalibration.Builder sliceCalibBuilder = DefaultSliceCalibration.builder();
 
-        private boolean useHardwareTimePoints_ = false;
-        private boolean useAdvancedTiming_ = false;
+        private boolean useHardwareTimePoints = false;
+        private boolean useAdvancedTiming = false;
 
         private Builder() {
         }
 
         public Builder(final ScapeAcquisitionSettings settings) {
             super(settings);
-            timingBuilder_ = settings.timing().copyBuilder();
-            sliceBuilder_ = settings.slice().copyBuilder();
-            stageScanBuilder_ = settings.stageScan().copyBuilder();
-            sheetCalibBuilder_ = settings.sheetCalibration().copyBuilder();
-            sliceCalibBuilder_ = settings.sliceCalibration().copyBuilder();
-            useHardwareTimePoints_ = settings.isUsingHardwareTimePoints();
-            useAdvancedTiming_ =  settings.isUsingAdvancedTiming();
+            timingBuilder = settings.timing().copyBuilder();
+            sliceBuilder = settings.slice().copyBuilder();
+            stageScanBuilder = settings.stageScan().copyBuilder();
+            sheetCalibBuilder = settings.sheetCalibration().copyBuilder();
+            sliceCalibBuilder = settings.sliceCalibration().copyBuilder();
+            useHardwareTimePoints = settings.isUsingHardwareTimePoints();
+            useAdvancedTiming =  settings.isUsingAdvancedTiming();
         }
 
         @Override
         public Builder useHardwareTimePoints(final boolean state) {
-            useHardwareTimePoints_ = state;
+            useHardwareTimePoints = state;
             return this;
         }
 
         @Override
         public Builder useAdvancedTiming(final boolean state) {
-            useAdvancedTiming_ = state;
+            useAdvancedTiming = state;
             return this;
         }
 
         // getters for sub-builders
         public TimingSettings.Builder timingBuilder() {
-            return timingBuilder_;
+            return timingBuilder;
         }
 
         public SliceSettings.Builder sliceBuilder() {
-            return sliceBuilder_;
+            return sliceBuilder;
         }
 
         @Override
         public StageScanSettings.Builder stageScanBuilder() {
-            return stageScanBuilder_;
+            return stageScanBuilder;
         }
 
         public SheetCalibration.Builder sheetCalibrationBuilder() {
-            return sheetCalibBuilder_;
+            return sheetCalibBuilder;
         }
 
         public SliceCalibration.Builder sliceCalibrationBuilder() {
-            return sliceCalibBuilder_;
+            return sliceCalibBuilder;
         }
 
         public void timingBuilder(DefaultTimingSettings.Builder builder) {
-            timingBuilder_ = builder;
+            timingBuilder = builder;
         }
 
         @Override
@@ -218,7 +218,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         @Override
         public String toString() {
             return String.format("%s[timingBuilder=%s]",
-                    getClass().getSimpleName(), timingBuilder_);
+                    getClass().getSimpleName(), timingBuilder);
         }
 
     }

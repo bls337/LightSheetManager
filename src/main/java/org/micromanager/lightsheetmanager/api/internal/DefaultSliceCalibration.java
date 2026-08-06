@@ -6,12 +6,12 @@ import java.util.Objects;
 
 public class DefaultSliceCalibration implements SliceCalibration {
 
-    private final double slope_;
-    private final double offset_;
+    private final double slope;
+    private final double offset;
 
     private DefaultSliceCalibration(Builder builder) {
-        slope_ = builder.slope_;
-        offset_ = builder.offset_;
+        slope = builder.slope;
+        offset = builder.offset;
     }
 
     // Note: used by GSON library for deserialization
@@ -35,12 +35,12 @@ public class DefaultSliceCalibration implements SliceCalibration {
 
     @Override
     public double slope() {
-        return slope_;
+        return slope;
     }
 
     @Override
     public double offset() {
-        return offset_;
+        return offset;
     }
 
     @Override
@@ -52,42 +52,43 @@ public class DefaultSliceCalibration implements SliceCalibration {
             return false;
         }
         DefaultSliceCalibration other = (DefaultSliceCalibration) obj;
-        return Double.compare(slope_, other.slope_) == 0 &&
-                Double.compare(offset_, other.offset_) == 0;
+        return Double.compare(slope, other.slope) == 0 &&
+                Double.compare(offset, other.offset) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(slope_, offset_);
+        return Objects.hash(slope, offset);
     }
 
     @Override
     public String toString() {
         return String.format("%s[slope=%s, offset=%s]",
-                getClass().getSimpleName(), slope_, offset_);
+                getClass().getSimpleName(), slope, offset);
     }
 
     public static class Builder implements SliceCalibration.Builder {
-        private double slope_ = 0.0;
-        private double offset_ = 0.0;
+
+        private double slope = 0.0;
+        private double offset = 0.0;
 
         private Builder() {
         }
 
         private Builder(final SliceCalibration settings) {
-            slope_ = settings.slope();
-            offset_ = settings.offset();
+            slope = settings.slope();
+            offset = settings.offset();
         }
 
         @Override
         public Builder slope(final double slope) {
-            slope_ = slope;
+            this.slope = slope;
             return this;
         }
 
         @Override
         public Builder offset(final double offset) {
-            offset_ = offset;
+            this.offset = offset;
             return this;
         }
 

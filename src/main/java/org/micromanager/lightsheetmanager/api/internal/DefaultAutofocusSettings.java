@@ -8,24 +8,24 @@ import java.util.Objects;
 
 public class DefaultAutofocusSettings implements AutofocusSettings {
 
-    private final boolean enabled_;
-    private final int numImages_;
-    private final double stepSizeUm_;
-    private final boolean showImages_;
-    private final boolean showGraph_;
-    private final AutofocusMode mode_;
-    private final AutofocusType scoringMethod_;
-    private final String channel_;
+    private final boolean enabled;
+    private final int numImages;
+    private final double stepSizeUm;
+    private final boolean showImages;
+    private final boolean showGraph;
+    private final AutofocusMode mode;
+    private final AutofocusType scoringMethod;
+    private final String channel;
 
     private DefaultAutofocusSettings(Builder builder) {
-        enabled_ =  builder.enabled_;
-        numImages_ = builder.numImages_;
-        stepSizeUm_ = builder.stepSizeUm_;
-        showImages_ = builder.showImages_;
-        showGraph_ = builder.showGraph_;
-        mode_ = builder.mode_;
-        scoringMethod_ = builder.scoringMethod_;
-        channel_ = builder.channel_;
+        enabled =  builder.enabled;
+        numImages = builder.numImages;
+        stepSizeUm = builder.stepSizeUm;
+        showImages = builder.showImages;
+        showGraph = builder.showGraph;
+        mode = builder.mode;
+        scoringMethod = builder.scoringMethod;
+        channel = builder.channel;
     }
 
     public static Builder builder() {
@@ -44,7 +44,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
 
     @Override
     public boolean enabled() {
-        return enabled_;
+        return enabled;
     }
 
     /**
@@ -54,7 +54,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
      */
     @Override
     public int numImages() {
-        return numImages_;
+        return numImages;
     }
 
     /**
@@ -64,7 +64,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
      */
     @Override
     public double stepSizeUm() {
-        return stepSizeUm_;
+        return stepSizeUm;
     }
 
     /**
@@ -74,7 +74,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
      */
     @Override
     public AutofocusMode mode() {
-        return mode_;
+        return mode;
     }
 
     /**
@@ -83,7 +83,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
      * @return {@code true} if displaying images
      */
     public boolean showImages() {
-        return showImages_;
+        return showImages;
     }
 
     /**
@@ -92,7 +92,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
      * @return {@code true} if displaying the graph
      */
     public boolean showGraph() {
-        return showGraph_;
+        return showGraph;
     }
 
     /**
@@ -102,7 +102,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
      */
     @Override
     public AutofocusType scoringMethod() {
-        return scoringMethod_;
+        return scoringMethod;
     }
 
     /**
@@ -112,7 +112,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
      */
     @Override
     public String channel() {
-        return channel_;
+        return channel;
     }
 
     @Override
@@ -124,20 +124,20 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
             return false;
         }
         DefaultAutofocusSettings other = (DefaultAutofocusSettings) obj;
-        return enabled_ == other.enabled_ &&
-                numImages_ == other.numImages_ &&
-                Double.compare(stepSizeUm_, other.stepSizeUm_) == 0 &&
-                showImages_ == other.showImages_ &&
-                showGraph_ == other.showGraph_ &&
-                mode_ == other.mode_ &&
-                scoringMethod_ == other.scoringMethod_ &&
-                channel_.equals(other.channel_);
+        return enabled == other.enabled &&
+                numImages == other.numImages &&
+                Double.compare(stepSizeUm, other.stepSizeUm) == 0 &&
+                showImages == other.showImages &&
+                showGraph == other.showGraph &&
+                mode == other.mode &&
+                scoringMethod == other.scoringMethod &&
+                channel.equals(other.channel);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled_, numImages_, stepSizeUm_,
-                showImages_, showGraph_, mode_, scoringMethod_, channel_);
+        return Objects.hash(enabled, numImages, stepSizeUm,
+                showImages, showGraph, mode, scoringMethod, channel);
     }
 
     @Override
@@ -145,37 +145,37 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
         return String.format("%s[enabled=%s, numImages=%s, stepSizeUm=%s, " +
                         "showImages=%s, showGraph=%s, mode=%s, scoringMethod=%s, channel=%s]",
                 getClass().getSimpleName(),
-                enabled_, numImages_, stepSizeUm_, showImages_, showGraph_, mode_, scoringMethod_, channel_);
+                enabled, numImages, stepSizeUm, showImages, showGraph, mode, scoringMethod, channel);
     }
 
     public static class Builder implements AutofocusSettings.Builder {
 
-        private boolean enabled_ = false;
-        private int numImages_ = 10;
-        private double stepSizeUm_ = 1.0;
-        private boolean showImages_ = false;
-        private boolean showGraph_ = false;
-        private AutofocusMode mode_ = AutofocusMode.FIXED_PIEZO_SWEEP_SLICE;
-        private AutofocusType scoringMethod_ = AutofocusType.VOLATH5;
-        private String channel_ = "";
+        private boolean enabled = false;
+        private int numImages = 10;
+        private double stepSizeUm = 1.0;
+        private boolean showImages = false;
+        private boolean showGraph = false;
+        private AutofocusMode mode = AutofocusMode.FIXED_PIEZO_SWEEP_SLICE;
+        private AutofocusType scoringMethod = AutofocusType.VOLATH5;
+        private String channel = "";
 
         private Builder() {
         }
 
         private Builder(final AutofocusSettings settings) {
-            enabled_ = settings.enabled();
-            numImages_ = settings.numImages();
-            stepSizeUm_ = settings.stepSizeUm();
-            showImages_ = settings.showImages();
-            showGraph_ = settings.showGraph();
-            mode_ = settings.mode();
-            scoringMethod_ = settings.scoringMethod();
-            channel_ = settings.channel();
+            enabled = settings.enabled();
+            numImages = settings.numImages();
+            stepSizeUm = settings.stepSizeUm();
+            showImages = settings.showImages();
+            showGraph = settings.showGraph();
+            mode = settings.mode();
+            scoringMethod = settings.scoringMethod();
+            channel = settings.channel();
         }
 
         @Override
         public Builder enabled(final boolean state) {
-            enabled_ = state;
+            enabled = state;
             return this;
         }
 
@@ -186,7 +186,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          */
         @Override
         public Builder numImages(final int numImages) {
-            numImages_ = numImages;
+            this.numImages = numImages;
             return this;
         }
 
@@ -197,7 +197,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          */
         @Override
         public Builder stepSizeUm(final double stepSize) {
-            stepSizeUm_ = stepSize;
+            stepSizeUm = stepSize;
             return this;
         }
 
@@ -208,7 +208,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          */
         @Override
         public Builder showImages(boolean state) {
-            showImages_ = state;
+            showImages = state;
             return this;
         }
 
@@ -219,7 +219,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          */
         @Override
         public Builder showGraph(boolean state) {
-            showGraph_ = state;
+            showGraph = state;
             return this;
         }
 
@@ -230,7 +230,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          */
         @Override
         public Builder mode(final AutofocusMode mode) {
-            mode_ = mode;
+            this.mode = mode;
             return this;
         }
 
@@ -241,7 +241,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          */
         @Override
         public Builder scoringMethod(final AutofocusType type) {
-            scoringMethod_ = type;
+            scoringMethod = type;
             return this;
         }
 
@@ -252,7 +252,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
          */
         @Override
         public Builder channel(final String channel) {
-            channel_ = channel;
+            this.channel = channel;
             return this;
         }
 

@@ -6,24 +6,24 @@ import java.util.Objects;
 
 public class DefaultVolumeSettings implements VolumeSettings {
 
-    private final int firstView_;
-    private final int numViews_;
-    private final int slicesPerView_;
-    private final double delayBeforeView_;
-    private final double sliceStepSize_;
-    private final double startPosition_;
-    private final double centerPosition_;
-    private final double endPosition_;
+    private final int firstView;
+    private final int numViews;
+    private final int slicesPerView;
+    private final double delayBeforeView;
+    private final double sliceStepSize;
+    private final double startPosition;
+    private final double centerPosition;
+    private final double endPosition;
 
     private DefaultVolumeSettings(Builder builder) {
-        firstView_ = builder.firstView_;
-        numViews_ = builder.numViews_;
-        slicesPerView_ = builder.slicesPerView_;
-        delayBeforeView_ = builder.delayBeforeView_;
-        sliceStepSize_ = builder.sliceStepSize_;
-        startPosition_ = builder.startPosition_;
-        centerPosition_ = builder.centerPosition_;
-        endPosition_ = builder.endPosition_;
+        firstView = builder.firstView;
+        numViews = builder.numViews;
+        slicesPerView = builder.slicesPerView;
+        delayBeforeView = builder.delayBeforeView;
+        sliceStepSize = builder.sliceStepSize;
+        startPosition = builder.startPosition;
+        centerPosition = builder.centerPosition;
+        endPosition = builder.endPosition;
     }
 
     // Note: used by GSON library for deserialization
@@ -47,42 +47,42 @@ public class DefaultVolumeSettings implements VolumeSettings {
 
     @Override
     public int firstView() {
-        return firstView_;
+        return firstView;
     }
 
     @Override
     public int numViews() {
-        return numViews_;
+        return numViews;
     }
 
     @Override
     public int slicesPerView() {
-        return slicesPerView_;
+        return slicesPerView;
     }
 
     @Override
     public double delayBeforeView() {
-        return delayBeforeView_;
+        return delayBeforeView;
     }
 
     @Override
     public double sliceStepSize() {
-        return sliceStepSize_;
+        return sliceStepSize;
     }
 
     @Override
     public double startPosition() {
-        return startPosition_;
+        return startPosition;
     }
 
     @Override
     public double centerPosition() {
-        return centerPosition_;
+        return centerPosition;
     }
 
     @Override
     public double endPosition() {
-        return endPosition_;
+        return endPosition;
     }
 
     @Override
@@ -94,20 +94,20 @@ public class DefaultVolumeSettings implements VolumeSettings {
             return false;
         }
         DefaultVolumeSettings other = (DefaultVolumeSettings) obj;
-        return firstView_ == other.firstView_ &&
-                numViews_ == other.numViews_ &&
-                slicesPerView_ == other.slicesPerView_ &&
-                Double.compare(delayBeforeView_, other.delayBeforeView_) == 0 &&
-                Double.compare(sliceStepSize_, other.sliceStepSize_) == 0 &&
-                Double.compare(startPosition_, other.startPosition_) == 0 &&
-                Double.compare(centerPosition_, other.centerPosition_) == 0 &&
-                Double.compare(endPosition_, other.endPosition_) == 0;
+        return firstView == other.firstView &&
+                numViews == other.numViews &&
+                slicesPerView == other.slicesPerView &&
+                Double.compare(delayBeforeView, other.delayBeforeView) == 0 &&
+                Double.compare(sliceStepSize, other.sliceStepSize) == 0 &&
+                Double.compare(startPosition, other.startPosition) == 0 &&
+                Double.compare(centerPosition, other.centerPosition) == 0 &&
+                Double.compare(endPosition, other.endPosition) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstView_, numViews_, slicesPerView_, delayBeforeView_, sliceStepSize_,
-                startPosition_, centerPosition_, endPosition_);
+        return Objects.hash(firstView, numViews, slicesPerView, delayBeforeView, sliceStepSize,
+                startPosition, centerPosition, endPosition);
     }
 
     @Override
@@ -116,95 +116,95 @@ public class DefaultVolumeSettings implements VolumeSettings {
                 "%s[firstView=%s, numViews=%s, numSlices=%s, viewDelayMs=%s, stepSizeUm=%s, "
                         + "startPosition=%s, centerPosition=%s, endPosition=%s]",
                 getClass().getSimpleName(),
-                firstView_, numViews_, slicesPerView_, delayBeforeView_, sliceStepSize_,
-                startPosition_, centerPosition_, endPosition_
+                firstView, numViews, slicesPerView, delayBeforeView, sliceStepSize,
+                startPosition, centerPosition, endPosition
         );
     }
 
     public static class Builder implements VolumeSettings.Builder {
 
-        private int firstView_ = 1;
-        private int numViews_ = 1;
-        private int slicesPerView_ = 10;
-        private double delayBeforeView_ = 50;
-        private double sliceStepSize_ = 0.5;
-        private double startPosition_ = 0.0;
-        private double centerPosition_ = 0.0;
-        private double endPosition_ = 0.0;
+        private int firstView = 1;
+        private int numViews = 1;
+        private int slicesPerView = 10;
+        private double delayBeforeView = 50;
+        private double sliceStepSize = 0.5;
+        private double startPosition = 0.0;
+        private double centerPosition = 0.0;
+        private double endPosition = 0.0;
 
         private Builder() {
         }
 
         private Builder(final VolumeSettings settings) {
-            firstView_ = settings.firstView();
-            numViews_ = settings.numViews();
-            slicesPerView_ = settings.slicesPerView();
-            delayBeforeView_ = settings.delayBeforeView();
-            sliceStepSize_ = settings.sliceStepSize();
-            startPosition_ = settings.startPosition();
-            centerPosition_ = settings.centerPosition();
-            endPosition_ = settings.endPosition();
+            firstView = settings.firstView();
+            numViews = settings.numViews();
+            slicesPerView = settings.slicesPerView();
+            delayBeforeView = settings.delayBeforeView();
+            sliceStepSize = settings.sliceStepSize();
+            startPosition = settings.startPosition();
+            centerPosition = settings.centerPosition();
+            endPosition = settings.endPosition();
         }
 
         @Override
         public Builder numViews(final int numViews) {
-            numViews_ = numViews;
+            this.numViews = numViews;
             return this;
         }
 
         @Override
         public Builder firstView(final int firstView) {
-            firstView_ = firstView;
+            this.firstView = firstView;
             return this;
         }
 
         @Override
         public Builder delayBeforeView(final double viewDelayMs) {
-            delayBeforeView_ = viewDelayMs;
+            delayBeforeView = viewDelayMs;
             return this;
         }
 
         @Override
         public Builder slicesPerView(final int numSlices) {
-            slicesPerView_ = numSlices;
+            slicesPerView = numSlices;
             return this;
         }
 
         @Override
         public Builder sliceStepSize(final double stepSizeUm) {
-            sliceStepSize_ = stepSizeUm;
+            sliceStepSize = stepSizeUm;
             return this;
         }
 
         // TODO: what happens when stepSize is not evenly divided by range? maybe just remove?
         @Override
         public Builder volumeBounds(final double startPosition, final double endPosition, final double stepSizeUm) {
-            startPosition_ = startPosition;
-            endPosition_ = endPosition;
-            sliceStepSize_ = stepSizeUm;
-            centerPosition_ = (startPosition + endPosition) / 2.0;
-            slicesPerView_ = (int)Math.floor((Math.abs(startPosition) + Math.abs(endPosition)) / stepSizeUm);
+            this.startPosition = startPosition;
+            this.endPosition = endPosition;
+            sliceStepSize = stepSizeUm;
+            centerPosition = (startPosition + endPosition) / 2.0;
+            slicesPerView = (int)Math.floor((Math.abs(startPosition) + Math.abs(endPosition)) / stepSizeUm);
             return this;
         }
 
         @Override
         public Builder volumeBounds(final double startPosition, final double endPosition, final int numSlices) {
-            startPosition_ = startPosition;
-            endPosition_ = endPosition;
-            slicesPerView_ = numSlices;
-            centerPosition_ = (startPosition + endPosition) / 2.0;
-            sliceStepSize_ = (Math.abs(startPosition) + Math.abs(endPosition)) / numSlices;
+            this.startPosition = startPosition;
+            this.endPosition = endPosition;
+            slicesPerView = numSlices;
+            centerPosition = (startPosition + endPosition) / 2.0;
+            sliceStepSize = (Math.abs(startPosition) + Math.abs(endPosition)) / numSlices;
             return this;
         }
 
         @Override
         public Builder volumeBounds(final double centerPosition, final int numSlices, final double stepSizeUm) {
             final double halfDistance = (stepSizeUm * numSlices) / 2.0;
-            centerPosition_ = centerPosition;
-            sliceStepSize_ = stepSizeUm;
-            slicesPerView_ = numSlices;
-            startPosition_ = centerPosition - halfDistance;
-            endPosition_ = centerPosition + halfDistance;
+            this.centerPosition = centerPosition;
+            sliceStepSize = stepSizeUm;
+            slicesPerView = numSlices;
+            startPosition = centerPosition - halfDistance;
+            endPosition = centerPosition + halfDistance;
             return this;
         }
 

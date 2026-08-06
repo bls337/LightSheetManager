@@ -6,16 +6,16 @@ import java.util.Objects;
 
 public class DefaultSliceSettingsLS implements SliceSettingsLightSheet {
 
-    private final double scanResetTime_;
-    private final double scanSettleTime_;
-    private final double shutterWidth_;
-    private final double shutterSpeedFactor_;
+    private final double scanResetTime;
+    private final double scanSettleTime;
+    private final double shutterWidth;
+    private final double shutterSpeedFactor;
 
     private DefaultSliceSettingsLS(Builder builder) {
-        scanResetTime_ = builder.scanResetTime_;
-        scanSettleTime_ = builder.scanSettleTime_;
-        shutterWidth_ = builder.shutterWidth_;
-        shutterSpeedFactor_ = builder.shutterSpeedFactor_;
+        scanResetTime = builder.scanResetTime;
+        scanSettleTime = builder.scanSettleTime;
+        shutterWidth = builder.shutterWidth;
+        shutterSpeedFactor = builder.shutterSpeedFactor;
     }
 
     public static Builder builder() {
@@ -34,22 +34,22 @@ public class DefaultSliceSettingsLS implements SliceSettingsLightSheet {
 
     @Override
     public double scanResetTime() {
-        return scanResetTime_;
+        return scanResetTime;
     }
 
     @Override
     public double scanSettleTime() {
-        return scanSettleTime_;
+        return scanSettleTime;
     }
 
     @Override
     public double shutterWidth() {
-        return shutterWidth_;
+        return shutterWidth;
     }
 
     @Override
     public double shutterSpeedFactor() {
-        return shutterSpeedFactor_;
+        return shutterSpeedFactor;
     }
 
     @Override
@@ -61,15 +61,15 @@ public class DefaultSliceSettingsLS implements SliceSettingsLightSheet {
             return false;
         }
         DefaultSliceSettingsLS other = (DefaultSliceSettingsLS) obj;
-        return Double.compare(scanResetTime_, other.scanResetTime_) == 0 &&
-                Double.compare(scanSettleTime_, other.scanSettleTime_) == 0 &&
-                Double.compare(shutterWidth_, other.shutterWidth_) == 0 &&
-                Double.compare(shutterSpeedFactor_, other.shutterSpeedFactor_) == 0;
+        return Double.compare(scanResetTime, other.scanResetTime) == 0 &&
+                Double.compare(scanSettleTime, other.scanSettleTime) == 0 &&
+                Double.compare(shutterWidth, other.shutterWidth) == 0 &&
+                Double.compare(shutterSpeedFactor, other.shutterSpeedFactor) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(scanResetTime_, scanSettleTime_, shutterWidth_, shutterSpeedFactor_);
+        return Objects.hash(scanResetTime, scanSettleTime, shutterWidth, shutterSpeedFactor);
     }
 
     @Override
@@ -77,48 +77,48 @@ public class DefaultSliceSettingsLS implements SliceSettingsLightSheet {
         return String.format(
                 "%s[scanResetTime=%s, scanSettleTime=%s, shutterWidth=%s, shutterSpeedFactor=%s]",
                 getClass().getSimpleName(),
-                scanResetTime_, scanSettleTime_, shutterWidth_, shutterSpeedFactor_
+                scanResetTime, scanSettleTime, shutterWidth, shutterSpeedFactor
         );
     }
 
     public static class Builder implements SliceSettingsLightSheet.Builder {
 
-        private double scanResetTime_ = 3.0;
-        private double scanSettleTime_ = 1.0;
-        private double shutterWidth_ = 5.0;
-        private double shutterSpeedFactor_ = 1.0;
+        private double scanResetTime = 3.0;
+        private double scanSettleTime = 1.0;
+        private double shutterWidth = 5.0;
+        private double shutterSpeedFactor = 1.0;
 
         private Builder() {
         }
 
         private Builder(final SliceSettingsLightSheet settings) {
-            scanResetTime_ = settings.scanResetTime();
-            scanSettleTime_ = settings.scanSettleTime();
-            shutterWidth_ = settings.shutterWidth();
-            shutterSpeedFactor_ = settings.shutterSpeedFactor();
+            scanResetTime = settings.scanResetTime();
+            scanSettleTime = settings.scanSettleTime();
+            shutterWidth = settings.shutterWidth();
+            shutterSpeedFactor = settings.shutterSpeedFactor();
         }
 
         @Override
         public Builder shutterWidth(final double um) {
-            shutterWidth_ = um;
+            shutterWidth = um;
             return this;
         }
 
         @Override
         public Builder shutterSpeedFactor(final double factor) {
-            shutterSpeedFactor_ = factor;
+            shutterSpeedFactor = factor;
             return this;
         }
 
         @Override
         public Builder scanSettleTime(final double ms) {
-            scanSettleTime_ = ms;
+            scanSettleTime = ms;
             return this;
         }
 
         @Override
         public Builder scanResetTime(final double ms) {
-            scanResetTime_ = ms;
+            scanResetTime = ms;
             return this;
         }
 

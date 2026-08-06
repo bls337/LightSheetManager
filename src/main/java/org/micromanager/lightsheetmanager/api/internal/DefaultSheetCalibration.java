@@ -6,22 +6,22 @@ import java.util.Objects;
 
 public class DefaultSheetCalibration implements SheetCalibration {
 
-    private final double imagingCenter_;
-    private final double sheetWidth_;
-    private final double sheetOffset_;
-    private final boolean autoSheetWidthEnabled_;
-    private final double autoSheetWidthPerPixel_;
-    private final double scanSpeed_;
-    private final double scanOffset_;
+    private final double imagingCenter;
+    private final double sheetWidth;
+    private final double sheetOffset;
+    private final boolean autoSheetWidthEnabled;
+    private final double autoSheetWidthPerPixel;
+    private final double scanSpeed;
+    private final double scanOffset;
 
     private DefaultSheetCalibration(Builder builder) {
-        imagingCenter_ = builder.imagingCenter_;
-        sheetWidth_ = builder.sheetWidth_;
-        sheetOffset_ = builder.sheetOffset_;
-        autoSheetWidthEnabled_ = builder.autoSheetWidthEnabled_;
-        autoSheetWidthPerPixel_ = builder.autoSheetWidthPerPixel_;
-        scanSpeed_ = builder.scanSpeed_;
-        scanOffset_ = builder.scanOffset_;
+        imagingCenter = builder.imagingCenter;
+        sheetWidth = builder.sheetWidth;
+        sheetOffset = builder.sheetOffset;
+        autoSheetWidthEnabled = builder.autoSheetWidthEnabled;
+        autoSheetWidthPerPixel = builder.autoSheetWidthPerPixel;
+        scanSpeed = builder.scanSpeed;
+        scanOffset = builder.scanOffset;
     }
 
     // Note: used by GSON library for deserialization
@@ -45,41 +45,41 @@ public class DefaultSheetCalibration implements SheetCalibration {
 
     @Override
     public double imagingCenter() {
-        return imagingCenter_;
+        return imagingCenter;
     }
 
     // standard camera modes
 
     @Override
     public double sheetWidth() {
-        return sheetWidth_;
+        return sheetWidth;
     }
 
     @Override
     public double sheetOffset() {
-        return sheetOffset_;
+        return sheetOffset;
     }
 
     @Override
     public boolean autoSheetWidthEnabled() {
-        return autoSheetWidthEnabled_;
+        return autoSheetWidthEnabled;
     }
 
     @Override
     public double autoSheetWidthPerPixel() {
-        return autoSheetWidthPerPixel_;
+        return autoSheetWidthPerPixel;
     }
 
     // virtual slit camera mode
 
     @Override
     public double scanSpeed() {
-        return scanSpeed_;
+        return scanSpeed;
     }
 
     @Override
     public double scanOffset() {
-        return scanOffset_;
+        return scanOffset;
     }
 
     @Override
@@ -91,19 +91,19 @@ public class DefaultSheetCalibration implements SheetCalibration {
             return false;
         }
         DefaultSheetCalibration other = (DefaultSheetCalibration) obj;
-        return Double.compare(imagingCenter_, other.imagingCenter_) == 0 &&
-                Double.compare(sheetWidth_, other.sheetWidth_) == 0 &&
-                Double.compare(sheetOffset_, other.sheetOffset_) == 0 &&
-                autoSheetWidthEnabled_ == other.autoSheetWidthEnabled_ &&
-                Double.compare(autoSheetWidthPerPixel_, other.autoSheetWidthPerPixel_) == 0 &&
-                Double.compare(scanSpeed_, other.scanSpeed_) == 0 &&
-                Double.compare(scanOffset_, other.scanOffset_) == 0;
+        return Double.compare(imagingCenter, other.imagingCenter) == 0 &&
+                Double.compare(sheetWidth, other.sheetWidth) == 0 &&
+                Double.compare(sheetOffset, other.sheetOffset) == 0 &&
+                autoSheetWidthEnabled == other.autoSheetWidthEnabled &&
+                Double.compare(autoSheetWidthPerPixel, other.autoSheetWidthPerPixel) == 0 &&
+                Double.compare(scanSpeed, other.scanSpeed) == 0 &&
+                Double.compare(scanOffset, other.scanOffset) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(imagingCenter_, sheetWidth_, sheetOffset_,
-                autoSheetWidthEnabled_, autoSheetWidthPerPixel_, scanSpeed_, scanOffset_);
+        return Objects.hash(imagingCenter, sheetWidth, sheetOffset,
+                autoSheetWidthEnabled, autoSheetWidthPerPixel, scanSpeed, scanOffset);
     }
 
     @Override
@@ -111,62 +111,62 @@ public class DefaultSheetCalibration implements SheetCalibration {
         return String.format("%s[imagingCenter=%s, sheetWidth=%s, sheetOffset=%s, " +
                         "autoSheetWidthEnabled=%s, autoSheetWidthPerPixel=%s, scanSpeed=%s, scanOffset=%s]",
                 getClass().getSimpleName(),
-                imagingCenter_, sheetWidth_, sheetOffset_,
-                autoSheetWidthEnabled_, autoSheetWidthPerPixel_, scanSpeed_, scanOffset_);
+                imagingCenter, sheetWidth, sheetOffset,
+                autoSheetWidthEnabled, autoSheetWidthPerPixel, scanSpeed, scanOffset);
     }
 
     public static class Builder implements SheetCalibration.Builder {
 
-        private double imagingCenter_ = 0.0;
-        private double sheetWidth_ = 0.0;
-        private double sheetOffset_ = 0.0;
-        private boolean autoSheetWidthEnabled_ = false;
-        private double autoSheetWidthPerPixel_ = 0.0;
-        private double scanSpeed_ = 0.0;
-        private double scanOffset_ = 0.0;
+        private double imagingCenter = 0.0;
+        private double sheetWidth = 0.0;
+        private double sheetOffset = 0.0;
+        private boolean autoSheetWidthEnabled = false;
+        private double autoSheetWidthPerPixel = 0.0;
+        private double scanSpeed = 0.0;
+        private double scanOffset = 0.0;
 
         private Builder() {
         }
 
         private Builder(final SheetCalibration settings) {
-            imagingCenter_ = settings.imagingCenter();
-            sheetWidth_ = settings.sheetWidth();
-            sheetOffset_ = settings.sheetOffset();
-            autoSheetWidthEnabled_ = settings.autoSheetWidthEnabled();
-            autoSheetWidthPerPixel_ = settings.autoSheetWidthPerPixel();
-            scanSpeed_ = settings.scanSpeed();
-            scanOffset_ = settings.scanOffset();
+            imagingCenter = settings.imagingCenter();
+            sheetWidth = settings.sheetWidth();
+            sheetOffset = settings.sheetOffset();
+            autoSheetWidthEnabled = settings.autoSheetWidthEnabled();
+            autoSheetWidthPerPixel = settings.autoSheetWidthPerPixel();
+            scanSpeed = settings.scanSpeed();
+            scanOffset = settings.scanOffset();
         }
 
         // normal camera modes
 
         @Override
         public Builder imagingCenter(double center) {
-            imagingCenter_ = center;
+            imagingCenter = center;
             return this;
         }
 
         @Override
         public Builder sheetWidth(double width) {
-            sheetWidth_ = width;
+            sheetWidth = width;
             return this;
         }
 
         @Override
         public Builder sheetOffset(double offset) {
-            sheetOffset_ = offset;
+            sheetOffset = offset;
             return this;
         }
 
         @Override
         public Builder autoSheetWidthEnabled(boolean state) {
-            autoSheetWidthEnabled_ = state;
+            autoSheetWidthEnabled = state;
             return this;
         }
 
         @Override
         public Builder autoSheetWidthPerPixel(double widthPerPixel) {
-            autoSheetWidthPerPixel_ = widthPerPixel;
+            autoSheetWidthPerPixel = widthPerPixel;
             return this;
         }
 
@@ -174,13 +174,13 @@ public class DefaultSheetCalibration implements SheetCalibration {
 
         @Override
         public Builder scanSpeed(double speed) {
-            scanSpeed_ = speed;
+            scanSpeed = speed;
             return this;
         }
 
         @Override
         public Builder scanOffset(double offset) {
-            scanOffset_ = offset;
+            scanOffset = offset;
             return this;
         }
 
