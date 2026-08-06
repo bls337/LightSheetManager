@@ -13,3 +13,6 @@
 build/
 out/
 target/
+
+# Micro-Manager java layer, supplied locally per how-to-build.md
+lib/*.jar
