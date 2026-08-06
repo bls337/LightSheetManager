@@ -6,28 +6,28 @@ import java.util.Objects;
 
 public class DefaultTimingSettings implements TimingSettings {
 
-    private final int scansPerSlice_;
-    private final double delayBeforeScanMs_;
-    private final double scanDurationMs_;
-    private final double delayBeforeLaserMs_;
-    private final double laserTriggerDurationMs_;
-    private final double delayBeforeCameraMs_;
-    private final double cameraTriggerDurationMs_;
-    private final double cameraExposureMs_;
-    private final double sliceDurationMs_;
-    private final boolean alternateScanDirection_;
+    private final int scansPerSlice;
+    private final double delayBeforeScanMs;
+    private final double scanDurationMs;
+    private final double delayBeforeLaserMs;
+    private final double laserTriggerDurationMs;
+    private final double delayBeforeCameraMs;
+    private final double cameraTriggerDurationMs;
+    private final double cameraExposureMs;
+    private final double sliceDurationMs;
+    private final boolean alternateScanDirection;
 
     private DefaultTimingSettings(Builder builder) {
-        scansPerSlice_ = builder.scansPerSlice_;
-        delayBeforeScanMs_ = builder.delayBeforeScanMs_;
-        scanDurationMs_ = builder.scanDurationMs_;
-        delayBeforeLaserMs_ = builder.delayBeforeLaserMs_;
-        laserTriggerDurationMs_ = builder.laserTriggerDurationMs_;
-        delayBeforeCameraMs_ = builder.delayBeforeCameraMs_;
-        cameraTriggerDurationMs_ = builder.cameraTriggerDurationMs_;
-        cameraExposureMs_ = builder.cameraExposureMs_;
-        sliceDurationMs_ = builder.sliceDurationMs();
-        alternateScanDirection_ = builder.alternateScanDirection_;
+        scansPerSlice = builder.scansPerSlice;
+        delayBeforeScanMs = builder.delayBeforeScanMs;
+        scanDurationMs = builder.scanDurationMs;
+        delayBeforeLaserMs = builder.delayBeforeLaserMs;
+        laserTriggerDurationMs = builder.laserTriggerDurationMs;
+        delayBeforeCameraMs = builder.delayBeforeCameraMs;
+        cameraTriggerDurationMs = builder.cameraTriggerDurationMs;
+        cameraExposureMs = builder.cameraExposureMs;
+        sliceDurationMs = builder.sliceDurationMs();
+        alternateScanDirection = builder.alternateScanDirection;
     }
 
     // Note: used by GSON library for deserialization
@@ -61,7 +61,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public double delayBeforeScanMs() {
-        return delayBeforeScanMs_;
+        return delayBeforeScanMs;
     }
 
     /**
@@ -71,7 +71,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public int scansPerSlice() {
-        return scansPerSlice_;
+        return scansPerSlice;
     }
 
     /**
@@ -81,7 +81,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public double scanDurationMs() {
-        return scanDurationMs_;
+        return scanDurationMs;
     }
 
     /**
@@ -91,7 +91,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public double delayBeforeLaserMs() {
-        return delayBeforeLaserMs_;
+        return delayBeforeLaserMs;
     }
 
     /**
@@ -101,7 +101,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public double laserTriggerDurationMs() {
-        return laserTriggerDurationMs_;
+        return laserTriggerDurationMs;
     }
 
     /**
@@ -111,7 +111,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public double delayBeforeCameraMs() {
-        return delayBeforeCameraMs_;
+        return delayBeforeCameraMs;
     }
 
     /**
@@ -121,7 +121,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public double cameraTriggerDurationMs() {
-        return cameraTriggerDurationMs_;
+        return cameraTriggerDurationMs;
     }
 
     /**
@@ -131,7 +131,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public double cameraExposureMs() {
-        return cameraExposureMs_;
+        return cameraExposureMs;
     }
 
     /**
@@ -141,7 +141,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public double sliceDurationMs() {
-        return sliceDurationMs_;
+        return sliceDurationMs;
     }
 
     /**
@@ -151,7 +151,7 @@ public class DefaultTimingSettings implements TimingSettings {
      */
     @Override
     public boolean useAlternateScanDirection() {
-        return alternateScanDirection_;
+        return alternateScanDirection;
     }
 
     @Override
@@ -163,23 +163,23 @@ public class DefaultTimingSettings implements TimingSettings {
             return false;
         }
         DefaultTimingSettings other = (DefaultTimingSettings) obj;
-        return scansPerSlice_ == other.scansPerSlice_ &&
-                Double.compare(delayBeforeScanMs_, other.delayBeforeScanMs_) == 0 &&
-                Double.compare(scanDurationMs_, other.scanDurationMs_) == 0 &&
-                Double.compare(delayBeforeLaserMs_, other.delayBeforeLaserMs_) == 0 &&
-                Double.compare(laserTriggerDurationMs_, other.laserTriggerDurationMs_) == 0 &&
-                Double.compare(delayBeforeCameraMs_, other.delayBeforeCameraMs_) == 0 &&
-                Double.compare(cameraTriggerDurationMs_, other.cameraTriggerDurationMs_) == 0 &&
-                Double.compare(cameraExposureMs_, other.cameraExposureMs_) == 0 &&
-                Double.compare(sliceDurationMs_, other.sliceDurationMs_) == 0 &&
-                alternateScanDirection_ == other.alternateScanDirection_;
+        return scansPerSlice == other.scansPerSlice &&
+                Double.compare(delayBeforeScanMs, other.delayBeforeScanMs) == 0 &&
+                Double.compare(scanDurationMs, other.scanDurationMs) == 0 &&
+                Double.compare(delayBeforeLaserMs, other.delayBeforeLaserMs) == 0 &&
+                Double.compare(laserTriggerDurationMs, other.laserTriggerDurationMs) == 0 &&
+                Double.compare(delayBeforeCameraMs, other.delayBeforeCameraMs) == 0 &&
+                Double.compare(cameraTriggerDurationMs, other.cameraTriggerDurationMs) == 0 &&
+                Double.compare(cameraExposureMs, other.cameraExposureMs) == 0 &&
+                Double.compare(sliceDurationMs, other.sliceDurationMs) == 0 &&
+                alternateScanDirection == other.alternateScanDirection;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(scansPerSlice_, delayBeforeScanMs_, scanDurationMs_, delayBeforeLaserMs_,
-                laserTriggerDurationMs_, delayBeforeCameraMs_, cameraTriggerDurationMs_, cameraExposureMs_,
-                sliceDurationMs_, alternateScanDirection_);
+        return Objects.hash(scansPerSlice, delayBeforeScanMs, scanDurationMs, delayBeforeLaserMs,
+                laserTriggerDurationMs, delayBeforeCameraMs, cameraTriggerDurationMs, cameraExposureMs,
+                sliceDurationMs, alternateScanDirection);
     }
 
     @Override
@@ -190,37 +190,37 @@ public class DefaultTimingSettings implements TimingSettings {
                         + " delayBeforeCameraMs=%s, cameraTriggerDurationMs=%s,"
                         + " cameraExposureMs=%s, sliceDurationMs=%s, alternateScanDirection=%s]",
                 getClass().getSimpleName(),
-                scansPerSlice_, delayBeforeScanMs_, scanDurationMs_, delayBeforeLaserMs_,
-                laserTriggerDurationMs_, delayBeforeCameraMs_, cameraTriggerDurationMs_,
-                cameraExposureMs_, sliceDurationMs_, alternateScanDirection_
+                scansPerSlice, delayBeforeScanMs, scanDurationMs, delayBeforeLaserMs,
+                laserTriggerDurationMs, delayBeforeCameraMs, cameraTriggerDurationMs,
+                cameraExposureMs, sliceDurationMs, alternateScanDirection
         );
     }
 
     public static class Builder implements TimingSettings.Builder {
 
-        private int scansPerSlice_ = 1;
-        private double delayBeforeScanMs_ = 0.0;
-        private double scanDurationMs_ = 10.0;
-        private double delayBeforeLaserMs_ = 1.0;
-        private double laserTriggerDurationMs_ = 1.0;
-        private double delayBeforeCameraMs_ = 0.0;
-        private double cameraTriggerDurationMs_ = 1.0;
-        private double cameraExposureMs_ = 1.0;
-        private boolean alternateScanDirection_ = false;
+        private int scansPerSlice = 1;
+        private double delayBeforeScanMs = 0.0;
+        private double scanDurationMs = 10.0;
+        private double delayBeforeLaserMs = 1.0;
+        private double laserTriggerDurationMs = 1.0;
+        private double delayBeforeCameraMs = 0.0;
+        private double cameraTriggerDurationMs = 1.0;
+        private double cameraExposureMs = 1.0;
+        private boolean alternateScanDirection = false;
 
         private Builder() {
         }
 
         private Builder(final TimingSettings settings) {
-            scansPerSlice_ = settings.scansPerSlice();
-            delayBeforeScanMs_ = settings.delayBeforeScanMs();
-            scanDurationMs_ = settings.scanDurationMs();
-            delayBeforeLaserMs_ = settings.delayBeforeLaserMs();
-            laserTriggerDurationMs_ = settings.laserTriggerDurationMs();
-            delayBeforeCameraMs_ = settings.delayBeforeCameraMs();
-            cameraTriggerDurationMs_ = settings.cameraTriggerDurationMs();
-            cameraExposureMs_ = settings.cameraExposureMs();
-            alternateScanDirection_ = settings.useAlternateScanDirection();
+            scansPerSlice = settings.scansPerSlice();
+            delayBeforeScanMs = settings.delayBeforeScanMs();
+            scanDurationMs = settings.scanDurationMs();
+            delayBeforeLaserMs = settings.delayBeforeLaserMs();
+            laserTriggerDurationMs = settings.laserTriggerDurationMs();
+            delayBeforeCameraMs = settings.delayBeforeCameraMs();
+            cameraTriggerDurationMs = settings.cameraTriggerDurationMs();
+            cameraExposureMs = settings.cameraExposureMs();
+            alternateScanDirection = settings.useAlternateScanDirection();
         }
 
         /**
@@ -230,7 +230,7 @@ public class DefaultTimingSettings implements TimingSettings {
          */
         @Override
         public Builder delayBeforeScanMs(final double delayMs) {
-            delayBeforeScanMs_ = delayMs;
+            delayBeforeScanMs = delayMs;
             return this;
         }
 
@@ -241,7 +241,7 @@ public class DefaultTimingSettings implements TimingSettings {
          */
         @Override
         public Builder scansPerSlice(final int numScans) {
-            scansPerSlice_ = numScans;
+            scansPerSlice = numScans;
             return this;
         }
 
@@ -252,7 +252,7 @@ public class DefaultTimingSettings implements TimingSettings {
          */
         @Override
         public Builder scanDurationMs(final double durationMs) {
-            scanDurationMs_ = durationMs;
+            scanDurationMs = durationMs;
             return this;
         }
 
@@ -263,7 +263,7 @@ public class DefaultTimingSettings implements TimingSettings {
          */
         @Override
         public Builder delayBeforeLaserMs(final double delayMs) {
-            delayBeforeLaserMs_ = delayMs;
+            delayBeforeLaserMs = delayMs;
             return this;
         }
 
@@ -274,7 +274,7 @@ public class DefaultTimingSettings implements TimingSettings {
          */
         @Override
         public Builder laserTriggerDurationMs(final double durationMs) {
-            laserTriggerDurationMs_ = durationMs;
+            laserTriggerDurationMs = durationMs;
             return this;
         }
 
@@ -285,7 +285,7 @@ public class DefaultTimingSettings implements TimingSettings {
          */
         @Override
         public Builder delayBeforeCameraMs(final double delayMs) {
-            delayBeforeCameraMs_ = delayMs;
+            delayBeforeCameraMs = delayMs;
             return this;
         }
 
@@ -296,7 +296,7 @@ public class DefaultTimingSettings implements TimingSettings {
          */
         @Override
         public Builder cameraTriggerDurationMs(final double durationMs) {
-            cameraTriggerDurationMs_ = durationMs;
+            cameraTriggerDurationMs = durationMs;
             return this;
         }
 
@@ -307,7 +307,7 @@ public class DefaultTimingSettings implements TimingSettings {
          */
         @Override
         public Builder cameraExposureMs(final double exposureMs) {
-            cameraExposureMs_ = exposureMs;
+            cameraExposureMs = exposureMs;
             return this;
         }
 
@@ -318,7 +318,7 @@ public class DefaultTimingSettings implements TimingSettings {
          */
         @Override
         public Builder useAlternateScanDirection(final boolean state) {
-            alternateScanDirection_ = state;
+            alternateScanDirection = state;
             return this;
         }
 
@@ -328,10 +328,10 @@ public class DefaultTimingSettings implements TimingSettings {
         @Override
         public double sliceDurationMs() {
             return Math.max(Math.max(
-                            delayBeforeScanMs_ + (scanDurationMs_ * scansPerSlice_), // scan time
-                            delayBeforeLaserMs_ + laserTriggerDurationMs_            // laser time
+                            delayBeforeScanMs + (scanDurationMs * scansPerSlice), // scan time
+                            delayBeforeLaserMs + laserTriggerDurationMs            // laser time
                     ),
-                    delayBeforeCameraMs_ + cameraTriggerDurationMs_                  // camera time
+                    delayBeforeCameraMs + cameraTriggerDurationMs                  // camera time
             );
         }
 
@@ -342,9 +342,9 @@ public class DefaultTimingSettings implements TimingSettings {
                             "cameraTriggerDurationMs=%s, cameraExposureMs=%s, " +
                             "sliceDurationMs=%s, alternateScanDirection=%s]",
                     getClass().getSimpleName(),
-                    scansPerSlice_, delayBeforeScanMs_, scanDurationMs_, delayBeforeLaserMs_, laserTriggerDurationMs_,
-                    delayBeforeCameraMs_, cameraTriggerDurationMs_, cameraExposureMs_,
-                    sliceDurationMs(), alternateScanDirection_
+                    scansPerSlice, delayBeforeScanMs, scanDurationMs, delayBeforeLaserMs, laserTriggerDurationMs,
+                    delayBeforeCameraMs, cameraTriggerDurationMs, cameraExposureMs,
+                    sliceDurationMs(), alternateScanDirection
             );
         }
 

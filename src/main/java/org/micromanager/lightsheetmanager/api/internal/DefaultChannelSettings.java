@@ -12,19 +12,19 @@ import java.util.Objects;
 
 public class DefaultChannelSettings implements ChannelSettings {
 
-    private final boolean enabled_;
-    private final ChannelMode mode_;
-    private final String group_;
-    private final HashMap<String, ChannelSpec[]> groups_;
+    private final boolean enabled;
+    private final ChannelMode mode;
+    private final String group;
+    private final HashMap<String, ChannelSpec[]> groups;
 
     // default value for when the channel group key is not found
     private static final ChannelSpec[] EMPTY_CHANNELS = new ChannelSpec[0];
 
     private DefaultChannelSettings(Builder builder) {
-        enabled_ = builder.enabled_;
-        mode_ = builder.mode_;
-        group_ = builder.group_;
-        groups_ = builder.groups_;
+        enabled = builder.enabled;
+        mode = builder.mode;
+        group = builder.group;
+        groups = builder.groups;
     }
 
     // Note: used by GSON library for deserialization
@@ -53,7 +53,7 @@ public class DefaultChannelSettings implements ChannelSettings {
      */
     @Override
     public boolean enabled() {
-        return enabled_;
+        return enabled;
     }
 
     /**
@@ -63,7 +63,7 @@ public class DefaultChannelSettings implements ChannelSettings {
      */
     @Override
     public int count() {
-        if (enabled_) {
+        if (enabled) {
             return used().length;
         } else {
             return 1;
@@ -77,7 +77,7 @@ public class DefaultChannelSettings implements ChannelSettings {
      */
     @Override
     public int numGroups() {
-        return groups_.size();
+        return groups.size();
     }
 
     /**
@@ -87,7 +87,7 @@ public class DefaultChannelSettings implements ChannelSettings {
      */
     @Override
     public String group() {
-        return group_;
+        return group;
     }
 
     /**
@@ -97,7 +97,7 @@ public class DefaultChannelSettings implements ChannelSettings {
      */
     @Override
     public ChannelMode mode() {
-        return mode_;
+        return mode;
     }
 
     /**
@@ -107,7 +107,7 @@ public class DefaultChannelSettings implements ChannelSettings {
      */
     @Override
     public String[] groupNames() {
-        return groups_.keySet().toArray(String[]::new);
+        return groups.keySet().toArray(String[]::new);
     }
 
     /**
@@ -117,7 +117,7 @@ public class DefaultChannelSettings implements ChannelSettings {
      */
     @Override
     public ChannelSpec[] used() {
-        return Arrays.stream(groups_.getOrDefault(group_, EMPTY_CHANNELS))
+        return Arrays.stream(groups.getOrDefault(group, EMPTY_CHANNELS))
                 .filter(ChannelSpec::useChannel)
                 .toArray(ChannelSpec[]::new);
     }
@@ -129,12 +129,12 @@ public class DefaultChannelSettings implements ChannelSettings {
      */
     @Override
     public ChannelSpec[] data() {
-        return groups_.getOrDefault(group_, EMPTY_CHANNELS);
+        return groups.getOrDefault(group, EMPTY_CHANNELS);
     }
 
     @Override
     public Map<String, ChannelSpec[]> groups() {
-        return Collections.unmodifiableMap(groups_);
+        return Collections.unmodifiableMap(groups);
     }
 
     // TODO: add groups_ to toString, equals, and hashCode methods
@@ -142,7 +142,7 @@ public class DefaultChannelSettings implements ChannelSettings {
     @Override
     public String toString() {
         return String.format("%s[enabled=%s, group=%s, mode=%s]",
-                getClass().getSimpleName(), enabled_, group_, mode_);
+                getClass().getSimpleName(), enabled, group, mode);
     }
 
     @Override
@@ -154,62 +154,62 @@ public class DefaultChannelSettings implements ChannelSettings {
             return false;
         }
         DefaultChannelSettings other = (DefaultChannelSettings) obj;
-        return enabled_ == other.enabled_
-                && group_.equals(other.group_)
-                && mode_ == other.mode_;
+        return enabled == other.enabled
+                && group.equals(other.group)
+                && mode == other.mode;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabled_, group_, mode_);
+        return Objects.hash(enabled, group, mode);
     }
 
     public static class Builder implements ChannelSettings.Builder {
 
-        private boolean enabled_ = false;
-        private ChannelMode mode_ = ChannelMode.VOLUME;
-        private String group_ = "";
-        private HashMap<String, ChannelSpec[]> groups_ = new HashMap<>();
+        private boolean enabled = false;
+        private ChannelMode mode = ChannelMode.VOLUME;
+        private String group = "";
+        private HashMap<String, ChannelSpec[]> groups = new HashMap<>();
 
         private Builder() {
         }
 
         public Builder(final ChannelSettings settings) {
-            enabled_ = settings.enabled();
-            mode_ = settings.mode();
-            group_ = settings.group();
-            groups_ = new HashMap<>();
+            enabled = settings.enabled();
+            mode = settings.mode();
+            group = settings.group();
+            groups = new HashMap<>();
             // deep copy
             settings.groups().forEach((name, channels) -> {
                 ChannelSpec[] array = new ChannelSpec[channels.length];
                 for (int i = 0; i < channels.length; i++) {
                     array[i] = new ChannelSpec(channels[i]);
                 }
-                groups_.put(name, array);
+                groups.put(name, array);
             });
         }
 
         @Override
         public Builder enabled(final boolean state) {
-            enabled_ = state;
+            enabled = state;
             return this;
         }
 
         @Override
         public Builder group(final String group) {
-            group_ = group;
+            this.group = group;
             return this;
         }
 
         @Override
         public Builder mode(final ChannelMode mode) {
-            mode_ = mode;
+            this.mode = mode;
             return this;
         }
 
         @Override
         public Builder data(final ChannelSpec[] channels) {
-            groups_.put(group_, channels);
+            groups.put(group, channels);
             return this;
         }
 

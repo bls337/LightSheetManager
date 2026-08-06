@@ -6,14 +6,14 @@ import java.util.Objects;
 
 public class DefaultSliceSettings implements SliceSettings {
 
-    private final double period_;
-    private final double sampleExposure_;
-    private final boolean periodMinimized_;
+    private final double period;
+    private final double sampleExposure;
+    private final boolean periodMinimized;
 
     private DefaultSliceSettings(Builder builder) {
-        period_ = builder.period_;
-        sampleExposure_ = builder.sampleExposure_;
-        periodMinimized_ = builder.periodMinimized_;
+        period = builder.period;
+        sampleExposure = builder.sampleExposure;
+        periodMinimized = builder.periodMinimized;
     }
 
     // Note: used by GSON library for deserialization
@@ -37,17 +37,17 @@ public class DefaultSliceSettings implements SliceSettings {
 
     @Override
     public double period() {
-        return period_;
+        return period;
     }
 
     @Override
     public double sampleExposure() {
-        return sampleExposure_;
+        return sampleExposure;
     }
 
     @Override
     public boolean periodMinimized() {
-        return periodMinimized_;
+        return periodMinimized;
     }
 
     @Override
@@ -59,14 +59,14 @@ public class DefaultSliceSettings implements SliceSettings {
             return false;
         }
         DefaultSliceSettings other = (DefaultSliceSettings) obj;
-        return Double.compare(period_, other.period_) == 0 &&
-                Double.compare(sampleExposure_, other.sampleExposure_) == 0 &&
-                periodMinimized_ == other.periodMinimized_;
+        return Double.compare(period, other.period) == 0 &&
+                Double.compare(sampleExposure, other.sampleExposure) == 0 &&
+                periodMinimized == other.periodMinimized;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(period_, sampleExposure_, periodMinimized_);
+        return Objects.hash(period, sampleExposure, periodMinimized);
     }
 
     @Override
@@ -74,40 +74,40 @@ public class DefaultSliceSettings implements SliceSettings {
         return String.format(
                 "%s[period=%s, sampleExposure=%s, periodMinimized=%s]",
                 getClass().getSimpleName(),
-                period_, sampleExposure_, periodMinimized_
+                period, sampleExposure, periodMinimized
         );
     }
 
     public static class Builder implements SliceSettings.Builder {
 
-        private double period_ = 10.0;
-        private double sampleExposure_ = 1.0;
-        private boolean periodMinimized_ = false;
+        private double period = 10.0;
+        private double sampleExposure = 1.0;
+        private boolean periodMinimized = false;
 
         private Builder() {
         }
 
         private Builder(final SliceSettings settings) {
-            period_ = settings.period();
-            sampleExposure_ = settings.sampleExposure();
-            periodMinimized_ = settings.periodMinimized();
+            period = settings.period();
+            sampleExposure = settings.sampleExposure();
+            periodMinimized = settings.periodMinimized();
         }
 
         @Override
         public Builder period(double periodMs) {
-            period_ = periodMs;
+            period = periodMs;
             return this;
         }
 
         @Override
         public Builder sampleExposure(double exposureMs) {
-            sampleExposure_ = exposureMs;
+            sampleExposure = exposureMs;
             return this;
         }
 
         @Override
         public Builder periodMinimized(boolean state) {
-            periodMinimized_ = state;
+            periodMinimized = state;
             return this;
         }
 
