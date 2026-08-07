@@ -10,6 +10,7 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineScape;
+import org.micromanager.lightsheetmanager.model.acquisitions.CameraTriggers;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
@@ -377,11 +378,7 @@ public class PLogicScape {
 
             // if we are changing color slice by slice then set controller to do multiple slices per piezo move
             // otherwise just set to 1 slice per piezo move
-            int numSlicesPerPiezo = 1;
-            if (settings.channels().enabled() && settings.channels().mode() == ChannelMode.SLICE_HW) {
-                numSlicesPerPiezo = settings.channels().count();
-            }
-            scanner_.setSPIMNumSlicesPerPiezo(numSlicesPerPiezo);
+            scanner_.setSPIMNumSlicesPerPiezo(CameraTriggers.channelsPerSlice(settings));
 
             // set controller to do multiple volumes per start trigger if we are doing
             //   multiple channels with  hardware switching of channel volume by volume
@@ -451,9 +448,15 @@ public class PLogicScape {
             piezoAmplitude = (settings.volume().slicesPerView() - 1) * settings.volume().sliceStepSize();
         }
 
-        // use this instead of settings.numSlices from here on out because
-        // we modify it if we are taking "extra slice" for synchronous/overlap
-        int numSlicesHW = settings.volume().slicesPerView();
+        // how many slices we ask the hardware for, which is one more than the number of images
+        // wanted in synchronous/overlap mode.
+        // Only the hardware time point event factories are sized from this same count, because
+        // only they describe one continuous burst in which the extra trigger's frame reads out.
+        // The software time point factories stay sized to the images wanted, and must: each of
+        // their volumes is its own camera sequence that ends before the extra trigger's frame
+        // arrives, so arming for this count instead would wait for a frame per volume that never
+        // comes.
+        final int numSlicesHW = CameraTriggers.slicesPerVolume(settings);
 
         // tweak the piezo parameters if we are using synchronous/overlap mode
         // object is to get exact same piezo/scanner positions in first N frames (piezo/scanner will move to N+1st position but no image taken)
@@ -461,12 +464,14 @@ public class PLogicScape {
         // offset shifts by half a step
         final CameraMode cameraMode = settings.cameraMode();
         if (cameraMode == CameraMode.OVERLAP) {
-            if (settings.volume().slicesPerView() > 1) {
-                piezoAmplitude *= numSlicesHW / (numSlicesHW - 1.0);
+            // the number of images wanted, not the number of triggers: the extra trigger moves the
+            // piezo to a position no wanted image is taken at
+            final int numSlices = settings.volume().slicesPerView();
+            if (numSlices > 1) {
+                piezoAmplitude *= numSlices / (numSlices - 1.0);
             }
             // was piezoCenter += piezoAmplitude/(2*numSlicesHW) which isn't quite the same but close enough that nobody probably noticed
             piezoCenter += settings.volume().sliceStepSize() / 2;
-            numSlicesHW += 1;
         }
 
         // HACK(Brandon): used this to get a single camera to work with 2 simultaneous cameras
