@@ -161,14 +161,18 @@ public final class SurplusFrames {
     }
 
     /**
-     * Mark an event so the image it consumes is discarded instead of filed.
+     * Refuse to mark an event, because nothing downstream can act on the mark.
      * <p>
-     * The engine drops the image after popping this event and before stamping it, which is the only
-     * order that leaves the remaining events lined up with the remaining frames. The event still
-     * consumes its frame; only the filing is skipped.
+     * Discarding a consumed image needs an engine that understands the flag, and the stock engine
+     * does not. The setup path refuses overlap with hardware time points before an acquisition
+     * starts, so reaching this is a bug rather than a configuration the user chose. Throwing keeps
+     * that failure loud: returning the event unmarked would file the surplus image as a real slice
+     * and shift every frame after it, silently.
      */
     private static AcquisitionEvent markSurplus(final AcquisitionEvent event) {
-        event.setDiscardImage(true);
-        return event;
+        throw new UnsupportedOperationException(
+                "overlap camera mode with hardware time points delivers images the dataset cannot "
+                        + "keep, and no mechanism for discarding one exists yet; this combination "
+                        + "is meant to be refused before an acquisition starts");
     }
 }

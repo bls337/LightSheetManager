@@ -1082,6 +1082,18 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         + "stage scanning. Raise the time point interval to at least " + minIntervalSec + " s.");
                 return false;
             }
+            if (CameraTriggers.hasSurplusFrames(acqSettings_)) {
+                // Overlap mode delivers more images than the dataset wants, and the extra ones
+                // arrive at the end of every volume rather than at the end of the run. Keeping the
+                // events lined up with the frames means consuming those images and discarding them
+                // afterwards, and no mechanism for discarding one exists yet. Refuse here rather
+                // than file them as the next time point's first slices and shift everything after.
+                studio_.logs().showError("Time point interval is too short: intervals under about "
+                        + minIntervalSec + " s switch to hardware time points, which can't yet be combined "
+                        + "with the \"Overlap/Synchronous\" camera mode. Either raise the time point "
+                        + "interval to at least " + minIntervalSec + " s, or choose a different camera mode.");
+                return false;
+            }
         }
 
         final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
