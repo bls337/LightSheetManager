@@ -219,6 +219,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
+
             // --- testing code below ---
 //            StrVector deviceNames = core_.getLoadedDevices();
 //            for (String deviceName : deviceNames) {
@@ -672,8 +673,13 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                             // carrying no per-channel presets. Stamping a preset per channel made
                             // AcqEngJ split the merge and start one more camera sequence than the
                             // controller was armed to deliver, which then waited for frames that
-                            // never arrived. VOLUME_HW reaches this branch too, but needs the
-                            // opposite channel axis order and is refused on SCAPE.
+                            // never arrived.
+                            // VOLUME_HW reaches this branch too and is filed wrong when it does:
+                            // it switches channel once per volume, so it needs the channel axis
+                            // outside the z axis rather than innermost. The channel panel steers
+                            // users away from it but does not write the corrected mode back to the
+                            // settings, so a stored profile or an API caller still arrives here.
+                            // Nothing refuses it on this path yet.
                             currentAcquisition_.submitEventIterator(
                                     LightSheetEventAdapter.createChannelPerSliceAcqEvents(
                                             baseEvent.copy(), acqSettings_, cameraNames,
@@ -896,6 +902,28 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     changeChannelPerVolumeDoneFirst = true;
                     break;
                 case VOLUME_HW:
+                    if (acqSettings_.channels().count() > 1) {
+                        // The controller switches channel once per volume here, so it delivers every
+                        // slice of one channel before starting the next. The event stream built for
+                        // this geometry puts the channel axis innermost, which is the interleaved
+                        // order, so the counts match, nothing fails, and nearly every frame is filed
+                        // against the wrong channel and slice. Refuse rather than record that.
+                        // Refusing here also covers the combination with hardware time points, which
+                        // 1.4 rejects separately: both drive the controller's repeat counter, and
+                        // hardware time points overwrite the repeat count this mode depends on.
+                        // The channel panel steers away from this mode but does not write the
+                        // correction back to the settings, so it still arrives here from a stored
+                        // profile or through the API.
+                        studio_.logs().showError("Channel mode \"" + ChannelMode.VOLUME_HW
+                                + "\" is not supported: images would be saved against the wrong "
+                                + "channel and slice. Use \"" + ChannelMode.SLICE_HW
+                                + "\" for hardware channel switching, or \"" + ChannelMode.VOLUME
+                                + "\" to switch channels in software.");
+                        return false; // early exit
+                    }
+                    // one channel needs no hardware switching at all, so it behaves like the
+                    // single channel case below and cannot be misordered
+                    break;
                 case SLICE_HW:
                     if (acqSettings_.channels().count() == 1) {
                         // only 1 channel selected so don't have to really use hardware switching
@@ -927,11 +955,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // 1.4 adjusts nrSlicesSoftware at this point when hardware timepoints are in use: one
         // controller trigger covers every timepoint, so the camera sequence has to be sized for
-        // the whole burst rather than one volume. There is no counterpart here, and
-        // nrSlicesSoftware is never read below because AcqEngJ sizes the sequence from however
-        // many events it merges. It will not merge across a timepoint boundary while the events
-        // carry per-timepoint start times, so under hardware timepoints the camera sequence
-        // covers one timepoint while the controller runs all of them.
+        // the whole burst rather than one volume. The counterpart here is the event stream itself,
+        // since AcqEngJ sizes the sequence from however many events it merges, and the hardware
+        // timepoint factories carry the whole burst for exactly that reason. CameraTriggers holds
+        // the arithmetic both that stream and the controller are built from. nrSlicesSoftware
+        // stays dead: it is assigned above and never read.
 
         // TODO: make this more robust, should this be the first imaging camera?
         String cameraName;
@@ -1052,6 +1080,18 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 studio_.logs().showError("Time point interval is too short: intervals under about "
                         + minIntervalSec + " s switch to hardware time points, which can't be combined with "
                         + "stage scanning. Raise the time point interval to at least " + minIntervalSec + " s.");
+                return false;
+            }
+            if (CameraTriggers.hasSurplusFrames(acqSettings_)) {
+                // Overlap mode delivers more images than the dataset wants, and the extra ones
+                // arrive at the end of every volume rather than at the end of the run. Keeping the
+                // events lined up with the frames means consuming those images and discarding them
+                // afterwards, and no mechanism for discarding one exists yet. Refuse here rather
+                // than file them as the next time point's first slices and shift everything after.
+                studio_.logs().showError("Time point interval is too short: intervals under about "
+                        + minIntervalSec + " s switch to hardware time points, which can't yet be combined "
+                        + "with the \"Overlap/Synchronous\" camera mode. Either raise the time point "
+                        + "interval to at least " + minIntervalSec + " s, or choose a different camera mode.");
                 return false;
             }
         }

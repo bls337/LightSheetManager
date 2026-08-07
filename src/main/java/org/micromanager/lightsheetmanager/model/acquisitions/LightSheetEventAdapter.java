@@ -74,14 +74,22 @@ public final class LightSheetEventAdapter {
             applySingleChannel(baseEvent, usedChannels[0]);
         }
 
+        // No start time per time point. The controller owns the pacing once it is running the
+        // whole burst from one trigger, and a start time that differs per time point is half of
+        // what makes AcqEngJ refuse to merge across the boundary, which arms the cameras for one
+        // time point while the controller runs them all. The time index still goes on, since the
+        // datastore needs the coordinate and the index alone does not split the merge.
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> timelapse =
-                timelapse(settings.numTimePoints(), settings.timePointIntervalSec());
+                timelapse(settings.numTimePoints(), null);
         // Base 0 so cameras() leaves the plain camera index on the axis; channelAxis() runs
         // innermost and folds it into the combined slot.
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras =
                 cameras(cameraDeviceNames, 0);
+        // The slice count the controller was programmed with, not the number of images wanted, so
+        // there is one event per trigger. The wrapper below then drops the single trigger that
+        // reads out no frame, leaving one event per frame the camera actually delivers.
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
-                zStack(0, settings.volume().slicesPerView());
+                zStack(0, CameraTriggers.slicesPerVolume(settings));
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels =
                 channelAxis(usedChannels.length);
 
@@ -90,9 +98,18 @@ public final class LightSheetEventAdapter {
         acqFunctions.add(cameras);
         acqFunctions.add(zStack);
         acqFunctions.add(channels);
-        return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
+        return SurplusFrames.wrap(
+                new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor), settings);
     }
 
+    /**
+     * Build events for a timelapse of volumes with no channels, which the controller free-runs.
+     * <p>
+     * The channel-carrying sibling above describes the same burst; the only difference here is
+     * that the controller fires once per slice position instead of once per channel at each
+     * position, so a volume is one event per slice. Everything about the surplus frames in overlap
+     * mode applies unchanged, one image per volume rather than one per channel per volume.
+     */
     public static Iterator<AcquisitionEvent> createTimelapseVolumeAcqEvents(
             AcquisitionEvent baseEvent, AcquisitionSettings settings,
             String[] cameraDeviceNames,
@@ -106,14 +123,18 @@ public final class LightSheetEventAdapter {
 
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras = cameras(cameraDeviceNames);
 
+        // The slice count the controller was programmed with, not the number of images wanted, so
+        // there is one event per trigger. The wrapper below then drops the single trigger that
+        // reads out no frame, leaving one event per frame the camera actually delivers.
         Function<AcquisitionEvent, Iterator<AcquisitionEvent>> zStack =
-                zStack(0, settings.volume().slicesPerView());
+                zStack(0, CameraTriggers.slicesPerVolume(settings));
 
         ArrayList<Function<AcquisitionEvent, Iterator<AcquisitionEvent>>> acqFunctions = new ArrayList<>();
         acqFunctions.add(timelapse);
         acqFunctions.add(cameras);
         acqFunctions.add(zStack);
-        return new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor);
+        return SurplusFrames.wrap(
+                new AcquisitionEventIterator(baseEvent, acqFunctions, eventMonitor), settings);
     }
 
     public static Iterator<AcquisitionEvent> createAcqEvents(
