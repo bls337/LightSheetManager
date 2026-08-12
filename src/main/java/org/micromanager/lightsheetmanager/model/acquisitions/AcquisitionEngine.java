@@ -539,18 +539,15 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         if (acq == null) {
             return true; // nothing is running, so there is nothing to protect
         }
-        // Micro-Manager vetoes the entire viewer close when this returns false, so refusing here
-        // keeps the close from racing the end of run save. Both closes post to the same event
-        // subscriber, and the acquisition thread already holds that lock while the save runs.
-        // The display's own abort button also calls this and ignores the result, so the
-        // confirmation has to answer for both callers. Unattended runs are not asked and are
-        // left running.
-        if (!model_.logging().confirmOrDefault("Abort Acquisition",
+        // always refuse while a run is live: Micro-Manager vetoes the close, and that veto is what
+        // keeps it from racing the abort into finish(), whose save closes the same datastore from
+        // the acquisition thread. answering yes only aborts, so the close succeeds on the next
+        // attempt. the display's abort button also lands here and ignores the result.
+        if (model_.logging().confirmOrDefault("Abort Acquisition",
                 "Abort the current acquisition task?", false)) {
-            return false;
+            acq.abort();
         }
-        acq.abort();
-        return true;
+        return false;
     }
 
     @Override
