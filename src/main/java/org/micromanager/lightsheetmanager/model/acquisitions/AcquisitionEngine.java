@@ -534,9 +534,22 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     @Override
     public boolean abortRequest() {
-        if (currentAcquisition_ != null) {
-            currentAcquisition_.abort();
+        // read once: the acquisition thread clears this field as soon as finish() returns
+        final Acquisition acq = currentAcquisition_;
+        if (acq == null) {
+            return true; // nothing is running, so there is nothing to protect
         }
+        // Micro-Manager vetoes the entire viewer close when this returns false, so refusing here
+        // keeps the close from racing the end of run save. Both closes post to the same event
+        // subscriber, and the acquisition thread already holds that lock while the save runs.
+        // The display's own abort button also calls this and ignores the result, so the
+        // confirmation has to answer for both callers. Unattended runs are not asked and are
+        // left running.
+        if (!model_.logging().confirmOrDefault("Abort Acquisition",
+                "Abort the current acquisition task?", false)) {
+            return false;
+        }
+        acq.abort();
         return true;
     }
 

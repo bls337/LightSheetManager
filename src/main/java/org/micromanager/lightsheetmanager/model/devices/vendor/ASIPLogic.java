@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 public class ASIPLogic extends ASITigerBase {
 
     public static final int addrZero = 0;
-    public static final int addrEdge = 0;
+    public static final int addrEdge = 128;
     public static final int addrInvert = 64;
 
     // front panel BNC 1-8
