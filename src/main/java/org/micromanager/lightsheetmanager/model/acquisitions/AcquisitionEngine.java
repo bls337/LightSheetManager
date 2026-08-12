@@ -534,10 +534,20 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     @Override
     public boolean abortRequest() {
-        if (currentAcquisition_ != null) {
-            currentAcquisition_.abort();
+        // read once: the acquisition thread clears this field as soon as finish() returns
+        final Acquisition acq = currentAcquisition_;
+        if (acq == null) {
+            return true; // nothing is running, so there is nothing to protect
         }
-        return true;
+        // always refuse while a run is live: Micro-Manager vetoes the close, and that veto is what
+        // keeps it from racing the abort into finish(), whose save closes the same datastore from
+        // the acquisition thread. answering yes only aborts, so the close succeeds on the next
+        // attempt. the display's abort button also lands here and ignores the result.
+        if (model_.logging().confirmOrDefault("Abort Acquisition",
+                "Abort the current acquisition task?", false)) {
+            acq.abort();
+        }
+        return false;
     }
 
     @Override
