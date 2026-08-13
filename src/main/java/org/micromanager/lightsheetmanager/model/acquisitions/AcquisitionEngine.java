@@ -218,6 +218,10 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
         // default settings
         asb_ = ScapeAcquisitionSettings.builder();
+        // seeded from the geometry because the angle has no single sensible default;
+        // a saved profile replaces it later when UserSettings loads
+        asb_.stageScanBuilder().firstViewAngle(
+                model.devices().adapter().geometry().defaultFirstViewAngle());
         acqSettings_ = asb_.build();
     }
 
