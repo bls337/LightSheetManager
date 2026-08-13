@@ -105,6 +105,8 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
             table_.getData().setChannels(channelGroup, model_.acquisitions().settings().channels().used());
             table_.getData().setChannelGroup(channelGroup);
             table_.refreshData();
+            // a different group can select a different number of channels, which changes the duration
+            model_.acquisitions().updateDurationLabels();
         });
 
         // add channel
@@ -112,6 +114,7 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
             table_.getTableModel().addEmptyChannel();
             final ChannelSpec[] channels = table_.getData().getChannels();
             model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
+            model_.acquisitions().updateDurationLabels();
             //System.out.println("add channel");
             //table_.getData().printChannelData();
         });
@@ -123,6 +126,7 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
                 table_.getTableModel().removeChannel(row);
                 final ChannelSpec[] channels = table_.getData().getChannels();
                 model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
+                model_.acquisitions().updateDurationLabels();
                 //System.out.println("remove row index: " + row);
             }
         });
@@ -155,6 +159,8 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
             } else {
                 model_.acquisitions().settingsBuilder().channelBuilder().mode(selected);
                 lastChannelMode_ = selected;
+                // per slice and per volume give different totals, so the labels have to be redone
+                model_.acquisitions().updateDurationLabels();
             }
         });
 

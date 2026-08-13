@@ -48,6 +48,14 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             r -> new Thread(r, "Acquisition Thread"));
     protected volatile Acquisition currentAcquisition_ = null; // TODO: consider making a getter rather than protected?
 
+    // true from the moment a run is requested until the acquisition thread exits. currentAcquisition_
+    // cannot answer "is a run in flight?": the engines only assign it partway through run(), so it
+    // stays null across all of setup() and the arming that follows.
+    private volatile boolean acquisitionRequested_ = false;
+    // a stop asked for before the acquisition was started, acted on by the checks in requestRun()
+    // and in each engine's run()
+    private volatile boolean stopRequested_ = false;
+
     private final AutofocusAdapter autofocus_;
 
     protected Datastore datastore_;
@@ -236,6 +244,20 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     abstract void finish();
 
+    /**
+     * Whether the user asked to stop before the acquisition was started.
+     * <p>
+     * Everything from the moment a run is requested up to {@code currentAcquisition_.start()} is
+     * preparation, and for the first part of it {@code currentAcquisition_} is still null, so
+     * {@code requestStop()} has nothing to abort and only records the request. Engines must check
+     * this before starting, or a stop clicked while arming is silently ignored and the run proceeds.
+     *
+     * @return true if the run should be given up instead of started
+     */
+    protected boolean isStopRequested() {
+        return stopRequested_;
+    }
+
     public abstract void recalculateSliceTiming();
 
     public abstract void updateDurationLabels();
@@ -269,6 +291,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     @Override
     public Future<?> requestRun(boolean speedTest) {
+        // set here and not inside the task: a Stop clicked while the task is still queued, or
+        // anywhere inside setup(), must find a run in flight
+        acquisitionRequested_ = true;
+        stopRequested_ = false; // never let a previous run's stop request kill this one
+
         // Run on a new thread, so it doesn't block the EDT
         Future<?> acqFinished = acquisitionExecutor_.submit(() -> {
             if (currentAcquisition_ != null) {
@@ -313,6 +340,14 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                     model_.logging().reportError(e, "Error during acquisition setup");
                     return; // early exit => stop acquisition
                 }
+                if (stopRequested_) {
+                    // Stop was clicked during setup(), when there was no Acquisition to abort.
+                    // Give up here so run() never touches the hardware. run() checks again just
+                    // before it starts, which covers the rest of the window.
+                    studio_.logs().logMessage("Acquisition stopped during setup.");
+                    return; // early exit => finish() still tears down in the finally
+                }
+
                 run(); // run the acquisition and block until complete
             } catch (Exception e) {
                 model_.logging().reportError(e);
@@ -325,6 +360,9 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                     // must ALWAYS run: if currentAcquisition_ is left set, every future
                     // acquisition is rejected until the plugin restarts
                     currentAcquisition_ = null;
+                    // cleared last of the run-state flags: while it is set, requestStop() treats
+                    // a stop as something to act on rather than an error
+                    acquisitionRequested_ = false;
                     // free the datastore so a large store isn't kept in memory (matches MM's
                     // AcqEngJAdapter.onAcquisitionEnded); also what the save guard checks to skip aborted/empty runs
                     datastore_ = null;
@@ -341,11 +379,17 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     @Override
     public void requestStop() {
-        if (currentAcquisition_ == null || currentAcquisition_.getDataSink().isFinished()) {
+        if (!acquisitionRequested_) {
             model_.logging().reportError("Acquisition is not running.");
             return;
         }
-        currentAcquisition_.abort();
+        // record the request before trying to abort. During setup() there is nothing to abort yet,
+        // and reporting "not running" there would leave the run going with the button reading
+        // "Start Acquisition", which is also the way into a second, unwanted run.
+        stopRequested_ = true;
+        if (currentAcquisition_ != null && !currentAcquisition_.getDataSink().isFinished()) {
+            currentAcquisition_.abort();
+        }
     }
 
     @Override
