@@ -537,6 +537,13 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }, Acquisition.AFTER_CAMERA_HOOK);
 
+        // Last chance to honor a Stop clicked while everything above was being armed. Checked
+        // before the shutter is touched, so giving up here cannot leave it open.
+        if (isStopRequested()) {
+            studio_.logs().logMessage("Acquisition stopped before it started.");
+            return false; // early exit => finish() still restores whatever was armed
+        }
+
         ///////////// Turn off autoshutter /////////////////
         try {
             shutterState_ = new ShutterState(core_.getShutterOpen(), core_.getAutoShutter());
