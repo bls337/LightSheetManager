@@ -1,5 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs.setup;
 
+import com.google.common.eventbus.Subscribe;
+import org.micromanager.events.LiveModeEvent;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.gui.components.Button;
@@ -11,6 +13,7 @@ import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import java.util.Objects;
 
 
@@ -23,6 +26,7 @@ public class CameraPanel extends Panel {
 
     private boolean isPreviewPressed = false;
     private boolean isLivePressed = false;
+    private boolean isSubscribed = false;
 
     private Button btnImagingPath_;
     private Button btnEpiPath_;
@@ -198,19 +202,104 @@ public class CameraPanel extends Panel {
         }
     }
 
-    // TODO: do we want to subscribe to events?
-//    @Subscribe
-//    public void liveModeListener(LiveModeEvent event) {
-//        if (!model_.studio().live().isLiveModeOn()) {
-//            if (isPreviewPressed) {
-//                isPreviewPressed = false;
-//                btnInvertedPath_.setState(false);
-//            }
-//            if (isLivePressed) {
-//                isLivePressed = false;
-//                btnLiveMode_.setState(false);;
-//            }
-//        }
-//    }
+    // Subscribe on the notify hooks rather than in the constructor so that unsubscribing is
+    // symmetric: the plugin frame is DISPOSE_ON_CLOSE, which removes this panel from the
+    // hierarchy. Leaving the subscription behind would keep delivering events to a dead panel.
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        if (!isSubscribed) {
+            model_.studio().events().registerForEvents(this);
+            isSubscribed = true;
+            // opening the plugin while live mode is already running fires no event, so take
+            // the current state once on the way in
+            syncToggles();
+        }
+    }
+
+    @Override
+    public void removeNotify() {
+        if (isSubscribed) {
+            model_.studio().events().unregisterForEvents(this);
+            isSubscribed = false;
+        }
+        super.removeNotify();
+    }
+
+    /**
+     * Keeps the Preview and Live toggles in step with live mode.
+     *
+     * <p>Live mode can be started and stopped from outside this panel, from Micro-Manager's own
+     * live window or by an acquisition starting, and without this the toggles show whatever this
+     * panel last did rather than what the system is actually doing.
+     *
+     * @param event the live mode event
+     */
+    @Subscribe
+    public void liveModeListener(LiveModeEvent event) {
+        // Micro-Manager posts this on whichever thread changed live mode, and an acquisition
+        // stops it from the acquisition thread, so it does not always arrive on the EDT.
+        // Handle it inline when it does: the Preview button stops live mode and starts it again
+        // a few lines later, and only a same-thread update sees the "off" in between.
+        if (SwingUtilities.isEventDispatchThread()) {
+            syncToggles();
+        } else {
+            SwingUtilities.invokeLater(this::syncToggles);
+        }
+    }
+
+    /**
+     * Points the toggles at the current live mode state.
+     *
+     * <p>The two flags track which toggle is lit, so a run started from this panel is already
+     * accounted for by the time the event arrives and only an outside change does any work.
+     */
+    private void syncToggles() {
+        if (model_.studio().live().isLiveModeOn()) {
+            if (!isPreviewPressed && !isLivePressed) {
+                selectToggleForCamera();
+            }
+        } else {
+            if (isPreviewPressed) {
+                isPreviewPressed = false;
+                btnInvertedPath_.setState(false);
+            }
+            if (isLivePressed) {
+                isLivePressed = false;
+                btnLiveMode_.setState(false);
+            }
+        }
+    }
+
+    /**
+     * Lights the toggle belonging to the camera live mode is running on.
+     *
+     * <p>Live mode started elsewhere says nothing about which path it is using, so match the
+     * current camera against the two this panel knows about and leave both toggles alone when it
+     * is neither.
+     */
+    private void selectToggleForCamera() {
+        final String activeCamera;
+        try {
+            activeCamera = model_.studio().core().getCameraDevice();
+        } catch (Exception e) {
+            return; // no camera to match against
+        }
+        if (activeCamera == null || activeCamera.isEmpty()) {
+            return;
+        }
+        final CameraBase previewCamera = model_.devices().device("PreviewCamera");
+        if (previewCamera != null && activeCamera.equals(previewCamera.getDeviceName())) {
+            isPreviewPressed = true;
+            btnInvertedPath_.setState(true);
+            return;
+        }
+        // firstImagingCamera() returns null when no camera is active
+        final CameraBase imagingCamera = model_.devices().firstImagingCamera();
+        if (imagingCamera != null && activeCamera.equals(imagingCamera.getDeviceName())) {
+            isLivePressed = true;
+            btnLiveMode_.setState(true);
+        }
+    }
 
 }
