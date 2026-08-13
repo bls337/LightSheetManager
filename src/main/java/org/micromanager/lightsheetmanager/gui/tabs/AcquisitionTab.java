@@ -9,6 +9,7 @@ import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
 import org.micromanager.lightsheetmanager.gui.data.Icons;
+import org.micromanager.lightsheetmanager.gui.utils.DialogUtils;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.AdvancedTimingPanel;
 import org.micromanager.lightsheetmanager.gui.tabs.acquisition.CameraPanel;
@@ -232,7 +233,15 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
             if (btnRunAcquisition_.isSelected()) {
                 runAcquisition(false);
             } else {
-                model_.acquisitions().requestStop();
+                // confirm first: one stray click discards a run in progress
+                if (DialogUtils.showYesNoDialog(this, "Stop Acquisition",
+                        "Stop the current acquisition?")) {
+                    model_.acquisitions().requestStop();
+                } else {
+                    // the press already flipped the toggle, so put it back or the button
+                    // reads "Start Acquisition" while the run is still going
+                    btnRunAcquisition_.setState(true);
+                }
             }
         });
 
