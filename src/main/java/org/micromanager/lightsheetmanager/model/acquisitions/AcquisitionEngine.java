@@ -65,10 +65,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      * Validates that the acquisition can actually be written to disk, before anything is acquired.
      * <p>
      * The images are written by {@code finish()}, i.e. only AFTER the run completes, so without this
-     * check an unusable save location is discovered at the very end and the data is lost. Observed
-     * 2026-07-27: a 41 s dual-camera run ended in "could not save the acquisition data to:
-     * D:\SCOPE\test\Test" because {@code D:\SCOPE\test} did not exist. The same path also silently
-     * drops {@code acq_settings.json} and {@code position_list.pos}, which are written up front.
+     * check an unusable save location is discovered at the very end and the data is lost.
      * <p>
      * Called from both geometry engines' {@code setup()} before any hardware is touched, so a failure
      * costs nothing and leaves the microscope untouched.
@@ -125,8 +122,6 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      * <p>Cameras that disagree overrun the shared Core circular buffer and take the whole JVM with
      * them: {@code EXCEPTION_ACCESS_VIOLATION} inside {@code popNextImageMD}, no Java exception, no
      * recovery, no data. Refusing to arm is the only place this can be stopped from inside LSM.
-     * Observed in the field 2026-07-28 on a dual-Kinetix rig where a partly-applied ROI left one
-     * camera at 1200x1200 and the other at 600x600.
      *
      * <p>Called from both geometry engines' {@code setup()} before any hardware is touched, so a
      * failure costs nothing and leaves the microscope untouched.
@@ -223,6 +218,10 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
         // default settings
         asb_ = ScapeAcquisitionSettings.builder();
+        // seeded from the geometry because the angle has no single sensible default;
+        // a saved profile replaces it later when UserSettings loads
+        asb_.stageScanBuilder().firstViewAngle(
+                model.devices().adapter().geometry().defaultFirstViewAngle());
         acqSettings_ = asb_.build();
     }
 

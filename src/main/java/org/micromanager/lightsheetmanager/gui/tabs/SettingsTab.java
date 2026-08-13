@@ -93,7 +93,7 @@ public class SettingsTab extends Panel implements ListeningPanel {
 
         spnScanFirstViewAngle_ = Spinner.createDoubleSpinner(
                 settings.stageScan().firstViewAngle(),
-                1.0, 89.0, 1.0);
+                1.0, 89.0, 0.1);
 
         // Scan CheckBoxes
         cbxScanFromCurrentPosition_ = new CheckBox("Scan from current position instead of center",
@@ -133,13 +133,20 @@ public class SettingsTab extends Panel implements ListeningPanel {
             pnlScanSettings.add(spnScanOvershootDist_, "wrap");
             pnlScanSettings.add(lblScanRetraceSpeed, "");
             pnlScanSettings.add(spnScanRetraceSpeed_, "wrap");
-            pnlScanSettings.add(lblScanAngleFirstView, "");
-            pnlScanSettings.add(spnScanFirstViewAngle_, "wrap");
+        }
+
+        // the grid slice step size is derived from the angle as well, so it stays
+        // available even when the stage cannot scan
+        pnlScanSettings.add(lblScanAngleFirstView, "");
+        pnlScanSettings.add(spnScanFirstViewAngle_, "wrap");
+
+        if (isUsingScanSettings_) {
             pnlScanSettings.add(cbxScanFromCurrentPosition_, "span 2, wrap");
             pnlScanSettings.add(cbxScanNegativeDirection_, "span 2, wrap");
             pnlScanSettings.add(cbxReturnToStart_, "span 2, wrap");
         } else {
-            pnlScanSettings.add(new JLabel("Stage scanning not supported by your firmware."), "");
+            pnlScanSettings.add(new JLabel("Stage scanning not supported by your firmware."),
+                    "span 2");
         }
 
         // light sheet scanner settings panel
@@ -183,9 +190,6 @@ public class SettingsTab extends Panel implements ListeningPanel {
             spnScanRetraceSpeed_.registerListener(
                     () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .retraceSpeed(spnScanRetraceSpeed_.getDouble()));
-            spnScanFirstViewAngle_.registerListener(
-                    () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
-                            .firstViewAngle(spnScanFirstViewAngle_.getDouble()));
 
             cbxScanFromCurrentPosition_.registerListener(
                     () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
@@ -197,6 +201,11 @@ public class SettingsTab extends Panel implements ListeningPanel {
                     () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
                             .returnToStart(cbxReturnToStart_.isSelected()));
         }
+
+        // registered outside the block above because the angle spinner is always shown
+        spnScanFirstViewAngle_.registerListener(
+                () -> model_.acquisitions().settingsBuilder().stageScanBuilder()
+                        .firstViewAngle(spnScanFirstViewAngle_.getDouble()));
 
         // ASIScanner Filter Freq
         if (isUsingPLogic_) {
