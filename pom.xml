@@ -183,70 +183,101 @@
          </execution>
         </executions>
        </plugin>
-       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>3.2.1</version>
-        <executions>
-         <execution>
-          <id>attach-sources</id>
-          <goals>
-           <goal>jar-no-fork</goal>
-          </goals>
-         </execution>
-        </executions>
-       </plugin>
-       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-         <execution>
-          <id>attach-javadocs</id>
-          <goals>
-           <goal>jar</goal>
-          </goals>
-         </execution>
-        </executions>
-       </plugin>
-       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.5</version>
-        <executions>
-         <execution>
-          <id>sign-artifacts</id>
-          <phase>verify</phase>
-          <goals>
-           <goal>sign</goal>
-          </goals>
-		 
-		<configuration>
-             	<gpgArguments>
-			<arg>--pinentry-mode</arg>
-			<arg>loopback</arg>
-		</gpgArguments>
-	     </configuration>
-		 
-		 
-         </execution>
-        </executions>
-       </plugin>
-       <plugin>
-      <groupId>org.sonatype.plugins</groupId>
-      <artifactId>nexus-staging-maven-plugin</artifactId>
-      <version>1.6.7</version>
-      <extensions>true</extensions>
-      <configuration>
-         <serverId>ossrh</serverId>
-         <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-         <autoReleaseAfterClose>true</autoReleaseAfterClose>
-      </configuration>
-    </plugin>
       </plugins>
+
+      <!-- versions stay pinned here so an on-demand goal such as mvn javadoc:javadoc still runs a
+           known version; only the executions move into the release profile -->
+      <pluginManagement>
+       <plugins>
+        <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-source-plugin</artifactId>
+         <version>3.2.1</version>
+        </plugin>
+        <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-javadoc-plugin</artifactId>
+         <version>3.2.0</version>
+        </plugin>
+        <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-gpg-plugin</artifactId>
+         <version>1.5</version>
+        </plugin>
+        <plugin>
+         <groupId>org.sonatype.plugins</groupId>
+         <artifactId>nexus-staging-maven-plugin</artifactId>
+         <version>1.6.7</version>
+        </plugin>
+       </plugins>
+      </pluginManagement>
      </build>
 
-
+    <profiles>
+     <!-- everything Maven Central needs and a plugin build does not: signing, the javadoc and
+          sources jars, and staging. Off by default so mvn package stays compile plus package;
+          build with -Prelease to publish. Docs on demand come from mvn javadoc:javadoc -->
+     <profile>
+      <id>release</id>
+      <build>
+       <plugins>
+        <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-source-plugin</artifactId>
+         <executions>
+          <execution>
+           <id>attach-sources</id>
+           <goals>
+            <goal>jar-no-fork</goal>
+           </goals>
+          </execution>
+         </executions>
+        </plugin>
+        <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-javadoc-plugin</artifactId>
+         <executions>
+          <execution>
+           <id>attach-javadocs</id>
+           <goals>
+            <goal>jar</goal>
+           </goals>
+          </execution>
+         </executions>
+        </plugin>
+        <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-gpg-plugin</artifactId>
+         <executions>
+          <execution>
+           <id>sign-artifacts</id>
+           <phase>verify</phase>
+           <goals>
+            <goal>sign</goal>
+           </goals>
+           <configuration>
+            <gpgArguments>
+             <arg>--pinentry-mode</arg>
+             <arg>loopback</arg>
+            </gpgArguments>
+           </configuration>
+          </execution>
+         </executions>
+        </plugin>
+        <plugin>
+         <groupId>org.sonatype.plugins</groupId>
+         <artifactId>nexus-staging-maven-plugin</artifactId>
+         <extensions>true</extensions>
+         <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+         </configuration>
+        </plugin>
+       </plugins>
+      </build>
+     </profile>
+    </profiles>
 
     <distributionManagement>
       <repository>
