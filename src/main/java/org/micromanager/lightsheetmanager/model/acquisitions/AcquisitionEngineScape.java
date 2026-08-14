@@ -280,8 +280,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
-        // This sets the preferred save mode for DefaultDatastore, this value
-        // is used in the MMAcquisition constructor to set the Storage object.
+        // Sets MM's persisted preferred save mode. Inert today: MMAcquisition reads it only when
+        // SequenceSettings has save() and root() set, and we set neither, so our datastore is
+        // always StorageRAM and finish() passes the mode to save() explicitly. Kept because it is
+        // the only channel MMAcquisition offers if direct to disk is re-enabled.
         if (acqSettings_.saveMode() == SaveMode.ND_TIFF) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
         } else if (acqSettings_.saveMode() == SaveMode.MULTIPAGE_TIFF) {
