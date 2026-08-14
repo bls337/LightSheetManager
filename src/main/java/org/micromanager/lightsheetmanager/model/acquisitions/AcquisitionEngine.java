@@ -42,7 +42,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     private static final AtomicLong runIdCounter_ = new AtomicLong();
 
     protected ScapeAcquisitionSettings.Builder asb_;
-    protected ScapeAcquisitionSettings acqSettings_;
+    // TODO(IMMUTABLE-RUN): stop-gap. The user interface writes this field and the acquisition
+    // thread reads it. Volatile only makes publication safe, so a reader cannot see a partly
+    // built snapshot; it does NOT stop the user interface rebuilding this field mid-run, it only
+    // makes those rebuilds land sooner. Remove when the run reads a snapshot frozen at arm time.
+    protected volatile ScapeAcquisitionSettings acqSettings_;
 
     private final ExecutorService acquisitionExecutor_ = Executors.newSingleThreadExecutor(
             r -> new Thread(r, "Acquisition Thread"));
@@ -288,9 +292,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         // Build fully before assigning: acqSettings_ is read from other threads, and a second
         // assignment here would briefly publish the user's settings during a test acquisition.
         ScapeAcquisitionSettings settings = asb_.build();
-        // Re-apply here and not at the call site: acqSettings_ is rebuilt from the builder at
-        // several points during a run, and the builder holds the user's settings, so an override
-        // applied once is discarded by the next rebuild.
+        // TODO(IMMUTABLE-RUN): stop-gap. Re-applied here and not at the call site because
+        // acqSettings_ is rebuilt from the builder at several points during a run, and the builder
+        // holds the user's settings, so an override applied once is discarded by the next rebuild.
+        // Once the run reads a snapshot frozen at arm time this is applied once at the freeze and
+        // testAcquisition_ goes away.
         if (testAcquisition_) {
             settings = settings.copyBuilder()
                     .saveImagesDuringAcquisition(false)
