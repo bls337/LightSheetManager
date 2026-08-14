@@ -83,7 +83,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // including the refusals, and restores these unconditionally. Initialized further down they
         // are still at their field defaults on those paths, so finish() writes 0.0. The stage rejects
         // that for speed but ACCEPTS it for acceleration, leaving it unable to move properly.
-        xyPosUm_ = new Point2D.Double();
+        // null means this run never captured a position, so finish() leaves the stage alone.
+        // (0,0) cannot say that because it is a position the stage can actually be at.
+        xyPosUm_ = null;
         origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
         origAccelX_ = 1.0; // don't want 0 in case something goes wrong
 
@@ -278,8 +280,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
-        // This sets the preferred save mode for DefaultDatastore, this value
-        // is used in the MMAcquisition constructor to set the Storage object.
+        // Sets MM's persisted preferred save mode. Inert today: MMAcquisition reads it only when
+        // SequenceSettings has save() and root() set, and we set neither, so our datastore is
+        // always StorageRAM and finish() passes the mode to save() explicitly. Kept because it is
+        // the only channel MMAcquisition offers if direct to disk is re-enabled.
         if (acqSettings_.saveMode() == SaveMode.ND_TIFF) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
         } else if (acqSettings_.saveMode() == SaveMode.MULTIPAGE_TIFF) {
@@ -800,17 +804,23 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // if we did stage scanning restore the original position and speed
         if (acqSettings_.stageScan().enabled()) {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
-            final boolean returnToOriginalPosition =
-                    acqSettings_.stageScan().returnToStart();
+            if (xyStage == null) {
+                // setup() can return before its own stage checks, such as a save location refusal
+                studio_.logs().logError("Could not restore the stage: no SampleXY device");
+            } else {
+                final boolean returnToOriginalPosition =
+                        acqSettings_.stageScan().returnToStart();
 
-            // make sure stage scanning state machine is stopped,
-            // otherwise setting speed/position won't take
-            xyStage.setScanState(ASIXYStage.ScanState.IDLE);
-            xyStage.setSpeedX(origSpeedX_);
-            xyStage.setAccelerationX(origAccelX_);
+                // make sure stage scanning state machine is stopped,
+                // otherwise setting speed/position won't take
+                xyStage.setScanState(ASIXYStage.ScanState.IDLE);
+                xyStage.setSpeedX(origSpeedX_);
+                xyStage.setAccelerationX(origAccelX_);
 
-            if (returnToOriginalPosition) {
-                xyStage.setXYPosition(xyPosUm_.x, xyPosUm_.y);
+                // xyPosUm_ is null when setup() returned before it captured a position
+                if (returnToOriginalPosition && xyPosUm_ != null) {
+                    xyStage.setXYPosition(xyPosUm_.x, xyPosUm_.y);
+                }
             }
         }
 
