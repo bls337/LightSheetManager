@@ -285,17 +285,20 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      * Build the {@code DefaultAcquisitionSettingsSCAPE} with the builder and update settings.
      */
     public void updateSettings() {
-        acqSettings_ = asb_.build();
+        // Build fully before assigning: acqSettings_ is read from other threads, and a second
+        // assignment here would briefly publish the user's settings during a test acquisition.
+        ScapeAcquisitionSettings settings = asb_.build();
         // Re-apply here and not at the call site: acqSettings_ is rebuilt from the builder at
         // several points during a run, and the builder holds the user's settings, so an override
         // applied once is discarded by the next rebuild.
         if (testAcquisition_) {
-            acqSettings_ = acqSettings_.copyBuilder()
+            settings = settings.copyBuilder()
                     .saveImagesDuringAcquisition(false)
                     .useTimePoints(false)
                     .numTimePoints(1)
                     .build();
         }
+        acqSettings_ = settings;
     }
 
     public Future<?> requestRun() {
@@ -313,8 +316,6 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     }
 
     private Future<?> requestRun(boolean speedTest, boolean testAcquisition) {
-        // set before the task so it is in place for the first updateSettings() call
-        testAcquisition_ = testAcquisition;
         // set here and not inside the task: a Stop clicked while the task is still queued, or
         // anywhere inside setup(), must find a run in flight
         acquisitionRequested_ = true;
@@ -332,6 +333,12 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             long startNs = 0; // set alongside runId at START
 
             try {
+                // set inside the task and not at request time: the executor runs one task at a
+                // time, so this cannot reach a run that is already in flight, and the finally
+                // below only ever clears the request it belongs to. Set before updateSettings()
+                // so the first rebuild already carries the override.
+                testAcquisition_ = testAcquisition;
+
                 updateSettings(); // make sure settings are current
 
                 if (speedTest) {
