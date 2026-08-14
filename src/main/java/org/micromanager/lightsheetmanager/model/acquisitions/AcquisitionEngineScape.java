@@ -802,18 +802,23 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // if we did stage scanning restore the original position and speed
         if (acqSettings_.stageScan().enabled()) {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
-            final boolean returnToOriginalPosition =
-                    acqSettings_.stageScan().returnToStart();
+            if (xyStage == null) {
+                // setup() can return before its own stage checks, such as a save location refusal
+                studio_.logs().logError("Could not restore the stage: no SampleXY device");
+            } else {
+                final boolean returnToOriginalPosition =
+                        acqSettings_.stageScan().returnToStart();
 
-            // make sure stage scanning state machine is stopped,
-            // otherwise setting speed/position won't take
-            xyStage.setScanState(ASIXYStage.ScanState.IDLE);
-            xyStage.setSpeedX(origSpeedX_);
-            xyStage.setAccelerationX(origAccelX_);
+                // make sure stage scanning state machine is stopped,
+                // otherwise setting speed/position won't take
+                xyStage.setScanState(ASIXYStage.ScanState.IDLE);
+                xyStage.setSpeedX(origSpeedX_);
+                xyStage.setAccelerationX(origAccelX_);
 
-            // xyPosUm_ is null when setup() returned before it captured a position
-            if (returnToOriginalPosition && xyPosUm_ != null) {
-                xyStage.setXYPosition(xyPosUm_.x, xyPosUm_.y);
+                // xyPosUm_ is null when setup() returned before it captured a position
+                if (returnToOriginalPosition && xyPosUm_ != null) {
+                    xyStage.setXYPosition(xyPosUm_.x, xyPosUm_.y);
+                }
             }
         }
 
