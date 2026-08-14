@@ -134,17 +134,21 @@ public class UserSettings {
      * Save user settings.
      */
     public void save() {
-        // make settings current before saving
-        model_.acquisitions().updateSettings();
-
         // settings key based on geometry type
         final GeometryType geometryType = model_.devices().adapter().geometry();
         final String key = SETTINGS_PREFIX + geometryType.toString().toUpperCase();
 
+        // Build from the builder, which holds what the user set in the user interface. The
+        // acquisition settings can carry run scoped overrides, for example a test acquisition
+        // turning saving off, and writing one of those to the profile would change the user's
+        // settings for every later session. Building here also means saving no longer rebuilds
+        // the settings a running acquisition is reading.
+        final ScapeAcquisitionSettings settings = model_.acquisitions().settingsBuilder().build();
+
         // save acquisition settings
-        settings_.putString(key, model_.acquisitions().settings().toJson());
+        settings_.putString(key, settings.toJson());
         model_.studio().logs().logDebugMessage("saved JSON to " + key + ": "
-                + model_.acquisitions().settings().toPrettyJson());
+                + settings.toPrettyJson());
 
         // save plugin settings
         settings_.putString(SETTINGS_PLUGIN, model_.pluginSettings().toJson());

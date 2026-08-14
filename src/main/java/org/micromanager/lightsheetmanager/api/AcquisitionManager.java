@@ -23,6 +23,16 @@ public interface AcquisitionManager {
     Future<?> requestRun(boolean speedTest);
 
     /**
+     * Request that a test acquisition is run.
+     *
+     * <p>A test acquisition runs a single time point and does not save anything to disk. The
+     * settings shown in the user interface are left unchanged.
+     *
+     * @return a future that completes when the acquisition finishes
+     */
+    Future<?> requestTestAcquisition();
+
+    /**
      * Request the running acquisition to stop.
      */
     void requestStop();
