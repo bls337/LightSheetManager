@@ -83,7 +83,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // including the refusals, and restores these unconditionally. Initialized further down they
         // are still at their field defaults on those paths, so finish() writes 0.0. The stage rejects
         // that for speed but ACCEPTS it for acceleration, leaving it unable to move properly.
-        xyPosUm_ = new Point2D.Double();
+        // null means this run never captured a position, so finish() leaves the stage alone.
+        // (0,0) cannot say that because it is a position the stage can actually be at.
+        xyPosUm_ = null;
         origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
         origAccelX_ = 1.0; // don't want 0 in case something goes wrong
 
@@ -809,7 +811,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             xyStage.setSpeedX(origSpeedX_);
             xyStage.setAccelerationX(origAccelX_);
 
-            if (returnToOriginalPosition) {
+            // xyPosUm_ is null when setup() returned before it captured a position
+            if (returnToOriginalPosition && xyPosUm_ != null) {
                 xyStage.setXYPosition(xyPosUm_.x, xyPosUm_.y);
             }
         }
