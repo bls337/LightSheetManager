@@ -184,7 +184,6 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
         swapTimingSettingsPanels(isUsingAdvancedTiming);
 
         btnRunOverviewAcq_.setEnabled(false); // TODO: re-enable when these features are put in
-        btnTestAcquisition_.setEnabled(false);
 
         // set ui sizes, should match the MigLayout constraints
         pnlChannelTable_.setAbsoluteSize(280, 400);
@@ -257,6 +256,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
         btnOpenPlaylist_.setEnabled(false); // TODO: enable when playlist is implemented
 
         btnSpeedTest_.registerListener(() -> runAcquisition(true));
+        btnTestAcquisition_.registerListener(this::runTestAcquisition);
         btnRunOverviewAcq_.registerListener(() -> {
             // TODO: run the overview acq
         });
@@ -326,6 +326,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
                 btnRunAcquisition_.setState(false);
                 btnPauseAcquisition_.setEnabled(false);
                 btnSpeedTest_.setEnabled(true);
+                btnTestAcquisition_.setEnabled(true);
             });
         } catch (InterruptedException e) {
             model_.studio().logs().logError("Acquisition was interrupted!");
@@ -337,7 +338,21 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
     private void runAcquisition(boolean speedTest) {
         btnPauseAcquisition_.setEnabled(true);
         btnSpeedTest_.setEnabled(false);
-        Future<?> acqFinished = model_.acquisitions().requestRun(speedTest);
+        btnTestAcquisition_.setEnabled(false);
+        waitForAcquisition(model_.acquisitions().requestRun(speedTest));
+    }
+
+    private void runTestAcquisition() {
+        // this run is started from a button that is not the toggle, so select the toggle here
+        // or it reads "Start Acquisition" for as long as the test acquisition is running
+        btnRunAcquisition_.setState(true);
+        btnPauseAcquisition_.setEnabled(true);
+        btnSpeedTest_.setEnabled(false);
+        btnTestAcquisition_.setEnabled(false);
+        waitForAcquisition(model_.acquisitions().requestTestAcquisition());
+    }
+
+    private void waitForAcquisition(final Future<?> acqFinished) {
         // Launch new thread to update the button when the acquisition is complete
         new Thread(() -> {
             try {

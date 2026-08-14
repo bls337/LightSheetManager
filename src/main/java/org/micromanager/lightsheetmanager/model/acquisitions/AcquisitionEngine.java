@@ -52,6 +52,9 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     // cannot answer "is a run in flight?": the engines only assign it partway through run(), so it
     // stays null across all of setup() and the arming that follows.
     private volatile boolean acquisitionRequested_ = false;
+    // true while a test acquisition is in flight, read by updateSettings()
+    private volatile boolean testAcquisition_;
+
     // a stop asked for before the acquisition was started, acted on by the checks in requestRun()
     // and in each engine's run()
     private volatile boolean stopRequested_ = false;
@@ -283,6 +286,16 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      */
     public void updateSettings() {
         acqSettings_ = asb_.build();
+        // Re-apply here and not at the call site: acqSettings_ is rebuilt from the builder at
+        // several points during a run, and the builder holds the user's settings, so an override
+        // applied once is discarded by the next rebuild.
+        if (testAcquisition_) {
+            acqSettings_ = acqSettings_.copyBuilder()
+                    .saveImagesDuringAcquisition(false)
+                    .useTimePoints(false)
+                    .numTimePoints(1)
+                    .build();
+        }
     }
 
     public Future<?> requestRun() {
@@ -291,6 +304,17 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     @Override
     public Future<?> requestRun(boolean speedTest) {
+        return requestRun(speedTest, false);
+    }
+
+    @Override
+    public Future<?> requestTestAcquisition() {
+        return requestRun(false, true);
+    }
+
+    private Future<?> requestRun(boolean speedTest, boolean testAcquisition) {
+        // set before the task so it is in place for the first updateSettings() call
+        testAcquisition_ = testAcquisition;
         // set here and not inside the task: a Stop clicked while the task is still queued, or
         // anywhere inside setup(), must find a run in flight
         acquisitionRequested_ = true;
@@ -363,6 +387,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                     // cleared last of the run-state flags: while it is set, requestStop() treats
                     // a stop as something to act on rather than an error
                     acquisitionRequested_ = false;
+                    // cleared here so the next run rebuilds from the user's own settings
+                    testAcquisition_ = false;
                     // free the datastore so a large store isn't kept in memory (matches MM's
                     // AcqEngJAdapter.onAcquisitionEnded); also what the save guard checks to skip aborted/empty runs
                     datastore_ = null;
