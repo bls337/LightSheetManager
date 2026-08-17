@@ -98,7 +98,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
 
         setMigLayout(
                 "insets 10 10 10 10, ax center",
-                "[300!]8[pref!]8[300!]",
+                "[320!]8[pref!]8[300!]",
                 "[]5[]"
         );
 
@@ -187,7 +187,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
 
         // set ui sizes, should match the MigLayout constraints
         pnlChannelTable_.setAbsoluteSize(280, 400);
-        pnlLeft.setAbsoluteSize(300, 580);
+        pnlLeft.setAbsoluteSize(320, 580);
         pnlRight_.setAbsoluteSize(300, 580);
 
         // acquisition buttons
