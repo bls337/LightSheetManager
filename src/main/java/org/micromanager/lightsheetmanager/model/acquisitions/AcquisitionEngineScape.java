@@ -280,10 +280,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
-        // Sets MM's persisted preferred save mode. Inert today: MMAcquisition reads it only when
-        // SequenceSettings has save() and root() set, and we set neither, so our datastore is
-        // always StorageRAM and finish() passes the mode to save() explicitly. Kept because it is
-        // the only channel MMAcquisition offers if direct to disk is re-enabled.
+        // Sets MM's persisted preferred save mode. MMAcquisition reads it when SequenceSettings
+        // has save() and root() set, which is what the saving branch below does, so this is what
+        // picks ND-TIFF over multipage TIFF or a single plane series for the images written during
+        // the run. It is the only channel MMAcquisition offers for that choice.
         if (acqSettings_.saveMode() == SaveMode.ND_TIFF) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
         } else if (acqSettings_.saveMode() == SaveMode.MULTIPAGE_TIFF) {
@@ -317,6 +317,16 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // TODO(Brandon): where should i get this from?
         SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
         sequenceSettingsBuilder.shouldDisplayImages(true);
+        // Write images to disk as they arrive instead of accumulating the run in memory.
+        // MMAcquisition swaps StorageRAM for the preferred save mode set above only when both
+        // save() and root() are set, so setting them here is what selects streaming. This is what
+        // the checkbox means in 1.4 as well: checked writes during the run, unchecked keeps the
+        // run in memory.
+        if (acqSettings_.isSavingImagesDuringAcquisition()) {
+            sequenceSettingsBuilder.save(true)
+                    .root(saveDir)
+                    .prefix(saveName);
+        }
 
         MMAcquisition acq = new MMAcquisition(studio_, dsmd,
                 this, sequenceSettingsBuilder.build());
@@ -768,7 +778,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         //   Job A: restore hardware/system state. Must ALWAYS run: setup() can mutate hardware
         //          before it fails, so each step self-guards on whether its state was changed.
         //   Job B: end-of-acquisition work. Only valid if the run actually happened, so each step
-        //          self-guards on that (don't, e.g., save a datastore that was never filled).
+        //          self-guards on that (don't, e.g., report on an acquisition that never started).
         //
         // Adding a step? Pick its job: Job A runs unconditionally, Job B only when the run happened.
         // Don't interleave them.
@@ -868,19 +878,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // TODO: execute any end-acquisition runnables
 
-        // save only if this run created a store with images
-        if (acqSettings_.isSavingImagesDuringAcquisition()
-                && datastore_ != null && datastore_.getNumImages() > 0) {
-            final String savePath = FileUtils.createUniquePath(
-                    acqSettings_.saveDirectory(), acqSettings_.saveNamePrefix());
-            try {
-                // convert from DataStorage.SaveMode to Datastore.SaveMode
-                final Datastore.SaveMode saveMode = SaveMode.convert(acqSettings_.saveMode());
-                datastore_.save(saveMode, savePath);
-            } catch (Exception e) {
-                model_.studio().logs().showError("could not save the acquisition data to: \n" + savePath);
-            }
-        }
+        // Nothing to save here. Images are written during the run when saving is enabled, and a
+        // run acquired without saving is held in memory and discarded, which is what 1.4 does.
+        // The unsaved case still offers the data: MM prompts to save when its window is closed,
+        // because StorageRAM leaves the datastore save path unset.
     }
 
     private boolean doHardwareCalculations(PLogicScape plc) {
