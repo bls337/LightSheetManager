@@ -15,7 +15,6 @@ import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJMDADataSink;
 import org.micromanager.data.Datastore;
 import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
-import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
@@ -43,6 +42,7 @@ import javax.swing.JLabel;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -53,6 +53,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     PLogicScape controller_;
     ArrayList<Double> savedExposures_ = new ArrayList<>();
     Point2D.Double xyPosUm_;
+    // Snapshot taken when the run is armed. The position list is user-editable at any time, so
+    // a live read can give different answers to different parts of one run: the saved
+    // position_list.pos, the generated events, and the per-arm stage scan setup must agree.
+    private volatile PositionList positionList_;
     private double origSpeedX_;
     private double origAccelX_;
     private double scanSpeedX_;
@@ -97,8 +101,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // make sure that there are positions in the PositionList; a pure read, so it belongs
         // above the hardware changes below for the same reason as the save location check
+        positionList_ = studio_.positions().getPositionList();
         if (acqSettings_.isUsingMultiplePositions()) {
-            final int numPositions = studio_.positions().getPositionList().getNumberOfPositions();
+            final int numPositions = positionList_.getNumberOfPositions();
             if (numPositions == 0) {
                 studio_.logs().showError("XY positions expected but the position list is empty");
                 return false;
@@ -268,7 +273,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // write the position list if we are using multiple positions
         if (model_.acquisitions().settings().isSavingImagesDuringAcquisition()
                 && model_.acquisitions().settings().isUsingMultiplePositions()) {
-            final PositionList positionList = model_.studio().positions().getPositionList();
+            final PositionList positionList = positionList_;
             if (positionList.getNumberOfPositions() > 0) {
                 try {
                     final String path = saveDir + File.separator + "position_list.pos";
@@ -508,10 +513,37 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 if (isUsingPLC) {
                     if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
                         final ASIXYStage xyStage = model_.devices().device("SampleXY");
-                        final Point2D.Double pos = xyStage.getXYPosition();
+                        // Scan from the coordinate this event was generated for instead of reading
+                        // the stage. The read only agrees with the target when a move was issued
+                        // for this arm. When the same position repeats across time points no move
+                        // is issued, the stage is still parked on the previous scan start, and
+                        // centering on that subtracts half the scan distance again, so the window
+                        // walks half a field every arm while plane counts stay exact. The 1.4
+                        // plugin takes this value from the position list for the same reason.
+                        // A hardware sequence arrives here as a wrapper event whose own
+                        // coordinates and axis positions are null by construction. The constituent
+                        // events keep theirs, so read the coordinate off the first of them.
+                        AcquisitionEvent coordEvent = event;
+                        final List<AcquisitionEvent> sequence = event.getSequence();
+                        if (sequence != null && !sequence.isEmpty()) {
+                            coordEvent = sequence.get(0);
+                        }
+                        final Double eventX = coordEvent.getXPosition();
+                        final Double eventY = coordEvent.getYPosition();
+                        if (eventX == null || eventY == null) {
+                            // An exception thrown here is invisible. AcqEngJ leaves both cameras
+                            // armed and the run stops with nothing in the log, so refuse through
+                            // abort() rather than let a dereference escape the hook.
+                            studio_.logs().logError("stage scan: acquisition event carried no XY "
+                                    + "coordinate, aborting rather than scanning at an unknown "
+                                    + "position");
+                            currentAcquisition_.abort();
+                            return event;
+                        }
                         xyStage.setSpeedX(scanSpeedX_);
                         xyStage.setAccelerationX(scanAccelX_);
-                        controllerInstance.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
+                        controllerInstance.prepareStageScanForAcquisition(
+                                eventX, eventY, acqSettings_);
                         controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode());
                         return event;
                     }
@@ -590,7 +622,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
 
         // Loop 1: XY positions
-        PositionList pl = MMStudio.getInstance().positions().getPositionList();
+        PositionList pl = positionList_;
 
         String[] cameraNames;
         if (demoMode) {
