@@ -13,6 +13,7 @@ import org.micromanager.acquisition.internal.MMAcquisition;
 import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJAdapter;
 import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJMDADataSink;
 import org.micromanager.data.Datastore;
+import org.micromanager.data.SummaryMetadata;
 import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
@@ -264,27 +265,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         String saveDir = acqSettings_.saveDirectory();
         String saveName = acqSettings_.saveNamePrefix();
 
-        // TODO: put this in AcquisitionEngine base class, between setup and run once structure is better
-        // save settings as JSON to the save directory
-        if (model_.acquisitions().settings().isSavingImagesDuringAcquisition()) {
-            FileUtils.writeStringToFile(saveDir + File.separator + "acq_settings.json", settingsJson);
-        }
-
-        // write the position list if we are using multiple positions
-        if (model_.acquisitions().settings().isSavingImagesDuringAcquisition()
-                && model_.acquisitions().settings().isUsingMultiplePositions()) {
-            final PositionList positionList = positionList_;
-            if (positionList.getNumberOfPositions() > 0) {
-                try {
-                    final String path = saveDir + File.separator + "position_list.pos";
-                    positionList.save(path);
-                    model_.studio().logs().logMessage("Position list saved to " + path);
-                } catch (Exception e) {
-                    model_.studio().logs().logError(e, "Could not save position list.");
-                }
-            }
-        }
-
         // Sets MM's persisted preferred save mode. MMAcquisition reads it when SequenceSettings
         // has save() and root() set, which is what the saving branch below does, so this is what
         // picks ND-TIFF over multipage TIFF or a single plane series for the images written during
@@ -340,6 +320,38 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         curPipeline_ = acq.getPipeline();
         sink.setDatastore(datastore_);
         sink.setPipeline(curPipeline_);
+
+        // TODO: put this in AcquisitionEngine base class, between setup and run once structure is better
+        // Write the run settings and the position list into the dataset directory instead of the
+        // parent, so a dataset carries the record of what produced it. Written here rather than
+        // earlier because the directory name is chosen by MMAcquisition above: it creates the
+        // directory at run start and stamps the name into the summary metadata as the prefix.
+        if (acqSettings_.isSavingImagesDuringAcquisition()) {
+            String datasetDir = saveDir;
+            final SummaryMetadata summary = datastore_.getSummaryMetadata();
+            final String datasetName = (summary == null) ? null : summary.getPrefix();
+            if (datasetName != null && !datasetName.isEmpty()
+                    && new File(saveDir + File.separator + datasetName).isDirectory()) {
+                datasetDir = saveDir + File.separator + datasetName;
+            } else {
+                // a configured processing pipeline can delay the summary metadata reaching the
+                // store, so fall back to the parent directory rather than dropping the files
+                studio_.logs().logError("Could not resolve the dataset directory, writing the run "
+                        + "settings beside the dataset instead of inside it.");
+            }
+            FileUtils.writeStringToFile(
+                    datasetDir + File.separator + "acq_settings.json", settingsJson);
+            if (acqSettings_.isUsingMultiplePositions()
+                    && positionList_.getNumberOfPositions() > 0) {
+                try {
+                    final String path = datasetDir + File.separator + "position_list.pos";
+                    positionList_.save(path);
+                    studio_.logs().logMessage("Position list saved to " + path);
+                } catch (Exception e) {
+                    studio_.logs().logError(e, "Could not save position list.");
+                }
+            }
+        }
 
         studio_.events().registerForEvents(this);
         // commented because this is prob specific to MM MDAs
