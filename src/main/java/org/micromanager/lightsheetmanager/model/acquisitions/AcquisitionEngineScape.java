@@ -13,9 +13,9 @@ import org.micromanager.acquisition.internal.MMAcquisition;
 import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJAdapter;
 import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJMDADataSink;
 import org.micromanager.data.Datastore;
+import org.micromanager.data.SummaryMetadata;
 import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
-import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
@@ -43,6 +43,7 @@ import javax.swing.JLabel;
 import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -53,6 +54,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     PLogicScape controller_;
     ArrayList<Double> savedExposures_ = new ArrayList<>();
     Point2D.Double xyPosUm_;
+    // Snapshot taken when the run is armed. The position list is user-editable at any time, so
+    // a live read can give different answers to different parts of one run: the saved
+    // position_list.pos, the generated events, and the per-arm stage scan setup must agree.
+    private volatile PositionList positionList_;
     private double origSpeedX_;
     private double origAccelX_;
     private double scanSpeedX_;
@@ -97,8 +102,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // make sure that there are positions in the PositionList; a pure read, so it belongs
         // above the hardware changes below for the same reason as the save location check
+        positionList_ = studio_.positions().getPositionList();
         if (acqSettings_.isUsingMultiplePositions()) {
-            final int numPositions = studio_.positions().getPositionList().getNumberOfPositions();
+            final int numPositions = positionList_.getNumberOfPositions();
             if (numPositions == 0) {
                 studio_.logs().showError("XY positions expected but the position list is empty");
                 return false;
@@ -259,27 +265,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         String saveDir = acqSettings_.saveDirectory();
         String saveName = acqSettings_.saveNamePrefix();
 
-        // TODO: put this in AcquisitionEngine base class, between setup and run once structure is better
-        // save settings as JSON to the save directory
-        if (model_.acquisitions().settings().isSavingImagesDuringAcquisition()) {
-            FileUtils.writeStringToFile(saveDir + File.separator + "acq_settings.json", settingsJson);
-        }
-
-        // write the position list if we are using multiple positions
-        if (model_.acquisitions().settings().isSavingImagesDuringAcquisition()
-                && model_.acquisitions().settings().isUsingMultiplePositions()) {
-            final PositionList positionList = model_.studio().positions().getPositionList();
-            if (positionList.getNumberOfPositions() > 0) {
-                try {
-                    final String path = saveDir + File.separator + "position_list.pos";
-                    positionList.save(path);
-                    model_.studio().logs().logMessage("Position list saved to " + path);
-                } catch (Exception e) {
-                    model_.studio().logs().logError(e, "Could not save position list.");
-                }
-            }
-        }
-
         // Sets MM's persisted preferred save mode. MMAcquisition reads it when SequenceSettings
         // has save() and root() set, which is what the saving branch below does, so this is what
         // picks ND-TIFF over multipage TIFF or a single plane series for the images written during
@@ -335,6 +320,38 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         curPipeline_ = acq.getPipeline();
         sink.setDatastore(datastore_);
         sink.setPipeline(curPipeline_);
+
+        // TODO: put this in AcquisitionEngine base class, between setup and run once structure is better
+        // Write the run settings and the position list into the dataset directory instead of the
+        // parent, so a dataset carries the record of what produced it. Written here rather than
+        // earlier because the directory name is chosen by MMAcquisition above: it creates the
+        // directory at run start and stamps the name into the summary metadata as the prefix.
+        if (acqSettings_.isSavingImagesDuringAcquisition()) {
+            String datasetDir = saveDir;
+            final SummaryMetadata summary = datastore_.getSummaryMetadata();
+            final String datasetName = (summary == null) ? null : summary.getPrefix();
+            if (datasetName != null && !datasetName.isEmpty()
+                    && new File(saveDir + File.separator + datasetName).isDirectory()) {
+                datasetDir = saveDir + File.separator + datasetName;
+            } else {
+                // a configured processing pipeline can delay the summary metadata reaching the
+                // store, so fall back to the parent directory rather than dropping the files
+                studio_.logs().logError("Could not resolve the dataset directory, writing the run "
+                        + "settings beside the dataset instead of inside it.");
+            }
+            FileUtils.writeStringToFile(
+                    datasetDir + File.separator + "acq_settings.json", settingsJson);
+            if (acqSettings_.isUsingMultiplePositions()
+                    && positionList_.getNumberOfPositions() > 0) {
+                try {
+                    final String path = datasetDir + File.separator + "position_list.pos";
+                    positionList_.save(path);
+                    studio_.logs().logMessage("Position list saved to " + path);
+                } catch (Exception e) {
+                    studio_.logs().logError(e, "Could not save position list.");
+                }
+            }
+        }
 
         studio_.events().registerForEvents(this);
         // commented because this is prob specific to MM MDAs
@@ -508,10 +525,37 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 if (isUsingPLC) {
                     if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
                         final ASIXYStage xyStage = model_.devices().device("SampleXY");
-                        final Point2D.Double pos = xyStage.getXYPosition();
+                        // Scan from the coordinate this event was generated for instead of reading
+                        // the stage. The read only agrees with the target when a move was issued
+                        // for this arm. When the same position repeats across time points no move
+                        // is issued, the stage is still parked on the previous scan start, and
+                        // centering on that subtracts half the scan distance again, so the window
+                        // walks half a field every arm while plane counts stay exact. The 1.4
+                        // plugin takes this value from the position list for the same reason.
+                        // A hardware sequence arrives here as a wrapper event whose own
+                        // coordinates and axis positions are null by construction. The constituent
+                        // events keep theirs, so read the coordinate off the first of them.
+                        AcquisitionEvent coordEvent = event;
+                        final List<AcquisitionEvent> sequence = event.getSequence();
+                        if (sequence != null && !sequence.isEmpty()) {
+                            coordEvent = sequence.get(0);
+                        }
+                        final Double eventX = coordEvent.getXPosition();
+                        final Double eventY = coordEvent.getYPosition();
+                        if (eventX == null || eventY == null) {
+                            // An exception thrown here is invisible. AcqEngJ leaves both cameras
+                            // armed and the run stops with nothing in the log, so refuse through
+                            // abort() rather than let a dereference escape the hook.
+                            studio_.logs().logError("stage scan: acquisition event carried no XY "
+                                    + "coordinate, aborting rather than scanning at an unknown "
+                                    + "position");
+                            currentAcquisition_.abort();
+                            return event;
+                        }
                         xyStage.setSpeedX(scanSpeedX_);
                         xyStage.setAccelerationX(scanAccelX_);
-                        controllerInstance.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
+                        controllerInstance.prepareStageScanForAcquisition(
+                                eventX, eventY, acqSettings_);
                         controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode());
                         return event;
                     }
@@ -590,7 +634,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
 
         // Loop 1: XY positions
-        PositionList pl = MMStudio.getInstance().positions().getPositionList();
+        PositionList pl = positionList_;
 
         String[] cameraNames;
         if (demoMode) {
@@ -1046,16 +1090,19 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         // TODO: implement multiple positions using hardware time points, currently
-        //  set hardware time points to false if using multiple positions
+        //  set hardware time points to false if using multiple positions. The 1.4 plugin does
+        //  not support this combination either, so it is new capability rather than a gap in
+        //  the port.
         if (acqSettings_.isUsingMultiplePositions()) {
-            if (isUsingHardwareTimePoints) {
-//                    || acqSettings_.numTimePoints() > 1)
-//                    && (timepointIntervalMs < timepointDuration*1.2)) {
+            if (isUsingHardwareTimePoints
+                    || (acqSettings_.numTimePoints() > 1
+                        && timepointIntervalMs < timepointDuration * 1.2)) {
+                // warn the user but allow the acquisition to continue
                 asb_.useHardwareTimePoints(false);
                 isUsingHardwareTimePoints = false;
-//                studio_.logs().showError("Time point interval may not be sufficient "
-//                        + "depending on actual time required to change positions. "
-//                        + "Proceed at your own risk.");
+                model_.logging().reportError("Time point interval may not be sufficient "
+                        + "depending on actual time required to change positions. "
+                        + "Proceed at your own risk.");
             }
         }
 

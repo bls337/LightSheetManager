@@ -426,7 +426,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         // and reporting "not running" there would leave the run going with the button reading
         // "Start Acquisition", which is also the way into a second, unwanted run.
         stopRequested_ = true;
-        if (currentAcquisition_ != null && !currentAcquisition_.getDataSink().isFinished()) {
+        final boolean isAcquisitionLive = currentAcquisition_ != null
+                && !currentAcquisition_.getDataSink().isFinished();
+        studio_.logs().logMessage("stop requested during "
+                + (isAcquisitionLive ? "acquisition" : "setup"));
+        if (isAcquisitionLive) {
             currentAcquisition_.abort();
         }
     }
