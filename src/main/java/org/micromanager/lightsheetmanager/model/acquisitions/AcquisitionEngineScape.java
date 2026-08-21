@@ -1078,16 +1078,19 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         // TODO: implement multiple positions using hardware time points, currently
-        //  set hardware time points to false if using multiple positions
+        //  set hardware time points to false if using multiple positions. The 1.4 plugin does
+        //  not support this combination either, so it is new capability rather than a gap in
+        //  the port.
         if (acqSettings_.isUsingMultiplePositions()) {
-            if (isUsingHardwareTimePoints) {
-//                    || acqSettings_.numTimePoints() > 1)
-//                    && (timepointIntervalMs < timepointDuration*1.2)) {
+            if (isUsingHardwareTimePoints
+                    || (acqSettings_.numTimePoints() > 1
+                        && timepointIntervalMs < timepointDuration * 1.2)) {
+                // warn the user but allow the acquisition to continue
                 asb_.useHardwareTimePoints(false);
                 isUsingHardwareTimePoints = false;
-//                studio_.logs().showError("Time point interval may not be sufficient "
-//                        + "depending on actual time required to change positions. "
-//                        + "Proceed at your own risk.");
+                model_.logging().reportError("Time point interval may not be sufficient "
+                        + "depending on actual time required to change positions. "
+                        + "Proceed at your own risk.");
             }
         }
 
