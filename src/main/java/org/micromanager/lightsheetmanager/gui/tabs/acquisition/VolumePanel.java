@@ -77,12 +77,14 @@ public class VolumePanel extends Panel implements SettingsListener {
         spnViewDelay_ = Spinner.createDoubleSpinner(
                 volumeSettings.delayBeforeView(),
                 0.0, Double.MAX_VALUE, 0.25);
+        // bounded to match 1.4; unbounded entry here is what turns a typo into a galvo command
+        // far outside the scanner's travel
         spnSliceStepSize_ = Spinner.createDoubleSpinner(
                 volumeSettings.sliceStepSize(),
-                0.0, Double.MAX_VALUE, 0.1);
+                0.0, 100.0, 0.1);
         spnNumSlices_ = Spinner.createIntegerSpinner(
                 volumeSettings.slicesPerView(),
-                1, Integer.MAX_VALUE, 1);
+                1, 65000, 1);
 
         switch (geometryType_) {
             case DISPIM:

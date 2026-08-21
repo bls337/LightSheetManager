@@ -603,6 +603,20 @@ public class PLogicDispim {
             sliceAmplitude = NumberUtils.roundToPlace(sliceAmplitude, 4);
             sliceCenter = NumberUtils.roundToPlace(sliceCenter, 4);
 
+            // Refuse a sweep that would drive the galvo past its travel limits, mirroring the
+            // check in the SCAPE controller. It runs after the rounding and before either branch
+            // below writes to the card, and a failed property read returns zero for both limits,
+            // so an unreadable scanner refuses the sweep rather than passing it through.
+            final double halfSweep = Math.abs(sliceAmplitude) / 2;
+            if (sliceCenter + halfSweep > scanner.getMaxDeflectionY()) {
+                studio_.logs().showError("Scanner will exceed allowed range in positive direction.");
+                return false;
+            }
+            if (sliceCenter - halfSweep < scanner.getMinDeflectionY()) {
+                studio_.logs().showError("Scanner will exceed allowed range in negative direction.");
+                return false;
+            }
+
             if (offsetOnly) {
                 scanner.sa().setOffsetY(sliceCenter);
             } else { // normal case
