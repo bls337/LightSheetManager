@@ -33,7 +33,7 @@ public class ChannelTable extends JScrollPane {
 
         // set the channel group first to get the correct channel array
         final String channelGroup = model_.acquisitions().settings().channels().group();
-        final ChannelSpec[] channels = model_.acquisitions().settings().channels().used();
+        final ChannelSpec[] channels = model_.acquisitions().settings().channels().data();
 
         tableData_ = new ChannelTableData(channelGroup, channels);
         tableModel_ = new ChannelTableModel(tableData_,
