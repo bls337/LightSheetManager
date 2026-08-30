@@ -37,8 +37,8 @@ public class ChannelTable extends JScrollPane {
 
         tableData_ = new ChannelTableData(channelGroup, channels);
         tableModel_ = new ChannelTableModel(tableData_, () -> {
-            // Push every row, used and unused, so the edit reaches the builder. The table and the
-            // builder hold separate ChannelSpec objects, so an unpushed edit is lost.
+            // Push every row, used and unused, so the edit reaches the builder. The table's rows are
+            // not always the objects the builder holds, so an unpushed edit can be lost.
             model_.acquisitions().settingsBuilder()
                     .channelBuilder().data(tableData_.getChannels());
             model_.acquisitions().updateDurationLabels();
