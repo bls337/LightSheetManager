@@ -22,11 +22,13 @@ public class ChannelTableModel extends AbstractTableModel {
     };
 
     private final ChannelTableData data_;
-    private final Runnable onUseToggled_;
 
-    public ChannelTableModel(final ChannelTableData tableData, final Runnable onUseToggled) {
+    /** Runs after any accepted cell edit, to commit the table into the settings. */
+    private final Runnable onEdit_;
+
+    public ChannelTableModel(final ChannelTableData tableData, final Runnable onEdit) {
         data_ = Objects.requireNonNull(tableData);
-        onUseToggled_ = Objects.requireNonNull(onUseToggled);
+        onEdit_ = Objects.requireNonNull(onEdit);
     }
 
     public void addEmptyChannel() {
@@ -99,7 +101,6 @@ public class ChannelTableModel extends AbstractTableModel {
             case COLUMN_USE:
                 if (value instanceof Boolean) {
                     channelSpec.setUsed((boolean) value);
-                    onUseToggled_.run(); // update durations
                 } else {
                    return; // early exit => wrong type
                 }
@@ -121,6 +122,9 @@ public class ChannelTableModel extends AbstractTableModel {
             default:
                 throw new IllegalArgumentException("Invalid column index: " + col);
         }
+
+        // commit the edit; the wrong type cases above return before reaching this
+        onEdit_.run();
 
         // update the table ui
         fireTableCellUpdated(row, col);

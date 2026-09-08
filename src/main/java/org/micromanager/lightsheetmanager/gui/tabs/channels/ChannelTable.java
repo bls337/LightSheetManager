@@ -33,11 +33,16 @@ public class ChannelTable extends JScrollPane {
 
         // set the channel group first to get the correct channel array
         final String channelGroup = model_.acquisitions().settings().channels().group();
-        final ChannelSpec[] channels = model_.acquisitions().settings().channels().used();
+        final ChannelSpec[] channels = model_.acquisitions().settings().channels().data();
 
         tableData_ = new ChannelTableData(channelGroup, channels);
-        tableModel_ = new ChannelTableModel(tableData_,
-                () -> model_.acquisitions().updateDurationLabels());
+        tableModel_ = new ChannelTableModel(tableData_, () -> {
+            // Push every row, used and unused, so the edit reaches the builder. The table's rows are
+            // not always the objects the builder holds, so an unpushed edit can be lost.
+            model_.acquisitions().settingsBuilder()
+                    .channelBuilder().data(tableData_.getChannels());
+            model_.acquisitions().updateDurationLabels();
+        });
         table_ = new JTable(tableModel_);
 
         // init presets combo box

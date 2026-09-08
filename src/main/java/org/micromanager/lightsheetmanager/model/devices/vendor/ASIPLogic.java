@@ -216,7 +216,8 @@ public class ASIPLogic extends ASITigerBase {
         BNC3_SOURCE_CELL_11("35 - BNC3 source = cell 11", 35),
         CELL_10_EQ_CELL_8("36 - cell 10 = cell 8", 36),
         BNC1_8_ON_17_24("51 - cells 17-24 on BNC1-8", 51),
-        BNC3_SOURCE_TTL5("52 - BNC3 source = TTL5", 52);
+        BNC3_SOURCE_TTL5("52 - BNC3 source = TTL5", 52),
+        MOD3_COUNTER_RESETTABLE("60 - mod3 counter", 60);
 
         private final String text_;
         private final int code_;

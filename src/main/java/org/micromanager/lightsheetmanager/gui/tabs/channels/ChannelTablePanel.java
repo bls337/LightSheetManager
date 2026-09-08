@@ -102,7 +102,7 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
             model_.acquisitions().settingsBuilder().channelBuilder().group(channelGroup);
             model_.acquisitions().updateSettings();
             // update the table data model and refresh ui
-            table_.getData().setChannels(channelGroup, model_.acquisitions().settings().channels().used());
+            table_.getData().setChannels(channelGroup, model_.acquisitions().settings().channels().data());
             table_.getData().setChannelGroup(channelGroup);
             table_.refreshData();
             // a different group can select a different number of channels, which changes the duration
