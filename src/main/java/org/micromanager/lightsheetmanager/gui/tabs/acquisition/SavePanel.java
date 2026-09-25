@@ -34,6 +34,7 @@ public class SavePanel extends Panel implements SettingsListener {
 
     private ComboBox<SaveMode> cbxSaveMode_;
     private CheckBox cbxSaveWhileAcquiring_;
+    private CheckBox cbxSeparateTimePoints_;
 
     private Button btnSaveSettings_;
     private Button btnLoadSettings_;
@@ -114,6 +115,12 @@ public class SavePanel extends Panel implements SettingsListener {
         cbxSaveWhileAcquiring_ = new CheckBox("Save images during acquisition",
                 acqSettings.isSavingImagesDuringAcquisition());
 
+        cbxSeparateTimePoints_ = new CheckBox("Separate file for each time point",
+                acqSettings.isUsingSeparateTimePoints());
+        cbxSeparateTimePoints_.setToolTipText("Write each time point to its own dataset, inside "
+                + "a folder named after the file name. Only applies when Time Points is checked, "
+                + "and requires \"Save images during acquisition\".");
+
         btnSaveSettings_ = new Button("Save", 60, 20);
         btnLoadSettings_ = new Button("Load", 60, 20);
         btnConvertSettings_ = new Button("Convert", 72, 20);
@@ -135,6 +142,7 @@ public class SavePanel extends Panel implements SettingsListener {
         add(lblSaveMode, "");
         add(cbxSaveMode_, "split 2, wrap");
         add(cbxSaveWhileAcquiring_, "span 2, wrap");
+        add(cbxSeparateTimePoints_, "span 2, wrap");
         add(new JLabel("Acq Settings:"), "");
         add(btnSaveSettings_, "split 3, span 3");
         add(btnLoadSettings_, "");
@@ -164,6 +172,17 @@ public class SavePanel extends Panel implements SettingsListener {
         cbxSaveWhileAcquiring_.registerListener(
                 () -> model_.acquisitions().settingsBuilder()
                         .saveImagesDuringAcquisition(cbxSaveWhileAcquiring_.isSelected()));
+
+        cbxSeparateTimePoints_.registerListener(() -> {
+            final boolean selected = cbxSeparateTimePoints_.isSelected();
+            model_.acquisitions().settingsBuilder().separateTimePoints(selected);
+            if (selected) {
+                // each time point's window is closed once the next time point starts, so the data
+                // has to already be on disk. The engine refuses the combination as well, because
+                // the api can turn saving off without going through this panel.
+                forceSaveWhileAcquiring();
+            }
+        });
 
         txtSaveFileName_.registerFilenameValidationListener(isValid -> {
             if (isValid) {
@@ -219,6 +238,20 @@ public class SavePanel extends Panel implements SettingsListener {
         });
     }
 
+    /**
+     * Turns on "Save images during acquisition" if it is off.
+     *
+     * <p>Uses doClick and not setSelected: the listener registered on this check box is an
+     * ActionListener, and setSelected fires item and change events but no ActionEvent, so the
+     * settings builder would keep saving switched off while the box read checked. The 1.4 plugin
+     * clicks the same box for the same reason.
+     */
+    private void forceSaveWhileAcquiring() {
+        if (!cbxSaveWhileAcquiring_.isSelected()) {
+            cbxSaveWhileAcquiring_.doClick();
+        }
+    }
+
     // Colors the save directory field and explains why in its tooltip when the path is unusable.
     // Only called where the value arrives from outside the field (plugin load, browse, settings
     // change); this touches the filesystem, and checking a dead network path can block the EDT.
@@ -272,5 +305,7 @@ public class SavePanel extends Panel implements SettingsListener {
         txtSaveFileName_.setText(settings.saveNamePrefix());
         cbxSaveMode_.setSelected(settings.saveMode());
         cbxSaveWhileAcquiring_.setSelected(settings.isSavingImagesDuringAcquisition());
+        // silent: a loaded profile must not click the save box on the user's behalf
+        cbxSeparateTimePoints_.setSelected(settings.isUsingSeparateTimePoints(), false);
     }
 }
