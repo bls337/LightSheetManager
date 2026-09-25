@@ -123,6 +123,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 cameraMode() == other.cameraMode() &&
                 Arrays.equals(imagingCameraOrder(), other.imagingCameraOrder()) &&
                 isUsingTimePoints() == other.isUsingTimePoints() &&
+                isUsingSeparateTimePoints() == other.isUsingSeparateTimePoints() &&
                 isUsingMultiplePositions() == other.isUsingMultiplePositions() &&
                 useHardwareTimePoints == other.useHardwareTimePoints &&
                 useAdvancedTiming == other.useAdvancedTiming &&
@@ -147,6 +148,7 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 cameraMode(),
                 Arrays.hashCode(imagingCameraOrder()),
                 isUsingTimePoints(),
+                isUsingSeparateTimePoints(),
                 isUsingMultiplePositions(),
                 useHardwareTimePoints,
                 useAdvancedTiming,

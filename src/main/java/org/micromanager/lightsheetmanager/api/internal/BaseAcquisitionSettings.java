@@ -33,6 +33,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         private boolean useMultiplePositions = false;
         private int postMoveDelay = 0;
         private boolean useTimePoints = false;
+        private boolean separateTimePoints = false;
         private int numTimePoints = 1;
         private double timePointIntervalSec = 0.0;
         private AcquisitionMode acquisitionMode = AcquisitionMode.NO_SCAN;
@@ -55,6 +56,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
             useMultiplePositions = settings.isUsingMultiplePositions();
             postMoveDelay = settings.postMoveDelay();
             useTimePoints = settings.isUsingTimePoints();
+            separateTimePoints = settings.isUsingSeparateTimePoints();
             numTimePoints = settings.numTimePoints();
             timePointIntervalSec = settings.timePointIntervalSec();
             acquisitionMode = settings.acquisitionMode();
@@ -179,6 +181,18 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         }
 
         /**
+         * Sets the acquisition to write each time point to its own dataset.
+         *
+         * @param state true to write one dataset per time point
+         * @return {@code this} builder
+         */
+        @Override
+        public T separateTimePoints(final boolean state) {
+            separateTimePoints = state;
+            return self();
+        }
+
+        /**
          * Sets the number of time points.
          *
          * @param numTimePoints the number of time points
@@ -276,6 +290,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
     private final boolean useMultiplePositions;
     private final int postMoveDelay;
     private final boolean useTimePoints;
+    private final boolean separateTimePoints;
     private final int numTimePoints;
     private final double timePointIntervalSec;
     private final AcquisitionMode acquisitionMode;
@@ -301,6 +316,7 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         useMultiplePositions = builder.useMultiplePositions;
         postMoveDelay = builder.postMoveDelay;
         useTimePoints = builder.useTimePoints;
+        separateTimePoints = builder.separateTimePoints;
         numTimePoints = builder.numTimePoints;
         timePointIntervalSec = builder.timePointIntervalSec;
         acquisitionMode = builder.acquisitionMode;
@@ -407,6 +423,20 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
     @Override
     public boolean isUsingTimePoints() {
         return useTimePoints;
+    }
+
+    /**
+     * Returns true if each time point is written to its own dataset.
+     *
+     * <p>One dataset per time point, inside a series folder named after the save name. Requires
+     * saving during the acquisition, because each time point's window is closed once the next
+     * time point starts, and cannot be combined with hardware time points.
+     *
+     * @return true if each time point is written to its own dataset
+     */
+    @Override
+    public boolean isUsingSeparateTimePoints() {
+        return separateTimePoints;
     }
 
     /**
