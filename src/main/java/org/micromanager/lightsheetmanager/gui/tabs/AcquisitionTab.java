@@ -154,7 +154,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
                 "Pause", "Resume",
                 Icons.PAUSE, Icons.PLAY, 120, 30
         );
-        btnPauseAcquisition_.setEnabled(false);
+        btnPauseAcquisition_.setEnabled(false); // TODO: enable once pause has been tested
 
         btnTestAcquisition_ = new Button("Test Acquisition", 120, 30);
         btnOpenPlaylist_ = new Button("Playlist...", 120, 30);
@@ -336,7 +336,6 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
     }
 
     private void runAcquisition(boolean speedTest) {
-        btnPauseAcquisition_.setEnabled(true);
         btnSpeedTest_.setEnabled(false);
         btnTestAcquisition_.setEnabled(false);
         waitForAcquisition(model_.acquisitions().requestRun(speedTest));
@@ -346,7 +345,6 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
         // this run is started from a button that is not the toggle, so select the toggle here
         // or it reads "Start Acquisition" for as long as the test acquisition is running
         btnRunAcquisition_.setState(true);
-        btnPauseAcquisition_.setEnabled(true);
         btnSpeedTest_.setEnabled(false);
         btnTestAcquisition_.setEnabled(false);
         waitForAcquisition(model_.acquisitions().requestTestAcquisition());
