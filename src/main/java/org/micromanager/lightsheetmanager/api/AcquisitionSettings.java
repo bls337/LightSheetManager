@@ -89,6 +89,18 @@ public interface AcquisitionSettings {
         T useTimePoints(final boolean state);
 
         /**
+         * Sets the acquisition to write each time point to its own dataset.
+         *
+         * <p>Only applies when time points are used. Requires saving images during the
+         * acquisition: a run with this set and saving off is refused. Hardware time points are
+         * never used in this mode.
+         *
+         * @param state true to write one dataset per time point
+         * @return {@code this} builder
+         */
+        T separateTimePoints(final boolean state);
+
+        /**
          * Sets the number of time points.
          *
          * @param numTimePoints the number of time points
@@ -216,6 +228,16 @@ public interface AcquisitionSettings {
      * @return true if using time points.
      */
     boolean isUsingTimePoints();
+
+    /**
+     * Returns true if each time point is written to its own dataset.
+     *
+     * <p>Only applies when time points are used, and requires saving images during the
+     * acquisition.
+     *
+     * @return true if each time point is written to its own dataset
+     */
+    boolean isUsingSeparateTimePoints();
 
     /**
      * Returns the number of time points.

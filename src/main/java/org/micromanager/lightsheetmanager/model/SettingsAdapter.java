@@ -208,7 +208,12 @@ public class SettingsAdapter {
                         .cameraMode(convertCameraMode((String) value)));
 
         // hardwareTimepoints - computed by the acquisition setup
-        // separateTimepoints - not used
+
+        // the key keeps the 1.4 spelling because that is what is in the file being converted
+        registry.put("separateTimepoints",
+                value -> model_.acquisitions().settingsBuilder()
+                        .separateTimePoints((boolean) value));
+
         // usePathPresets - not used
 
         registry.put("useAdvancedSliceTiming",

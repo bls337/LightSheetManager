@@ -101,6 +101,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
                 cameraMode() == other.cameraMode() &&
                 Arrays.equals(imagingCameraOrder(), other.imagingCameraOrder()) &&
                 isUsingTimePoints() == other.isUsingTimePoints() &&
+                isUsingSeparateTimePoints() == other.isUsingSeparateTimePoints() &&
                 isUsingMultiplePositions() == other.isUsingMultiplePositions() &&
                 useHardwareTimePoints == other.useHardwareTimePoints &&
                 useAdvancedTiming == other.useAdvancedTiming &&
@@ -123,6 +124,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
                 cameraMode(),
                 Arrays.hashCode(imagingCameraOrder()),
                 isUsingTimePoints(),
+                isUsingSeparateTimePoints(),
                 isUsingMultiplePositions(),
                 useHardwareTimePoints,
                 useAdvancedTiming,
