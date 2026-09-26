@@ -259,24 +259,29 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         updateSettings();
 
-        final String settingsJson = acqSettings_.toPrettyJson();
+        // The run snapshot: everything below reads this, never acqSettings_, so an edit made while
+        // the run is in flight cannot change it. finish() still reads the live field.
+        // TODO(IMMUTABLE-RUN): remove once acqSettings_ is the single run-time source of truth.
+        final ScapeAcquisitionSettings settings = acqSettings_;
+
+        final String settingsJson = settings.toPrettyJson();
         studio_.logs().logMessage("Starting Acquisition with settings:\n" + settingsJson);
 
-        String saveDir = acqSettings_.saveDirectory();
-        String saveName = acqSettings_.saveNamePrefix();
+        final String saveDir = settings.saveDirectory();
+        final String saveName = settings.saveNamePrefix();
 
         // Sets MM's persisted preferred save mode. MMAcquisition reads it when SequenceSettings
         // has save() and root() set, which is what the saving branch below does, so this is what
         // picks ND-TIFF over multipage TIFF or a single plane series for the images written during
         // the run. It is the only channel MMAcquisition offers for that choice.
-        if (acqSettings_.saveMode() == SaveMode.ND_TIFF) {
+        if (settings.saveMode() == SaveMode.ND_TIFF) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
-        } else if (acqSettings_.saveMode() == SaveMode.MULTIPAGE_TIFF) {
+        } else if (settings.saveMode() == SaveMode.MULTIPAGE_TIFF) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);
-        } else if (acqSettings_.saveMode() == SaveMode.SINGLEPLANE_TIFF_SERIES) {
+        } else if (settings.saveMode() == SaveMode.SINGLEPLANE_TIFF_SERIES) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.SINGLEPLANE_TIFF_SERIES);
         } else {
-            studio_.logs().showError("Unsupported save mode: " + acqSettings_.saveMode());
+            studio_.logs().showError("Unsupported save mode: " + settings.saveMode());
             return false;
         }
 
@@ -293,11 +298,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         JSONObject summaryMetadata = currentAcquisition_.getSummaryMetadata();
         try {
-            summaryMetadata.put("z-step_um", acqSettings_.volume().sliceStepSize());
+            summaryMetadata.put("z-step_um", settings.volume().sliceStepSize());
         } catch (JSONException e) {
             studio_.logs().logError("Failed to add z-step_um metadata: " + e.getMessage());
         }
-        DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata);
+        DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata, settings,
+                positionList_);
 
         // TODO(Brandon): where should i get this from?
         SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
@@ -307,7 +313,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // save() and root() are set, so setting them here is what selects streaming. This is what
         // the checkbox means in 1.4 as well: checked writes during the run, unchecked keeps the
         // run in memory.
-        if (acqSettings_.isSavingImagesDuringAcquisition()) {
+        if (settings.isSavingImagesDuringAcquisition()) {
             sequenceSettingsBuilder.save(true)
                     .root(saveDir)
                     .prefix(saveName);
@@ -326,7 +332,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // parent, so a dataset carries the record of what produced it. Written here rather than
         // earlier because the directory name is chosen by MMAcquisition above: it creates the
         // directory at run start and stamps the name into the summary metadata as the prefix.
-        if (acqSettings_.isSavingImagesDuringAcquisition()) {
+        if (settings.isSavingImagesDuringAcquisition()) {
             String datasetDir = saveDir;
             final SummaryMetadata summary = datastore_.getSummaryMetadata();
             final String datasetName = (summary == null) ? null : summary.getPrefix();
@@ -341,7 +347,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
             FileUtils.writeStringToFile(
                     datasetDir + File.separator + "acq_settings.json", settingsJson);
-            if (acqSettings_.isUsingMultiplePositions()
+            if (settings.isUsingMultiplePositions()
                     && positionList_.getNumberOfPositions() > 0) {
                 try {
                     final String path = datasetDir + File.separator + "position_list.pos";
@@ -407,7 +413,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
                 // TODO: where should these come from? In diSPIM they appear to come from preferences,
                 //  not settings...
-                boolean doAutofocus = acqSettings_.autofocus().enabled();
+                boolean doAutofocus = settings.autofocus().enabled();
 
                 boolean autofocusAtT0 = false;
                 // TODO: this is where they come from in diSPIM?
@@ -460,7 +466,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     // move between positions fast
                     scanSpeedX_ = 1.0;
                     scanAccelX_ = 1.0;
-                    if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
+                    if (settings.stageScan().enabled() && settings.isUsingMultiplePositions()) {
                         final ASIXYStage xyStage = model_.devices().device("SampleXY");
                         scanSpeedX_ = xyStage.getSpeedX();
                         scanAccelX_ = xyStage.getAccelerationX();
@@ -523,7 +529,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 }
 
                 if (isUsingPLC) {
-                    if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
+                    if (settings.stageScan().enabled() && settings.isUsingMultiplePositions()) {
                         final ASIXYStage xyStage = model_.devices().device("SampleXY");
                         // Scan from the coordinate this event was generated for instead of reading
                         // the stage. The read only agrees with the target when a move was issued
@@ -555,15 +561,15 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         xyStage.setSpeedX(scanSpeedX_);
                         xyStage.setAccelerationX(scanAccelX_);
                         controllerInstance.prepareStageScanForAcquisition(
-                                eventX, eventY, acqSettings_);
-                        controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode());
+                                eventX, eventY, settings);
+                        controllerInstance.triggerControllerStartAcquisition(settings.acquisitionMode());
                         return event;
                     }
 
                     // TODO: is this the best place to set state to idle?
                     ASIScanner scanner = model_.devices().device("IllumSlice");
                     // need to set to IDLE to re-arm for each z-stack
-                    if (!acqSettings_.isUsingHardwareTimePoints()) {
+                    if (!settings.isUsingHardwareTimePoints()) {
                         if (scanner.getSPIMState().equals(ASIScanner.SPIMState.RUNNING)) {
                             scanner.setSPIMState(ASIScanner.SPIMState.IDLE);
                         }
@@ -583,7 +589,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     // NOTE: not sure why this is being triggered twice with only 1 camera; so we need guard
                     // TODO: enable 2 sided acquisition
                     if (scanner.getSPIMState().equals(ASIScanner.SPIMState.IDLE)) {
-                        controllerInstance.triggerControllerStartAcquisition(acqSettings_.acquisitionMode());
+                        controllerInstance.triggerControllerStartAcquisition(settings.acquisitionMode());
                     }
                 }
                 return event;
@@ -662,7 +668,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 cameraNames = names.toArray(String[]::new);
             } else {
                // standard camera setup
-               if (acqSettings_.volume().numViews() > 1) {
+               if (settings.volume().numViews() > 1) {
                   cameraNames = new String[] {
                         model_.devices().device("Imaging1Camera").getDeviceName(),
                         model_.devices().device("Imaging2Camera").getDeviceName()
@@ -675,36 +681,36 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
-        if (acqSettings_.isUsingHardwareTimePoints()) {
+        if (settings.isUsingHardwareTimePoints()) {
             AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
-            if (acqSettings_.channels().enabled()) {
+            if (settings.channels().enabled()) {
                 currentAcquisition_.submitEventIterator(
                         LightSheetEventAdapter.createTimelapseMultiChannelVolumeAcqEvents(
-                                baseEvent.copy(), acqSettings_, cameraNames,
-                                acqSettings_.channels().used(), null));
+                                baseEvent.copy(), settings, cameraNames,
+                                settings.channels().used(), null));
             } else {
                 currentAcquisition_.submitEventIterator(
                         LightSheetEventAdapter.createTimelapseVolumeAcqEvents(
-                                baseEvent.copy(), acqSettings_, cameraNames, null));
+                                baseEvent.copy(), settings, cameraNames, null));
             }
 
         } else {
 
-            final int numPositions = acqSettings_.isUsingMultiplePositions() ? pl.getNumberOfPositions() : 1;
-            final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
+            final int numPositions = settings.isUsingMultiplePositions() ? pl.getNumberOfPositions() : 1;
+            final int numTimePoints = settings.isUsingTimePoints() ? settings.numTimePoints() : 1;
 
             // Loop 1: Multiple time points
             for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
                 //System.out.println("time index: " + timeIndex);
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
-                if (acqSettings_.isUsingTimePoints()) {
+                if (settings.isUsingTimePoints()) {
                     baseEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
-                    baseEvent.setMinimumStartTime((long) (timeIndex * (model_.acquisitions().settings().timePointIntervalSec() * 1000.0)));
+                    baseEvent.setMinimumStartTime((long) (timeIndex * (settings.timePointIntervalSec() * 1000.0)));
                 }
                 // Loop 2: XY positions
                 for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
                     //System.out.println("pos index: " + positionIndex);
-                    if (acqSettings_.isUsingMultiplePositions()) {
+                    if (settings.isUsingMultiplePositions()) {
                         baseEvent.setAxisPosition(LightSheetEventAdapter.POSITION_AXIS, positionIndex);
                         // is this the best way to do stage movements with new acq engine?
                         MultiStagePosition position = pl.getPosition(positionIndex);
@@ -715,8 +721,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     //  If yes, then nothing more to do here.
 
                     // Loop 3: Channels; Loop 4: Z slices
-                    if (acqSettings_.channels().enabled()) {
-                        if (acqSettings_.channels().mode() == ChannelMode.VOLUME) {
+                    if (settings.channels().enabled()) {
+                        if (settings.channels().mode() == ChannelMode.VOLUME) {
                             // software "Every Volume" multichannel submits ONE event
                             // iterator PER channel, so AcqEngJ flushes a SequenceEnd between
                             // channels (Engine.java:187) and the controller re-fires once per
@@ -725,11 +731,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                             // AcqEngJ merge identical-preset channels into one sequence that fires the
                             // controller once, collapsing the channel dimension (hang on hardware,
                             // silent wrong data in demo).
-                            final var used = acqSettings_.channels().used();
+                            final var used = settings.channels().used();
                             for (int channelIndex = 0; channelIndex < used.length; channelIndex++) {
                                 currentAcquisition_.submitEventIterator(
                                         LightSheetEventAdapter.createSingleChannelVolumeAcqEvents(
-                                                baseEvent.copy(), acqSettings_, cameraNames, null,
+                                                baseEvent.copy(), settings, cameraNames, null,
                                                 channelIndex, used[channelIndex], used.length));
                             }
                         } else {
@@ -747,13 +753,13 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                             // Nothing refuses it on this path yet.
                             currentAcquisition_.submitEventIterator(
                                     LightSheetEventAdapter.createChannelPerSliceAcqEvents(
-                                            baseEvent.copy(), acqSettings_, cameraNames,
-                                            acqSettings_.channels().used(), null));
+                                            baseEvent.copy(), settings, cameraNames,
+                                            settings.channels().used(), null));
                         }
                     } else {
                         currentAcquisition_.submitEventIterator(
                                 LightSheetEventAdapter.createAcqEvents(
-                                        baseEvent.copy(), acqSettings_, cameraNames, null));
+                                        baseEvent.copy(), settings, cameraNames, null));
                     }
                 }
             }
