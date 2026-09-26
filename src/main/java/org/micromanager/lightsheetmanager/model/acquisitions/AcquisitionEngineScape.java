@@ -601,6 +601,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }, Acquisition.AFTER_CAMERA_HOOK);
 
+        // read once, before the acquisition starts, so every channel's offset has the same origin
+        final Double baseFocusUm = readBaseFocusPosition(settings);
+
         // Last chance to honor a Stop clicked while everything above was being armed. Checked
         // before the shutter is touched, so giving up here cannot leave it open.
         if (isStopRequested()) {
@@ -703,6 +706,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
                 //System.out.println("time index: " + timeIndex);
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
+                if (baseFocusUm != null) {
+                    baseEvent.setZ(null, baseFocusUm);
+                }
                 if (settings.isUsingTimePoints()) {
                     baseEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
                     baseEvent.setMinimumStartTime((long) (timeIndex * (settings.timePointIntervalSec() * 1000.0)));
@@ -818,6 +824,35 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         currentAcquisition_.waitForCompletion();
 
         return true;
+    }
+
+    /**
+     * Reads the focus position the channel offsets are applied to, or null when the events do not
+     * apply them.
+     *
+     * <p>Read once, before the acquisition starts. An event factory that reads the stage itself
+     * can find it already moved by the events submitted before it, and adds its channel's offset
+     * on top of another channel's.
+     *
+     * @param settings the run snapshot
+     * @return the focus position in micrometers, or null
+     */
+    private Double readBaseFocusPosition(final ScapeAcquisitionSettings settings) {
+        if (!settings.channels().enabled() || core_.getFocusDevice().isEmpty()) {
+            return null;
+        }
+        // the same cases as the factories: software channels always read it, hardware channel
+        // switching only when a single channel is baked onto the base event
+        final boolean readsFocus = settings.channels().mode() == ChannelMode.VOLUME
+                || settings.channels().used().length == 1;
+        if (!readsFocus) {
+            return null;
+        }
+        try {
+            return core_.getPosition();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
