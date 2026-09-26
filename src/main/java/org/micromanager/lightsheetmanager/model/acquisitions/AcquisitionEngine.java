@@ -4,6 +4,7 @@ import mmcorej.CMMCore;
 import mmcorej.org.json.JSONArray;
 import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
+import org.micromanager.PositionList;
 import org.micromanager.Studio;
 import org.micromanager.acqj.main.Acquisition;
 import org.micromanager.acquisition.internal.MMAcquistionControlCallbacks;
@@ -459,11 +460,25 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      * This function adds in its fields in order to achieve compatibility.
      */
     protected DefaultSummaryMetadata addMMSummaryMetadata(JSONObject summaryMetadata) {
+        return addMMSummaryMetadata(summaryMetadata, acqSettings_,
+                studio_.positions().getPositionList());
+    }
+
+    /**
+     * As above, but from a run snapshot, so the summary describes the run even if the settings
+     * or the position list are edited while it is in flight.
+     *
+     * @param summaryMetadata the acquisition's own summary metadata, mutated in place
+     * @param settings the run snapshot
+     * @param positionList the run's position list snapshot
+     */
+    protected DefaultSummaryMetadata addMMSummaryMetadata(JSONObject summaryMetadata,
+            final ScapeAcquisitionSettings settings, final PositionList positionList) {
         try {
             // These are the ones from the clojure engine that may yet need to be translated
             //        "Channels" -> {Long@25854} 2
 
-            summaryMetadata.put(PropertyKey.CHANNEL_GROUP.key(), acqSettings_.channels().group());
+            summaryMetadata.put(PropertyKey.CHANNEL_GROUP.key(), settings.channels().group());
 
             // one name per position on the store's channel axis; with simultaneous cameras the
             // channel index varies fastest, so walk cameras outermost and repeat the whole channel
@@ -471,8 +486,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             // the wrong name.
             final List<String> channelNames = new ArrayList<>();
             final List<String> baseChannelNames = new ArrayList<>();
-            if (acqSettings_.channels().enabled() && acqSettings_.channels().count() > 0) {
-                for (ChannelSpec c : acqSettings_.channels().used()) {
+            if (settings.channels().enabled() && settings.channels().count() > 0) {
+                for (ChannelSpec c : settings.channels().used()) {
                     baseChannelNames.add(c.getName());
                 }
             } else {
@@ -481,7 +496,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             if (model_.devices().adapter().numSimultaneousCameras() > 1) {
                 for (CameraBase camera : model_.devices().imagingCameras()) {
                     for (String channelName : baseChannelNames) {
-                        channelNames.add(acqSettings_.channels().enabled()
+                        channelNames.add(settings.channels().enabled()
                                 ? channelName + "-" + camera.getDeviceName()
                                 : camera.getDeviceName());
                     }
@@ -501,17 +516,17 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
             // MM MDA acquisitions have a defined number of
             // frames/slices/channels/positions at the outset
-            summaryMetadata.put(PropertyKey.FRAMES.key(), acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1);
+            summaryMetadata.put(PropertyKey.FRAMES.key(), settings.isUsingTimePoints() ? settings.numTimePoints() : 1);
 
-            summaryMetadata.put(PropertyKey.SLICES.key(), acqSettings_.volume().slicesPerView());
+            summaryMetadata.put(PropertyKey.SLICES.key(), settings.volume().slicesPerView());
 
             summaryMetadata.put(PropertyKey.CHANNELS.key(), channelNames.size());
-            summaryMetadata.put(PropertyKey.POSITIONS.key(), acqSettings_.isUsingMultiplePositions() ?
-                        studio_.positions().getPositionList().getNumberOfPositions() : 1);
+            summaryMetadata.put(PropertyKey.POSITIONS.key(), settings.isUsingMultiplePositions() ?
+                        positionList.getNumberOfPositions() : 1);
 
             // MM MDA acquisitions have a defined order
             summaryMetadata.put(PropertyKey.SLICES_FIRST.key(),
-                  acqSettings_.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
+                  settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
             summaryMetadata.put(PropertyKey.TIME_FIRST.key(),
                   false); // currently only position, time ordering
 
@@ -526,14 +541,14 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             }
             summaryMetadata.put(PropertyKey.AXIS_ORDER.key(), axes);
 
-            final int numPositions = studio_.positions().getPositionList().getNumberOfPositions();
+            final int numPositions = positionList.getNumberOfPositions();
 
             // channelNames.size() already includes the simultaneous-camera factor
             final Coords dims = studio_.data().coordsBuilder()
                     .channel(channelNames.size())
-                    .z(acqSettings_.volume().slicesPerView())
-                    .timePoint(acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1)
-                    .stagePosition(acqSettings_.isUsingMultiplePositions() ? numPositions : 1)
+                    .z(settings.volume().slicesPerView())
+                    .timePoint(settings.isUsingTimePoints() ? settings.numTimePoints() : 1)
+                    .stagePosition(settings.isUsingMultiplePositions() ? numPositions : 1)
                     .build();
 
             final List<String> axisOrder = new ArrayList<>();
@@ -546,11 +561,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             final DefaultSummaryMetadata dsmd = (DefaultSummaryMetadata) dsmb
                     .prefix("")
                     .axisOrder(axisOrder)
-                    .channelGroup(model_.acquisitions().settings().channels().group())
+                    .channelGroup(settings.channels().group())
                     .channelNames(channelNames)
                     .imageWidth((int)core_.getImageWidth())
                     .imageHeight((int)core_.getImageHeight())
-                    .zStepUm(acqSettings_.volume().sliceStepSize())
+                    .zStepUm(settings.volume().sliceStepSize())
                     .intendedDimensions(dims)
                     .build();
 
