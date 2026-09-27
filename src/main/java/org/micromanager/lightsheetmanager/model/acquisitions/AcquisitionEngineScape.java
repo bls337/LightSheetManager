@@ -3,8 +3,10 @@ package org.micromanager.lightsheetmanager.model.acquisitions;
 import mmcorej.StrVector;
 import mmcorej.org.json.JSONException;
 import mmcorej.org.json.JSONObject;
+import com.google.gson.GsonBuilder;
 import org.micromanager.MultiStagePosition;
 import org.micromanager.PositionList;
+import org.micromanager.PropertyMaps;
 import org.micromanager.acqj.api.AcquisitionHook;
 import org.micromanager.acqj.main.Acquisition;
 import org.micromanager.acqj.main.AcquisitionEvent;
@@ -47,10 +49,16 @@ import org.micromanager.lightsheetmanager.model.utils.GeometryUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import javax.swing.JLabel;
+import javax.swing.SwingUtilities;
 import java.awt.geom.Point2D;
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -58,9 +66,15 @@ import java.util.Objects;
  */
 public class AcquisitionEngineScape extends AcquisitionEngine {
 
+    // NDTiff grows each new file to this length on open and trims it on close, so every dataset
+    // needs this much free space however little it holds
+    private static final long NDTIFF_FILE_RESERVATION_BYTES = 4L << 30;
+
     PLogicScape controller_;
     ArrayList<Double> savedExposures_ = new ArrayList<>();
     Point2D.Double xyPosUm_;
+    // wall clock start of the series, which relates one dataset's elapsed times to another's
+    private long seriesStartEpochMs_;
     // Snapshot taken when the run is armed. The position list is user-editable at any time, so
     // a live read can give different answers to different parts of one run: the saved
     // position_list.pos, the generated events, and the per-arm stage scan setup must agree.
@@ -119,6 +133,16 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // save location would otherwise cost a full acquisition before it is discovered
         if (!validateSaveLocation()) {
             return false; // early exit => save location unusable
+        }
+
+        // each time point's store is closed once the next one starts, so without saving the
+        // images would be lost. checked here because the api can set both flags independently
+        if (isSeparatingTimePoints(acqSettings_)
+                && !acqSettings_.isSavingImagesDuringAcquisition()) {
+            model_.logging().reportError("Separate time points requires saving.\n\n"
+                    + "Check \"Save images during acquisition\" on the Save Settings panel, "
+                    + "or uncheck \"Separate file for each time point\".");
+            return false; // early exit => nothing would reach disk
         }
 
         // make sure that there are positions in the PositionList; a pure read, so it belongs
@@ -295,6 +319,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // has save() and root() set, which is what the saving branch below does, so this is what
         // picks ND-TIFF over multipage TIFF or a single plane series for the images written during
         // the run. It is the only channel MMAcquisition offers for that choice.
+        // Once per run, not per time point: every profile write delays the profile's flush.
         if (settings.saveMode() == SaveMode.ND_TIFF) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
         } else if (settings.saveMode() == SaveMode.MULTIPAGE_TIFF) {
@@ -323,15 +348,30 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return false; // early exit => finish() still restores whatever was armed
         }
 
+        // once per run: finish() restores what is captured here, and a second capture would
+        // record the first one's autoshutter off and shutter open
         captureShutterStateAndOpen();
 
-        if (!startTimePointAcquisition(settings, cameraNames, baseFocusUm, settingsJson,
-                saveDir, saveName)) {
-            // never wait on an Acquisition that was not finished: the wait is unbounded
-            return false;
+        if (!isSeparatingTimePoints(settings)) {
+            if (!startTimePointAcquisition(settings, cameraNames, baseFocusUm, settingsJson,
+                    saveDir, saveName, -1)) {
+                // never wait on an Acquisition that was not finished: the wait is unbounded
+                return false;
+            }
+            currentAcquisition_.waitForCompletion();
+            return true;
         }
-        currentAcquisition_.waitForCompletion();
-        return true;
+
+        return runSeparateTimePoints(settings, cameraNames, baseFocusUm, settingsJson,
+                saveDir, saveName);
+    }
+
+    /**
+     * True when this run writes one dataset per time point. The flag is ignored when time points
+     * are off, as numTimePoints is.
+     */
+    private static boolean isSeparatingTimePoints(final ScapeAcquisitionSettings settings) {
+        return settings.isUsingTimePoints() && settings.isUsingSeparateTimePoints();
     }
 
     /**
@@ -452,14 +492,20 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * @param settingsJson the run settings, written into the dataset directory
      * @param root the directory MMAcquisition creates the dataset in
      * @param prefix the dataset name, which MMAcquisition suffixes with a counter of its own
+     * @param datasetTimeIndex the time point this dataset holds, or -1 when the dataset is the
+     *                         whole run
      * @return true if the acquisition started and every event was submitted
      */
     private boolean startTimePointAcquisition(final ScapeAcquisitionSettings settings,
             final String[] cameraNames, final Double baseFocusUm, final String settingsJson,
-            final String root, final String prefix) {
+            final String root, final String prefix, final int datasetTimeIndex) {
 
         // used to detect if the plugin is using ASI hardware
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
+        final boolean separate = datasetTimeIndex >= 0;
+        // one time point per dataset in separate mode, the whole series otherwise
+        final int numTimePoints = separate ? 1
+                : (settings.isUsingTimePoints() ? settings.numTimePoints() : 1);
 
         //////////////////////////////////////
         // Begin AcqEngJ integration
@@ -478,8 +524,28 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         } catch (JSONException e) {
             studio_.logs().logError("Failed to add z-step_um metadata: " + e.getMessage());
         }
-        DefaultSummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata, settings,
-                positionList_);
+        SummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata, settings, positionList_,
+                numTimePoints);
+        if (separate) {
+            // Series identity, since every dataset holds time index 0. The start time is the
+            // actual one, taken as the dataset opens: a late time point starts after its slot.
+            final long startEpochMs = System.currentTimeMillis();
+            dsmd = dsmd.copyBuilder()
+                    // Micro-Manager's own start time key and format
+                    .startDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z", Locale.ROOT)
+                            .format(new Date(startEpochMs)))
+                    .userData(PropertyMaps.builder()
+                            .putBoolean("SeparateTimePoints", true)
+                            .putInteger("TimePointIndex", datasetTimeIndex)
+                            .putInteger("NumTimePoints", settings.numTimePoints())
+                            .putLong("IntervalMs",
+                                    Math.round(settings.timePointIntervalSec() * 1000.0))
+                            .putString("SeriesName", new File(root).getName())
+                            .putLong("SeriesStartEpochMs", seriesStartEpochMs_)
+                            .putLong("TimePointStartEpochMs", startEpochMs)
+                            .build())
+                    .build();
+        }
 
         // TODO(Brandon): where should i get this from?
         SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
@@ -776,7 +842,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         try {
             currentAcquisition_.start();
 
-            submitEvents(settings, cameraNames, baseFocusUm);
+            submitEvents(settings, cameraNames, baseFocusUm, separate, numTimePoints);
 
             // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
             // once everything finishes
@@ -833,9 +899,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * @param settings the run snapshot
      * @param cameraNames the camera device names, in slot order
      * @param baseFocusUm the focus position channel offsets are applied to, or null
+     * @param separate true if this dataset is one time point of a separate time point series
+     * @param numTimePoints the time points this dataset holds
      */
     private void submitEvents(final ScapeAcquisitionSettings settings, final String[] cameraNames,
-            final Double baseFocusUm) {
+            final Double baseFocusUm, final boolean separate, final int numTimePoints) {
 
         ////////////  Create and submit acquisition events ////////////////////
         // Create iterators of acquisition events and submit them to the engine for execution
@@ -848,7 +916,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // Loop 1: XY positions
         PositionList pl = positionList_;
 
-        if (settings.isUsingHardwareTimePoints()) {
+        // never in separate mode: without a controller the hardware flag is not recomputed, so
+        // it can be left set by earlier settings
+        if (!separate && settings.isUsingHardwareTimePoints()) {
             AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
             if (settings.channels().enabled()) {
                 currentAcquisition_.submitEventIterator(
@@ -864,7 +934,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         } else {
 
             final int numPositions = settings.isUsingMultiplePositions() ? pl.getNumberOfPositions() : 1;
-            final int numTimePoints = settings.isUsingTimePoints() ? settings.numTimePoints() : 1;
 
             // Loop 1: Multiple time points
             for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
@@ -873,7 +942,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 if (baseFocusUm != null) {
                     baseEvent.setZ(null, baseFocusUm);
                 }
-                if (settings.isUsingTimePoints()) {
+                // in separate mode each dataset holds time index 0 and the series loop keeps the
+                // schedule, so no time axis and no minimum start time
+                if (!separate && settings.isUsingTimePoints()) {
                     baseEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
                     baseEvent.setMinimumStartTime((long) (timeIndex * (settings.timePointIntervalSec() * 1000.0)));
                 }
@@ -934,6 +1005,296 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 }
             }
 
+        }
+    }
+
+    /**
+     * Runs one acquisition per time point, each into its own dataset. The controller is armed
+     * once for the whole series, so this loop never touches it.
+     *
+     * <p>Time point t is due at start + t * interval on a monotonic clock, so a late time point
+     * does not delay the later ones: they run back to back until the schedule catches up.
+     *
+     * <p>Any abort or failure ends the series. There is no camera timeout, so a starved time
+     * point hangs the series.
+     *
+     * @return true if at least one dataset was completed
+     */
+    private boolean runSeparateTimePoints(final ScapeAcquisitionSettings settings,
+            final String[] cameraNames, final Double baseFocusUm, final String settingsJson,
+            final String saveDir, final String saveName) {
+
+        final int numTimePoints = settings.numTimePoints();
+        final long intervalMs = Math.round(settings.timePointIntervalSec() * 1000.0);
+
+        final String seriesDir = createSeriesDirectory(saveDir, saveName);
+        if (seriesDir == null) {
+            return false; // early exit => nowhere to write
+        }
+
+        // differs from saveName when a folder with that name already existed
+        final String seriesName = new File(seriesDir).getName();
+        seriesStartEpochMs_ = System.currentTimeMillis();
+        final long seriesStartNs = System.nanoTime();
+        // directory names of the completed datasets
+        final List<String> datasetNames = new ArrayList<>();
+        writeSeriesManifest(seriesDir, seriesName, numTimePoints, intervalMs, datasetNames,
+                "running");
+
+        // the last dataset's window stays open until the next time point starts, so a series
+        // that stops in the wait still shows it
+        Datastore previousStore = null;
+        // the time point not yet accounted for, so an exception still marks its dataset
+        int inFlightIndex = -1;
+        try {
+            for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
+                if (!awaitTimePointSlot(seriesStartNs, timeIndex, intervalMs)) {
+                    break; // stop requested during the wait
+                }
+                if (!hasRoomForOneTimePoint(seriesDir, settings, cameraNames, timeIndex)) {
+                    break; // not enough free space
+                }
+                // set before the start, which can throw after its dataset directory exists
+                inFlightIndex = timeIndex;
+                // Locale.ROOT: a locale with its own digits would put them in the directory name
+                if (!startTimePointAcquisition(settings, cameraNames, baseFocusUm, settingsJson,
+                        seriesDir, String.format(Locale.ROOT, "%04d", timeIndex), timeIndex)) {
+                    break; // nothing started, so nothing to wait for
+                }
+                if (previousStore != null) {
+                    closeDisplaysOnInterfaceThread(previousStore, timeIndex - 1);
+                    previousStore = null;
+                }
+                // returns once the store is frozen, so the dataset is complete on disk
+                currentAcquisition_.waitForCompletion();
+
+                final String datasetDir = datastore_.getSavePath();
+                previousStore = datastore_;
+                final boolean keepGoing =
+                        finishTimePoint(settings, timeIndex, datasetDir, datasetNames);
+                inFlightIndex = -1; // accounted for by finishTimePoint
+                // after every time point, so a series that dies still lists what it completed
+                writeSeriesManifest(seriesDir, seriesName, numTimePoints, intervalMs, datasetNames,
+                        "running");
+                if (!keepGoing) {
+                    break;
+                }
+            }
+        } finally {
+            // no save path means no directory was created, so there is nothing to mark
+            final String inFlightDir = datastore_ == null ? null : datastore_.getSavePath();
+            if (inFlightIndex >= 0 && inFlightDir != null) {
+                writeIncompleteMarker(inFlightDir, inFlightIndex, "failed");
+            }
+            final int completed = datasetNames.size();
+            final String status = completed == numTimePoints ? "complete" : "ended early";
+            writeSeriesManifest(seriesDir, seriesName, numTimePoints, intervalMs, datasetNames,
+                    status);
+            studio_.logs().logMessage("separate time points: " + completed + " of " + numTimePoints
+                    + " datasets complete in " + seriesDir);
+        }
+        return !datasetNames.isEmpty();
+    }
+
+    /**
+     * Sleeps until the time point is due, in short steps so a Stop is acted on promptly.
+     *
+     * @return false if the series should stop instead of running this time point
+     */
+    private boolean awaitTimePointSlot(final long seriesStartNs, final int timeIndex,
+            final long intervalMs) {
+        final long dueNs = seriesStartNs + timeIndex * intervalMs * 1_000_000L;
+        long remainingMs = (dueNs - System.nanoTime()) / 1_000_000L;
+        if (remainingMs < 0 && timeIndex > 0) {
+            studio_.logs().logMessage("separate time points: time point " + timeIndex
+                    + " is starting " + (-remainingMs) + " ms late");
+        }
+        setAwaitingTimePoint(true);
+        try {
+            while (remainingMs > 0) {
+                if (isStopRequested()) {
+                    return false;
+                }
+                // MM's countdown compares this against its own monotonic clock in milliseconds
+                nextWakeTime_ = System.nanoTime() / 1_000_000L + remainingMs;
+                try {
+                    Thread.sleep(Math.min(250L, remainingMs));
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
+                remainingMs = (dueNs - System.nanoTime()) / 1_000_000L;
+            }
+            return !isStopRequested();
+        } finally {
+            setAwaitingTimePoint(false);
+        }
+    }
+
+    /**
+     * Checks that the disk can take one more dataset before it is opened, so a full disk ends the
+     * series with one message instead of failing every remaining time point.
+     *
+     * @return true if the next dataset can be written in full
+     */
+    private boolean hasRoomForOneTimePoint(final String seriesDir,
+            final ScapeAcquisitionSettings settings, final String[] cameraNames,
+            final int timeIndex) {
+        final long usable = new File(seriesDir).getUsableSpace();
+        final long payload = estimateTimePointBytes(settings, cameraNames);
+        final long reservation =
+                settings.saveMode() == SaveMode.ND_TIFF ? NDTIFF_FILE_RESERVATION_BYTES : 0L;
+        if (usable >= payload + reservation) {
+            return true;
+        }
+        model_.logging().reportError("Not enough free space for time point " + timeIndex + ": "
+                + (usable >> 20) + " MB free, about " + ((payload + reservation) >> 20)
+                + " MB needed. The series stopped here; earlier time points are complete on disk.");
+        return false;
+    }
+
+    /**
+     * Estimates the bytes one time point writes, from the frame size and the image count.
+     */
+    private long estimateTimePointBytes(final ScapeAcquisitionSettings settings,
+            final String[] cameraNames) {
+        final long frameBytes =
+                core_.getImageWidth() * core_.getImageHeight() * core_.getBytesPerPixel();
+        final long channels = settings.channels().enabled()
+                ? Math.max(1, settings.channels().count()) : 1L;
+        final long positions = settings.isUsingMultiplePositions()
+                ? Math.max(1, positionList_.getNumberOfPositions()) : 1L;
+        return frameBytes * settings.volume().slicesPerView() * channels * positions
+                * cameraNames.length;
+    }
+
+    /**
+     * Creates the folder the series' datasets are written into and returns its path, or null.
+     * An existing folder is never reused: a fresh one keeps MMAcquisition's name counter at one,
+     * so the datasets are named 0000_1, 0001_1 and so on.
+     */
+    private String createSeriesDirectory(final String saveDir, final String saveName) {
+        final String seriesDir = FileUtils.createUniquePath(saveDir, saveName);
+        if (!new File(seriesDir).mkdirs()) {
+            model_.logging().reportError("Could not create the series directory:\n\n" + seriesDir);
+            return null;
+        }
+        if (!seriesDir.equals(saveDir + File.separator + saveName)) {
+            studio_.logs().logMessage("A folder named " + saveName + " already exists in "
+                    + saveDir + "; this series is in " + seriesDir);
+        }
+        return seriesDir;
+    }
+
+    /**
+     * Writes series.json into the series folder: before the first time point, after each one,
+     * and at the end with the final status. Datasets are listed by directory name, so the
+     * manifest still holds when the series folder is moved.
+     */
+    private void writeSeriesManifest(final String seriesDir, final String seriesName,
+            final int numTimePoints, final long intervalMs, final List<String> datasetNames,
+            final String status) {
+        final Map<String, Object> manifest = new LinkedHashMap<>();
+        manifest.put("seriesName", seriesName);
+        manifest.put("status", status);
+        manifest.put("numTimePoints", numTimePoints);
+        manifest.put("completedTimePoints", datasetNames.size());
+        manifest.put("intervalMs", intervalMs);
+        manifest.put("seriesStartEpochMs", seriesStartEpochMs_);
+        manifest.put("datasets", new ArrayList<>(datasetNames));
+        FileUtils.writeStringToFile(seriesDir + File.separator + "series.json",
+                new GsonBuilder().setPrettyPrinting().create().toJson(manifest));
+    }
+
+    /**
+     * Ends one time point of a series, after waitForCompletion(), and says whether the series
+     * should go on. Records the dataset as complete or marks it incomplete, and leaves its window
+     * for the caller to close.
+     *
+     * @param settings the run snapshot
+     * @param timeIndex the time point that just ended
+     * @param datasetDir where this time point was written
+     * @param datasetNames the series manifest's completed list, appended to when this one is whole
+     * @return true if the next time point should run
+     */
+    private boolean finishTimePoint(final ScapeAcquisitionSettings settings, final int timeIndex,
+            final String datasetDir, final List<String> datasetNames) {
+
+        // check both: some aborts set only the flag, others reach only this Acquisition
+        final boolean aborted = currentAcquisition_.isAbortRequested();
+        boolean keepGoing = !aborted && !isStopRequested();
+        if (!keepGoing) {
+            studio_.logs().logMessage("separate time points: the series stopped at time point "
+                    + timeIndex);
+        }
+        // null while the dataset is whole; a stop after it finished ends the series but does not
+        // make it incomplete
+        String incompleteReason = aborted ? "aborted" : null;
+        try {
+            currentAcquisition_.checkForExceptions();
+        } catch (Exception e) {
+            // shown, not only logged, so a long series that stops unattended says why
+            model_.logging().reportError(e, "The acquisition failed at time point " + timeIndex
+                    + " and the series stopped there. Earlier time points are complete on disk.");
+            incompleteReason = "failed";
+            keepGoing = false;
+        }
+
+        // an incomplete dataset is also marked inside its folder, for anything that reads the
+        // folder rather than the manifest
+        if (incompleteReason == null) {
+            datasetNames.add(new File(datasetDir).getName());
+        } else {
+            writeIncompleteMarker(datasetDir, timeIndex, incompleteReason);
+        }
+
+        // stage scan only: let the stage finish retracing before the next time point moves it.
+        // finish() does this after the last one.
+        if (keepGoing && settings.stageScan().enabled() && model_.devices().isUsingPLogic()
+                && controller_ != null) {
+            controller_.stopSPIMStateMachines();
+        }
+
+        // released before the caller closes the window, or the close guard would treat it as the
+        // live store and ask to abort
+        datastore_ = null;
+        return keepGoing;
+    }
+
+    /**
+     * Marks a dataset directory whose time point did not finish.
+     *
+     * @param datasetDir the directory the incomplete dataset was written to
+     * @param timeIndex the time point that did not finish
+     * @param reason what ended it
+     */
+    private void writeIncompleteMarker(final String datasetDir, final int timeIndex,
+            final String reason) {
+        final Map<String, Object> marker = new LinkedHashMap<>();
+        marker.put("complete", false);
+        marker.put("timePointIndex", timeIndex);
+        marker.put("reason", reason);
+        marker.put("writtenEpochMs", System.currentTimeMillis());
+        FileUtils.writeStringToFile(datasetDir + File.separator + "incomplete.json",
+                new GsonBuilder().setPrettyPrinting().create().toJson(marker));
+    }
+
+    /**
+     * Closes a finished time point's window. The store is managed, so this also closes the store
+     * and releases the dataset's files.
+     */
+    private void closeDisplaysOnInterfaceThread(final Datastore store, final int timeIndex) {
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                studio_.logs().logMessage("separate time points: closing the window for time "
+                        + "point " + timeIndex);
+                if (!studio_.displays().closeDisplaysFor(store)) {
+                    studio_.logs().logError("The window for time point " + timeIndex
+                            + " refused to close");
+                }
+            });
+        } catch (Exception e) {
+            studio_.logs().logError(e, "Could not close the window for time point " + timeIndex);
         }
     }
 
@@ -1204,7 +1565,14 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // reset the flag every run and recompute below
         asb_.useHardwareTimePoints(false);
         boolean isUsingHardwareTimePoints = false; // TODO: asb_ not built yet
+
+        // Separate time points never uses hardware time points, which would run the whole series
+        // on one trigger. Decided here because this recompute turns the hardware flag on by
+        // itself when the interval is short.
+        final boolean separateTimePoints = isSeparatingTimePoints(acqSettings_);
+
         if (acqSettings_.isUsingTimePoints()
+                && !separateTimePoints
                 && acqSettings_.numTimePoints() > 1
                 && timepointIntervalMs < (timepointDuration + 750)
                 && !acqSettings_.stageScan().enabled()) {
@@ -1290,6 +1658,17 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 studio_.logs().showError("Time point interval shorter than the time to collect a single volume.");
                 return false;
             }
+        }
+
+        // warn and continue: in separate mode a short interval makes time points late rather
+        // than losing data. below the refusals so a refused run shows only the refusal
+        if (separateTimePoints
+                && acqSettings_.numTimePoints() > 1
+                && timepointIntervalMs < (timepointDuration + 750)) {
+            model_.logging().reportError("The time point interval is close to the time one time "
+                    + "point takes to acquire, leaving little or no time to open and close its "
+                    + "dataset. Time points will run late and the schedule will catch up rather "
+                    + "than skip. Proceed at your own risk.");
         }
 
         // set exposure for imaging camera
