@@ -73,8 +73,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     PLogicScape controller_;
     ArrayList<Double> savedExposures_ = new ArrayList<>();
     Point2D.Double xyPosUm_;
-    // wall clock start of the series, which relates one dataset's elapsed times to another's
-    private long seriesStartEpochMs_;
     // Snapshot taken when the run is armed. The position list is user-editable at any time, so
     // a live read can give different answers to different parts of one run: the saved
     // position_list.pos, the generated events, and the per-arm stage scan setup must agree.
@@ -527,22 +525,16 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         SummaryMetadata dsmd = addMMSummaryMetadata(summaryMetadata, settings, positionList_,
                 numTimePoints);
         if (separate) {
-            // Series identity, since every dataset holds time index 0. The start time is the
-            // actual one, taken as the dataset opens: a late time point starts after its slot.
-            final long startEpochMs = System.currentTimeMillis();
+            // Every dataset holds time index 0, so record which time point this is. The start
+            // time is the actual one, taken as the dataset opens: a late time point starts after
+            // its slot.
             dsmd = dsmd.copyBuilder()
                     // Micro-Manager's own start time key and format
                     .startDate(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS Z", Locale.ROOT)
-                            .format(new Date(startEpochMs)))
+                            .format(new Date()))
                     .userData(PropertyMaps.builder()
                             .putBoolean("SeparateTimePoints", true)
                             .putInteger("TimePointIndex", datasetTimeIndex)
-                            .putInteger("NumTimePoints", settings.numTimePoints())
-                            .putLong("IntervalMs",
-                                    Math.round(settings.timePointIntervalSec() * 1000.0))
-                            .putString("SeriesName", new File(root).getName())
-                            .putLong("SeriesStartEpochMs", seriesStartEpochMs_)
-                            .putLong("TimePointStartEpochMs", startEpochMs)
                             .build())
                     .build();
         }
@@ -1032,14 +1024,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return false; // early exit => nowhere to write
         }
 
-        // differs from saveName when a folder with that name already existed
-        final String seriesName = new File(seriesDir).getName();
-        seriesStartEpochMs_ = System.currentTimeMillis();
         final long seriesStartNs = System.nanoTime();
         // directory names of the completed datasets
         final List<String> datasetNames = new ArrayList<>();
-        writeSeriesManifest(seriesDir, seriesName, numTimePoints, intervalMs, datasetNames,
-                "running");
 
         // the last dataset's window stays open until the next time point starts, so a series
         // that stops in the wait still shows it
@@ -1073,9 +1060,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 final boolean keepGoing =
                         finishTimePoint(settings, timeIndex, datasetDir, datasetNames);
                 inFlightIndex = -1; // accounted for by finishTimePoint
-                // after every time point, so a series that dies still lists what it completed
-                writeSeriesManifest(seriesDir, seriesName, numTimePoints, intervalMs, datasetNames,
-                        "running");
                 if (!keepGoing) {
                     break;
                 }
@@ -1087,9 +1071,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 writeIncompleteMarker(inFlightDir, inFlightIndex, "failed");
             }
             final int completed = datasetNames.size();
-            final String status = completed == numTimePoints ? "complete" : "ended early";
-            writeSeriesManifest(seriesDir, seriesName, numTimePoints, intervalMs, datasetNames,
-                    status);
             studio_.logs().logMessage("separate time points: " + completed + " of " + numTimePoints
                     + " datasets complete in " + seriesDir);
         }
@@ -1187,26 +1168,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     }
 
     /**
-     * Writes series.json into the series folder: before the first time point, after each one,
-     * and at the end with the final status. Datasets are listed by directory name, so the
-     * manifest still holds when the series folder is moved.
-     */
-    private void writeSeriesManifest(final String seriesDir, final String seriesName,
-            final int numTimePoints, final long intervalMs, final List<String> datasetNames,
-            final String status) {
-        final Map<String, Object> manifest = new LinkedHashMap<>();
-        manifest.put("seriesName", seriesName);
-        manifest.put("status", status);
-        manifest.put("numTimePoints", numTimePoints);
-        manifest.put("completedTimePoints", datasetNames.size());
-        manifest.put("intervalMs", intervalMs);
-        manifest.put("seriesStartEpochMs", seriesStartEpochMs_);
-        manifest.put("datasets", new ArrayList<>(datasetNames));
-        FileUtils.writeStringToFile(seriesDir + File.separator + "series.json",
-                new GsonBuilder().setPrettyPrinting().create().toJson(manifest));
-    }
-
-    /**
      * Ends one time point of a series, after waitForCompletion(), and says whether the series
      * should go on. Records the dataset as complete or marks it incomplete, and leaves its window
      * for the caller to close.
@@ -1214,7 +1175,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * @param settings the run snapshot
      * @param timeIndex the time point that just ended
      * @param datasetDir where this time point was written
-     * @param datasetNames the series manifest's completed list, appended to when this one is whole
+     * @param datasetNames the completed datasets, appended to when this one is whole
      * @return true if the next time point should run
      */
     private boolean finishTimePoint(final ScapeAcquisitionSettings settings, final int timeIndex,
@@ -1240,8 +1201,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             keepGoing = false;
         }
 
-        // an incomplete dataset is also marked inside its folder, for anything that reads the
-        // folder rather than the manifest
+        // an incomplete dataset is marked inside its folder, so it is not mistaken for a whole one
         if (incompleteReason == null) {
             datasetNames.add(new File(datasetDir).getName());
         } else {
