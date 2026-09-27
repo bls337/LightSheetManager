@@ -66,7 +66,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     private final AutofocusAdapter autofocus_;
 
-    protected Datastore datastore_;
+    // visibility: written on the acquisition thread, read on the edt when a window asks to close
+    protected volatile Datastore datastore_;
     protected Pipeline curPipeline_;
     protected long nextWakeTime_ = -1;
 
@@ -640,10 +641,9 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         if (acq == null) {
             return true; // nothing is running, so there is nothing to protect
         }
-        // always refuse while a run is live: Micro-Manager vetoes the close, and that veto is what
-        // keeps it from racing the abort into finish(), whose save closes the same datastore from
-        // the acquisition thread. answering yes only aborts, so the close succeeds on the next
-        // attempt. the display's abort button also lands here and ignores the result.
+        // always refuse while a run is live: closing the live window would close the datastore
+        // the run is still writing. answering yes only aborts, so the close succeeds on the next
+        // attempt.
         if (model_.logging().confirmOrDefault("Abort Acquisition",
                 "Abort the current acquisition task?", false)) {
             acq.abort();
