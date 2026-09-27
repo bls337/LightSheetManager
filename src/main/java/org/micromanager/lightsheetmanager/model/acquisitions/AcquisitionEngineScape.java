@@ -306,6 +306,161 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return false;
         }
 
+        studio_.events().registerForEvents(this);
+        // commented because this is prob specific to MM MDAs
+//        studio_.events().post(new DefaultAcquisitionStartedEvent(datastore_, this,
+//              acquisitionSettings));
+
+        final String[] cameraNames = resolveCameraNames(settings, demoMode);
+
+        // read once, before the acquisition starts, so every channel's offset has the same origin
+        final Double baseFocusUm = readBaseFocusPosition(settings);
+
+        // Last chance to honor a Stop clicked while everything above was being armed. Checked
+        // before the shutter is touched, so giving up here cannot leave it open.
+        if (isStopRequested()) {
+            studio_.logs().logMessage("Acquisition stopped before it started.");
+            return false; // early exit => finish() still restores whatever was armed
+        }
+
+        captureShutterStateAndOpen();
+
+        if (!startTimePointAcquisition(settings, cameraNames, baseFocusUm, settingsJson,
+                saveDir, saveName)) {
+            // never wait on an Acquisition that was not finished: the wait is unbounded
+            return false;
+        }
+        currentAcquisition_.waitForCompletion();
+        return true;
+    }
+
+    /**
+     * Resolves the camera device names the events are addressed to.
+     *
+     * @param settings the run snapshot
+     * @param demoMode true if the default camera is a DemoCamera
+     * @return the camera device names, in slot order
+     */
+    private String[] resolveCameraNames(final ScapeAcquisitionSettings settings,
+            final boolean demoMode) {
+        String[] cameraNames;
+        if (demoMode) {
+            ArrayList<String> cameraDeviceNames = new ArrayList<>();
+            StrVector loadedDevices = core_.getLoadedDevices();
+            for (int i = 0; i < loadedDevices.size(); i++) {
+                try {
+                    if (core_.getDeviceType(loadedDevices.get(i)).toString().equals("CameraDevice")) {
+                        cameraDeviceNames.add(loadedDevices.get(i));
+                    }
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            cameraNames = cameraDeviceNames.toArray(new String[0]);
+        } else {
+            final DeviceAdapter adapter = model_.devices().adapter();
+            if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
+                // multiple simultaneous cameras
+                final ArrayList<String> names = new ArrayList<>();
+                final CameraBase[] cameraList = model_.devices().imagingCameras();
+                for (CameraBase camera: cameraList) {
+                    names.add(camera.getDeviceName());
+                }
+                cameraNames = names.toArray(String[]::new);
+            } else {
+               // standard camera setup
+               if (settings.volume().numViews() > 1) {
+                  cameraNames = new String[] {
+                        model_.devices().device("Imaging1Camera").getDeviceName(),
+                        model_.devices().device("Imaging2Camera").getDeviceName()
+                  };
+               } else {
+                  cameraNames = new String[] {
+                        model_.devices().device("ImagingCamera").getDeviceName()
+                  };
+               }
+            }
+        }
+        return cameraNames;
+    }
+
+    /**
+     * Reads the focus position the channel offsets are applied to, or null when the events do not
+     * apply them.
+     *
+     * <p>Read once, before the acquisition starts. An event factory that reads the stage itself
+     * can find it already moved by the events submitted before it, and adds its channel's offset
+     * on top of another channel's.
+     *
+     * @param settings the run snapshot
+     * @return the focus position in micrometers, or null
+     */
+    private Double readBaseFocusPosition(final ScapeAcquisitionSettings settings) {
+        if (!settings.channels().enabled() || core_.getFocusDevice().isEmpty()) {
+            return null;
+        }
+        // the same cases as the factories: software channels always read it, hardware channel
+        // switching only when a single channel is baked onto the base event
+        final boolean readsFocus = settings.channels().mode() == ChannelMode.VOLUME
+                || settings.channels().used().length == 1;
+        if (!readsFocus) {
+            return null;
+        }
+        try {
+            return core_.getPosition();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Captures the shutter and autoshutter state for finish() to restore, then opens the shutter
+     * for the run.
+     */
+    private void captureShutterStateAndOpen() {
+        ///////////// Turn off autoshutter /////////////////
+        try {
+            shutterState_ = new ShutterState(core_.getShutterOpen(), core_.getAutoShutter());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // TODO: should the shutter be left open for the full duration of acquisition?
+        //  because that's what this code currently does
+        if (shutterState_.autoShutter) {
+            core_.setAutoShutter(false);
+            if (!shutterState_.isOpen) {
+                try {
+                    core_.setShutterOpen(true);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Builds and starts one dataset, and returns once every event for it has been submitted.
+     * The controller is already armed and the shutter already open.
+     *
+     * <p>Call waitForCompletion() only if this returned true: an early exit leaves an Acquisition
+     * that was never finished, and waiting on it blocks forever.
+     *
+     * @param settings the run snapshot
+     * @param cameraNames the camera device names, resolved once for the run
+     * @param baseFocusUm the focus position channel offsets are applied to, or null
+     * @param settingsJson the run settings, written into the dataset directory
+     * @param root the directory MMAcquisition creates the dataset in
+     * @param prefix the dataset name, which MMAcquisition suffixes with a counter of its own
+     * @return true if the acquisition started and every event was submitted
+     */
+    private boolean startTimePointAcquisition(final ScapeAcquisitionSettings settings,
+            final String[] cameraNames, final Double baseFocusUm, final String settingsJson,
+            final String root, final String prefix) {
+
+        // used to detect if the plugin is using ASI hardware
+        final boolean isUsingPLC = model_.devices().isUsingPLogic();
+
         //////////////////////////////////////
         // Begin AcqEngJ integration
         //      The acqSettings object should be static at this point, it will now
@@ -337,8 +492,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // run in memory.
         if (settings.isSavingImagesDuringAcquisition()) {
             sequenceSettingsBuilder.save(true)
-                    .root(saveDir)
-                    .prefix(saveName);
+                    .root(root)
+                    .prefix(prefix);
         }
 
         MMAcquisition acq = new MMAcquisition(studio_, dsmd,
@@ -352,20 +507,16 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // TODO: put this in AcquisitionEngine base class, between setup and run once structure is better
         // Write the run settings and the position list into the dataset directory instead of the
         // parent, so a dataset carries the record of what produced it. Written here rather than
-        // earlier because the directory name is chosen by MMAcquisition above: it creates the
-        // directory at run start and stamps the name into the summary metadata as the prefix.
+        // earlier because MMAcquisition above chooses the directory name.
         if (settings.isSavingImagesDuringAcquisition()) {
-            String datasetDir = saveDir;
-            final SummaryMetadata summary = datastore_.getSummaryMetadata();
-            final String datasetName = (summary == null) ? null : summary.getPrefix();
-            if (datasetName != null && !datasetName.isEmpty()
-                    && new File(saveDir + File.separator + datasetName).isDirectory()) {
-                datasetDir = saveDir + File.separator + datasetName;
-            } else {
-                // a configured processing pipeline can delay the summary metadata reaching the
-                // store, so fall back to the parent directory rather than dropping the files
-                studio_.logs().logError("Could not resolve the dataset directory, writing the run "
-                        + "settings beside the dataset instead of inside it.");
+            // the path MMAcquisition gave the storage, which is the dataset directory
+            final String datasetDir = datastore_.getSavePath();
+            if (datasetDir == null) {
+                // saving was never set up: MMAcquisition failed before creating the storage and
+                // has already shown its error
+                studio_.logs().logError("The dataset directory could not be created under "
+                        + root + "; the acquisition was not started.");
+                return false; // early exit => nothing started, so nothing to wait for
             }
             FileUtils.writeStringToFile(
                     datasetDir + File.separator + "acq_settings.json", settingsJson);
@@ -381,13 +532,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
+        // after the directory check above, so a dataset that could not be created gets no window
         createAcquisitionDisplay(dsmd);
-
-        studio_.events().registerForEvents(this);
-        // commented because this is prob specific to MM MDAs
-//        studio_.events().post(new DefaultAcquisitionStartedEvent(datastore_, this,
-//              acquisitionSettings));
-
 
         // TODO if position time ordering ever implemented, this should be reactivated and the
         //  timelapse hook copied from org.micromanager.acquisition.internal.acqengjcompat.AcqEngJAdapter
@@ -625,37 +771,64 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }, Acquisition.AFTER_CAMERA_HOOK);
 
-        // read once, before the acquisition starts, so every channel's offset has the same origin
-        final Double baseFocusUm = readBaseFocusPosition(settings);
-
-        // Last chance to honor a Stop clicked while everything above was being armed. Checked
-        // before the shutter is touched, so giving up here cannot leave it open.
-        if (isStopRequested()) {
-            studio_.logs().logMessage("Acquisition stopped before it started.");
-            return false; // early exit => finish() still restores whatever was armed
-        }
-
-        ///////////// Turn off autoshutter /////////////////
-        try {
-            shutterState_ = new ShutterState(core_.getShutterOpen(), core_.getAutoShutter());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        // TODO: should the shutter be left open for the full duration of acquisition?
-        //  because that's what this code currently does
-        if (shutterState_.autoShutter) {
-            core_.setAutoShutter(false);
-            if (!shutterState_.isOpen) {
-                try {
-                    core_.setShutterOpen(true);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
         currentAcquisition_.start();
+
+        submitEvents(settings, cameraNames, baseFocusUm);
+
+        // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
+        // once everything finishes
+        currentAcquisition_.finish();
+
+        return true;
+    }
+
+    /**
+     * Opens the acquisition's window, with the settings and position MMAcquisition would use.
+     * MMAcquisition's own window is not used because its abort and pause buttons are never
+     * unsubscribed after an LSM acquisition, so every window it opens stays in memory after it is
+     * closed.
+     *
+     * @param summary the summary metadata the dataset was created with, which names its channels
+     */
+    private void createAcquisitionDisplay(final SummaryMetadata summary) {
+        // before the window: closing the last window closes the store only if it is managed
+        studio_.displays().manage(datastore_);
+
+        // start from the settings of the last acquisition window that was closed
+        final String profileKey = PropertyKey.ACQUISITION_DISPLAY_SETTINGS.key();
+        final DisplaySettings remembered =
+                studio_.displays().displaySettingsFromProfile(profileKey);
+        final DisplaySettings.Builder builder = remembered != null
+                ? remembered.copyBuilder()
+                : studio_.displays().displaySettingsBuilder();
+        final List<String> channelNames = summary.getChannelNameList();
+        if (channelNames.size() == 1) {
+            builder.colorModeGrayscale();
+        } else if (channelNames.size() > 1) {
+            builder.colorModeComposite();
+        }
+        for (int i = 0; i < channelNames.size(); i++) {
+            builder.channel(i, RememberedDisplaySettings.loadChannel(studio_,
+                    summary.getChannelGroup(), channelNames.get(i), null));
+        }
+
+        final DisplayWindow display =
+                studio_.displays().createDisplay(datastore_, null, builder.build());
+        display.setWindowPositionKey(DefaultDisplayManager.MDA_DISPLAY);
+        display.setDisplaySettingsProfileKey(profileKey);
+        // ahead of the display manager's listener at 100, which is the one that closes the store
+        display.addListener(liveWindowCloseGuard_, 1);
+    }
+
+    /**
+     * Builds and submits the event iterators for one dataset.
+     *
+     * @param settings the run snapshot
+     * @param cameraNames the camera device names, in slot order
+     * @param baseFocusUm the focus position channel offsets are applied to, or null
+     */
+    private void submitEvents(final ScapeAcquisitionSettings settings, final String[] cameraNames,
+            final Double baseFocusUm) {
 
         ////////////  Create and submit acquisition events ////////////////////
         // Create iterators of acquisition events and submit them to the engine for execution
@@ -665,48 +838,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // TODO: execute any start-acquisition runnables
 
-
         // Loop 1: XY positions
         PositionList pl = positionList_;
-
-        String[] cameraNames;
-        if (demoMode) {
-            ArrayList<String> cameraDeviceNames = new ArrayList<>();
-            StrVector loadedDevices = core_.getLoadedDevices();
-            for (int i = 0; i < loadedDevices.size(); i++) {
-                try {
-                    if (core_.getDeviceType(loadedDevices.get(i)).toString().equals("CameraDevice")) {
-                        cameraDeviceNames.add(loadedDevices.get(i));
-                    }
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            cameraNames = cameraDeviceNames.toArray(new String[0]);
-        } else {
-            final DeviceAdapter adapter = model_.devices().adapter();
-            if (adapter.numSimultaneousCameras() > 1 && adapter.numImagingPaths() == 1) {
-                // multiple simultaneous cameras
-                final ArrayList<String> names = new ArrayList<>();
-                final CameraBase[] cameraList = model_.devices().imagingCameras();
-                for (CameraBase camera: cameraList) {
-                    names.add(camera.getDeviceName());
-                }
-                cameraNames = names.toArray(String[]::new);
-            } else {
-               // standard camera setup
-               if (settings.volume().numViews() > 1) {
-                  cameraNames = new String[] {
-                        model_.devices().device("Imaging1Camera").getDeviceName(),
-                        model_.devices().device("Imaging2Camera").getDeviceName()
-                  };
-               } else {
-                  cameraNames = new String[] {
-                        model_.devices().device("ImagingCamera").getDeviceName()
-                  };
-               }
-            }
-        }
 
         if (settings.isUsingHardwareTimePoints()) {
             AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
@@ -795,126 +928,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
 
         }
-
-//            for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
-//                AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
-//                if (acqSettings_.isUsingMultiplePositions()) {
-//                    baseEvent.setAxisPosition(LSMAcquisitionEvents.POSITION_AXIS, positionIndex);
-//                    // is this the best way to do stage movements with new acq engine?
-//                    MultiStagePosition position = pl.getPosition(positionIndex);
-//                    baseEvent.setX(position.getX());
-//                    baseEvent.setY(position.getY());
-//                }
-//                // TODO: what to do if multiple positions not defined: acquire at current stage position?
-//                //  If yes, then nothing more to do here.
-//
-//                if (acqSettings_.isUsingHardwareTimePoints()) {
-//                    // create a full iterator of TCZ acquisition events, and Tiger controller
-//                    // will handle everything else
-//                    if (acqSettings_.isUsingChannels()) {
-//                        currentAcquisition_.submitEventIterator(
-//                                LSMAcquisitionEvents.createTimelapseMultiChannelVolumeAcqEvents(
-//                                        baseEvent.copy(), acqSettings_, cameraNames, null));
-//                    } else {
-//                        currentAcquisition_.submitEventIterator(
-//                                LSMAcquisitionEvents.createTimelapseVolumeAcqEvents(
-//                                        baseEvent.copy(), acqSettings_, cameraNames, null));
-//                    }
-//                } else {
-//                    // Loop 2: Multiple time points
-//                    for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
-//                        baseEvent.setTimeIndex(timeIndex);
-//                        // Loop 3: Channels; Loop 4: Z slices (non-interleaved)
-//                        // Loop 3: Channels; Loop 4: Z slices (interleaved)
-//                        if (acqSettings_.isUsingChannels()) {
-//                            currentAcquisition_.submitEventIterator(
-//                                    LSMAcquisitionEvents.createMultiChannelVolumeAcqEvents(
-//                                            baseEvent.copy(), acqSettings_, cameraNames, null,
-//                                            acqSettings_.acquisitionMode() ==
-//                                                    AcquisitionMode.STAGE_SCAN_INTERLEAVED));
-//                        } else {
-//                            currentAcquisition_.submitEventIterator(
-//                                    LSMAcquisitionEvents.createVolumeAcqEvents(
-//                                            baseEvent.copy(), acqSettings_, cameraNames, null));
-//                        }
-//                    }
-//                }
-//            }
-
-        // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
-        // once everything finishes
-        currentAcquisition_.finish();
-
-        currentAcquisition_.waitForCompletion();
-
-        return true;
-    }
-
-    /**
-     * Reads the focus position the channel offsets are applied to, or null when the events do not
-     * apply them.
-     *
-     * <p>Read once, before the acquisition starts. An event factory that reads the stage itself
-     * can find it already moved by the events submitted before it, and adds its channel's offset
-     * on top of another channel's.
-     *
-     * @param settings the run snapshot
-     * @return the focus position in micrometers, or null
-     */
-    private Double readBaseFocusPosition(final ScapeAcquisitionSettings settings) {
-        if (!settings.channels().enabled() || core_.getFocusDevice().isEmpty()) {
-            return null;
-        }
-        // the same cases as the factories: software channels always read it, hardware channel
-        // switching only when a single channel is baked onto the base event
-        final boolean readsFocus = settings.channels().mode() == ChannelMode.VOLUME
-                || settings.channels().used().length == 1;
-        if (!readsFocus) {
-            return null;
-        }
-        try {
-            return core_.getPosition();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Opens the acquisition's window, with the settings and position MMAcquisition would use.
-     * MMAcquisition's own window is not used because its abort and pause buttons are never
-     * unsubscribed after an LSM acquisition, so every window it opens stays in memory after it is
-     * closed.
-     *
-     * @param summary the summary metadata the dataset was created with, which names its channels
-     */
-    private void createAcquisitionDisplay(final SummaryMetadata summary) {
-        // before the window: closing the last window closes the store only if it is managed
-        studio_.displays().manage(datastore_);
-
-        // start from the settings of the last acquisition window that was closed
-        final String profileKey = PropertyKey.ACQUISITION_DISPLAY_SETTINGS.key();
-        final DisplaySettings remembered =
-                studio_.displays().displaySettingsFromProfile(profileKey);
-        final DisplaySettings.Builder builder = remembered != null
-                ? remembered.copyBuilder()
-                : studio_.displays().displaySettingsBuilder();
-        final List<String> channelNames = summary.getChannelNameList();
-        if (channelNames.size() == 1) {
-            builder.colorModeGrayscale();
-        } else if (channelNames.size() > 1) {
-            builder.colorModeComposite();
-        }
-        for (int i = 0; i < channelNames.size(); i++) {
-            builder.channel(i, RememberedDisplaySettings.loadChannel(studio_,
-                    summary.getChannelGroup(), channelNames.get(i), null));
-        }
-
-        final DisplayWindow display =
-                studio_.displays().createDisplay(datastore_, null, builder.build());
-        display.setWindowPositionKey(DefaultDisplayManager.MDA_DISPLAY);
-        display.setDisplaySettingsProfileKey(profileKey);
-        // ahead of the display manager's listener at 100, which is the one that closes the store
-        display.addListener(liveWindowCloseGuard_, 1);
     }
 
     @Override
