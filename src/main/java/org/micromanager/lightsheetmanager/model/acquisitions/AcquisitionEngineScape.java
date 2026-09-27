@@ -771,13 +771,20 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }, Acquisition.AFTER_CAMERA_HOOK);
 
-        currentAcquisition_.start();
+        // A throw before finish() would leave the Acquisition started and never finished, so
+        // abort with the exception, which ends it and still lets the exception reach the caller.
+        try {
+            currentAcquisition_.start();
 
-        submitEvents(settings, cameraNames, baseFocusUm);
+            submitEvents(settings, cameraNames, baseFocusUm);
 
-        // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
-        // once everything finishes
-        currentAcquisition_.finish();
+            // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
+            // once everything finishes
+            currentAcquisition_.finish();
+        } catch (RuntimeException e) {
+            currentAcquisition_.abort(e);
+            throw e;
+        }
 
         return true;
     }
