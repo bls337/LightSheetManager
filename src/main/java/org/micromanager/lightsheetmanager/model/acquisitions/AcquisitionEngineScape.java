@@ -16,6 +16,13 @@ import org.micromanager.data.Datastore;
 import org.micromanager.data.SummaryMetadata;
 import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
+import org.micromanager.data.internal.PropertyKey;
+import org.micromanager.display.DataViewer;
+import org.micromanager.display.DataViewerListener;
+import org.micromanager.display.DisplaySettings;
+import org.micromanager.display.DisplayWindow;
+import org.micromanager.display.internal.DefaultDisplayManager;
+import org.micromanager.display.internal.RememberedDisplaySettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
@@ -63,6 +70,20 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     private double scanSpeedX_;
     private double scanAccelX_;
     private boolean isPolling_; // true if polling was enabled at the start of an acquisition
+
+    // Vetoes closing the running acquisition's window unless the user confirms an abort. Otherwise
+    // the display manager closes the store under the running acquisition and every later image
+    // is dropped without an abort.
+    private final DataViewerListener liveWindowCloseGuard_ = new DataViewerListener() {
+        @Override
+        public boolean canCloseViewer(final DataViewer viewer) {
+            final Datastore live = datastore_;
+            if (live == null || viewer.getDataProvider() != live) {
+                return true; // not the running acquisition's window
+            }
+            return abortRequest();
+        }
+    };
 
     public AcquisitionEngineScape(final LightSheetManager model) {
         super(Objects.requireNonNull(model));
@@ -307,7 +328,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // TODO(Brandon): where should i get this from?
         SequenceSettings.Builder sequenceSettingsBuilder = new SequenceSettings.Builder();
-        sequenceSettingsBuilder.shouldDisplayImages(true);
+        // LSM opens the window itself, see createAcquisitionDisplay()
+        sequenceSettingsBuilder.shouldDisplayImages(false);
         // Write images to disk as they arrive instead of accumulating the run in memory.
         // MMAcquisition swaps StorageRAM for the preferred save mode set above only when both
         // save() and root() are set, so setting them here is what selects streaming. This is what
@@ -358,6 +380,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 }
             }
         }
+
+        createAcquisitionDisplay(dsmd);
 
         studio_.events().registerForEvents(this);
         // commented because this is prob specific to MM MDAs
@@ -853,6 +877,44 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Opens the acquisition's window, with the settings and position MMAcquisition would use.
+     * MMAcquisition's own window is not used because its abort and pause buttons are never
+     * unsubscribed after an LSM acquisition, so every window it opens stays in memory after it is
+     * closed.
+     *
+     * @param summary the summary metadata the dataset was created with, which names its channels
+     */
+    private void createAcquisitionDisplay(final SummaryMetadata summary) {
+        // before the window: closing the last window closes the store only if it is managed
+        studio_.displays().manage(datastore_);
+
+        // start from the settings of the last acquisition window that was closed
+        final String profileKey = PropertyKey.ACQUISITION_DISPLAY_SETTINGS.key();
+        final DisplaySettings remembered =
+                studio_.displays().displaySettingsFromProfile(profileKey);
+        final DisplaySettings.Builder builder = remembered != null
+                ? remembered.copyBuilder()
+                : studio_.displays().displaySettingsBuilder();
+        final List<String> channelNames = summary.getChannelNameList();
+        if (channelNames.size() == 1) {
+            builder.colorModeGrayscale();
+        } else if (channelNames.size() > 1) {
+            builder.colorModeComposite();
+        }
+        for (int i = 0; i < channelNames.size(); i++) {
+            builder.channel(i, RememberedDisplaySettings.loadChannel(studio_,
+                    summary.getChannelGroup(), channelNames.get(i), null));
+        }
+
+        final DisplayWindow display =
+                studio_.displays().createDisplay(datastore_, null, builder.build());
+        display.setWindowPositionKey(DefaultDisplayManager.MDA_DISPLAY);
+        display.setDisplaySettingsProfileKey(profileKey);
+        // ahead of the display manager's listener at 100, which is the one that closes the store
+        display.addListener(liveWindowCloseGuard_, 1);
     }
 
     @Override
