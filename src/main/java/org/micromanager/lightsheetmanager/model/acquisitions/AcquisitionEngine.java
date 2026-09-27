@@ -64,6 +64,9 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     // and in each engine's run()
     private volatile boolean stopRequested_ = false;
 
+    // true while a separate time point series waits for its next time point
+    private volatile boolean awaitingTimePoint_ = false;
+
     private final AutofocusAdapter autofocus_;
 
     // visibility: written on the acquisition thread, read on the edt when a window asks to close
@@ -267,6 +270,25 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         return stopRequested_;
     }
 
+    /**
+     * Records whether a series is waiting between time points, for the stop and abort log lines.
+     *
+     * @param awaiting true while waiting for the next time point
+     */
+    protected void setAwaitingTimePoint(final boolean awaiting) {
+        awaitingTimePoint_ = awaiting;
+    }
+
+    /**
+     * Names the stage the run is in, for a log line reading "... during &lt;stage&gt;".
+     */
+    private String runPhase() {
+        if (currentAcquisition_ != null && !currentAcquisition_.getDataSink().isFinished()) {
+            return "acquisition";
+        }
+        return awaitingTimePoint_ ? "the wait between time points" : "setup";
+    }
+
     public abstract void recalculateSliceTiming();
 
     public abstract void updateDurationLabels();
@@ -302,6 +324,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         if (testAcquisition_) {
             settings = settings.copyBuilder()
                     .saveImagesDuringAcquisition(false)
+                    // setup() refuses separate time points without saving
+                    .separateTimePoints(false)
                     .useTimePoints(false)
                     .numTimePoints(1)
                     .build();
@@ -328,6 +352,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         // anywhere inside setup(), must find a run in flight
         acquisitionRequested_ = true;
         stopRequested_ = false; // never let a previous run's stop request kill this one
+        awaitingTimePoint_ = false;
 
         // Run on a new thread, so it doesn't block the EDT
         Future<?> acqFinished = acquisitionExecutor_.submit(() -> {
@@ -430,8 +455,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         stopRequested_ = true;
         final boolean isAcquisitionLive = currentAcquisition_ != null
                 && !currentAcquisition_.getDataSink().isFinished();
-        studio_.logs().logMessage("stop requested during "
-                + (isAcquisitionLive ? "acquisition" : "setup"));
+        studio_.logs().logMessage("stop requested during " + runPhase());
         if (isAcquisitionLive) {
             currentAcquisition_.abort();
         }
@@ -462,19 +486,22 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      */
     protected DefaultSummaryMetadata addMMSummaryMetadata(JSONObject summaryMetadata) {
         return addMMSummaryMetadata(summaryMetadata, acqSettings_,
-                studio_.positions().getPositionList());
+                studio_.positions().getPositionList(),
+                acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1);
     }
 
     /**
-     * As above, but from a run snapshot, so the summary describes the run even if the settings
-     * or the position list are edited while it is in flight.
+     * As above, but from a run snapshot, so every dataset of a series describes the same run
+     * even if the settings or the position list are edited while it is in flight.
      *
      * @param summaryMetadata the acquisition's own summary metadata, mutated in place
      * @param settings the run snapshot
      * @param positionList the run's position list snapshot
+     * @param numFrames the number of time points this dataset will hold
      */
     protected DefaultSummaryMetadata addMMSummaryMetadata(JSONObject summaryMetadata,
-            final ScapeAcquisitionSettings settings, final PositionList positionList) {
+            final ScapeAcquisitionSettings settings, final PositionList positionList,
+            final int numFrames) {
         try {
             // These are the ones from the clojure engine that may yet need to be translated
             //        "Channels" -> {Long@25854} 2
@@ -517,7 +544,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
             // MM MDA acquisitions have a defined number of
             // frames/slices/channels/positions at the outset
-            summaryMetadata.put(PropertyKey.FRAMES.key(), settings.isUsingTimePoints() ? settings.numTimePoints() : 1);
+            summaryMetadata.put(PropertyKey.FRAMES.key(), numFrames);
 
             summaryMetadata.put(PropertyKey.SLICES.key(), settings.volume().slicesPerView());
 
@@ -548,7 +575,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             final Coords dims = studio_.data().coordsBuilder()
                     .channel(channelNames.size())
                     .z(settings.volume().slicesPerView())
-                    .timePoint(settings.isUsingTimePoints() ? settings.numTimePoints() : 1)
+                    .timePoint(numFrames)
                     .stagePosition(settings.isUsingMultiplePositions() ? numPositions : 1)
                     .build();
 
@@ -636,7 +663,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     @Override
     public boolean abortRequest() {
-        // read once: the acquisition thread clears this field as soon as finish() returns
+        // the acquisition thread clears this field as soon as finish() returns
         final Acquisition acq = currentAcquisition_;
         if (acq == null) {
             return true; // nothing is running, so there is nothing to protect
@@ -646,7 +673,14 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         // attempt.
         if (model_.logging().confirmOrDefault("Abort Acquisition",
                 "Abort the current acquisition task?", false)) {
-            acq.abort();
+            // the flag stops a series between time points. re-read the Acquisition: the series
+            // runs on behind the modal dialog, so the one read above may have finished
+            studio_.logs().logMessage("abort confirmed during " + runPhase());
+            stopRequested_ = true;
+            final Acquisition live = currentAcquisition_;
+            if (live != null) {
+                live.abort();
+            }
         }
         return false;
     }
