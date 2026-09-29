@@ -60,7 +60,6 @@ public class ControlPanel extends Panel implements Subscriber {
     private Button btnMoveToZero_;
     private Button btnSetZero_;
 
-    private UpdateMethod updateMethod_;
     private final LightSheetManager model_;
 
     public ControlPanel(final LightSheetManager model, final String propertyName, final String deviceName, final DeviceType deviceType, final Axis axis, final Units units) {
@@ -71,7 +70,6 @@ public class ControlPanel extends Panel implements Subscriber {
         deviceType_ = Objects.requireNonNull(deviceType);
         axis_ = axis;
         units_ = units;
-        setUpdateMethod();
         createUserInterface();
         createEventHandlers();
     }
@@ -235,39 +233,6 @@ public class ControlPanel extends Panel implements Subscriber {
         }
     }
 
-    /**
-     * Sets the update method for this ControlPanel based on DeviceType.
-     */
-    private void setUpdateMethod() {
-        if (deviceType_ == DeviceType.XYStageDevice) {
-            switch (axis_) {
-                case X:
-                    updateMethod_ = this::getXPosition;
-                    break;
-                case Y:
-                    updateMethod_ = this::getYPosition;
-                    break;
-                default:
-                    //model_.studio().logs().showError("No update method set!");
-                    break;
-            }
-        } else if (deviceType_ == DeviceType.GalvoDevice) {
-            switch (axis_) {
-                case X:
-                    updateMethod_ = this::getGalvoPositionX;
-                    break;
-                case Y:
-                    updateMethod_ = this::getGalvoPositionY;
-                    break;
-                default:
-                    //model_.studio().logs().showError("No update method set!");
-                    break;
-            }
-        } else {
-            updateMethod_ = this::getPosition;
-        }
-    }
-
     private boolean isStageDevice() {
         return deviceType_ == DeviceType.XYStageDevice || deviceType_ == DeviceType.StageDevice;
     }
@@ -354,15 +319,6 @@ public class ControlPanel extends Panel implements Subscriber {
     private double getYPosition() {
         try {
             return core_.getYPosition(deviceName_);
-        } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
-            return 0.0;
-        }
-    }
-
-    private double getPosition() {
-        try {
-            return core_.getPosition(deviceName_);
         } catch (Exception e) {
             model_.studio().logs().showError("failed!");
             return 0.0;
@@ -494,10 +450,18 @@ public class ControlPanel extends Panel implements Subscriber {
 
     @Override
     public void update(String topic, Object value) {
-        //System.out.println("topic: " + topic + " obj:" + value);
-        SwingUtilities.invokeLater(() -> {
-            lblPosition_.setText(String.format("%.3f %s", updateMethod_.update(), units_));
-        });
+        // the poller already read the position: reading it again here would block the edt
+        final double position;
+        if (value instanceof Point2D.Double) {
+            final Point2D.Double point = (Point2D.Double) value;
+            position = (axis_ == Axis.Y) ? point.y : point.x;
+        } else if (value instanceof Double) {
+            position = (Double) value;
+        } else {
+            return; // nothing to show
+        }
+        SwingUtilities.invokeLater(() ->
+                lblPosition_.setText(String.format("%.3f %s", position, units_)));
     }
 
 }
