@@ -168,6 +168,10 @@ public class CameraPanel extends Panel implements SettingsListener {
         // update camera order
         model_.acquisitions().settingsBuilder()
                 .imagingCameraOrder(cameraData.toArray(CameraData[]::new));
+        // live mode and the slice timing read the primary camera from the built settings, and
+        // simultaneous cameras can have different reset and readout times, so rebuild the
+        // settings and recompute the timing now
+        model_.acquisitions().updateDurationLabels();
     }
 
     @Override
