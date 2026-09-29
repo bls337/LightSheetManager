@@ -18,6 +18,7 @@ import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.AcquisitionManager;
+import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
@@ -477,6 +478,20 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                 currentAcquisition_.setPaused(false);
             }
         }
+    }
+
+    /**
+     * Returns the number of time points a run acquires.
+     *
+     * <p>The time point count keeps its value while time points are off, so that turning them
+     * back on restores it. Anything that sizes or checks a run reads the count through here,
+     * which gives 1 in that case.
+     *
+     * @param settings the acquisition settings
+     * @return the time point count, or 1 when time points are off
+     */
+    static int numTimePointsToAcquire(final AcquisitionSettings settings) {
+        return settings.isUsingTimePoints() ? settings.numTimePoints() : 1;
     }
 
     /**

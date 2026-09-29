@@ -1547,7 +1547,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         //  the port.
         if (acqSettings_.isUsingMultiplePositions()) {
             if (isUsingHardwareTimePoints
-                    || (acqSettings_.numTimePoints() > 1
+                    || (numTimePointsToAcquire(acqSettings_) > 1
                         && timepointIntervalMs < timepointDuration * 1.2)) {
                 // warn the user but allow the acquisition to continue
                 asb_.useHardwareTimePoints(false);
