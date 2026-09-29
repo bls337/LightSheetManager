@@ -118,9 +118,8 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
                     studio_.logs().logMessage("Stopping position updater polling...");
                 }
 
-                if (positionUpdater_.isPolling()) {
-                    positionUpdater_.stopPolling();
-                }
+                // the polling thread lasts as long as the plugin, so end it here
+                positionUpdater_.shutdown();
             }
         } catch (Exception e) {
             // log the error so we can still try to save the settings!
