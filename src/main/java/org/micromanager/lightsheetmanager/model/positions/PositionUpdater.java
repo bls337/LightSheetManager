@@ -3,19 +3,24 @@ package org.micromanager.lightsheetmanager.model.positions;
 import mmcorej.DeviceType;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 
-import javax.swing.SwingWorker;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PositionUpdater implements Publisher {
 
    // polling
-   private int pollingDelayMs_;
-   private final AtomicBoolean isPolling_;
-   private SwingWorker<Void, Void> worker_;
+   private volatile int pollingDelayMs_;
+   private volatile boolean isPolling_;
+   // one thread and one task, from the first start until shutdown(): starting and
+   // stopping only set the flag above, so a second polling loop can never exist
+   private final ScheduledExecutorService executor_;
+   private final AtomicBoolean isTicking_; // true once the task is scheduled
 
    // data
    private final HashMap<String, Object> positions_;
@@ -25,10 +30,15 @@ public class PositionUpdater implements Publisher {
 
    public PositionUpdater(final LightSheetManager model) {
        model_ = Objects.requireNonNull(model);
-       isPolling_ = new AtomicBoolean(false);
        positions_ = new HashMap<>();
        topics_ = new HashMap<>();
        pollingDelayMs_ = 500;
+       isTicking_ = new AtomicBoolean(false);
+       executor_ = Executors.newSingleThreadScheduledExecutor(runnable -> {
+          final Thread thread = new Thread(runnable, "LSM position polling");
+          thread.setDaemon(true); // must not keep Micro-Manager from exiting
+          return thread;
+       });
    }
 
    // call this after the devices are found
@@ -40,37 +50,45 @@ public class PositionUpdater implements Publisher {
       }
    }
 
-   private void createPollingTask() {
-      worker_ = new SwingWorker<>() {
-         @Override
-         protected Void doInBackground() {
-            while (isPolling_.get()) {
-               updatePositions();
-               updateSubscribers();
-               try {
-                  Thread.sleep(pollingDelayMs_);
-               } catch (InterruptedException e) {
-                  throw new RuntimeException(e);
-               }
-            }
-            //System.out.println("done!");
-            return null;
+   private void tick() {
+      try {
+         if (isPolling_) {
+            updatePositions();
+            updateSubscribers();
          }
-      };
+      } catch (RuntimeException e) {
+         model_.studio().logs().logError(e, "Position polling failed");
+      } finally {
+         // reschedule even after an error, so polling cannot stop while isPolling() is true
+         if (!executor_.isShutdown()) {
+            executor_.schedule(this::tick, pollingDelayMs_, TimeUnit.MILLISECONDS);
+         }
+      }
    }
 
    public void startPolling() {
-      isPolling_.set(true);
-      createPollingTask();
-      worker_.execute();
+      isPolling_ = true;
+      // the thread starts on first use: close() is skipped when the plugin fails to load,
+      // so a thread started any earlier could never be shut down
+      if (isTicking_.compareAndSet(false, true)) {
+         executor_.schedule(this::tick, 0, TimeUnit.MILLISECONDS);
+      }
    }
 
    public void stopPolling() {
-      isPolling_.set(false);
+      isPolling_ = false;
    }
 
    public boolean isPolling() {
-      return isPolling_.get();
+      return isPolling_;
+   }
+
+   /**
+    * Stops polling and ends the polling thread. Call when the plugin closes.
+    */
+   public void shutdown() {
+      isPolling_ = false;
+      executor_.shutdown();
    }
 
    public void setPollingDelayMs(final int delayMs) {
