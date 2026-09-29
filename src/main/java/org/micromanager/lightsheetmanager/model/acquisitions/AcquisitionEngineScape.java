@@ -1045,7 +1045,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 inFlightIndex = timeIndex;
                 // Locale.ROOT: a locale with its own digits would put them in the directory name
                 if (!startTimePointAcquisition(settings, cameraNames, baseFocusUm, settingsJson,
-                        seriesDir, String.format(Locale.ROOT, "%04d", timeIndex), timeIndex)) {
+                        seriesDir, String.format(Locale.ROOT, "%s_%04d", saveName, timeIndex),
+                        timeIndex)) {
                     break; // nothing started, so nothing to wait for
                 }
                 if (previousStore != null) {
@@ -1152,7 +1153,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     /**
      * Creates the folder the series' datasets are written into and returns its path, or null.
      * An existing folder is never reused: a fresh one keeps MMAcquisition's name counter at one,
-     * so the datasets are named 0000_1, 0001_1 and so on.
+     * so the datasets are named saveName_0000_1, saveName_0001_1 and so on.
      */
     private String createSeriesDirectory(final String saveDir, final String saveName) {
         final String seriesDir = FileUtils.createUniquePath(saveDir, saveName);
