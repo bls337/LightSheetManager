@@ -502,7 +502,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     protected DefaultSummaryMetadata addMMSummaryMetadata(JSONObject summaryMetadata) {
         return addMMSummaryMetadata(summaryMetadata, acqSettings_,
                 studio_.positions().getPositionList(),
-                acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1);
+                numTimePointsToAcquire(acqSettings_));
     }
 
     /**

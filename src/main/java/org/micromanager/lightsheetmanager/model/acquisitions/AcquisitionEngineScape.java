@@ -503,7 +503,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         final boolean separate = datasetTimeIndex >= 0;
         // one time point per dataset in separate mode, the whole series otherwise
         final int numTimePoints = separate ? 1
-                : (settings.isUsingTimePoints() ? settings.numTimePoints() : 1);
+                : numTimePointsToAcquire(settings);
 
         //////////////////////////////////////
         // Begin AcqEngJ integration
@@ -1613,7 +1613,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
-        final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
+        final int numTimePoints = numTimePointsToAcquire(acqSettings_);
         if (!acqSettings_.isUsingMultiplePositions() && numTimePoints > 1) {
             if (timepointIntervalMs < volumeDuration) {
                 studio_.logs().showError("Time point interval shorter than the time to collect a single volume.");
@@ -2072,7 +2072,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     }
 
     private double computeTotalTimeDuration() {
-        final int numTimePoints = acqSettings_.isUsingTimePoints() ? acqSettings_.numTimePoints() : 1;
+        final int numTimePoints = numTimePointsToAcquire(acqSettings_);
         return (numTimePoints - 1) * acqSettings_.timePointIntervalSec() + computeTimePointDuration() / 1000.0;
     }
 
