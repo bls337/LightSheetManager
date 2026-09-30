@@ -1827,12 +1827,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return DefaultTimingSettings.builder();
         }
 
-        // TODO: is this necessary? setTriggerMode is called in doHardwareCalculations too
-        CameraBase[] cameras = model_.devices().imagingCameras();
-        for (CameraBase cam : cameras) {
-            cam.setTriggerMode(acqSettings_.cameraMode());
-        }
-
         // settings are the source of truth for camera mode
         CameraMode camMode = acqSettings_.cameraMode();
 
