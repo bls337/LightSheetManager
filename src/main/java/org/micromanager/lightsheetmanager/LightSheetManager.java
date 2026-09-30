@@ -4,6 +4,7 @@ import mmcorej.CMMCore;
 import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.api.LightSheetManagerApi;
 import org.micromanager.lightsheetmanager.model.Logging;
+import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.model.PluginSettings;
@@ -13,6 +14,7 @@ import org.micromanager.lightsheetmanager.model.UserSettings;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineDispim;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineScape;
+import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
 import java.util.Objects;
 
@@ -99,6 +101,15 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
         // TODO: put this somewhere better, need to put this value into LightSheetEventAdapter for now
         LightSheetEventAdapter.isUsingMultipleCameras =
               deviceManager_.adapter().numSimultaneousCameras() > 1;
+
+        // put every imaging camera in internal trigger mode when the plugin launches,
+        // so the main window's Live works until an acquisition sets the mode it needs
+        for (String name : deviceManager_.imagingCameraNames()) {
+            final CameraBase camera = deviceManager_.device(name);
+            if (camera != null) {
+                camera.setTriggerMode(CameraMode.INTERNAL);
+            }
+        }
 
         // if we made it here then everything loaded correctly
         return true;
