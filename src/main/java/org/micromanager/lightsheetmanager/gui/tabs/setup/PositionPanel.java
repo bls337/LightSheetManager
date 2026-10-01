@@ -6,9 +6,11 @@ import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.TextField;
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.positions.Subscriber;
+import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -191,11 +193,7 @@ public class PositionPanel extends Panel implements Subscriber, ListeningPanel {
             });
 
             btnImagingCenterGo_.registerListener(() -> {
-                // FIXME: make sure this is the same as original plugin, diSPIM also moves Scanner with computeGalvoFromPiezo
-                // TODO: (also check if the move when the tab is selected is correct)
-                final double imagingCenter = model_.acquisitions().settingsBuilder().build()
-                        .sheetCalibration().imagingCenter();
-                piezo.setPosition(imagingCenter);
+                centerPiezoAndGalvo();
                 lblImagingPositionValue_.setText(String.format("%.3f μm", piezo.getPosition()));
             });
 
@@ -242,11 +240,27 @@ public class PositionPanel extends Panel implements Subscriber, ListeningPanel {
     @Override
     public void selected() {
         if (model_.devices().isUsingPLogic()) {
-            // TODO: check the fixme above
-            final double imagingCenter = model_.acquisitions().settingsBuilder().build()
-                    .sheetCalibration().imagingCenter();
-            final ASIPiezo piezo = model_.devices().device("ImagingFocus");
-            piezo.setPosition(imagingCenter);
+            centerPiezoAndGalvo();
+        }
+    }
+
+    /**
+     * Moves the imaging piezo to the imaging center and the sheet to the slice that images it.
+     */
+    private void centerPiezoAndGalvo() {
+        final ScapeAcquisitionSettings settings = model_.acquisitions().settingsBuilder().build();
+        final double imagingCenter = settings.sheetCalibration().imagingCenter();
+        final ASIPiezo piezo = model_.devices().device("ImagingFocus");
+        piezo.setPosition(imagingCenter);
+
+        // with the beam off this sets where the sheet goes when the beam is turned on, so it
+        // also replaces a park position the scanner would otherwise restore
+        final double sliceSlope = settings.sliceCalibration().slope();
+        final ASIScanner scanner = model_.devices().device("IllumSlice");
+        if (scanner != null && !NumberUtils.doublesEqual(sliceSlope, 0.0)) {
+            final double sliceCenter =
+                    (imagingCenter - settings.sliceCalibration().offset()) / sliceSlope;
+            scanner.setPosition(scanner.getPosition().x, sliceCenter);
         }
     }
 
