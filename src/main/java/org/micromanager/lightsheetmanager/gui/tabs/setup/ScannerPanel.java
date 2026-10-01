@@ -36,10 +36,10 @@ public class ScannerPanel extends Panel implements ListeningPanel {
 
         isUsingPLogic_ = model_.devices().isUsingPLogic();
 
-        final JLabel lblExcitation = new JLabel("Excitation side:");
+        final JLabel lblExcitation = new JLabel("Excitation:");
         final JLabel lblEpi = new JLabel("Epi side:");
 
-        cbxBeamExc_ = new CheckBox("Beam", false);
+        cbxBeamExc_ = new CheckBox(geometryType == GeometryType.SCAPE ? "Sheet" : "Beam", false);
         cbxSheetExc_ = new CheckBox("Sheet", false);
         cbxBeamEpi_ = new CheckBox("Beam", false);
         cbxSheetEpi_ = new CheckBox("Sheet", false);
