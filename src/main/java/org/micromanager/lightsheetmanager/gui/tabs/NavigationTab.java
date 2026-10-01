@@ -25,7 +25,8 @@ public class NavigationTab extends Panel implements ListeningPanel {
 
     @Override
     public void selected() {
-
+        // the beam may have been turned on or off on another tab or by an acquisition
+        navigationPanel_.updateBeamState();
     }
 
     @Override

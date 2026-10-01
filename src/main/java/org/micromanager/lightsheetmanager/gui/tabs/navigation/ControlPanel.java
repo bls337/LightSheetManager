@@ -41,6 +41,8 @@ public class ControlPanel extends Panel implements Subscriber {
         }
     }
 
+    private static final String BEAM_ENABLED = "BeamEnabled";
+
     private final CMMCore core_;
 
     // data
@@ -60,6 +62,9 @@ public class ControlPanel extends Panel implements Subscriber {
     private Button btnMoveToZero_;
     private Button btnSetZero_;
 
+    // true for a galvo whose device can blank the beam
+    private final boolean hasBeam_;
+
     private final LightSheetManager model_;
 
     public ControlPanel(final LightSheetManager model, final String propertyName, final String deviceName, final DeviceType deviceType, final Axis axis, final Units units) {
@@ -70,8 +75,10 @@ public class ControlPanel extends Panel implements Subscriber {
         deviceType_ = Objects.requireNonNull(deviceType);
         axis_ = axis;
         units_ = units;
+        hasBeam_ = deviceType_ == DeviceType.GalvoDevice && hasBeamProperty();
         createUserInterface();
         createEventHandlers();
+        updateBeamState();
     }
 
     public String getPropertyName() {
@@ -462,6 +469,39 @@ public class ControlPanel extends Panel implements Subscriber {
         }
         SwingUtilities.invokeLater(() ->
                 lblPosition_.setText(String.format("%.3f %s", position, units_)));
+    }
+
+    /**
+     * Enables the move controls of a galvo only while its beam is on.
+     */
+    public void updateBeamState() {
+        if (!hasBeam_) {
+            return;
+        }
+        final boolean isBeamOn = isBeamOn();
+        SwingUtilities.invokeLater(() -> {
+            txtAbsoluteMove_.setEnabled(isBeamOn);
+            btnRelMoveMinus_.setEnabled(isBeamOn);
+            btnRelMovePlus_.setEnabled(isBeamOn);
+            btnMoveToZero_.setEnabled(isBeamOn);
+        });
+    }
+
+    private boolean hasBeamProperty() {
+        try {
+            return core_.hasProperty(deviceName_, BEAM_ENABLED);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // the device adapter answers from its own state, so this does not query the controller
+    private boolean isBeamOn() {
+        try {
+            return "Yes".equals(core_.getProperty(deviceName_, BEAM_ENABLED));
+        } catch (Exception e) {
+            return true; // a failed read should not lock the controls
+        }
     }
 
 }
