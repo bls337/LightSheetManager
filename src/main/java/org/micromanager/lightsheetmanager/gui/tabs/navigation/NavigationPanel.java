@@ -266,4 +266,12 @@ public class NavigationPanel extends Panel {
         return containsDigit;
     }
 
+    /**
+     * Updates the controls that depend on the beam, which can be turned on and off elsewhere.
+     */
+    public void updateBeamState() {
+        for (ControlPanel controlPanel : controlPanels_) {
+            controlPanel.updateBeamState();
+        }
+    }
 }
