@@ -172,7 +172,10 @@ public class CalibrationPanel extends Panel {
                     model_.studio().logs().logMessage("updated offset for view " + pathNum_ + "; new value is " +
                             newOffset + " (with channel offset of " + channelOffset + ")");
                 } else {
-                    model_.studio().logs().showError("The beam must be enabled to update the offset.", btnUpdate_);
+                    final String name = (model_.devices().adapter().geometry() == GeometryType.SCAPE)
+                            ? "sheet" : "beam";
+                    model_.studio().logs().showError(
+                            "The " + name + " must be enabled to update the offset.", btnUpdate_);
                 }
             });
         }
