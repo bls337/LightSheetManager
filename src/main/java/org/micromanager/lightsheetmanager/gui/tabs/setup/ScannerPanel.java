@@ -90,10 +90,11 @@ public class ScannerPanel extends Panel implements ListeningPanel {
     @Override
     public void selected() {
         if (isUsingPLogic_) {
-//            final ASIScanner scanner = model_.devices().device("IllumSlice");
-//            if (scanner != null && !scanner.isBeamOn()) {
-//                scanner.setBeamOn(true);
-//            }
+            // an acquisition turns the beam off, so restore the state of the check box
+            final ASIScanner scanner = model_.devices().device("IllumSlice");
+            if (scanner != null && scanner.isBeamOn() != cbxBeamExc_.isSelected()) {
+                scanner.setBeamOn(cbxBeamExc_.isSelected());
+            }
         }
     }
 
