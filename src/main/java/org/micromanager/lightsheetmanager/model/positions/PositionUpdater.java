@@ -3,7 +3,6 @@ package org.micromanager.lightsheetmanager.model.positions;
 import mmcorej.DeviceType;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
@@ -113,9 +112,7 @@ public class PositionUpdater implements Publisher {
          final DeviceType deviceType = model_.devices().device(device).getDeviceType();
          try {
             if (deviceType == DeviceType.XYStageDevice) {
-               positions_.put(device, new Point2D.Double(
-                     model_.core().getXPosition(deviceName),
-                     model_.core().getYPosition(deviceName)));
+               positions_.put(device, model_.core().getXYStagePosition(deviceName));
             } else if (deviceType == DeviceType.StageDevice) {
                positions_.put(device, model_.core().getPosition(deviceName));
             } else if (deviceType == DeviceType.GalvoDevice) {
