@@ -13,6 +13,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 
 import javax.swing.JLabel;
 import java.awt.Dimension;
+import java.util.Locale;
 import java.util.Objects;
 
 public class CalibrationPanel extends Panel {
@@ -88,8 +89,8 @@ public class CalibrationPanel extends Panel {
         final double sliceSlope = acqSettings.sliceCalibration().slope();
         final double sliceOffset = acqSettings.sliceCalibration().offset();
 
-        txtSlope_.setText(Double.toString(sliceSlope));
-        txtOffset_.setText(Double.toString(sliceOffset));
+        txtSlope_.setText(String.format(Locale.ROOT, "%.3f", sliceSlope));
+        txtOffset_.setText(String.format(Locale.ROOT, "%.3f", sliceOffset));
 
         lblSlopeValue_.setText(String.format("%.3f μm/°", sliceSlope));
         lblOffsetValue_.setText(String.format("%.3f μm", sliceOffset));
@@ -154,7 +155,7 @@ public class CalibrationPanel extends Panel {
 
             btnUpdate_.registerListener(() -> {
                 if (scanner.isBeamOn()) {
-                    final double rate = model_.acquisitions().settings()
+                    final double rate = model_.acquisitions().settingsBuilder().build()
                             .sliceCalibration().slope();
                     final double piezoPosition = piezo.getPosition();
                     final double scannerPosition = scanner.getPosition().y;
@@ -162,7 +163,7 @@ public class CalibrationPanel extends Panel {
                     // FIXME: update channelOffset
                     // was: channelOffset = ASIdiSPIM.getFrame().getAcquisitionPanel().getChannelOffset();
                     final double newOffset = piezoPosition - rate * scannerPosition - channelOffset;
-                    txtOffset_.setText(Double.toString(newOffset));
+                    txtOffset_.setText(String.format(Locale.ROOT, "%.3f", newOffset));
                     lblOffsetValue_.setText(String.format("%.3f μm", newOffset));
                     panel_.setImagingCenterValue(newOffset);
                     model_.acquisitions().settingsBuilder()
