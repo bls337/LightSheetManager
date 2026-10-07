@@ -154,6 +154,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
+        // checked here so demo and NIDAQ runs, which skip doHardwareCalculations, refuse too
+        if (acqSettings_.channels().enabled() && acqSettings_.channels().count() == 0) {
+            studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
+            return false;
+        }
+
         // mismatched camera frame sizes kill the JVM once acquisition starts, so refuse to arm
         if (!validateCameraFrameSizes()) {
             return false; // early exit => cameras disagree on frame size
@@ -624,11 +630,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 if (event.getMinimumStartTimeAbsolute() != null) {
                     nextWakeTime_ = event.getMinimumStartTimeAbsolute();
                 }
-
-                // Translate event to timeIndex/channel/etc
-                AcquisitionEvent firstAcqEvent = event.getSequence().get(0);
-                // TODO: add later when autofocus is complete, prevent errors if no time index is found for now
-                //int timePoint = firstAcqEvent.getTIndex();
 
                 try {
                     core_.waitForSystem();
@@ -1399,10 +1400,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         boolean changeChannelPerVolumeSoftware = false;
         boolean changeChannelPerVolumeDoneFirst = false;
         if (acqSettings_.channels().enabled()) {
-            if (acqSettings_.channels().count() == 0) {
-                studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
-                return false; // early exit
-            }
             switch (acqSettings_.channels().mode()) {
                 case VOLUME:
                     changeChannelPerVolumeSoftware = true;

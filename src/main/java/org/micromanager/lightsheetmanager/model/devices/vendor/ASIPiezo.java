@@ -78,8 +78,8 @@ public class ASIPiezo extends ASITigerBase {
         return AxisPolarity.fromString(getProperty(Properties.AXIS_POLARITY));
     }
 
-    public void setHomePosition(final double um) {
-        setPropertyFloat(Properties.HOME_POSITION, um);
+    public void setHomePosition(final double mm) {
+        setPropertyFloat(Properties.HOME_POSITION, mm);
     }
 
     public double getHomePosition() {
@@ -278,8 +278,8 @@ public class ASIPiezo extends ASITigerBase {
     public enum PiezoMode {
         INTERNAL_CLOSED_LOOP("0 - internal input closed-loop"),
         EXTERNAL_CLOSED_LOOP("1 - external input closed-loop"),
-        INTERNAL_OPEN_LOOP("0 - internal input open-loop"),
-        EXTERNAL_OPEN_LOOP("1 - external input open-loop");
+        INTERNAL_OPEN_LOOP("2 - internal input open-loop"),
+        EXTERNAL_OPEN_LOOP("3 - external input open-loop");
 
         private final String text_;
 

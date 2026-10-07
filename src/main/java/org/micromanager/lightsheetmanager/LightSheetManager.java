@@ -98,6 +98,12 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
             return false; // early exit => show error ui
         }
 
+        // warn but still open: isUsingPLogic() answers false for these trigger setups
+        final String triggerProblem = devices().triggerProblem();
+        if (triggerProblem != null) {
+            studio_.logs().showError(triggerProblem);
+        }
+
         // TODO: put this somewhere better, need to put this value into LightSheetEventAdapter for now
         LightSheetEventAdapter.isUsingMultipleCameras =
               deviceManager_.adapter().numSimultaneousCameras() > 1;

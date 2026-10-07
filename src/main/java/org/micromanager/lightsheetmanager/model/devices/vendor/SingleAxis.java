@@ -151,8 +151,8 @@ public class SingleAxis extends DeviceBase {
     public enum Mode {
         DISABLED("0 - Disabled"),
         ENABLED("1 - Enabled"),
-        ARMED_FOR_TTL("3 - Armed for TTL trigger"),
-        ENABLED_AXES_SYNCED("4 - Enabled with axes synced");
+        ARMED_FOR_TTL("2 - Armed for TTL trigger"),
+        ENABLED_AXES_SYNCED("3 - Enabled with axes synced");
 
         private final String text_;
 

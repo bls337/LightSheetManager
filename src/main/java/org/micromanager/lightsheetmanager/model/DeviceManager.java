@@ -477,20 +477,38 @@ public class DeviceManager {
 
     // check for ASI hardware triggering device
     public boolean isUsingPLogic() {
-        if (deviceMap_.get("TriggerLaser") == null && deviceMap_.get("TriggerCamera") == null) {
+        final DeviceBase laser = deviceMap_.get("TriggerLaser");
+        final DeviceBase camera = deviceMap_.get("TriggerCamera");
+        if (laser == null || camera == null) {
             return false; // early exit => devices not set
         }
         // check if both device names contain "PLogic"
-        boolean result = false;
-        final boolean isLaserPLogic = deviceMap_.get("TriggerLaser").getDeviceName().contains("PLogic");
-        final boolean isCameraPLogic = deviceMap_.get("TriggerCamera").getDeviceName().contains("PLogic");
-        if (isLaserPLogic && !isCameraPLogic || !isLaserPLogic && isCameraPLogic) {
-            studio_.logs().showError("PLogic must be set as both the camera and laser trigger.");
+        return laser.getDeviceName().contains("PLogic")
+                && camera.getDeviceName().contains("PLogic");
+    }
+
+    /**
+     * Returns a message when only one of TriggerLaser and TriggerCamera is set, or only one of
+     * them is a PLogic device.
+     *
+     * @return a message for the user, or null for any other trigger setup
+     */
+    public String triggerProblem() {
+        final DeviceBase laser = deviceMap_.get("TriggerLaser");
+        final DeviceBase camera = deviceMap_.get("TriggerCamera");
+        if (laser == null && camera == null) {
+            return null;
         }
-        if (isLaserPLogic && isCameraPLogic) {
-            result = true;
+        if (laser == null || camera == null) {
+            return "TriggerLaser and TriggerCamera must both be set; "
+                    + (laser == null ? "TriggerLaser" : "TriggerCamera") + " is not.";
         }
-        return result;
+        final boolean isLaserPLogic = laser.getDeviceName().contains("PLogic");
+        final boolean isCameraPLogic = camera.getDeviceName().contains("PLogic");
+        if (isLaserPLogic != isCameraPLogic) {
+            return "PLogic must be set as both the camera and laser trigger.";
+        }
+        return null;
     }
 
     // check for ASI stage scanning
@@ -625,7 +643,7 @@ public class DeviceManager {
      * @return true if the device is present
      */
     public boolean hasDevice(final String deviceName) {
-        return !deviceMap_.get(deviceName).getDeviceName().equals("Undefined");
+        return deviceMap_.containsKey(deviceName);
     }
 
     /**

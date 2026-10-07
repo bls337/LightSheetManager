@@ -461,7 +461,7 @@ public class ASIScanner extends ASITigerBase {
     public enum LaserOutputMode {
         FAST_CIRCLES("fast circles"),
         INDIVIDUAL_SHUTTER("individual shutters"),
-        SHUTTER_PLUS_SIDE("fast circles"),
+        SHUTTER_PLUS_SIDE("shutter + side"),
         SIDE_PLUS_SIDE("side + side");
         private final String text_;
 
