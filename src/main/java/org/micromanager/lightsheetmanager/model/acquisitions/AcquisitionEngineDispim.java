@@ -294,10 +294,6 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                     nextWakeTime_ = event.getMinimumStartTimeAbsolute();
                 }
 
-                // Translate event to timeIndex/channel/etc
-                AcquisitionEvent firstAcqEvent = event.getSequence().get(0);
-                int timePoint = firstAcqEvent.getTIndex();
-
                 ////////////////////////////////////
                 ///////// Run autofocus ////////////
                 ///////////////////////////////////

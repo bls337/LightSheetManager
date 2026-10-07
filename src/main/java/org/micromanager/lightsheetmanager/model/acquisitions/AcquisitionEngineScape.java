@@ -625,11 +625,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     nextWakeTime_ = event.getMinimumStartTimeAbsolute();
                 }
 
-                // Translate event to timeIndex/channel/etc
-                AcquisitionEvent firstAcqEvent = event.getSequence().get(0);
-                // TODO: add later when autofocus is complete, prevent errors if no time index is found for now
-                //int timePoint = firstAcqEvent.getTIndex();
-
                 try {
                     core_.waitForSystem();
                 } catch (Exception e) {
