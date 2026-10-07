@@ -78,8 +78,8 @@ public class ASIPiezo extends ASITigerBase {
         return AxisPolarity.fromString(getProperty(Properties.AXIS_POLARITY));
     }
 
-    public void setHomePosition(final double um) {
-        setPropertyFloat(Properties.HOME_POSITION, um);
+    public void setHomePosition(final double mm) {
+        setPropertyFloat(Properties.HOME_POSITION, mm);
     }
 
     public double getHomePosition() {

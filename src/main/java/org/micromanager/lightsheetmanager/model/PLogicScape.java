@@ -429,7 +429,7 @@ public class PLogicScape {
             // for stage scanning we define the piezo position to be the home position (normally 0)
             // this is basically required for interleaved mode (otherwise piezo would be moving every slice)
             //    and by convention we'll do it for all stage scanning
-            piezoCenter = piezo_.getHomePosition() * 1000.0; // convert to mm
+            piezoCenter = piezo_.getHomePosition() * 1000.0; // convert mm to um
         } else {
             // TODO: add centerAtCurrentZ to acqSettings
             final boolean centerAtCurrentZ = false;
