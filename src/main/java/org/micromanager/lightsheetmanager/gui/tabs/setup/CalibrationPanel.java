@@ -88,8 +88,8 @@ public class CalibrationPanel extends Panel {
         final double sliceSlope = acqSettings.sliceCalibration().slope();
         final double sliceOffset = acqSettings.sliceCalibration().offset();
 
-        txtSlope_.setText("0");
-        txtOffset_.setText("0");
+        txtSlope_.setText(Double.toString(sliceSlope));
+        txtOffset_.setText(Double.toString(sliceOffset));
 
         lblSlopeValue_.setText(String.format("%.3f μm/°", sliceSlope));
         lblOffsetValue_.setText(String.format("%.3f μm", sliceOffset));
@@ -162,7 +162,7 @@ public class CalibrationPanel extends Panel {
                     // FIXME: update channelOffset
                     // was: channelOffset = ASIdiSPIM.getFrame().getAcquisitionPanel().getChannelOffset();
                     final double newOffset = piezoPosition - rate * scannerPosition - channelOffset;
-                    //txtOffset_.setText(String.format("%.3f μm", newOffset));
+                    txtOffset_.setText(Double.toString(newOffset));
                     lblOffsetValue_.setText(String.format("%.3f μm", newOffset));
                     panel_.setImagingCenterValue(newOffset);
                     model_.acquisitions().settingsBuilder()
