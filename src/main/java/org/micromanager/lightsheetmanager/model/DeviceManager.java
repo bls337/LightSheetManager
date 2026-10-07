@@ -625,7 +625,7 @@ public class DeviceManager {
      * @return true if the device is present
      */
     public boolean hasDevice(final String deviceName) {
-        return !deviceMap_.get(deviceName).getDeviceName().equals("Undefined");
+        return deviceMap_.containsKey(deviceName);
     }
 
     /**
