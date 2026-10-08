@@ -82,6 +82,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     private double scanSpeedX_;
     private double scanAccelX_;
     private boolean isPolling_; // true if polling was enabled at the start of an acquisition
+    // the Core-Camera and channel preset setup() found, which finish() puts back; null means
+    // this run never captured them
+    private String originalCoreCamera_;
+    private String originalChannelPreset_;
 
     // Vetoes closing the running acquisition's window unless the user confirms an abort. Otherwise
     // the display manager closes the store under the running acquisition and every later image
@@ -126,6 +130,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         xyPosUm_ = null;
         origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
         origAccelX_ = 1.0; // don't want 0 in case something goes wrong
+        originalCoreCamera_ = null;
+        originalChannelPreset_ = null;
 
         // fail before touching any hardware: the datastore is written by finish(), so an unusable
         // save location would otherwise cost a full acquisition before it is discovered
@@ -191,11 +197,22 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // set the "Core-Camera" property to the first logical camera device
         final String cameraName = model_.devices().firstImagingCamera().getDeviceName();
+        originalCoreCamera_ = core_.getCameraDevice();
         try {
             core_.setCameraDevice(cameraName);
         } catch (Exception e) {
             studio_.logs().showError("Could not set \"Core-Camera\" to the first logical camera device.");
             return false;
+        }
+
+        // the run's events switch presets in the channel group
+        if (acqSettings_.channels().enabled()) {
+            final String group = acqSettings_.channels().group();
+            try {
+                originalChannelPreset_ = core_.getCurrentConfig(group);
+            } catch (Exception e) {
+                studio_.logs().logError("Could not read the current preset of channel group " + group);
+            }
         }
 
         // this is needed for LSMAcquisitionEvents to work with multiple positions
@@ -1344,6 +1361,28 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 camera.setExposure(savedExposures_.get(i));
             }
         }
+
+        // put back the Core-Camera and channel preset setup() found
+        if (originalCoreCamera_ != null) {
+            try {
+                core_.setCameraDevice(originalCoreCamera_);
+            } catch (Exception e) {
+                studio_.logs().logError("Could not restore Core-Camera to " + originalCoreCamera_);
+            } finally {
+                originalCoreCamera_ = null;
+            }
+        }
+        // an empty preset means the group matched none of its presets, so there is nothing to set
+        if (originalChannelPreset_ != null && !originalChannelPreset_.isEmpty()) {
+            final String group = acqSettings_.channels().group();
+            try {
+                core_.setConfig(group, originalChannelPreset_);
+            } catch (Exception e) {
+                studio_.logs().logError("Could not restore channel group " + group
+                        + " to " + originalChannelPreset_);
+            }
+        }
+        originalChannelPreset_ = null;
 
         // unregister to stop ghost events
         studio_.events().unregisterForEvents(this);
