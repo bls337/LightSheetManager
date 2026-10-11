@@ -74,7 +74,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         if (acqSettings_.isUsingMultiplePositions()) {
             final int numPositions = studio_.positions().getPositionList().getNumberOfPositions();
             if (numPositions == 0) {
-                studio_.logs().showError("XY positions expected but the position list is empty");
+                model_.logging().reportError("XY positions expected but the position list is empty");
                 return false;
             }
         }
@@ -221,7 +221,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
             } else if (acqSettings_.saveMode() == SaveMode.SINGLEPLANE_TIFF_SERIES) {
                 DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.SINGLEPLANE_TIFF_SERIES);
             } else {
-                studio_.logs().showError("Unsupported save mode: " + acqSettings_.saveMode());
+                model_.logging().reportError("Unsupported save mode: " + acqSettings_.saveMode());
                 return false;
             }
             result.setStorage(new NDTiffAdapter(result, saveDir, true));
@@ -601,7 +601,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                 final Datastore.SaveMode saveMode = SaveMode.convert(acqSettings_.saveMode());
                 datastore_.save(saveMode, savePath);
             } catch (Exception e) {
-                model_.studio().logs().showError("could not save the acquisition data to: \n" + savePath);
+                model_.logging().reportError("could not save the acquisition data to: \n" + savePath);
             }
         }
     }
@@ -635,7 +635,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         boolean changeChannelPerVolumeDoneFirst = false;
         if (acqSettings_.channels().enabled()) {
             if (acqSettings_.channels().count() == 0) {
-                studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
+                model_.logging().reportError("\"Channels\" is checked, but no channels are selected");
                 return false; // early exit
             }
             switch (acqSettings_.channels().mode()) {
@@ -653,7 +653,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                         //   for the channel in the main Micro-Manager window
                         final boolean success = plc.setupHardwareChannelSwitching(acqSettings_);
                         if (!success) {
-                            studio_.logs().showError("Couldn't set up slice hardware channel switching.");
+                            model_.logging().reportError("Couldn't set up slice hardware channel switching.");
                             return false; // early exit
                         }
                         nrChannelsSoftware = 1;
@@ -661,7 +661,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                     }
                     break;
                 default:
-                    studio_.logs().showError(
+                    model_.logging().reportError(
                             "Unsupported multichannel mode \"" + acqSettings_.channels().mode() + "\"");
                     return false; // early exit
             }
@@ -709,7 +709,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         if (exposureTime + cameraReadoutTime > sliceDurationMs) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
-            studio_.logs().showError("Exposure time of " + exposureTime +
+            model_.logging().reportError("Exposure time of " + exposureTime +
                     " is longer than time needed for a line scan with" +
                     " readout time of " + cameraReadoutTime + "\n" +
                     "This will result in dropped frames. " +
@@ -879,12 +879,12 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                         cameraExposureMs = sliceDurationMs - delayBeforeCameraMs;  // delayBeforeCameraMs should be 0.25ms for PCO
                         break;
                     default:
-                        studio_.logs().showError("Unknown camera library for pseudo-overlap "
+                        model_.logging().reportError("Unknown camera library for pseudo-overlap "
                                 + "calculations: " + camera.getDeviceLibrary());
                         break;
                 }
                 if (cameraReadoutMax < 0.24) {
-                    studio_.logs().showError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
+                    model_.logging().reportError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
                 }
                 break;
             case VIRTUAL_SLIT:
@@ -917,7 +917,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                 laserDuration = (totalExposureMax*shutterSpeed) + scanLaserBufferTime; // laser will turn off as exposure is ending
                 break;
             default:
-                studio_.logs().showError("Invalid camera mode");
+                model_.logging().reportError("Invalid camera mode");
                 break;
         }
 

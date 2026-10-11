@@ -152,14 +152,14 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         if (acqSettings_.isUsingMultiplePositions()) {
             final int numPositions = positionList_.getNumberOfPositions();
             if (numPositions == 0) {
-                studio_.logs().showError("XY positions expected but the position list is empty");
+                model_.logging().reportError("XY positions expected but the position list is empty");
                 return false;
             }
         }
 
         // checked here so demo and NIDAQ runs, which skip doHardwareCalculations, refuse too
         if (acqSettings_.channels().enabled() && acqSettings_.channels().count() == 0) {
-            studio_.logs().showError("\"Channels\" is checked, but no channels are selected");
+            model_.logging().reportError("\"Channels\" is checked, but no channels are selected");
             return false;
         }
 
@@ -167,7 +167,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         final String cameraModeProblem =
                 ScapeAcquisitionSettings.cameraModeProblem(acqSettings_.cameraMode());
         if (cameraModeProblem != null) {
-            studio_.logs().showError(cameraModeProblem + ".\n\n"
+            model_.logging().reportError(cameraModeProblem + ".\n\n"
                     + "Select a mode in the Trigger Mode menu on the Acquisition tab.");
             return false;
         }
@@ -207,7 +207,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         try {
             core_.setCameraDevice(cameraName);
         } catch (Exception e) {
-            studio_.logs().showError("Could not set \"Core-Camera\" to the first logical camera device.");
+            model_.logging().reportError("Could not set \"Core-Camera\" to the first logical camera device.");
             return false;
         }
 
@@ -224,7 +224,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // this is needed for LSMAcquisitionEvents to work with multiple positions
         if (core_.getFocusDevice().isEmpty()
                 && acqSettings_.isUsingMultiplePositions()) {
-            studio_.logs().showError(
+            model_.logging().reportError(
                     "The default focus device \"Core-Focus\" needs to be set to use multiple positions.");
             return false;
         }
@@ -251,7 +251,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             final ASIXYStage xyStage = model_.devices().device("SampleXY");
             if (xyStage != null) {
                 if (!xyStage.hasProperty(ASIXYStage.Properties.SCAN_NUM_LINES)) {
-                    studio_.logs().showError("Must have stage with scan-enabled firmware for stage scanning.");
+                    model_.logging().reportError("Must have stage with scan-enabled firmware for stage scanning.");
                     return false;
                 }
                 // second part: initialize stage scanning, so we can restore state later
@@ -354,7 +354,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         } else if (settings.saveMode() == SaveMode.SINGLEPLANE_TIFF_SERIES) {
             DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.SINGLEPLANE_TIFF_SERIES);
         } else {
-            studio_.logs().showError("Unsupported save mode: " + settings.saveMode());
+            model_.logging().reportError("Unsupported save mode: " + settings.saveMode());
             return false;
         }
 
@@ -1456,7 +1456,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         // The channel panel steers away from this mode but does not write the
                         // correction back to the settings, so it still arrives here from a stored
                         // profile or through the API.
-                        studio_.logs().showError("Channel mode \"" + ChannelMode.VOLUME_HW
+                        model_.logging().reportError("Channel mode \"" + ChannelMode.VOLUME_HW
                                 + "\" is not supported: images would be saved against the wrong "
                                 + "channel and slice. Use \"" + ChannelMode.SLICE_HW
                                 + "\" for hardware channel switching, or \"" + ChannelMode.VOLUME
@@ -1477,7 +1477,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         //   for the channel in the main Micro-Manager window
                         final boolean success = plc.setupHardwareChannelSwitching(acqSettings_);
                         if (!success) {
-                            studio_.logs().showError("Couldn't set up slice hardware channel switching.");
+                            model_.logging().reportError("Couldn't set up slice hardware channel switching.");
                             return false; // early exit
                         }
                         nrChannelsSoftware = 1;
@@ -1485,7 +1485,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     }
                     break;
                 default:
-                    studio_.logs().showError(
+                    model_.logging().reportError(
                             "Unsupported multichannel mode \"" + acqSettings_.channels().mode().toString() + "\"");
                     return false; // early exit
             }
@@ -1605,7 +1605,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         if (exposureTime + cameraReadoutTime > sliceDurationMs) {
             // should only possible to mess this up using advanced timing settings
             // or if there are errors in our own calculations
-            studio_.logs().showError("Exposure time of " + exposureTime +
+            model_.logging().reportError("Exposure time of " + exposureTime +
                     " is longer than time needed for a line scan with" +
                     " readout time of " + cameraReadoutTime + "\n" +
                     "This will result in dropped frames. " +
@@ -1620,7 +1620,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             // 0.1 s so the suggested value clears the threshold (interval < timepointDuration + 750 ms)
             final double minIntervalSec = Math.ceil((timepointDuration + 750.0) / 100.0) / 10.0;
             if (acqSettings_.channels().enabled() && acqSettings_.channels().mode() == ChannelMode.VOLUME) {
-                studio_.logs().showError("Time point interval is too short for software (\"Every Volume\") "
+                model_.logging().reportError("Time point interval is too short for software (\"Every Volume\") "
                         + "channels: intervals under about " + minIntervalSec + " s switch to hardware time "
                         + "points, which require hardware (PLogic) channel switching. Either raise the time "
                         + "point interval to at least " + minIntervalSec + " s, or set the channel mode to "
@@ -1629,7 +1629,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
             if (acqSettings_.stageScan().enabled()) {
                 // stage scanning needs to be triggered for each time point
-                studio_.logs().showError("Time point interval is too short: intervals under about "
+                model_.logging().reportError("Time point interval is too short: intervals under about "
                         + minIntervalSec + " s switch to hardware time points, which can't be combined with "
                         + "stage scanning. Raise the time point interval to at least " + minIntervalSec + " s.");
                 return false;
@@ -1640,7 +1640,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 // events lined up with the frames means consuming those images and discarding them
                 // afterwards, and no mechanism for discarding one exists yet. Refuse here rather
                 // than file them as the next time point's first slices and shift everything after.
-                studio_.logs().showError("Time point interval is too short: intervals under about "
+                model_.logging().reportError("Time point interval is too short: intervals under about "
                         + minIntervalSec + " s switch to hardware time points, which can't yet be combined "
                         + "with the \"Overlap/Synchronous\" camera mode. Either raise the time point "
                         + "interval to at least " + minIntervalSec + " s, or choose a different camera mode.");
@@ -1651,7 +1651,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         final int numTimePoints = numTimePointsToAcquire(acqSettings_);
         if (!acqSettings_.isUsingMultiplePositions() && numTimePoints > 1) {
             if (timepointIntervalMs < volumeDuration) {
-                studio_.logs().showError("Time point interval shorter than the time to collect a single volume.");
+                model_.logging().reportError("Time point interval shorter than the time to collect a single volume.");
                 return false;
             }
         }
@@ -1796,7 +1796,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 delayBeforeScanMs = 0.0;
                 break;
             default:
-                studio_.logs().showError("The camera trigger mode \"" + cameraMode
+                model_.logging().reportError("The camera trigger mode \"" + cameraMode
                         + "\" has no stage scan timing.\n\n"
                         + "Select another mode in the Trigger Mode menu on the Acquisition tab.");
                 break;
@@ -1975,16 +1975,16 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                         cameraExposureMs = tsb.sliceDurationMs() - delayBeforeCameraMs;  // delayBeforeCameraMs should be 0.25ms for PCO
                         break;
                     default:
-                        studio_.logs().showError("Unknown camera library for pseudo-overlap "
+                        model_.logging().reportError("Unknown camera library for pseudo-overlap "
                                 + "calculations: " + camera.getDeviceLibrary());
                         break;
                 }
                 if (cameraReadoutMax < 0.24) {
-                    studio_.logs().showError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
+                    model_.logging().reportError("Camera delay should be at least 0.25ms for pseudo-overlap mode.");
                 }
                 break;
             default:
-                studio_.logs().showError("The camera trigger mode \"" + cameraMode
+                model_.logging().reportError("The camera trigger mode \"" + cameraMode
                         + "\" has no slice timing.\n\n"
                         + "Select another mode in the Trigger Mode menu on the Acquisition tab.");
                 break;
@@ -2204,7 +2204,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     private double getStageRetraceDuration(final ScapeAcquisitionSettings settings) {
         final ASIXYStage stage = model_.devices().device("SampleXY");
         if (stage == null) {
-            studio_.logs().showError("could not find XY stage!");
+            model_.logging().reportError("could not find XY stage!");
             return 0.0; // early exit => error
         }
         final double retraceRelativeSpeedPercent;
