@@ -8,6 +8,7 @@ import org.micromanager.lightsheetmanager.api.AcquisitionSettings;
 import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.gui.components.SettingsListener;
+import org.micromanager.lightsheetmanager.model.utils.JsonUtils;
 import org.micromanager.propertymap.MutablePropertyMapView;
 
 import javax.swing.SwingUtilities;
@@ -188,50 +189,14 @@ public class UserSettings {
         // different number of keys => merge loaded settings with default settings
         if (numLoadedKeys != numDefaultKeys) {
             try {
-                mergeSettingsJson(defaultJson, loadedJson);
+                JsonUtils.addMissingKeys(defaultJson, loadedJson, MAX_RECURSION_DEPTH_JSON,
+                        message -> model_.studio().logs().logMessage("UserSettings: " + message));
             } catch (JSONException e) {
                 model_.studio().logs().showError("could not merge new default settings into loaded settings.");
                 return Optional.empty();
             }
         }
         return Optional.of(loadedJson);
-    }
-
-    // Overloaded method to give mergeSettingsJson a default parameter.
-    private void mergeSettingsJson(JSONObject defaultJson, JSONObject loadedJson) throws JSONException {
-        mergeSettingsJson(defaultJson, loadedJson, 0);
-    }
-
-    private void mergeSettingsJson(
-            JSONObject defaultJson, JSONObject loadedJson, final int level) throws JSONException {
-
-        // bail out if settings data is nested too deep
-        if (level > MAX_RECURSION_DEPTH_JSON) {
-            model_.studio().logs().logMessage("UserSettings: recursion too deep, increase max level.");
-            return; // early exit => recursion too deep
-        }
-
-        // for every key in the default settings, check to make sure the loaded settings has that key
-        Iterator<String> keys = defaultJson.keys();
-        while (keys.hasNext()) {
-            final String key = keys.next();
-            final Object value = defaultJson.get(key);
-            // if the loaded settings are missing the key then add it
-            if (!loadedJson.has(key)) {
-                loadedJson.put(key, value);
-                model_.studio().logs().logMessage(
-                        "UserSettings: Added key \"" + key + "\" to the loaded settings.");
-            }
-            // recursively call on sub-objects of type JSONObject
-            if (value instanceof JSONObject) {
-                JSONObject subDefaultJson = (JSONObject)value;
-                JSONObject subLoadedJson = (JSONObject)loadedJson.get(key);
-                if (subLoadedJson.length() != subDefaultJson.length()) {
-                    mergeSettingsJson(subDefaultJson, subLoadedJson, level+1);
-                    loadedJson.put(key, subLoadedJson);
-                }
-            }
-        }
     }
 
     /**
