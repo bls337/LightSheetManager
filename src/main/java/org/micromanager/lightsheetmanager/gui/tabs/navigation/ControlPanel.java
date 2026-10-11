@@ -107,7 +107,7 @@ public class ControlPanel extends Panel implements Subscriber {
         btnMoveToZero_ = new Button("Go to 0", 68, 26);
         if (isStageDevice()) {
             btnSetZero_ = new Button("Set 0", 58, 26);
-            btnSetZero_.setToolTipText("");
+            btnSetZero_.setToolTipText("Make the current position of this axis its zero.");
         }
 
         // select axis names based on device

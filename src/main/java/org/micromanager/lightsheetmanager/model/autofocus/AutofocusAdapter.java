@@ -31,14 +31,10 @@ public class AutofocusAdapter {
         // save the original plugin settings
         final AutofocusManager manager = model_.studio().getAutofocusManager();
         final AutofocusPlugin originalPlugin = manager.getAutofocusMethod();
-        String name = originalPlugin.getName();
-        System.out.println(name);
 
         // switch to OughtaFocus plugin
         manager.setAutofocusMethodByName(AF_METHOD);
         final AutofocusPlugin plugin = manager.getAutofocusMethod();
-        String name2 = plugin.getName();
-        System.out.println(name2);
 
         // TODO: switch based on AutofocusMode?
         final String deviceName = model_.devices()
@@ -78,8 +74,7 @@ public class AutofocusAdapter {
         }
 
         try {
-            final double score = plugin.fullFocus();
-            System.out.println("score: " + score);
+            plugin.fullFocus();
         } catch (Exception e) {
             model_.studio().logs().logError("error running fullFocus() " + e.getMessage());
             return; // early exit => could not run fullFocus()
@@ -87,8 +82,6 @@ public class AutofocusAdapter {
 
         // restore original plugin settings
         manager.setAutofocusMethod(originalPlugin);
-        String name3 = manager.getAutofocusMethod().getName();
-        System.out.println(name3);
     }
 
     public void setPropertyValue(final AutofocusPlugin plugin, final String key, final String value) {
