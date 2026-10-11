@@ -125,6 +125,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
         pnlMultiPositions_ = new PositionPanel(model_, cbxUseMultiplePositions_);
         // disable elements based on settings
         pnlMultiPositions_.setPanelEnabled(settings.isUsingMultiplePositions());
+        // the playlist opens the same grid frame as the positions panel
+        acqTableFrame_.setXYZGridFrame(pnlMultiPositions_.getXYZGridFrame());
 
         pnlSaveData_ = new SavePanel(model_, frame_);
         pnlCameras_ = new CameraPanel(model_);
