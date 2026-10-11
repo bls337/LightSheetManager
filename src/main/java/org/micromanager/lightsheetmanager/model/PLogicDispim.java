@@ -181,11 +181,11 @@ public class PLogicDispim {
         if (settings.stageScan().enabled()
                 && settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
             if (numViews != 2) {
-                studio_.logs().showError("Interleaved stage scan only possible for 2-sided acquisition.");
+                model_.logging().reportError("Interleaved stage scan only possible for 2-sided acquisition.");
                 return false;
             }
             if (settings.cameraMode() == CameraMode.OVERLAP) {
-                studio_.logs().showError("Interleaved stage scan not compatible with overlap camera mode");
+                model_.logging().reportError("Interleaved stage scan not compatible with overlap camera mode");
                 return false;
             }
         }
@@ -198,7 +198,7 @@ public class PLogicDispim {
         try {
             core_.setShutterDevice(plcLaser_.getDeviceName());
         } catch (Exception e) {
-            studio_.logs().showError("could not set shutter to " + plcLaser_.getDeviceName());
+            model_.logging().reportError("could not set shutter to " + plcLaser_.getDeviceName());
         }
 
         if (settings.stageScan().enabled()) {
@@ -229,13 +229,13 @@ public class PLogicDispim {
             final double maxSpeed = xyStage_.getMaxSpeedX();
             if (requestedMotorSpeed > maxSpeed * 0.8) {
                 // trying to go near max speed smooth scanning will be compromised
-                studio_.logs().showError("Required stage speed is too fast, please reduce step size or increase sample exposure.");
+                model_.logging().reportError("Required stage speed is too fast, please reduce step size or increase sample exposure.");
                 return false;
             }
             if (requestedMotorSpeed < maxSpeed / 2000) {
                 // 1/2000 of the max speed is approximate place where smooth scanning breaks down (speed quantum is ~1/12000 max speed);
                 // this also prevents setting to 0 which the controller rejects
-                studio_.logs().showError("Required stage speed is too slow, please increase step size or decrease sample exposure.");
+                model_.logging().reportError("Required stage speed is too slow, please increase step size or decrease sample exposure.");
                 return false;
             }
             xyStage_.setSpeedX(requestedMotorSpeed);
@@ -258,7 +258,7 @@ public class PLogicDispim {
             xyStage_.setScanPattern(isStageScan2Sided ? ASIXYStage.ScanPattern.SERPENTINE : ASIXYStage.ScanPattern.RASTER);
 
             if (xyStage_.getAxisPolarityX() != ASIXYStage.AxisPolarity.NORMAL) {
-                studio_.logs().showError(
+                model_.logging().reportError(
                         "Stage scanning requires X axis polarity set to " + ASIXYStage.AxisPolarity.NORMAL);
                 return false;
             }
@@ -323,7 +323,7 @@ public class PLogicDispim {
         try {
             core_.setShutterDevice(plcLaser_.getDeviceName());
         } catch (Exception e) {
-            studio_.logs().showError("could not set shutter to " + plcLaser_.getDeviceName());
+            model_.logging().reportError("could not set shutter to " + plcLaser_.getDeviceName());
         }
 
         scanDistance_ = 0;
@@ -490,7 +490,7 @@ public class PLogicDispim {
                 piezo = piezo2_;
                 break;
             default:
-                studio_.logs().showError("does not support numViews > 2!");
+                model_.logging().reportError("does not support numViews > 2!");
                 break;
         }
 
@@ -583,7 +583,7 @@ public class PLogicDispim {
             final double slope2 = settings.sliceCalibration(2).slope();
             double sliceRate = (view == 1) ? slope1 : slope2;
             if (NumberUtils.doublesEqual(sliceRate, 0.0)) {
-                studio_.logs().showError("Calibration slope for view " + view + " cannot be zero. Re-do calibration on Setup tab.");
+                model_.logging().reportError("Calibration slope for view " + view + " cannot be zero. Re-do calibration on Setup tab.");
                 return false;
             }
             final double offset1 = settings.sliceCalibration(1).offset() + channelOffset;
@@ -609,11 +609,11 @@ public class PLogicDispim {
             // so an unreadable scanner refuses the sweep rather than passing it through.
             final double halfSweep = Math.abs(sliceAmplitude) / 2;
             if (sliceCenter + halfSweep > scanner.getMaxDeflectionY()) {
-                studio_.logs().showError("Scanner will exceed allowed range in positive direction.");
+                model_.logging().reportError("Scanner will exceed allowed range in positive direction.");
                 return false;
             }
             if (sliceCenter - halfSweep < scanner.getMinDeflectionY()) {
-                studio_.logs().showError("Scanner will exceed allowed range in negative direction.");
+                model_.logging().reportError("Scanner will exceed allowed range in negative direction.");
                 return false;
             }
 
@@ -665,7 +665,7 @@ public class PLogicDispim {
 
                 if (NumberUtils.outsideRange(piezoCenter - piezoAmplitude / 2, piezoMin, piezoMax)
                         || NumberUtils.outsideRange(piezoCenter + piezoAmplitude / 2, piezoMin, piezoMax)) {
-                    studio_.logs().showError("Imaging piezo for view " + view +
+                    model_.logging().reportError("Imaging piezo for view " + view +
                             " would travel outside the piezo limits during acquisition.");
                     return false;
                 }
@@ -780,7 +780,7 @@ public class PLogicDispim {
         // PLogic can only handle up to 4 channels
         if ((settings.channels().count() > 4) &&
                 (channelMode == ChannelMode.VOLUME_HW || channelMode == ChannelMode.SLICE_HW)) {
-            studio_.logs().showError("PLogic card cannot handle more than 4 channels for hardware switching.");
+            model_.logging().reportError("PLogic card cannot handle more than 4 channels for hardware switching.");
             return false;
         }
 
@@ -797,7 +797,7 @@ public class PLogicDispim {
                 }
                 break;
             default:
-                studio_.logs().showError("Unknown multichannel mode for hardware switching.");
+                model_.logging().reportError("Unknown multichannel mode for hardware switching.");
                 return false;
         }
 
@@ -816,7 +816,7 @@ public class PLogicDispim {
                 plcLaser_.setPreset(15); // mod4 counter
                 break;
             default:
-                studio_.logs().showError("Hardware channel switching only supports 1-4 channels");
+                model_.logging().reportError("Hardware channel switching only supports 1-4 channels");
                 return false;
         }
 
@@ -841,7 +841,7 @@ public class PLogicDispim {
             if (plcLaser_.getNumCells() < 24) {
                 // restore update setting
                 plcLaser_.setAutoUpdateCells(editCellUpdates);
-                studio_.logs().showError("Require 24-cell PLC firmware to use hardware channel switching with 7-channel shutter");
+                model_.logging().reportError("Require 24-cell PLC firmware to use hardware channel switching with 7-channel shutter");
                 return false;
             }
 
@@ -893,7 +893,7 @@ public class PLogicDispim {
                 if (hardwareChannelUsed[outputNum - 5]) {
                     // restore update setting
                     plcLaser_.setAutoUpdateCells(editCellUpdates);
-                    studio_.logs().showError("Multiple channels cannot use same laser for PLogic triggering");
+                    model_.logging().reportError("Multiple channels cannot use same laser for PLogic triggering");
                     return false;
                 } else {
                     hardwareChannelUsed[outputNum - 5] = true;
@@ -950,7 +950,7 @@ public class PLogicDispim {
                 scanner.setSPIMState(ASIScanner.SPIMState.RUNNING);
                 break;
             default:
-                studio_.logs().showError("Unknown acquisition mode");
+                model_.logging().reportError("Unknown acquisition mode");
                 return false;
         }
         return true;
@@ -961,7 +961,7 @@ public class PLogicDispim {
         try {
             Configuration configData = core_.getConfigData(channelGroup, channel.getName());
             if (!configData.isPropertyIncluded(plcLaser_.getDeviceName(), "OutputChannel")) {
-                studio_.logs().showError("Channel preset \"" + channel.getName() + "\" (group \""
+                model_.logging().reportError("Channel preset \"" + channel.getName() + "\" (group \""
                         + channelGroup + "\") must include the PLogic \"OutputChannel\" property to use "
                         + "hardware channel switching. Edit the preset in the main Micro-Manager window and "
                         + "set \"OutputChannel\" to one of \"output 5 only\" through \"output 8 only\".");
@@ -977,14 +977,14 @@ public class PLogicDispim {
             } else if (setting.equals("output 8 only")) {
                 return 8;
             } else {
-                studio_.logs().showError("Channel preset \"" + channel.getName() + "\" (group \""
+                model_.logging().reportError("Channel preset \"" + channel.getName() + "\" (group \""
                         + channelGroup + "\") has PLogic \"OutputChannel\" set to \"" + setting + "\"; it "
                         + "must be one of \"output 5 only\" through \"output 8 only\" (each channel a "
                         + "distinct output 5-8). Edit the preset in the main Micro-Manager window.");
                 return 0;
             }
         } catch (Exception e) {
-            studio_.logs().showError(e, "Could not get PLogic output from channel");
+            model_.logging().reportError(e, "Could not get PLogic output from channel");
             return 0;
         }
     }
@@ -994,13 +994,13 @@ public class PLogicDispim {
         try {
             Configuration configData = core_.getConfigData(channelGroup, channel.getName());
             if (!configData.isPropertyIncluded(plcLaser_.getDeviceName(), "OutputChannel")) {
-                studio_.logs().showError("Must include PLogic \"OutputChannel\" in preset for hardware switching");
+                model_.logging().reportError("Must include PLogic \"OutputChannel\" in preset for hardware switching");
                 return false;
             }
             String setting = configData.getSetting(plcLaser_.getDeviceName(), "OutputChannel").getPropertyValue();
             return setting.contains(String.valueOf(laserNum));
         } catch (Exception e) {
-            studio_.logs().showError(e, "Could not get PLogic output from channel");
+            model_.logging().reportError(e, "Could not get PLogic output from channel");
             return false;
         }
     }
@@ -1120,7 +1120,7 @@ public class PLogicDispim {
                 sideKey = "PathConfig2";
                 break;
             default:
-                studio_.logs().showError("unknown side when setting up path presets");
+                model_.logging().reportError("unknown side when setting up path presets");
                 break;
         }
         final String preset = "PathConfig1";///props_.getPropValueString(Devices.Keys.PLUGIN, sideKey); // TODO: get from plugin!
@@ -1131,7 +1131,7 @@ public class PLogicDispim {
                 core_.waitForConfig(group, preset);
             }
         } catch (Exception e) {
-            studio_.logs().showError("Couldn't set the path config " + preset + " of group " + group);
+            model_.logging().reportError("Couldn't set the path config " + preset + " of group " + group);
         }
     }
 

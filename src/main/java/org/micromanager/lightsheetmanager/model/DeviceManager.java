@@ -148,11 +148,14 @@ public class DeviceManager {
                         ASIPiezo piezo = new ASIPiezo(studio_, deviceName);
                         addDevice(propertyName, deviceName, piezo);
                         devicesAdded.put(deviceName, piezo);
-                    }
-                    if (deviceName.contains("ZStage")) {
+                    } else if (deviceName.contains("ZStage")) {
                         ASIZStage zStage = new ASIZStage(studio_, deviceName);
                         addDevice(propertyName, deviceName, zStage);
                         devicesAdded.put(deviceName, zStage);
+                    } else {
+                        studio_.logs().logError("DeviceManager: " + propertyName + " names "
+                                + deviceName + ", a Tiger stage whose label has neither Piezo "
+                                + "nor ZStage in it, so it is ignored");
                     }
                 } else {
                     // generic stage device
@@ -181,6 +184,11 @@ public class DeviceManager {
                     NIDAQ nidaq = new NIDAQ(studio_, deviceName);
                     addDevice(propertyName, deviceName, nidaq);
                     devicesAdded.put(deviceName, nidaq);
+                } else {
+                    studio_.logs().logError("DeviceManager: " + propertyName + " names "
+                            + deviceName + ", a shutter from the " + deviceLibrary
+                            + " library, which is neither an ASI PLogic card nor a NIDAQ board, "
+                            + "so it is ignored");
                 }
             } else if (deviceType == DeviceType.CameraDevice) {
                 createCameraDevice(propertyName, deviceName,
