@@ -1,6 +1,5 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.Future;
 import javax.swing.SwingUtilities;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
@@ -321,18 +320,12 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
     }
 
     private void acqFinishedCallback() {
-        try {
-            SwingUtilities.invokeAndWait(() -> {
-                btnRunAcquisition_.setState(false);
-                btnPauseAcquisition_.setEnabled(false);
-                btnSpeedTest_.setEnabled(true);
-                btnTestAcquisition_.setEnabled(true);
-            });
-        } catch (InterruptedException e) {
-            model_.studio().logs().logError("Acquisition was interrupted!");
-        } catch (InvocationTargetException e) {
-            model_.studio().logs().logError("Could not update UI components.");
-        }
+        SwingUtilities.invokeLater(() -> {
+            btnRunAcquisition_.setState(false);
+            btnPauseAcquisition_.setEnabled(false);
+            btnSpeedTest_.setEnabled(true);
+            btnTestAcquisition_.setEnabled(true);
+        });
     }
 
     private void runAcquisition(boolean speedTest) {
