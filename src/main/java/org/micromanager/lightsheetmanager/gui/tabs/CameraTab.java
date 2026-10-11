@@ -32,7 +32,7 @@ public class CameraTab extends Panel implements ListeningPanel {
 
     private final LightSheetManager model_;
 
-    public CameraTab(final LightSheetManager model) {;
+    public CameraTab(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
