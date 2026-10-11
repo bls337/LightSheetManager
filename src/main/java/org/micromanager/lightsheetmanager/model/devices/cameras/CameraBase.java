@@ -6,6 +6,10 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 
 import java.awt.Rectangle;
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.TreeSet;
+import java.util.function.BooleanSupplier;
 
 /**
  * This is the base camera class.
@@ -17,10 +21,15 @@ import java.awt.Rectangle;
  * the mode to the device. {@link #setTriggerMode} is final and records it here for
  * {@link #getTriggerMode}, so no vendor has to maintain it.
  *
+ * <p>Binning is implemented here, because every adapter uses Micro-Manager's standard property.
+ *
  * <p>Cameras whose device library resolves to {@code CameraLibrary.UNKNOWN} use
  * {@link UnknownCamera}.
  */
 public abstract class CameraBase extends DeviceBase implements LightSheetCamera {
+
+    // Micro-Manager's standard binning property, used by every supported adapter
+    private static final String BINNING_PROPERTY = "Binning";
 
     protected CameraMode mode_;
 
@@ -122,6 +131,23 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
      * @return true if the camera accepted the ROI
      */
     public boolean setROI(final Rectangle roi) {
+        return withLiveModeOff(() -> {
+            try {
+                core_.setROI(deviceName_, roi.x, roi.y, roi.width, roi.height);
+                return true;
+            } catch (Exception e) {
+                studio_.logs().logError("could not set roi " + roi.width + "x" + roi.height
+                        + " at (" + roi.x + ", " + roi.y + ") on camera " + deviceName_ + ": "
+                        + e.getMessage());
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Runs a change with live mode stopped, and starts live mode again if it was on.
+     */
+    private boolean withLiveModeOff(final BooleanSupplier change) {
         final boolean isLiveModeOn = studio_.live().isLiveModeOn();
         if (isLiveModeOn) {
             studio_.live().setLiveModeOn(false);
@@ -130,14 +156,7 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
                 studio_.live().getDisplay().close();
             }
         }
-        boolean accepted = true;
-        try {
-            core_.setROI(deviceName_, roi.x, roi.y, roi.width, roi.height);
-        } catch (Exception e) {
-            accepted = false;
-            studio_.logs().logError("could not set roi " + roi.width + "x" + roi.height + " at ("
-                    + roi.x + ", " + roi.y + ") on camera " + deviceName_ + ": " + e.getMessage());
-        }
+        final boolean accepted = change.getAsBoolean();
         if (isLiveModeOn) {
             studio_.live().setLiveModeOn(true);
         }
@@ -217,15 +236,37 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
      * Reads a camera's binning for reporting, or returns {@link #UNKNOWN_BINNING} if it cannot.
      *
      * <p>Binning is diagnostic here, so a camera that cannot report it must not be able to break the
-     * frame-size check that protects against a JVM kill. It can throw for ordinary reasons:
-     * {@code UnknownCamera} throws deliberately, and every vendor's {@code getBinning()} takes
-     * {@code substring(0, 1)} of a property read that yields {@code ""} when it fails.
+     * frame-size check that protects against a JVM kill.
      */
     private static int binningOrUnknown(final CameraBase camera) {
         try {
             return camera.getBinning();
         } catch (Exception e) {
             return UNKNOWN_BINNING;
+        }
+    }
+
+    /**
+     * Parses an adapter's binning value, such as "2" or "2x2", into a factor.
+     *
+     * @return the factor, or -1 if the value is not a square binning
+     */
+    static int parseBinningFactor(final String value) {
+        if (value == null) {
+            return -1;
+        }
+        final String text = value.trim().toLowerCase(Locale.ROOT);
+        final int separator = text.indexOf('x');
+        final String columns = (separator < 0) ? text : text.substring(0, separator);
+        final String rows = (separator < 0) ? columns : text.substring(separator + 1);
+        if (!columns.equals(rows)) {
+            return -1;
+        }
+        try {
+            final int factor = Integer.parseInt(columns);
+            return (factor >= 1) ? factor : -1;
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 
@@ -274,11 +315,109 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
         return mode_;
     }
 
+    /**
+     * Sets the binning factor, written the way the adapter spells it, such as "2" or "2x2".
+     *
+     * <p>Live mode is stopped around the write, and a running acquisition is refused. The value is
+     * read back, because an adapter can accept a value and not apply it.
+     *
+     * @param factor the binning factor, such as 2 for 2x2
+     * @return true if the camera reports the factor afterwards
+     */
     @Override
-    public abstract void setBinning();
+    public boolean setBinning(final int factor) {
+        // already set, so skip the write and the live mode restart
+        if (binningOrUnknown(this) == factor) {
+            return true;
+        }
+        final String value = allowedBinningValue(factor);
+        if (value == null) {
+            studio_.logs().logError("camera " + deviceName_ + " does not offer binning " + factor
+                    + "; it offers " + Arrays.toString(getAllowedBinnings()));
+            return false;
+        }
+        // a sequence running without live mode is an acquisition
+        if (!studio_.live().isLiveModeOn() && isSequenceRunning()) {
+            studio_.logs().logError("camera " + deviceName_
+                    + " is acquiring, so its binning was not changed");
+            return false;
+        }
+        return withLiveModeOff(() -> {
+            try {
+                core_.setProperty(deviceName_, BINNING_PROPERTY, value);
+            } catch (Exception e) {
+                studio_.logs().logError("could not set binning " + value + " on camera "
+                        + deviceName_ + ": " + e.getMessage());
+                return false;
+            }
+            final int actual = binningOrUnknown(this);
+            if (actual != factor) {
+                studio_.logs().logError("camera " + deviceName_ + " reports binning "
+                        + (actual == UNKNOWN_BINNING ? "unknown" : String.valueOf(actual))
+                        + " after a request for " + factor);
+                return false;
+            }
+            return true;
+        });
+    }
 
+    /**
+     * Returns the binning factor the camera reports.
+     *
+     * @throws IllegalStateException if the value cannot be read or is not a square binning
+     */
     @Override
-    public abstract int getBinning();
+    public int getBinning() {
+        final String value = getProperty(BINNING_PROPERTY);
+        final int factor = parseBinningFactor(value);
+        if (factor < 1) {
+            throw new IllegalStateException("camera " + deviceName_
+                    + " reports an unusable binning value \"" + value + "\"");
+        }
+        return factor;
+    }
+
+    /**
+     * Returns the binning factors the camera offers, ascending, leaving out asymmetric values.
+     * A camera that lists no values offers only its current one.
+     */
+    @Override
+    public int[] getAllowedBinnings() {
+        final TreeSet<Integer> factors = new TreeSet<>();
+        for (final String value : getAllowedPropertyValues(BINNING_PROPERTY)) {
+            final int factor = parseBinningFactor(value);
+            if (factor >= 1) {
+                factors.add(factor);
+            }
+        }
+        if (factors.isEmpty()) {
+            final int current = binningOrUnknown(this);
+            if (current != UNKNOWN_BINNING) {
+                factors.add(current);
+            }
+        }
+        return factors.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    /**
+     * Returns the adapter's own spelling of the given factor, or null if it does not offer it.
+     */
+    private String allowedBinningValue(final int factor) {
+        for (final String value : getAllowedPropertyValues(BINNING_PROPERTY)) {
+            if (parseBinningFactor(value) == factor) {
+                return value;
+            }
+        }
+        return null;
+    }
+
+    private boolean isSequenceRunning() {
+        try {
+            return core_.isSequenceRunning(deviceName_);
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     /**
      * Returns the physical sensor size in unbinned pixels.

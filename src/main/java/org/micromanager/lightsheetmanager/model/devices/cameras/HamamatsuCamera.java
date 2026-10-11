@@ -27,7 +27,6 @@ public class HamamatsuCamera extends CameraBase {
         public static final String INTERNAL_LINE_INTERVAL = "INTERNAL LINE INTERVAL";
         public static final String SCAN_MODE = "ScanMode";
         public static final String READOUT_TIME = "ReadoutTime";
-        public static final String BINNING = "Binning";
     }
 
     public static class Values {
@@ -87,23 +86,6 @@ public class HamamatsuCamera extends CameraBase {
             default:
                 break;
         }
-    }
-
-    // TODO: impl
-    @Override
-    public void setBinning() {
-
-    }
-
-    @Override
-    public int getBinning() {
-        final String binning = getProperty(Properties.BINNING);
-        final int factor = Integer.parseInt(binning.substring(0, 1));
-        if (factor < 1) {
-            studio_.logs().showError("Was not able to get camera binning factor");
-            return 1;
-        }
-        return Integer.parseInt(binning.substring(0, 1));
     }
 
     @Override

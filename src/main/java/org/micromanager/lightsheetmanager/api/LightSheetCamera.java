@@ -13,8 +13,18 @@ public interface LightSheetCamera {
     void setTriggerMode(final CameraMode cameraMode);
     CameraMode getTriggerMode();
 
-    void setBinning();
+    /**
+     * Sets the binning factor, such as 2 for 2x2.
+     *
+     * @return true if the camera reports the factor afterwards
+     */
+    boolean setBinning(final int factor);
+
+    /** Returns the binning factor the camera reports. */
     int getBinning();
+
+    /** Returns the binning factors the camera offers, ascending. */
+    int[] getAllowedBinnings();
 
     Rectangle getResolution();
     double getRowReadoutTime();
