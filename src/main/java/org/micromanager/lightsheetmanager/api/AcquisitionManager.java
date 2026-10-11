@@ -18,7 +18,13 @@ public interface AcquisitionManager {
     /**
      * Request that an acquisition is run.
      *
-     * @return a future that completes when the acquisition finishes
+     * <p>The future completes normally however the run ends: completed, stopped, failed with
+     * an exception, or refused before it started. It tells when the request is over, not how
+     * it went, and waiting on it blocks until then.
+     *
+     * @param speedTest true to run Micro-Manager's speed test, which streams the camera to the
+     *                  save directory, instead of the acquisition
+     * @return a future that completes when the request is over
      */
     Future<?> requestRun(boolean speedTest);
 
@@ -28,7 +34,11 @@ public interface AcquisitionManager {
      * <p>A test acquisition runs a single time point and does not save anything to disk. The
      * settings shown in the user interface are left unchanged.
      *
-     * @return a future that completes when the acquisition finishes
+     * <p>The future completes normally however the run ends: completed, stopped, failed with
+     * an exception, or refused before it started. It tells when the request is over, not how
+     * it went, and waiting on it blocks until then.
+     *
+     * @return a future that completes when the request is over
      */
     Future<?> requestTestAcquisition();
 
