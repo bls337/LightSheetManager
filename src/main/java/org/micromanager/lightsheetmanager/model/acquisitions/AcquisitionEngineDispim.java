@@ -255,12 +255,6 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         sink.setDatastore(datastore_);
         sink.setPipeline(curPipeline_);
 
-        studio_.events().registerForEvents(this);
-        // commented because this is prob specific to MM MDAs
-//        studio_.events().post(new DefaultAcquisitionStartedEvent(datastore_, this,
-//              acquisitionSettings));
-
-
         // TODO if position time ordering ever implemented, this should be reactivated and the
         //  timelapse hook copied from org.micromanager.acquisition.internal.acqengjcompat.AcqEngJAdapter
 //        if (sequenceSettings_.acqOrderMode() == AcqOrderMode.POS_TIME_CHANNEL_SLICE
@@ -576,9 +570,6 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                 camera.setExposure(savedExposures_.get(i));
             }
         }
-
-        // unregister to stop ghost events
-        studio_.events().unregisterForEvents(this);
 
         // start polling for navigation panel
         if (isPolling_) {

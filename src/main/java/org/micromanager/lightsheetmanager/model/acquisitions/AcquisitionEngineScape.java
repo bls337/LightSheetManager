@@ -361,11 +361,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return false;
         }
 
-        studio_.events().registerForEvents(this);
-        // commented because this is prob specific to MM MDAs
-//        studio_.events().post(new DefaultAcquisitionStartedEvent(datastore_, this,
-//              acquisitionSettings));
-
         final String[] cameraNames = resolveCameraNames(settings, demoMode);
 
         // read once, before the acquisition starts, so every channel's offset has the same origin
@@ -1392,9 +1387,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
         originalChannelPreset_ = null;
-
-        // unregister to stop ghost events
-        studio_.events().unregisterForEvents(this);
 
         // start polling for navigation panel
         if (isPolling_) {
