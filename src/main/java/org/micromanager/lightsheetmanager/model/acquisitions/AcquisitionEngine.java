@@ -448,6 +448,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                         final long elapsedMs = (System.nanoTime() - startNs) / 1_000_000L;
                         studio_.logs().logMessage("LSM-ACQ-STOP " + runId + " " + elapsedMs + " ms");
                     }
+                    // TODO(IMMUTABLE-RUN): stop-gap. Rebuild so settings() stops reporting the
+                    //  test acquisition's overrides; last, so nothing above is skipped if it throws
+                    if (testAcquisition) {
+                        updateSettings();
+                    }
                 }
             }
         });
