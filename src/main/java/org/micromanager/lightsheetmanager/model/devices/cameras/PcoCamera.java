@@ -138,6 +138,9 @@ public class PcoCamera extends CameraBase {
                 Rectangle sensorSize = getResolution();
 
                 numReadoutRows = roiReadoutRowsSplitReadout(roi2, sensorSize);
+                if (isEdge55()) {
+                    numReadoutRows += 2; // 2 rows overhead for the 5.5, none for the 4.2
+                }
                 readoutTimeMs = numReadoutRows * rowReadoutTime2;
                 break;
             case OVERLAP:
