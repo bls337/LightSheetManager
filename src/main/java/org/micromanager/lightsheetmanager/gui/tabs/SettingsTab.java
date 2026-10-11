@@ -114,9 +114,33 @@ public class SettingsTab extends Panel implements ListeningPanel {
         final JLabel lblSliceAxisFilterFreq = new JLabel("Filter freq, slice axis [kHz]:");
         final JLabel lblLiveScanPeriod = new JLabel("Live scan period [ms]:");
 
-        // TODO: increase max filter freq based on build (to 10.0)
-        spnSheetAxisFilterFreq_ = Spinner.createDoubleSpinner(0.4, 0.1, 1.0, 0.1);
-        spnSliceAxisFilterFreq_ = Spinner.createDoubleSpinner(0.4, 0.1, 1.0, 0.1);
+        // start the filter spinners from the scanner, because a run uses the scanner's values
+        double maxFilterFreq = 1.0;
+        double sheetAxisFilterFreq = 0.8;
+        double sliceAxisFilterFreq = 0.4;
+        if (isUsingPLogic_) {
+            final ASIScanner scanner = model_.devices().device("IllumSlice");
+            if (scanner != null) {
+                // the galvo firmware builds can filter up to 10 kHz
+                final String build = scanner.getFirmwareBuild();
+                if (build.equals("GALVO_SPIM") || build.equals("GALVO_SPIM_SLAVE")) {
+                    maxFilterFreq = 10.0;
+                }
+                // a failed read returns 0, so keep the default
+                final double sheetAxis = scanner.getFilterFreqX();
+                if (sheetAxis > 0.0) {
+                    sheetAxisFilterFreq = sheetAxis;
+                }
+                final double sliceAxis = scanner.getFilterFreqY();
+                if (sliceAxis > 0.0) {
+                    sliceAxisFilterFreq = sliceAxis;
+                }
+            }
+        }
+        spnSheetAxisFilterFreq_ = Spinner.createDoubleSpinner(
+                sheetAxisFilterFreq, 0.1, maxFilterFreq, 0.1);
+        spnSliceAxisFilterFreq_ = Spinner.createDoubleSpinner(
+                sliceAxisFilterFreq, 0.1, maxFilterFreq, 0.1);
         spnLiveScanPeriod_ = Spinner.createIntegerSpinner(20, 2, 10000, 100);
 
         add(lblGeometryType, "wrap");
