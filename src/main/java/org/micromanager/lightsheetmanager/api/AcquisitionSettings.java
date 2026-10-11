@@ -24,6 +24,7 @@ public interface AcquisitionSettings {
          * Sets the folder name.
          *
          * @param name the name of the folder
+         * @throws IllegalArgumentException if the name cannot be used as a Windows file name
          */
         T saveNamePrefix(final String name);
 
@@ -53,6 +54,8 @@ public interface AcquisitionSettings {
          *
          * @param mode the camera mode
          * @return {@code this} builder
+         * @throws IllegalArgumentException if the microscope does not support the mode
+         *                                  (SCAPE does not support virtual slit)
          */
         T cameraMode(final CameraMode mode);
 

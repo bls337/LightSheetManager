@@ -6,13 +6,11 @@ import org.micromanager.Studio;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.api.data.AcquisitionMode;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
-import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.api.data.ChannelMode;
 import org.micromanager.lightsheetmanager.api.internal.ScapeAcquisitionSettings;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngineScape;
 import org.micromanager.lightsheetmanager.model.acquisitions.CameraTriggers;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
-import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPLogic;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIPiezo;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
@@ -22,7 +20,6 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.SingleAxis;
 import org.micromanager.lightsheetmanager.model.utils.GeometryUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
-import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.util.Objects;
 
@@ -627,23 +624,7 @@ public class PLogicScape {
             // set interleaved sides flag low unless we are doing interleaved stage scan
             scanner_.setSPIMInterleaveSides(isInterleaved);
 
-            // send sheet width/offset
-            double sheetWidth = getSheetWidth(acqSettings_.cameraMode(), view);
-            double sheetOffset = getSheetOffset(acqSettings_.cameraMode(), view);
-            if (cameraMode == CameraMode.VIRTUAL_SLIT) {
-                // adjust sheet width and offset to account for settle time where scan is going but we aren't imaging yet
-                // FIXME: !!!
-                //final float settleTime = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_LS_SCAN_SETTLE);
-                // infer the main scan time (during imaging) from the laser duration
-//                    final float readoutTime = settings.timingSettings().laserTriggerDurationMs() - 0.25;  // -0.25 is for scanLaserBufferTime
-//                    // offset should be decreased by half of the distance traveled during settle time (instead of re-extracting slope use existing sheetWidth/readoutTime)
-//                    sheetOffset -= (sheetWidth * settleTime/readoutTime)/2;
-//                    // width should be increased by ratio (1 + settle_fraction)
-//                    sheetWidth += (sheetWidth * settleTime/readoutTime);
-            }
-            // SCOPE should not modify the x-axis of the galvo
-            // scanner_.sa().setAmplitudeX(sheetWidth);
-            // scanner_.sa().setOffsetX(sheetOffset);
+            // SCAPE leaves the galvo's x axis alone, so no sheet width or offset is sent
         }
         return true;
     }
@@ -930,98 +911,6 @@ public class PLogicScape {
             studio_.logs().showError(e, "Could not get PLogic output from channel");
             return false;
         }
-    }
-
-    // TODO: need sheet width settings in AcquisitionSettings
-    /**
-     * gets the sheet width for the specified settings in units of degrees
-     * @param cameraMode
-     * @param view
-     * @return 0 if camera isn't assigned
-     */
-    public double getSheetWidth(CameraMode cameraMode, int view) {
-        double sheetWidth;
-        //final String cameraName = devices_.getMMDevice(cameraDevice);
-        String deviceName = "ImagingCamera" + view; // diSPIM
-        if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
-            deviceName = "ImagingCamera";
-            if (model_.devices().adapter().numSimultaneousCameras() > 1 ) {
-                deviceName += String.valueOf(view);
-            }
-        }
-        CameraBase camera = devices_.device(deviceName); // TODO: find a way of adapting to different cameras
-        String cameraName = camera.getDeviceName(); // TODO: put this on LSM camera?
-
-//        // start by assuming the base value, then modify below if needed
-//        final Properties.Keys widthProp = (side == Devices.Sides.A) ?
-//                Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_A : Properties.Keys.PLUGIN_SHEET_WIDTH_EDGE_B;
-//        sheetWidth = props_.getPropValueFloat(Devices.Keys.PLUGIN, widthProp);
-        sheetWidth = model_.acquisitions().settings().sheetCalibration().sheetWidth();
-
-        if (cameraName == null || cameraName.isEmpty()) {
-            studio_.logs().logDebugMessage("Could not get sheet width for invalid device " + cameraName);
-            return sheetWidth;
-        }
-
-        if (cameraMode == CameraMode.VIRTUAL_SLIT) {
-            // TODO: this!
-//            final float sheetSlope = prefs_.getFloat(
-//                    MyStrings.PanelNames.SETUP.toString() + side.toString(),
-//                    Properties.Keys.PLUGIN_LIGHTSHEET_SLOPE, 2000);
-//            Rectangle roi = cameras_.getCameraROI(cameraDevice);  // get binning-adjusted ROI so value can stay the same regardless of binning
-//            if (roi == null || roi.height == 0) {
-//                studio_.logs().logDebugMessage("Could not get camera ROI for light sheet mode");
-//            }
-//            final float slopePolarity = (side == Devices.Sides.B) ? -1 : 1;
-//            sheetWidth = roi.height * sheetSlope * slopePolarity / 1e6;  // in microdegrees per pixel, convert to degrees
-        } else {
-            final boolean autoSheet = model_.acquisitions().settings().sheetCalibration().autoSheetWidthEnabled();
-            if (autoSheet) {
-                // unbinned, so the sheet width stays the same regardless of binning
-                Rectangle roi = camera.getUnbinnedROI();
-                if (roi == null || roi.height == 0) {
-                    studio_.logs().logDebugMessage("Could not get camera ROI for auto sheet mode");
-                }
-                final double sheetSlope = model_.acquisitions().settings().sheetCalibration().autoSheetWidthPerPixel();
-                sheetWidth = roi.height *  sheetSlope / 1000.0;  // in millidegrees per pixel, convert to degrees
-                sheetWidth *= 1.1;  // 10% extra width just to be sure
-            }
-//            final boolean autoSheet = prefs_.getBoolean(
-//                    MyStrings.PanelNames.SETUP.toString() + side.toString(),
-//                    Properties.Keys.PREFS_AUTO_SHEET_WIDTH, false);
-//            if (autoSheet) {
-//                Rectangle roi = cameras_.getCameraROI(cameraDevice);  // get binning-adjusted ROI so value can stay the same regardless of binning
-//                if (roi == null || roi.height == 0) {
-//                    studio_.logs().logDebugMessage("Could not get camera ROI for auto sheet mode");
-//                }
-//                final float sheetSlope = prefs_.getFloat(MyStrings.PanelNames.SETUP.toString() + side.toString(),
-//                        Properties.Keys.PLUGIN_SLOPE_SHEET_WIDTH.toString(), 2);
-//                sheetWidth = roi.height *  sheetSlope / 1000;  // in millidegrees per pixel, convert to degrees
-//                // TODO add extra width to compensate for filter depending on sweep rate and filter freq
-//                // TODO calculation should account for sample exposure to make sure 0.25ms edges get appropriately compensated for
-//                sheetWidth *= 1.1;  // 10% extra width just to be sure
-//            }
-        }
-        return sheetWidth;
-    }
-
-    // TODO: needs properties
-    public double getSheetOffset(CameraMode cameraMode, int view) {
-        double sheetOffset;
-        if (cameraMode == CameraMode.VIRTUAL_SLIT) {
-            // in millidegrees, convert to degrees
-            // TODO: is this correct?
-            sheetOffset = model_.acquisitions().settings().sheetCalibration().sheetOffset() / 1000.0;
-            //sheetOffset = prefs_.getFloat(
-            //MyStrings.PanelNames.SETUP.toString() + side.toString(),
-            //Properties.Keys.PLUGIN_LIGHTSHEET_OFFSET, 0) / 1000;  // in millidegrees, convert to degrees
-        } else {
-            sheetOffset = model_.acquisitions().settings().sheetCalibration().sheetOffset();
-            //final Properties.Keys offsetProp = (side == Devices.Sides.A) ?
-            // Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_A : Properties.Keys.PLUGIN_SHEET_OFFSET_EDGE_B;
-            // sheetOffset = props_.getPropValueFloat(Devices.Keys.PLUGIN, offsetProp);
-        }
-        return sheetOffset;
     }
 
     /**
