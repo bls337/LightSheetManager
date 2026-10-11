@@ -4,6 +4,7 @@ import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import java.awt.Dimension;
 import java.awt.Insets;
+import java.awt.event.MouseEvent;
 
 public class TabbedPane extends JTabbedPane {
 
@@ -52,5 +53,21 @@ public class TabbedPane extends JTabbedPane {
             }
             lastSelectedIndex_ = getSelectedIndex();
         });
+    }
+
+    // the look and feel highlights the tab under the mouse even when the pane is disabled,
+    // so a disabled pane drops the mouse events that set the highlight
+    @Override
+    protected void processMouseMotionEvent(final MouseEvent e) {
+        if (isEnabled()) {
+            super.processMouseMotionEvent(e);
+        }
+    }
+
+    @Override
+    protected void processMouseEvent(final MouseEvent e) {
+        if (isEnabled() || e.getID() != MouseEvent.MOUSE_ENTERED) {
+            super.processMouseEvent(e);
+        }
     }
 }
