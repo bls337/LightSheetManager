@@ -13,7 +13,6 @@ import org.micromanager.propertymap.MutablePropertyMapView;
 
 import javax.swing.SwingUtilities;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -172,52 +171,25 @@ public class UserSettings {
     private Optional<JSONObject> validateUserSettings(final String loadedSettings) {
         // create default settings from builder
         final String defaultSettings = ScapeAcquisitionSettings.builder().build().toJson();
-        // validate JSON strings and count the number of keys
-        int numLoadedKeys;
-        int numDefaultKeys;
+        // validate JSON strings
         JSONObject loadedJson;
         JSONObject defaultJson;
         try {
             loadedJson = new JSONObject(loadedSettings);
             defaultJson = new JSONObject(defaultSettings);
-            numLoadedKeys = countKeysJson(loadedJson);
-            numDefaultKeys = countKeysJson(defaultJson);
         } catch (JSONException e) {
             model_.studio().logs().showError("could not validate the JSON data.");
             return Optional.empty();
         }
-        // different number of keys => merge loaded settings with default settings
-        if (numLoadedKeys != numDefaultKeys) {
-            try {
-                JsonUtils.addMissingKeys(defaultJson, loadedJson, MAX_RECURSION_DEPTH_JSON,
-                        message -> model_.studio().logs().logMessage("UserSettings: " + message));
-            } catch (JSONException e) {
-                model_.studio().logs().showError("could not merge new default settings into loaded settings.");
-                return Optional.empty();
-            }
+        // add every default setting the loaded settings lack, including any whose key was renamed
+        try {
+            JsonUtils.addMissingKeys(defaultJson, loadedJson, MAX_RECURSION_DEPTH_JSON,
+                    message -> model_.studio().logs().logMessage("UserSettings: " + message));
+        } catch (JSONException e) {
+            model_.studio().logs().showError("could not merge new default settings into loaded settings.");
+            return Optional.empty();
         }
         return Optional.of(loadedJson);
-    }
-
-    /**
-     * Return the number of keys in the {@code JSONObject} object and
-     * all internal {@code JSONObject} objects.
-     *
-     * @param obj the root {@code JSONObject} object
-     * @return the number of keys in all objects
-     * @throws JSONException error getting value from key from object
-     */
-    private int countKeysJson(final JSONObject obj) throws JSONException {
-        int numKeys = obj.length();
-        Iterator<String> keys = obj.keys();
-        while (keys.hasNext()) {
-            final String key = keys.next();
-            final Object value = obj.get(key);
-            if (value instanceof JSONObject) {
-                numKeys += ((JSONObject)value).length();
-            }
-        }
-        return numKeys;
     }
 
     /**

@@ -14,9 +14,9 @@ public final class JsonUtils {
     }
 
     /**
-     * Adds each key of the defaults that the loaded object lacks, with its default value. A nested
-     * object is completed the same way when its key count differs from the default's, and replaced
-     * by the default when the loaded value is not an object.
+     * Adds each key of the defaults that the loaded object lacks, with its default value. Nested
+     * objects are completed the same way, and a loaded value that is not an object is replaced by
+     * the default.
      *
      * @param defaults the object holding every key, with its default value
      * @param loaded the object to complete, changed in place
@@ -54,11 +54,7 @@ public final class JsonUtils {
                 final JSONObject subDefaults = (JSONObject) value;
                 final Object loadedValue = loaded.get(key);
                 if (loadedValue instanceof JSONObject) {
-                    final JSONObject subLoaded = (JSONObject) loadedValue;
-                    if (subLoaded.length() != subDefaults.length()) {
-                        addMissingKeys(subDefaults, subLoaded, maxDepth, log, level + 1);
-                        loaded.put(key, subLoaded);
-                    }
+                    addMissingKeys(subDefaults, (JSONObject) loadedValue, maxDepth, log, level + 1);
                 } else {
                     // a value that is not an object, null included, cannot be completed
                     loaded.put(key, subDefaults);
