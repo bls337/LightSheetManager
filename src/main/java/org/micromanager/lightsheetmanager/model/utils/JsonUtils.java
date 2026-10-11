@@ -15,12 +15,14 @@ public final class JsonUtils {
 
     /**
      * Adds each key of the defaults that the loaded object lacks, with its default value. A nested
-     * object is completed the same way when its key count differs from the default's.
+     * object is completed the same way when its key count differs from the default's, and replaced
+     * by the default when the loaded value is not an object.
      *
      * @param defaults the object holding every key, with its default value
      * @param loaded the object to complete, changed in place
      * @param maxDepth the deepest level of nested objects to complete
-     * @param log receives one line for each key added, and one if the nesting goes past maxDepth
+     * @param log receives one line for each key added or replaced, and one if the nesting goes past
+     *            maxDepth
      * @throws JSONException if a value cannot be read or written
      */
     public static void addMissingKeys(final JSONObject defaults, final JSONObject loaded,
@@ -50,10 +52,18 @@ public final class JsonUtils {
             // recursively call on sub-objects of type JSONObject
             if (value instanceof JSONObject) {
                 final JSONObject subDefaults = (JSONObject) value;
-                final JSONObject subLoaded = (JSONObject) loaded.get(key);
-                if (subLoaded.length() != subDefaults.length()) {
-                    addMissingKeys(subDefaults, subLoaded, maxDepth, log, level + 1);
-                    loaded.put(key, subLoaded);
+                final Object loadedValue = loaded.get(key);
+                if (loadedValue instanceof JSONObject) {
+                    final JSONObject subLoaded = (JSONObject) loadedValue;
+                    if (subLoaded.length() != subDefaults.length()) {
+                        addMissingKeys(subDefaults, subLoaded, maxDepth, log, level + 1);
+                        loaded.put(key, subLoaded);
+                    }
+                } else {
+                    // a value that is not an object, null included, cannot be completed
+                    loaded.put(key, subDefaults);
+                    log.accept("Replaced key \"" + key
+                            + "\" with its default, the loaded value was not an object.");
                 }
             }
         }
