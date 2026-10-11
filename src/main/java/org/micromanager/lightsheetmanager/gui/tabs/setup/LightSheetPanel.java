@@ -85,7 +85,7 @@ public class LightSheetPanel extends Panel {
         final JLabel lblSheetWidth = new JLabel("Sheet width:");
         //final JLabel lblSheetOffset = new JLabel("Sheet offset:");
         final JLabel lblSheetOffset = new JLabel("Galvo offset * 1000:");
-        lblSlopeUnits2_ = new JLabel("μ°/px"); // TODO: reuse labels like this?
+        lblSlopeUnits2_ = new JLabel("m°/px");
 
         cbxAutoSheetWidth_ = new CheckBox("Automatic", false);
         txtSheetWidth_ = new TextField();

@@ -783,7 +783,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     return event;
                 }
 
-                if (isUsingPLC) {
+                if (isUsingPLC && controllerInstance != null) {
                     if (settings.stageScan().enabled() && settings.isUsingMultiplePositions()) {
                         final ASIXYStage xyStage = model_.devices().device("SampleXY");
                         // Scan from the coordinate this event was generated for instead of reading

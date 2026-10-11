@@ -127,7 +127,7 @@ public class AndorCamera extends CameraBase {
 
     @Override
     public int getBinning() {
-        final String binning = getProperty(PcoCamera.Properties.BINNING);
+        final String binning = getProperty(Properties.BINNING);
         final int factor = Integer.parseInt(binning.substring(0, 1));
         if (factor < 1) {
             studio_.logs().showError("Was not able to get camera binning factor");

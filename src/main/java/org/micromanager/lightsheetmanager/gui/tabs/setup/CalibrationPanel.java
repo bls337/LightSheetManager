@@ -107,7 +107,6 @@ public class CalibrationPanel extends Panel {
         pnlText.setMinimumSize(new Dimension(100, 30));
         pnlText.add(lblSlope, "");
         pnlText.add(lblSlopeValue_, "");
-        pnlText.add(lblSlopeValue_, "");
         pnlText.add(txtSlope_, "wrap");
         pnlText.add(lblOffset, "");
         pnlText.add(lblOffsetValue_, "");
