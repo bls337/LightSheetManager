@@ -118,29 +118,39 @@ public class SettingsTab extends Panel implements ListeningPanel {
         double maxFilterFreq = 1.0;
         double sheetAxisFilterFreq = 0.8;
         double sliceAxisFilterFreq = 0.4;
-        if (isUsingPLogic_) {
-            final ASIScanner scanner = model_.devices().device("IllumSlice");
-            if (scanner != null) {
-                // the galvo firmware builds can filter up to 10 kHz
-                final String build = scanner.getFirmwareBuild();
-                if (build.equals("GALVO_SPIM") || build.equals("GALVO_SPIM_SLAVE")) {
-                    maxFilterFreq = 10.0;
-                }
-                // a failed read returns 0, so keep the default
-                final double sheetAxis = scanner.getFilterFreqX();
-                if (sheetAxis > 0.0) {
-                    sheetAxisFilterFreq = sheetAxis;
-                }
-                final double sliceAxis = scanner.getFilterFreqY();
-                if (sliceAxis > 0.0) {
-                    sliceAxisFilterFreq = sliceAxis;
-                }
+        double sheetAxis = 0.0;
+        double sliceAxis = 0.0;
+        final ASIScanner scanner = isUsingPLogic_ ? model_.devices().device("IllumSlice") : null;
+        if (scanner != null) {
+            // the galvo firmware builds can filter up to 10 kHz
+            final String build = scanner.getFirmwareBuild();
+            if (build.equals("GALVO_SPIM") || build.equals("GALVO_SPIM_SLAVE")) {
+                maxFilterFreq = 10.0;
+            }
+            // a failed read returns 0, so keep the default
+            sheetAxis = scanner.getFilterFreqX();
+            if (sheetAxis > 0.0) {
+                sheetAxisFilterFreq = sheetAxis;
+            }
+            sliceAxis = scanner.getFilterFreqY();
+            if (sliceAxis > 0.0) {
+                sliceAxisFilterFreq = sliceAxis;
             }
         }
         spnSheetAxisFilterFreq_ = Spinner.createDoubleSpinner(
                 sheetAxisFilterFreq, 0.1, maxFilterFreq, 0.1);
         spnSliceAxisFilterFreq_ = Spinner.createDoubleSpinner(
                 sliceAxisFilterFreq, 0.1, maxFilterFreq, 0.1);
+        // the spinners clamp a value outside their range and show the default after a failed
+        // read, so write what they show when the scanner holds something else
+        if (scanner != null) {
+            if (spnSheetAxisFilterFreq_.getDouble() != sheetAxis) {
+                scanner.setFilterFreqX(spnSheetAxisFilterFreq_.getDouble());
+            }
+            if (spnSliceAxisFilterFreq_.getDouble() != sliceAxis) {
+                scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble());
+            }
+        }
         spnLiveScanPeriod_ = Spinner.createIntegerSpinner(20, 2, 10000, 100);
 
         add(lblGeometryType, "wrap");

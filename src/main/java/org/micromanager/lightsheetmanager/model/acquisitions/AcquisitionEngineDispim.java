@@ -823,7 +823,8 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         // the camera and laser trigger signals => subtract 0.25ms from the scanner delay
         // (start scanner 0.25ms later than it would be otherwise)
         // this time-shift opposes the Bessel filter delay
-        // scanDelayFilter won't be negative unless scanFilterFreq is more than 3kHz which shouldn't happen
+        // scanDelayFilter is negative above about 3kHz, which galvo firmware allows (up to 10kHz),
+        // because the trigger delay is then longer than the filter delay
         if (model_.devices().isUsingPLogic()) {
             scanDelayFilter -= 0.25;
         }
