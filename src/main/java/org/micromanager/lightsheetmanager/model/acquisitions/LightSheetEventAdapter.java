@@ -176,12 +176,12 @@ public final class LightSheetEventAdapter {
             Function<AcquisitionEvent, AcquisitionEvent> eventMonitor,
             int channelIndex, ChannelSpec channel, int numUsedChannels) {
 
-        // Bake this one channel's config into the base event (what channels().next() does per channel).
+        // Bake this one channel's config into the base event.
         baseEvent.setConfigGroup(channel.getGroup());
         baseEvent.setConfigPreset(channel.getName());
         baseEvent.setChannelName(Integer.toString(channelIndex));
 
-        // Channel z-offset: mirror channels(), apply the offset to the current stage/z position.
+        // Channel z-offset: apply the offset to the current stage/z position.
         double zPos;
         if (baseEvent.getZPosition() == null) {
             try {
@@ -265,14 +265,14 @@ public final class LightSheetEventAdapter {
     }
 
     /**
-     * Bake one channel's preset and z-offset onto the base event, as {@link #channels} stamps them
-     * per event on the software path.
+     * Bake one channel's preset and z-offset onto the base event, for a run with a single channel
+     * in use.
      */
     private static void applySingleChannel(AcquisitionEvent baseEvent, ChannelSpec channel) {
         baseEvent.setConfigGroup(channel.getGroup());
         baseEvent.setConfigPreset(channel.getName());
 
-        // Channel z-offset: mirror channels(), apply the offset to the current stage/z position.
+        // Channel z-offset: apply the offset to the current stage/z position.
         double zPos;
         if (baseEvent.getZPosition() == null) {
             try {
@@ -362,7 +362,7 @@ public final class LightSheetEventAdapter {
     /**
      * Fan an event out over the cameras, deriving the channel-axis base from the event.
      * <p>
-     * Used by the {@link #channels}-composed factories.
+     * Used by the factories that run with channels disabled, where the base is 0.
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(String[] cameraDeviceNames) {
         return cameras(cameraDeviceNames, null);
@@ -376,14 +376,14 @@ public final class LightSheetEventAdapter {
      * channel index and the camera index share one axis, and the coordinate written here is the combined
      * slot {@code channelIndex + cameraIndex * numChannels} that {@code addMMSummaryMetadata} names and
      * sizes the datastore for. Do not treat a value already present on that axis as a camera base unless
-     * you put it there: on the {@code channels()}-composed paths it is the raw channel index written by
-     * {@code setChannelName}.
+     * you put it there: {@link #createSingleChannelVolumeAcqEvents} writes the raw channel index there
+     * with {@code setChannelName}, and passes its base explicitly for that reason.
      * <p>
      * This overload steps one slot per camera, which is only the whole coordinate where a single
      * channel is in play; a multi-channel caller wants the stride overload below.
      *
      * @param channelAxisBase the channel-axis base for this fan-out, or {@code null} to derive it from
-     *                        the event: the channel index {@code channels()} left on the axis
+     *                        the event: the value already on the axis, or 0 when there is none
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> cameras(
             String[] cameraDeviceNames, Integer channelAxisBase) {
@@ -428,10 +428,10 @@ public final class LightSheetEventAdapter {
                     // Caller-supplied base (createSingleChannelVolumeAcqEvents, per-channel path).
                     baseIndex = channelAxisBase;
                 } else {
-                    // The base is the channel index channels() wrote onto this axis via
-                    // setChannelName (absent => 0 when channels are disabled). Read it off the event
-                    // rather than from shared state: run() submits one iterator per position per
-                    // timepoint eagerly, and AcqEngJ consumes them lazily and interleaved.
+                    // The base is the value already on this axis (absent => 0, as when channels
+                    // are disabled). Read it off the event rather than from shared state: run()
+                    // submits one iterator per position per timepoint eagerly, and AcqEngJ
+                    // consumes them lazily and interleaved.
                     Object position = event.getAxisPosition(CAMERA_AXIS);
                     int parsed = 0;
                     if (position != null) {
@@ -498,49 +498,6 @@ public final class LightSheetEventAdapter {
                 timePointEvent.setTimeIndex(frameIndex_);
                 frameIndex_++;
                 return timePointEvent;
-            }
-        };
-    }
-
-    /**
-     * Make an iterator for events for each active channel
-     *
-     * @param channelList the list of channels to iterate over
-     * @return
-     */
-    public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> channels(
-            ChannelSpec[] channelList) {
-        return (AcquisitionEvent event) -> new Iterator<>() {
-            int index = 0;
-
-            @Override
-            public boolean hasNext() {
-                return index < channelList.length;
-            }
-
-            @Override
-            public AcquisitionEvent next() {
-                AcquisitionEvent channelEvent = event.copy();
-                channelEvent.setConfigGroup(channelList[index].getGroup());
-                channelEvent.setConfigPreset(channelList[index].getName());
-                channelEvent.setChannelName(Integer.toString(index));
-
-                double zPos;
-                if (channelEvent.getZPosition() == null) {
-                    try {
-                        zPos = Engine.getCore().getPosition() + channelList[index].getOffset();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    zPos = channelEvent.getZPosition() + channelList[index].getOffset();
-                }
-                channelEvent.setZ(channelEvent.getZIndex(), zPos);
-
-                // TODO: do channels have different exposures?
-//               channelEvent.setExposure(channelList.get(index).exposure());
-                index++;
-                return channelEvent;
             }
         };
     }
