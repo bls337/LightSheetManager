@@ -254,8 +254,8 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         /**
          * Sets the acquisition mode.
          * <p>
-         * If the mode is a stage scanning mode,
-         * set the stage scanning flag to true.
+         * Also sets the stage scanning flag: true for a stage scanning mode,
+         * false for any other mode.
          *
          * @param mode the acquisition mode
          * @return {@code this} builder

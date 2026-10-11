@@ -73,9 +73,9 @@ public interface TimingSettings {
     double sliceDurationMs();
 
     /**
-     * Returns true if the scan direction is inverted.
+     * Returns true if successive beam scans alternate direction.
      *
-     * @return true if the scan direction is inverted
+     * @return true if successive beam scans alternate direction
      */
     boolean useAlternateScanDirection();
 
@@ -138,9 +138,9 @@ public interface TimingSettings {
         Builder cameraExposureMs(final double exposureMs);
 
         /**
-         * Sets the scan direction.
+         * Sets whether successive beam scans alternate direction.
          *
-         * @param state true to invert the scan direction
+         * @param state true to alternate the scan direction
          */
         Builder useAlternateScanDirection(final boolean state);
 
