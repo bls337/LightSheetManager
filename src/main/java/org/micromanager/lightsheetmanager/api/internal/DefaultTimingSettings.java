@@ -145,9 +145,9 @@ public class DefaultTimingSettings implements TimingSettings {
     }
 
     /**
-     * Returns true if the scan direction is inverted.
+     * Returns true if successive beam scans alternate direction.
      *
-     * @return true if the scan direction is inverted
+     * @return true if successive beam scans alternate direction
      */
     @Override
     public boolean useAlternateScanDirection() {
@@ -312,9 +312,9 @@ public class DefaultTimingSettings implements TimingSettings {
         }
 
         /**
-         * Sets the scan direction.
+         * Sets whether successive beam scans alternate direction.
          *
-         * @param state true to invert the scan direction
+         * @param state true to alternate the scan direction
          */
         @Override
         public Builder useAlternateScanDirection(final boolean state) {

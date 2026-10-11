@@ -12,7 +12,6 @@ import java.util.Optional;
 // 2) Add the AcquisitionMode to the GeometryType in MODES_BY_GEOMETRY.
 
 // Note: The UI display order is determined by the order in the MODES_BY_GEOMETRY lists.
-// Note: Each text string must be unique to support reliable lookup in fromString().
 
 /**
  * Acquisition modes for all microscope geometries.
@@ -87,7 +86,7 @@ public enum AcquisitionMode {
      * This list is filtered based on hardware capabilities: if {@code hasStageScanning}
      * is {@code false}, all stage-scan related modes are excluded.
      *
-     * @param geometryType the {@link GeometryType} to query; if {@code null}, an empty list is returned
+     * @param geometryType the {@link GeometryType} to query; if {@code null}, an empty array is returned
      * @param hasStageScanning {@code true} if stage scan hardware is available
      * @return an array of {@code AcquisitionMode} constants
      */

@@ -34,7 +34,8 @@ public interface VolumeSettings {
     int firstView();
 
     /**
-     * Return the delay in milliseconds before switching imaging paths in an acquisitions.
+     * Returns the delay in milliseconds before each view's slices start, also with a single
+     * view. In a stage scan it is instead the stage's settling time at the start of each pass.
      *
      * @return the delay in milliseconds
      */
@@ -86,7 +87,8 @@ public interface VolumeSettings {
         Builder firstView(final int firstView);
 
         /**
-         * Sets the delay between switching imaging paths in milliseconds.
+         * Sets the delay in milliseconds before each view's slices start, also with a single
+         * view. In a stage scan it is instead the stage's settling time at the start of each pass.
          *
          * @param viewDelayMs the delay in milliseconds
          */

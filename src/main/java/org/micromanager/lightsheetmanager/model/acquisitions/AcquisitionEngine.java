@@ -313,7 +313,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      * <p>
      * This is used to load the plugin settings from JSON.
      *
-     * @param acqSettings the {@code DefaultAcquisitionSettingsSCAPE} to use
+     * @param acqSettings the {@code ScapeAcquisitionSettings} to use
      */
     public void updateSettings(final ScapeAcquisitionSettings acqSettings) {
         asb_ = new ScapeAcquisitionSettings.Builder(acqSettings);
@@ -321,7 +321,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     }
 
     /**
-     * Build the {@code DefaultAcquisitionSettingsSCAPE} with the builder and update settings.
+     * Build the {@code ScapeAcquisitionSettings} with the builder and update settings.
      */
     public void updateSettings() {
         // Build fully before assigning: acqSettings_ is read from other threads, and a second

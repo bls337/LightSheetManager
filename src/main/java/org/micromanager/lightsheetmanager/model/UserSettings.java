@@ -114,10 +114,23 @@ public class UserSettings {
     }
 
     /**
-     * Load {@link AcquisitionSettings} from a JSON file.
+     * Load {@link AcquisitionSettings} from JSON text.
+     *
+     * <p>The text is what a settings file holds, not the path to the file. It is not merged with
+     * the default settings as the settings saved in the profile are, so every settings block must
+     * be present.
+     *
+     * @param json the acquisition settings as JSON text
+     * @param notify true to show the loaded settings in the user interface
+     * @throws IllegalArgumentException if the text is empty or the JSON {@code null}
+     * @throws com.google.gson.JsonParseException if the text is not a JSON object or a value has
+     *         the wrong type
+     * @throws NullPointerException if a settings block is missing
      */
     public void loadFromJson(final String json, final boolean notify) {
         // TODO: switch this based on microscope geometry type
+        // TODO: merge in the default settings as the startup load does, so a missing settings
+        // block takes its default value instead of throwing a NullPointerException below
         var settings = ScapeAcquisitionSettings.fromJson(json, ScapeAcquisitionSettings.class);
         if (settings == null) {
             throw new IllegalArgumentException("the text holds no acquisition settings");

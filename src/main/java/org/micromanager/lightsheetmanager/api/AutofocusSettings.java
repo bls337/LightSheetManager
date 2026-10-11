@@ -23,7 +23,7 @@ public interface AutofocusSettings {
     boolean enabled();
 
     /**
-     * Returns the number of images used in for autofocus routine.
+     * Returns the number of images used for the autofocus routine.
      *
      * @return the number of images
      */
