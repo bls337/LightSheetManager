@@ -361,11 +361,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return false;
         }
 
-        studio_.events().registerForEvents(this);
-        // commented because this is prob specific to MM MDAs
-//        studio_.events().post(new DefaultAcquisitionStartedEvent(datastore_, this,
-//              acquisitionSettings));
-
         final String[] cameraNames = resolveCameraNames(settings, demoMode);
 
         // read once, before the acquisition starts, so every channel's offset has the same origin
@@ -1005,12 +1000,13 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                             // AcqEngJ split the merge and start one more camera sequence than the
                             // controller was armed to deliver, which then waited for frames that
                             // never arrived.
-                            // VOLUME_HW reaches this branch too and is filed wrong when it does:
+                            // VOLUME_HW with more than one channel is filed wrong on this branch:
                             // it switches channel once per volume, so it needs the channel axis
                             // outside the z axis rather than innermost. The channel panel steers
                             // users away from it but does not write the corrected mode back to the
                             // settings, so a stored profile or an API caller still arrives here.
-                            // Nothing refuses it on this path yet.
+                            // doHardwareCalculations refuses it on PLogic runs; demo and NIDAQ
+                            // runs skip that check and still reach this branch.
                             currentAcquisition_.submitEventIterator(
                                     LightSheetEventAdapter.createChannelPerSliceAcqEvents(
                                             baseEvent.copy(), settings, cameraNames,
@@ -1392,9 +1388,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
         originalChannelPreset_ = null;
-
-        // unregister to stop ghost events
-        studio_.events().unregisterForEvents(this);
 
         // start polling for navigation panel
         if (isPolling_) {
