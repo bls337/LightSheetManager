@@ -14,7 +14,6 @@ import java.awt.Rectangle;
 public class DemoCamera extends CameraBase {
 
     public static class Properties {
-        public static final String BINNING = "Binning";
         public static final String X_RESOLUTION = "OnCameraCCDXSize";
         public static final String Y_RESOLUTION = "OnCameraCCDYSize";
         public static final String READOUT_TIME = "ReadoutTime";
@@ -29,22 +28,6 @@ public class DemoCamera extends CameraBase {
         // do nothing - no camera trigger modes - always internal - log for debug convenience
         studio_.logs().logMessage(
                 "setTriggerMode(" + cameraMode + ") called but the DemoCamera is always in internal mode.");
-    }
-
-    @Override
-    public void setBinning() {
-        //setProperty(Properties.BINNING); // TODO: need to modify LightSheetCamera interface to take param
-    }
-
-    @Override
-    public int getBinning() {
-        final String binning = getProperty(Properties.BINNING);
-        final int factor = Integer.parseInt(binning.substring(0, 1));
-        if (factor < 1) {
-            studio_.logs().showError("Was not able to get camera binning factor");
-            return 1;
-        }
-        return Integer.parseInt(binning.substring(0, 1));
     }
 
     @Override

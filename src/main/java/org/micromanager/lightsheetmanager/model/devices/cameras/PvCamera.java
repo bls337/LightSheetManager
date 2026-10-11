@@ -20,7 +20,6 @@ public class PvCamera extends CameraBase {
     }
 
     public static class Properties {
-        public static final String BINNING = "Binning";
         public static final String CHIP_NAME = "ChipName";
         public static final String TRIGGER_MODE = "TriggerMode";
 
@@ -56,22 +55,6 @@ public class PvCamera extends CameraBase {
             default:
                 break;
         }
-    }
-
-    @Override
-    public void setBinning() {
-
-    }
-
-    @Override
-    public int getBinning() {
-        final String binning = getProperty(Properties.BINNING);
-        final int factor = Integer.parseInt(binning.substring(0, 1));
-        if (factor < 1) {
-            studio_.logs().showError("Was not able to get camera binning factor");
-            return 1;
-        }
-        return Integer.parseInt(binning.substring(0, 1));
     }
 
     @Override

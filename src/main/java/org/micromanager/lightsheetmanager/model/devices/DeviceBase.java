@@ -169,6 +169,15 @@ public class DeviceBase {
         return devices.toArray();
     }
 
+    public String[] getAllowedPropertyValues(final String propertyName) {
+        try {
+            return core_.getAllowedPropertyValues(deviceName_, propertyName).toArray();
+        } catch (Exception e) {
+            studio_.logs().logError("Could not get the allowed values of the \"" + propertyName + "\" property.");
+            return new String[0];
+        }
+    }
+
     public String[] getEditableProperties(final String[] properties) {
         return Arrays.stream(properties)
                 .filter(p -> !isPropertyPreInit(p))

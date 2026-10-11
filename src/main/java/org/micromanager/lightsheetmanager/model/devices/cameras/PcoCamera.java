@@ -20,7 +20,6 @@ public class PcoCamera extends CameraBase {
 
     public static class Properties {
         public static final String CAMERA_TYPE = "CameraType";
-        public static final String BINNING = "Binning";
         public static final String TRIGGER_MODE = "Triggermode";
         public static final String LINE_TIME = "Line Time [us]";
         public static final String PIXEL_RATE = "PixelRate";
@@ -53,23 +52,6 @@ public class PcoCamera extends CameraBase {
             default:
                 break;
         }
-    }
-
-    // TODO: impl
-    @Override
-    public void setBinning() {
-
-    }
-
-    @Override
-    public int getBinning() {
-        final String binning = getProperty(Properties.BINNING);
-        final int factor = Integer.parseInt(binning.substring(0, 1));
-        if (factor < 1) {
-            studio_.logs().showError("Was not able to get camera binning factor");
-            return 1;
-        }
-        return Integer.parseInt(binning.substring(0, 1));
     }
 
     @Override
