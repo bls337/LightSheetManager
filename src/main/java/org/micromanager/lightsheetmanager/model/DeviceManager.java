@@ -148,11 +148,14 @@ public class DeviceManager {
                         ASIPiezo piezo = new ASIPiezo(studio_, deviceName);
                         addDevice(propertyName, deviceName, piezo);
                         devicesAdded.put(deviceName, piezo);
-                    }
-                    if (deviceName.contains("ZStage")) {
+                    } else if (deviceName.contains("ZStage")) {
                         ASIZStage zStage = new ASIZStage(studio_, deviceName);
                         addDevice(propertyName, deviceName, zStage);
                         devicesAdded.put(deviceName, zStage);
+                    } else {
+                        studio_.logs().logError("DeviceManager: " + propertyName + " names "
+                                + deviceName + ", a Tiger stage whose label has neither Piezo "
+                                + "nor ZStage in it, so it is ignored");
                     }
                 } else {
                     // generic stage device
