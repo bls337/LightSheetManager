@@ -57,6 +57,11 @@ public class NavigationPanel extends Panel {
         cbxPollPositions_ = new CheckBox("Poll Positions",
                 model_.pluginSettings().isPollingPositions());
 
+        btnHaltDevices_.setToolTipText(
+                "Stop every stage and piezo at once. This does not stop an acquisition.");
+        cbxPollPositions_.setToolTipText(
+                "Read the device positions in the background and show them on this tab.");
+
         // Property prefixes
         final String illum = "Illum";
         final String imaging = "Imaging";

@@ -100,6 +100,13 @@ public class CalibrationPanel extends Panel {
 
         btnRunAutofocus_.setEnabled(false);
 
+        final String name = (geometryType == GeometryType.SCAPE) ? "sheet" : "beam";
+        btnUpdate_.setToolTipText("Set the piezo offset and the imaging center from the current "
+                + "piezo and slice positions. The " + name + " must be on.");
+        txtSlope_.setToolTipText("Galvo constant in μm per degree. Press Enter to apply.");
+        txtOffset_.setToolTipText(
+                "Piezo offset in μm. Press Enter to apply. This also sets the imaging center.");
+
         lblSlopeValue_.setMinimumSize(new Dimension(74, 20));
         lblOffsetValue_.setMinimumSize(new Dimension(74, 20));
 

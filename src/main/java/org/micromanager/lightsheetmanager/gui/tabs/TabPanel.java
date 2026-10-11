@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.LightSheetManagerFrame;
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
@@ -76,6 +77,15 @@ public class TabPanel extends Panel {
             index = tabbedPane_.getTabCount();
             tabbedPane_.add(tabName, setupPathTab);
             tabbedPane_.setTabComponentAt(index, createTabTitle(tabName));
+            if (devices_.isUsingPLogic()) {
+                // set on the tab and not on its title label: a label with a tooltip takes the
+                // mouse clicks, and the tab could then no longer be selected by its title
+                final boolean isScape = devices_.adapter().geometry() == GeometryType.SCAPE;
+                final String name = isScape ? "sheet" : "beam";
+                tabbedPane_.setToolTipTextAt(index, "Opening this tab moves the imaging piezo "
+                        + "and the " + name + " to the imaging center and sets the " + name
+                        + " to match the " + (isScape ? "Sheet" : "Beam") + " box.");
+            }
             setupPathTabs_.add(setupPathTab);
         }
 

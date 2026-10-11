@@ -99,7 +99,12 @@ public class PositionPanel extends Panel implements Subscriber, ListeningPanel {
         lblSlicePositionValue_.setMinimumSize(new Dimension(60, 20));
 
         // tooltips
-        btnImagingCenterGo_.setToolTipText("Move \"Imaging Piezo\" position to \"Imaging Center\" value.");
+        btnImagingCenterGo_.setToolTipText("Move \"Imaging Piezo\" to the \"Imaging Center\" "
+                + "value and the slice position to match it.");
+        txtSlicePosition_.setToolTipText(
+                "Type a slice position in degrees and press Enter to move there.");
+        txtImagingPosition_.setToolTipText(
+                "Type an imaging piezo position in μm and press Enter to move there.");
         //btnImagingCenterSet_.setToolTipText("Set \"Imaging Center\" value to \"Imaging Piezo\" position. ");
         btnSliceZero_.setToolTipText("Move \"Slice Position\" position to 0 degrees.");
         btnImagingZero_.setToolTipText("Move \"Imaging Piezo\" position to 0 μm.");

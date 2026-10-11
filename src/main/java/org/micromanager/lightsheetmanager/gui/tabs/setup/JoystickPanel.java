@@ -111,6 +111,13 @@ public class JoystickPanel extends Panel {
         cmbLeftWheel_ = new ComboBox<>(wheelLabels, previousLeftWheel_, 100, 24);
         cmbRightWheel_ = new ComboBox<>(wheelLabels, previousRightWheel_, 100, 24);
 
+        cmbJoystick_.setToolTipText(
+                "Choose what the joystick moves. The previous choice stops following it.");
+        cmbLeftWheel_.setToolTipText(
+                "Choose what the left wheel moves. The previous choice stops following it.");
+        cmbRightWheel_.setToolTipText(
+                "Choose what the right wheel moves. The previous choice stops following it.");
+
         add(lblJoystick, "");
         add(cmbJoystick_, "wrap");
         add(lblLeftWheel, "");
