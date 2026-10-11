@@ -131,6 +131,15 @@ public class LightSheetManagerFrame extends JFrame {
     }
 
     /**
+     * Allows or blocks selecting another tab, as during an acquisition.
+     *
+     * @param enabled true to allow selecting another tab
+     */
+    public void setTabsEnabled(final boolean enabled) {
+        tabPanel_.setTabsEnabled(enabled);
+    }
+
+    /**
      * Detect settings after the model is loaded,
      * ask to change settings with dialogs.
      */
