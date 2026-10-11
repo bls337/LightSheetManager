@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.components.Button;
+import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
@@ -29,6 +30,8 @@ public class CameraTab extends Panel implements ListeningPanel {
     private Spinner spnOffsetY_;
     private Spinner spnWidth_;
     private Spinner spnHeight_;
+
+    private ComboBox<String> cmbBinning_;
 
     private final LightSheetManager model_;
 
@@ -78,8 +81,19 @@ public class CameraTab extends Panel implements ListeningPanel {
         pnlROI.add(spnHeight_, "wrap");
         pnlROI.add(btnCurrentROI_, "span 2");
 
+        final Panel pnlBinning = new Panel("Binning");
+
+        // TODO: list the binnings the imaging cameras share and enable the combo box
+        cmbBinning_ = new ComboBox<>(new String[0], null, 80, 20);
+        cmbBinning_.setEnabled(false);
+        cmbBinning_.setToolTipText("Binning cannot be set here yet.");
+
+        pnlBinning.add(new JLabel("All imaging cameras:"), "");
+        pnlBinning.add(cmbBinning_, "wrap");
+
         add(lblTitle, "wrap");
         add(pnlROI, "wrap");
+        add(pnlBinning, "wrap");
     }
 
     // TODO: should change roi for all cameras?
