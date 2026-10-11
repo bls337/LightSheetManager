@@ -145,7 +145,8 @@ public class HamamatsuCamera extends CameraBase {
         double readoutTimeMs = 10.0;
         switch (cameraMode) {
             case VIRTUAL_SLIT:
-                if (getProperty(Properties.CAMERA_BUS).equals(Values.USB3)) {
+                // the Fusion does seem to support light sheet mode over USB3
+                if (!isFusion_ && getProperty(Properties.CAMERA_BUS).equals(Values.USB3)) {
                     readoutTimeMs = 10000;  // absurdly large, light sheet mode over USB3 isn't supported by Flash4, but we are set up to decide available modes by device library and not a property
                 } else {
                     Rectangle roi = getUnbinnedROI();
