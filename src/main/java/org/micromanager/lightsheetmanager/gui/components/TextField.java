@@ -35,7 +35,7 @@ public class TextField extends JTextField {
     }
 
     /**
-     * Registers a listener that checks the current text whenever the document changes,
+     * Registers a listener that checks the text now and whenever the document changes,
      * and shows the error color while the text has a problem.
      *
      * @param problemOf returns why the text is invalid, or null when it is valid
@@ -67,6 +67,7 @@ public class TextField extends JTextField {
         };
 
         getDocument().addDocumentListener(docListener);
+        validate.run(); // check the text the field already holds
     }
 
     /**
