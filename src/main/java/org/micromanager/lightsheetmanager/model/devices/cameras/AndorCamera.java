@@ -201,8 +201,11 @@ public class AndorCamera extends CameraBase {
 
     @Override
     public double getResetTime(CameraMode cameraMode) {
+        if (cameraMode == CameraMode.VIRTUAL_SLIT) {
+            return 0.0;
+        }
         final double rowReadoutTime = getRowReadoutTime();
-        final double cameraReadoutTime = getReadoutTime(cameraMode);
+        final double cameraReadoutTime = getReadoutTime(CameraMode.EDGE);
         int numRowsOverhead = 1; // TODO: change? or keep for explanatory purposes
         return cameraReadoutTime + (numRowsOverhead * rowReadoutTime);
     }

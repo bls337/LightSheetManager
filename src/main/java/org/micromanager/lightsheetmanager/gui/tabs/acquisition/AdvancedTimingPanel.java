@@ -80,8 +80,8 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
         spnCameraExposure_ = Spinner.createDoubleSpinner(
                 timingSettings.cameraExposureMs(), 0.0, 1000.0, 0.25);
 
-        cbxAlternateScanDirection_ = new CheckBox(
-                "Alternate scan direction", false, CheckBox.LEFT);
+        cbxAlternateScanDirection_ = new CheckBox("Alternate scan direction",
+                timingSettings.useAlternateScanDirection(), CheckBox.LEFT);
 
         add(lblDelayBeforeScan_, "");
         add(spnDelayBeforeScan_, "wrap");
