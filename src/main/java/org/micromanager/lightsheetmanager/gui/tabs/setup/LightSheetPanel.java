@@ -189,17 +189,20 @@ public class LightSheetPanel extends Panel {
 //            //System.out.println("sheetOffset value: " + strValue);
 //        });
 
-        txtSheetOffset_.registerListener(() -> {
-            final double value = Double.parseDouble(txtSheetOffset_.getText());
-            //final double total = Math.max(-1.0, Math.min(1.0, value));
-            model_.acquisitions().settingsBuilder()
-                    .sheetCalibrationBuilder().sheetOffset(value);
-           // currentOffset_ = total;
+        // the offset text field is only built for SCAPE; the diSPIM layout uses the slider
+        if (txtSheetOffset_ != null) {
+            txtSheetOffset_.registerListener(() -> {
+                final double value = Double.parseDouble(txtSheetOffset_.getText());
+                //final double total = Math.max(-1.0, Math.min(1.0, value));
+                model_.acquisitions().settingsBuilder()
+                        .sheetCalibrationBuilder().sheetOffset(value);
+               // currentOffset_ = total;
 //            SwingUtilities.invokeLater(() -> {
 //                lblSlopeOffset_.setText(String.format("%.3f", total));
 //                //sldSheetOffset_.setDouble(total);
 //            });
-        });
+            });
+        }
 
 //        btnCenterOffset_.registerListener(() -> {
 //            //System.out.println("center offset pressed");

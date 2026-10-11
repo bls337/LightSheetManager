@@ -180,7 +180,9 @@ public class DeviceAdapter extends DeviceBase {
      * @return {@code true} if the device is not "Undefined".
      */
     public boolean hasDevice(final String deviceName) {
-        return !getProperty(deviceName).equals(UNDEFINED);
+        // a property the adapter does not create is not a device either: a two path
+        // configuration has Imaging1Focus and Imaging2Focus and no ImagingFocus
+        return hasProperty(deviceName) && !getProperty(deviceName).equals(UNDEFINED);
     }
 
 }
