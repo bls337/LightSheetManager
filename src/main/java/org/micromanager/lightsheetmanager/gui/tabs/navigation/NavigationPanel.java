@@ -86,21 +86,17 @@ public class NavigationPanel extends Panel {
             final String deviceName = deviceMap.get(propertyName);
 
             // TODO: only add certain kinds of devices
-            //System.out.println(propertyName);
             final DeviceType deviceType = deviceTypeMap.get(propertyName);
             if (deviceType == DeviceType.CameraDevice) {
                 continue; // don't add cameras to axis list
             }
 
-            //System.out.println(property);
             if (propertyName.startsWith(illum)) {
                 // check if String contains digit TODO: or switch based on microscope geometry?
                 boolean containsDigit = containsDigit(propertyName);
                 if (containsDigit) {
                     // DISPIM
-                    System.out.println("propertyName: " + propertyName);
                     final int pathNum = Character.getNumericValue(propertyName.charAt(illum.length()));
-                    System.out.println("pathNum: " + pathNum);
                     // galvo devices
                     ControlPanel.Axis axis = ControlPanel.Axis.NONE;
                     if (propertyName.endsWith("Beam")) {
@@ -111,7 +107,6 @@ public class NavigationPanel extends Panel {
                     ControlPanel controlPanel = new ControlPanel(
                             model_, propertyName, deviceName, deviceType, axis, ControlPanel.Units.MICRONS);
                     illumProperties.get(pathNum - 1).add(controlPanel);
-                    System.out.println(propertyName + " " + pathNum + " added to illum properties.");
                 } else {
                     // does not contain digit: SCAPE geometry etc
                     final int pathNum = 1;
@@ -124,7 +119,6 @@ public class NavigationPanel extends Panel {
                         illumProperties.get(pathNum - 1).add(controlPanelX);
                         illumProperties.get(pathNum - 1).add(controlPanelY);
                     }
-                    System.out.println(propertyName + " " + pathNum + " added to illum properties.");
                 }
             } else if (propertyName.startsWith(imaging)) {
                 boolean containsDigit = containsDigit(propertyName);
@@ -137,7 +131,6 @@ public class NavigationPanel extends Panel {
                 ControlPanel controlPanel = new ControlPanel(
                       model_, propertyName, deviceName, deviceType, ControlPanel.Axis.NONE, ControlPanel.Units.MICRONS);
                 imagingProperties.get(pathNum - 1).add(controlPanel);
-                System.out.println(propertyName + " " + pathNum + " added to imaging properties.");
             } else {
                 // propertyName doesn't start with "Illum" or "Imaging"
                 if (deviceType == DeviceType.XYStageDevice) {
@@ -147,17 +140,12 @@ public class NavigationPanel extends Panel {
                           model_, propertyName, deviceName, deviceType, ControlPanel.Axis.Y, ControlPanel.Units.MICRONS);
                     stageProperties.add(controlPanelX);
                     stageProperties.add(controlPanelY);
-
-                    System.out.println(propertyName + " added to misc properties");
                 } else if (deviceType == DeviceType.StageDevice) {
                     ControlPanel controlPanel = new ControlPanel(
                           model_, propertyName, deviceName, deviceType, ControlPanel.Axis.NONE, ControlPanel.Units.MICRONS);
                     stageProperties.add(controlPanel);
-
-                    System.out.println(propertyName + " added to misc properties");
                 } else {
                     // TODO: added this so we don't add PLC card here, hopefully nothing else breaks
-                    System.out.println(propertyName + " NOT added to misc properties");
                 }
             }
             devicesFound++;
@@ -245,7 +233,6 @@ public class NavigationPanel extends Panel {
             } else {
                 model_.positions().stopPolling();
             }
-            //System.out.println("poll positions isSelected: " + cbxPollPositions_.isSelected());
         });
 
     }
