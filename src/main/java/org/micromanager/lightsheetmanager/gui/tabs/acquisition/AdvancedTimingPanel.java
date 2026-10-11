@@ -253,9 +253,7 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
             spnScanDuration_.setValue(settingsScape.timing().scanDurationMs());
             spnDelayBeforeLaser_.setValue(settingsScape.timing().delayBeforeLaserMs());
             spnLaserTriggerDuration_.setValue(settingsScape.timing().laserTriggerDurationMs());
-            spnDelayBeforeCamera_.setValue(settingsScape.timing().cameraTriggerDurationMs());
-            spnLaserTriggerDuration_.setValue(settingsScape.timing().cameraTriggerDurationMs());
-            spnDelayBeforeCamera_.setDouble(settingsScape.timing().cameraTriggerDurationMs());
+            spnDelayBeforeCamera_.setValue(settingsScape.timing().delayBeforeCameraMs());
             spnCameraTriggerDuration_.setDouble(settingsScape.timing().cameraTriggerDurationMs());
             spnCameraExposure_.setValue(settingsScape.timing().cameraExposureMs());
             cbxAlternateScanDirection_.setSelected(settingsScape.timing().useAlternateScanDirection());
