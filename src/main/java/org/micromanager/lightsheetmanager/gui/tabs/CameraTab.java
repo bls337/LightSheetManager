@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.LightSheetManager;
 import org.micromanager.lightsheetmanager.gui.components.Button;
+import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
 import org.micromanager.lightsheetmanager.gui.components.Panel;
 import org.micromanager.lightsheetmanager.gui.components.Spinner;
@@ -29,6 +30,8 @@ public class CameraTab extends Panel implements ListeningPanel {
     private Spinner spnOffsetY_;
     private Spinner spnWidth_;
     private Spinner spnHeight_;
+
+    private ComboBox<String> cmbBinning_;
 
     private final LightSheetManager model_;
 
@@ -62,6 +65,25 @@ public class CameraTab extends Panel implements ListeningPanel {
         spnWidth_ = Spinner.createIntegerSpinner(0, 0, Integer.MAX_VALUE, 1, 6);
         spnHeight_ = Spinner.createIntegerSpinner(0, 0, Integer.MAX_VALUE, 1, 6);
 
+        // these buttons write the roi to the cameras at once, including cameras that are acquiring
+        final String notDuringRun = " Do not use while an acquisition is running.";
+        btnFullROI_.setToolTipText(
+                "Set every active imaging camera to its full sensor." + notDuringRun);
+        btnHalfROI_.setToolTipText("Set every active imaging camera to a centered ROI of half "
+                + "the sensor width and height." + notDuringRun);
+        btnQuarterROI_.setToolTipText("Set every active imaging camera to a centered ROI of a "
+                + "quarter of the sensor width and height." + notDuringRun);
+        btnEigthROI_.setToolTipText("Set every active imaging camera to a centered ROI of an "
+                + "eighth of the sensor width and height." + notDuringRun);
+        btnCustomROI_.setToolTipText("Set every active imaging camera to the offset and size "
+                + "below." + notDuringRun);
+        btnCurrentROI_.setToolTipText(
+                "Fill in the fields above from the first imaging camera's current ROI.");
+        spnOffsetX_.setToolTipText("Left edge of the Custom ROI, in binned pixels.");
+        spnOffsetY_.setToolTipText("Top edge of the Custom ROI, in binned pixels.");
+        spnWidth_.setToolTipText("Width of the Custom ROI, in binned pixels.");
+        spnHeight_.setToolTipText("Height of the Custom ROI, in binned pixels.");
+
         pnlROI.add(btnUnchangedROI_, "span 2, wrap");
         pnlROI.add(btnFullROI_, "");
         pnlROI.add(btnHalfROI_, "wrap");
@@ -78,8 +100,19 @@ public class CameraTab extends Panel implements ListeningPanel {
         pnlROI.add(spnHeight_, "wrap");
         pnlROI.add(btnCurrentROI_, "span 2");
 
+        final Panel pnlBinning = new Panel("Binning");
+
+        // TODO: list the binnings the imaging cameras share and enable the combo box
+        cmbBinning_ = new ComboBox<>(new String[0], null, 80, 20);
+        cmbBinning_.setEnabled(false);
+        cmbBinning_.setToolTipText("Binning cannot be set here yet.");
+
+        pnlBinning.add(new JLabel("All imaging cameras:"), "");
+        pnlBinning.add(cmbBinning_, "wrap");
+
         add(lblTitle, "wrap");
         add(pnlROI, "wrap");
+        add(pnlBinning, "wrap");
     }
 
     // TODO: should change roi for all cameras?

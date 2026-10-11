@@ -47,6 +47,9 @@ public class ScannerPanel extends Panel implements ListeningPanel {
         if (isUsingPLogic_) {
             final ASIScanner scanner = model_.devices().device("IllumSlice");
             cbxBeamExc_.setSelected(scanner.isBeamOn());
+            final String name = (geometryType == GeometryType.SCAPE) ? "sheet" : "beam";
+            cbxBeamExc_.setToolTipText("Turn the " + name + " on or off. Opening this tab sets the "
+                    + name + " to match this box.");
         }
 
         switch (geometryType) {

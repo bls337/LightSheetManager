@@ -91,6 +91,12 @@ public class CameraPanel extends Panel {
                 add(btnLiveMode_, "span 2");
                 break;
             case SCAPE:
+                btnInvertedPath_.setToolTipText("Show live images from the preview camera. "
+                        + "This makes it the current camera and sets it to internal trigger.");
+                btnLiveMode_.setToolTipText("Show live images from the first imaging camera. "
+                        + "This makes it the current camera and sets it to internal trigger.");
+                cmbPreset_.setToolTipText("Apply a preset of the \"" + CONFIG_GROUP
+                        + "\" configuration group. The light path switches at once.");
                 add(btnInvertedPath_, "wrap");
                 add(btnLiveMode_, "wrap");
                 add(new JLabel("Path Preset:"), "wrap");
