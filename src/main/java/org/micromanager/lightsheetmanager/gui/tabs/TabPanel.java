@@ -106,7 +106,6 @@ public class TabPanel extends Panel {
         } else {
             tabbedPane_.setSelectedIndex(0); // Navigation Tab
         }
-        tabbedPane_.setSelectedIndex(numImagingPaths + 1);
 
         // add ui elements to the panel
         add(tabbedPane_, "growx, growy");
