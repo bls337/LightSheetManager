@@ -121,7 +121,7 @@ public class SettingsAdapter {
                 value -> model_.acquisitions().settingsBuilder()
                         .autofocusBuilder().enabled((boolean) value));
 
-        // useMovementCorrection - not used, old planar correction feature
+        // useMovementCorrection - not used, motion correction (follows sample drift between time points)
         // acquireBothCamerasSimultaneously - not used, uses camera order to specify which cameras are active
         // numSides - not used, SCAPE microscopes only have a single view
         // firstSideIsA - not used, SCAPE microscopes only have a single view
