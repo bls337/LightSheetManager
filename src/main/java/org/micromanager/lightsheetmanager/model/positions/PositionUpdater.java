@@ -126,7 +126,8 @@ public class PositionUpdater implements Publisher {
                positions_.put(device, model_.core().getGalvoPosition(deviceName));
             }
          } catch (Exception e) {
-            model_.studio().logs().logError("Error in updatePositions()");
+            model_.studio().logs().logError("Position polling could not read " + device
+                  + " (" + deviceName + "): " + e.getMessage());
          }
       }
    }
