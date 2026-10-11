@@ -64,7 +64,7 @@ public interface SliceSettingsLightSheet {
         Builder scanSettleTime(final double ms);
 
         /**
-         * Sets the scan settle reset in milliseconds.
+         * Sets the scan reset time in milliseconds.
          *
          * @param ms the scan reset time in milliseconds
          * @return {@code this} builder
