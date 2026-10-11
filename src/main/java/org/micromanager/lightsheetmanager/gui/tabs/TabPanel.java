@@ -158,6 +158,19 @@ public class TabPanel extends Panel {
         }
     }
 
+    /**
+     * Allows or blocks selecting another tab. The selected tab stays usable.
+     *
+     * @param enabled true to allow selecting another tab
+     */
+    public void setTabsEnabled(final boolean enabled) {
+        tabbedPane_.setEnabled(enabled);
+        // the tab titles are labels with their own color, so they do not grey out with the pane
+        for (int i = 0; i < tabbedPane_.getTabCount(); i++) {
+            tabbedPane_.getTabComponentAt(i).setEnabled(enabled);
+        }
+    }
+
     public AcquisitionTab getAcquisitionTab() {
         return acquisitionTab_;
     }

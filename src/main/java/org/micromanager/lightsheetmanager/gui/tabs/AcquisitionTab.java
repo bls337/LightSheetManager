@@ -327,6 +327,7 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
             btnPauseAcquisition_.setEnabled(false);
             btnSpeedTest_.setEnabled(true);
             btnTestAcquisition_.setEnabled(true);
+            frame_.setTabsEnabled(true);
         });
     }
 
@@ -346,6 +347,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
     }
 
     private void waitForAcquisition(final Future<?> acqFinished) {
+        // lock the other tabs during the run (script runs do not come through here)
+        frame_.setTabsEnabled(false);
         // Launch new thread to update the button when the acquisition is complete
         new Thread(() -> {
             try {
