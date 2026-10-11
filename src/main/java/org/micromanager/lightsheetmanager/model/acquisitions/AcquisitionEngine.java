@@ -70,7 +70,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     private volatile boolean awaitingTimePoint_ = false;
 
     // true while finish() restores the system after a run, for the stop and abort log lines
-    private volatile boolean tearingDown_ = false;
+    private volatile boolean cleaningUp_ = false;
 
     private final AutofocusAdapter autofocus_;
 
@@ -297,8 +297,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      * Names the stage the run is in, for a log line reading "... during &lt;stage&gt;".
      */
     private String runPhase() {
-        if (tearingDown_) {
-            return "teardown";
+        if (cleaningUp_) {
+            return "cleanup";
         }
         if (currentAcquisition_ != null && !currentAcquisition_.getDataSink().isFinished()) {
             return "acquisition";
@@ -433,13 +433,13 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             } catch (Exception e) {
                 model_.logging().reportError(e);
             } finally {
-                tearingDown_ = true;
+                cleaningUp_ = true;
                 try {
                     finish(); // cleanup any resources
                 } catch (Exception e) {
                     model_.logging().reportError(e, "Error during acquisition cleanup");
                 } finally {
-                    tearingDown_ = false;
+                    cleaningUp_ = false;
                     // must ALWAYS run: if currentAcquisition_ is left set, every future
                     // acquisition is rejected until the plugin restarts
                     currentAcquisition_ = null;
