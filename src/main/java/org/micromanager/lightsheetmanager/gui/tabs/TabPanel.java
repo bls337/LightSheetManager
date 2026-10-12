@@ -64,6 +64,9 @@ public class TabPanel extends Panel {
         int index = tabbedPane_.getTabCount();
         tabbedPane_.addTab(tabName, navigationTab_);
         tabbedPane_.setTabComponentAt(index, createTabTitle(tabName));
+        // tab tooltips go on the tab and not on its title label, which would take the clicks
+        tabbedPane_.setToolTipTextAt(index,
+                "Move stages, galvos and piezos, and read their positions.");
 
         // create a setup path tab for each imaging path
         final int numImagingPaths = devices_.adapter().numImagingPaths();
@@ -93,6 +96,7 @@ public class TabPanel extends Panel {
         index = tabbedPane_.getTabCount();
         tabbedPane_.addTab(tabName, acquisitionTab_);
         tabbedPane_.setTabComponentAt(index, createTabTitle(tabName));
+        tabbedPane_.setToolTipTextAt(index, "Set up and run an acquisition.");
 
         tabName = "Autofocus";
         index = tabbedPane_.getTabCount();
@@ -103,11 +107,14 @@ public class TabPanel extends Panel {
         index = tabbedPane_.getTabCount();
         tabbedPane_.addTab(tabName, cameraTab_);
         tabbedPane_.setTabComponentAt(index, createTabTitle(tabName));
+        tabbedPane_.setToolTipTextAt(index, "Set the ROI of the active imaging cameras.");
 
         tabName = "Settings";
         index = tabbedPane_.getTabCount();
         tabbedPane_.addTab(tabName, settingsTab_);
         tabbedPane_.setTabComponentAt(index, createTabTitle(tabName));
+        tabbedPane_.setToolTipTextAt(index, "Microscope details, stage scan settings, "
+                + "error reporting and the device configuration group.");
 
         // set acquisition tab to default
         final int tabIndex = findTabNameIndex("Acquisition");

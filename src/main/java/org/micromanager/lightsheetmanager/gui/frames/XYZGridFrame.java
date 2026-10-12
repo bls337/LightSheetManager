@@ -87,6 +87,8 @@ public class XYZGridFrame extends JFrame {
         btnRunOverviewAcq_ = new Button("Run Overview Acquisition", 160, 26);
         btnRunOverviewAcq_.setEnabled(false);
 
+        btnEditPositionList_.setToolTipText("Open the Micro-Manager position list editor.");
+
         cbxUseX_ = new CheckBox("Slices from stage coordinates", false);
         cbxUseY_ = new CheckBox("Grid in Y", false);
         cbxUseZ_ = new CheckBox("Grid in Z", false);
