@@ -53,8 +53,9 @@ public class SettingsTab extends Panel implements ListeningPanel {
         isUsingScanSettings_ = model_.devices().hasStageScanning();
 
         btnCreateConfigGroup_ = new Button("Create Devices Configuration Group", 220, 30);
-        btnCreateConfigGroup_.setToolTipText("Creates or updates the \"System::Startup\" configuration " +
-                "group with all editable properties from the Light Sheet Manager device adapter.");
+        btnCreateConfigGroup_.setToolTipText("Add each editable Light Sheet Manager device "
+                + "adapter property missing from the \"System::Startup\" configuration group, "
+                + "with the value Undefined. Existing entries are kept.");
 
         final JLabel lblGeometryType = new JLabel("Microscope Geometry: "
                 + model_.devices().adapter().geometry());
@@ -103,6 +104,19 @@ public class SettingsTab extends Panel implements ListeningPanel {
         cbxReturnToStart_ = new CheckBox("Return to original position after scan",
                 settings.stageScan().returnToStart());
 
+        spnScanAcceleration_.setToolTipText(
+                "Scales the stage acceleration time. Larger values ramp more gently.");
+        // these describe the SCAPE stage scan, which the diSPIM engine does not match yet
+        if (model_.devices().adapter().geometry() == GeometryType.SCAPE) {
+            spnScanFirstViewAngle_.setToolTipText("Angle between the stage and the Path A "
+                    + "objective. Stage scans use it to turn the slice step into stage travel.");
+            cbxScanFromCurrentPosition_.setToolTipText(
+                    "Start the scan at the position instead of centering the scan on it.");
+            cbxScanNegativeDirection_.setToolTipText("Scan the stage toward decreasing X.");
+            cbxReturnToStart_.setToolTipText("When a stage scan acquisition ends, move the "
+                    + "stage back to where it was when the acquisition started.");
+        }
+
         final Panel pnlLightSheet = new Panel("Light Sheet Scanner");
         pnlLightSheet.setMigLayout(
                 "",
@@ -150,6 +164,12 @@ public class SettingsTab extends Panel implements ListeningPanel {
             if (spnSliceAxisFilterFreq_.getDouble() != sliceAxis) {
                 scanner.setFilterFreqY(spnSliceAxisFilterFreq_.getDouble());
             }
+            // described only here, where there is a scanner for the spinners to write
+            spnSheetAxisFilterFreq_.setToolTipText("Bessel filter frequency of the sheet "
+                    + "axis, written to the scanner at once. The computed slice timing "
+                    + "allows for its delay, except in stage scans.");
+            spnSliceAxisFilterFreq_.setToolTipText(
+                    "Bessel filter frequency of the slice axis, written to the scanner at once.");
         }
         spnLiveScanPeriod_ = Spinner.createIntegerSpinner(20, 2, 10000, 100);
 
@@ -201,8 +221,9 @@ public class SettingsTab extends Panel implements ListeningPanel {
 
         cbxAcquireFailQuietly_ = new CheckBox("Acquisition failures are quiet",
                 model_.pluginSettings().isAcquireFailQuietly());
-        cbxAcquireFailQuietly_.setToolTipText("Log acquisition errors instead of showing dialog " +
-                "boxes, so unattended runs (playlist or scripting) can never hang on an error dialog.");
+        cbxAcquireFailQuietly_.setToolTipText("Write acquisition errors and warnings, "
+                + "including a refused start, to the log instead of a dialog. Questions from "
+                + "the acquisition take their default answer.");
 
         add(pnlScanSettings, "wrap");
         if (isUsingPLogic_) {

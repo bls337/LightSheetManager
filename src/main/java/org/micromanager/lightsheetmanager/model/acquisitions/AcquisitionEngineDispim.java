@@ -13,7 +13,6 @@ import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJMDADataSink;
 import org.micromanager.data.Datastore;
 import org.micromanager.data.internal.DefaultDatastore;
 import org.micromanager.data.internal.DefaultSummaryMetadata;
-import org.micromanager.data.internal.ndtiff.NDTiffAdapter;
 import org.micromanager.internal.MMStudio;
 import org.micromanager.lightsheetmanager.api.data.CameraLibrary;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
@@ -29,7 +28,6 @@ import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 import org.micromanager.lightsheetmanager.model.devices.vendor.ASIScanner;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -212,21 +210,15 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
         String saveDir = acqSettings_.saveDirectory();
         String saveName = acqSettings_.saveNamePrefix();
 
-        DefaultDatastore result = new DefaultDatastore(studio_);
-        try {
-            if (acqSettings_.saveMode() == SaveMode.ND_TIFF) {
-                DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
-            } else if (acqSettings_.saveMode() == SaveMode.MULTIPAGE_TIFF) {
-                DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);
-            } else if (acqSettings_.saveMode() == SaveMode.SINGLEPLANE_TIFF_SERIES) {
-                DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.SINGLEPLANE_TIFF_SERIES);
-            } else {
-                model_.logging().reportError("Unsupported save mode: " + acqSettings_.saveMode());
-                return false;
-            }
-            result.setStorage(new NDTiffAdapter(result, saveDir, true));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (acqSettings_.saveMode() == SaveMode.ND_TIFF) {
+            DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.ND_TIFF);
+        } else if (acqSettings_.saveMode() == SaveMode.MULTIPAGE_TIFF) {
+            DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.MULTIPAGE_TIFF);
+        } else if (acqSettings_.saveMode() == SaveMode.SINGLEPLANE_TIFF_SERIES) {
+            DefaultDatastore.setPreferredSaveMode(studio_, Datastore.SaveMode.SINGLEPLANE_TIFF_SERIES);
+        } else {
+            model_.logging().reportError("Unsupported save mode: " + acqSettings_.saveMode());
+            return false;
         }
 
         //////////////////////////////////////
