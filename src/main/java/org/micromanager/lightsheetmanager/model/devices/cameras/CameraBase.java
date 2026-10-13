@@ -8,8 +8,10 @@ import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BooleanSupplier;
+import java.util.stream.Collectors;
 
 /**
  * This is the base camera class.
@@ -247,6 +249,26 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
     }
 
     /**
+     * Returns the binning factors every given camera offers, ascending.
+     */
+    public static int[] commonAllowedBinnings(final CameraBase[] cameras) {
+        Set<Integer> common = null;
+        for (final CameraBase camera : cameras) {
+            final Set<Integer> offered = Arrays.stream(camera.getAllowedBinnings()).boxed()
+                    .collect(Collectors.toCollection(TreeSet::new));
+            if (common == null) {
+                common = offered;
+            } else {
+                common.retainAll(offered);
+            }
+        }
+        if (common == null) {
+            return new int[0];
+        }
+        return common.stream().mapToInt(Integer::intValue).toArray();
+    }
+
+    /**
      * Parses an adapter's binning value, such as "2" or "2x2", into a factor.
      *
      * @return the factor, or -1 if the value is not a square binning
@@ -336,8 +358,7 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
                     + "; it offers " + Arrays.toString(getAllowedBinnings()));
             return false;
         }
-        // a sequence running without live mode is an acquisition
-        if (!studio_.live().isLiveModeOn() && isSequenceRunning()) {
+        if (isAcquiring()) {
             studio_.logs().logError("camera " + deviceName_
                     + " is acquiring, so its binning was not changed");
             return false;
@@ -409,6 +430,14 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
             }
         }
         return null;
+    }
+
+    /**
+     * Returns true when a sequence runs on this camera outside live mode, so an acquisition
+     * owns it and its frame size must not change.
+     */
+    public boolean isAcquiring() {
+        return !studio_.live().isLiveModeOn() && isSequenceRunning();
     }
 
     private boolean isSequenceRunning() {

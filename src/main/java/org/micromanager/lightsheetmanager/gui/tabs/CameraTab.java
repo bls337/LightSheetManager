@@ -1,6 +1,7 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.LightSheetManager;
+import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
@@ -9,14 +10,23 @@ import org.micromanager.lightsheetmanager.gui.components.Spinner;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
 
 import javax.swing.JLabel;
+import javax.swing.UIManager;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
 public class CameraTab extends Panel implements ListeningPanel {
+
+    private ComboBox<String> cmbBinning_;
+    private JLabel lblBinningState_;
+    private int[] binningFactors_ = new int[0];
+    private boolean refreshingBinning_;
 
     private Button btnUnchangedROI_;
     private Button btnFullROI_;
@@ -31,19 +41,27 @@ public class CameraTab extends Panel implements ListeningPanel {
     private Spinner spnWidth_;
     private Spinner spnHeight_;
 
-    private ComboBox<String> cmbBinning_;
-
     private final LightSheetManager model_;
 
     public CameraTab(final LightSheetManager model) {
         model_ = Objects.requireNonNull(model);
         createUserInterface();
         createEventHandlers();
+        refreshBinning();
     }
 
     private void createUserInterface() {
         final JLabel lblTitle = new JLabel("Camera Settings");
         lblTitle.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
+
+        final Panel pnlBinning = new Panel("Binning");
+
+        cmbBinning_ = new ComboBox<>(new String[0], null, 80, 20);
+        lblBinningState_ = new JLabel(" ");
+
+        pnlBinning.add(new JLabel("Active imaging cameras:"), "wrap");
+        pnlBinning.add(cmbBinning_, "wrap");
+        pnlBinning.add(lblBinningState_, "");
 
         final Panel pnlROI = new Panel("Imaging ROI");
 
@@ -100,23 +118,24 @@ public class CameraTab extends Panel implements ListeningPanel {
         pnlROI.add(spnHeight_, "wrap");
         pnlROI.add(btnCurrentROI_, "span 2");
 
-        final Panel pnlBinning = new Panel("Binning");
-
-        // TODO: list the binnings the imaging cameras share and enable the combo box
-        cmbBinning_ = new ComboBox<>(new String[0], null, 80, 20);
-        cmbBinning_.setEnabled(false);
-        cmbBinning_.setToolTipText("Binning cannot be set here yet.");
-
-        pnlBinning.add(new JLabel("All imaging cameras:"), "");
-        pnlBinning.add(cmbBinning_, "wrap");
-
         add(lblTitle, "wrap");
-        add(pnlROI, "wrap");
         add(pnlBinning, "wrap");
+        add(pnlROI, "wrap");
     }
 
-    // TODO: should change roi for all cameras?
     private void createEventHandlers() {
+        // set the binning on every imaging camera
+        cmbBinning_.registerListener(() -> {
+            // the combo box also fires while it is refilled
+            if (refreshingBinning_) {
+                return;
+            }
+            final int index = cmbBinning_.getSelectedIndex();
+            if (index >= 0 && index < binningFactors_.length) {
+                applyBinning(binningFactors_[index]);
+            }
+        });
+
         // roi is full camera
         btnFullROI_.registerListener(() -> applyROI(this::binnedSensor));
 
@@ -146,6 +165,156 @@ public class CameraTab extends Panel implements ListeningPanel {
                         + "configuration and set as Active on the Acquisition tab.");
             }
         });
+    }
+
+    /**
+     * Sets the binning on every imaging camera, then checks that they still agree.
+     */
+    private void applyBinning(final int factor) {
+        // the tabs are locked during a run from the Acquisition tab, but not during a script run
+        if (model_.acquisitions().isAcquisitionRunning()) {
+            model_.studio().logs().showError(
+                    "The binning cannot be changed during an acquisition.");
+            refreshBinning();
+            return;
+        }
+        final Map<String, CameraBase> active = activeImagingCameras();
+        final CameraBase[] cameras = active.values().toArray(new CameraBase[0]);
+        if (cameras.length == 0) {
+            model_.studio().logs().showError("No imaging camera available; check that a camera is "
+                    + "assigned in the hardware configuration and set as Active on the "
+                    + "Acquisition tab.");
+            return;
+        }
+        // refuse before any camera is written, so the cameras are never left at two sizes
+        for (final Map.Entry<String, CameraBase> entry : active.entrySet()) {
+            if (entry.getValue().isAcquiring()) {
+                model_.studio().logs().showError("The binning cannot be changed while "
+                        + entry.getKey() + " is acquiring.");
+                refreshBinning();
+                return;
+            }
+        }
+
+        final List<String> rejected = new ArrayList<>();
+        for (final Map.Entry<String, CameraBase> entry : active.entrySet()) {
+            if (!entry.getValue().setBinning(factor)) {
+                rejected.add(entry.getKey());
+            }
+        }
+
+        final String mismatch = CameraBase.describeFrameSizeMismatch(cameras);
+        // the slice timing depends on the camera ROI, which a binning change can reset
+        model_.acquisitions().updateDurationLabels();
+        refreshBinning();
+        if (rejected.isEmpty() && mismatch == null) {
+            return;
+        }
+
+        final StringBuilder message = new StringBuilder();
+        if (!rejected.isEmpty()) {
+            message.append("Binning ").append(factor).append("x").append(factor)
+                    .append(" was not set on: ").append(String.join(", ", rejected))
+                    .append(".\n\nSee the CoreLog for the reason.\n\n");
+        }
+        if (mismatch != null) {
+            message.append("The imaging cameras no longer agree on frame size: ")
+                    .append(mismatch)
+                    .append(".\n\nAcquisitions are blocked until they match.");
+        }
+        model_.studio().logs().showError(message.toString().trim());
+    }
+
+    /**
+     * Fills the binning control with the factors every imaging camera offers, and selects the
+     * one they all report, or nothing when they differ.
+     */
+    private void refreshBinning() {
+        refreshingBinning_ = true;
+        try {
+            cmbBinning_.removeAllItems();
+            final Map<String, CameraBase> active = activeImagingCameras();
+            final CameraBase[] cameras = active.values().toArray(new CameraBase[0]);
+            binningFactors_ = CameraBase.commonAllowedBinnings(cameras);
+            for (final int factor : binningFactors_) {
+                cmbBinning_.addItem(factor + "x" + factor);
+            }
+            // adding the first item selects it
+            cmbBinning_.setSelectedIndex(-1);
+            if (cameras.length == 0) {
+                showBinningState("No imaging camera is active.", false);
+            } else {
+                final List<String> lines = new ArrayList<>();
+                int agreed = -1;
+                boolean allKnown = true;
+                boolean agree = true;
+                for (final Map.Entry<String, CameraBase> entry : active.entrySet()) {
+                    final int binning = binningOf(entry.getValue());
+                    if (binning < 1) {
+                        allKnown = false;
+                    } else if (agreed == -1) {
+                        agreed = binning;
+                    } else if (binning != agreed) {
+                        agree = false;
+                    }
+                    lines.add(entry.getKey() + " = "
+                            + (binning > 0 ? binning + "x" + binning : "unknown"));
+                }
+                if (binningFactors_.length == 0) {
+                    lines.add("(no binning every camera offers)");
+                }
+                showBinningState(String.join("<br>", lines), allKnown && !agree);
+                // an unreadable camera is never shown as agreeing
+                if (allKnown && agree) {
+                    for (int i = 0; i < binningFactors_.length; i++) {
+                        if (binningFactors_[i] == agreed) {
+                            cmbBinning_.setSelectedIndex(i);
+                        }
+                    }
+                }
+            }
+            cmbBinning_.setEnabled(binningFactors_.length > 0);
+        } catch (Exception e) {
+            showBinningState("The camera binning could not be read; see the CoreLog.", false);
+            cmbBinning_.setEnabled(false);
+            model_.studio().logs().logError("could not read the camera binning: " + e.getMessage());
+        } finally {
+            refreshingBinning_ = false;
+        }
+    }
+
+    /**
+     * Returns the active imaging cameras by their logical names, such as "ImagingCamera1", in
+     * the order of the Acquisition tab.
+     */
+    private Map<String, CameraBase> activeImagingCameras() {
+        final Map<String, CameraBase> cameras = new LinkedHashMap<>();
+        for (final CameraData data : model_.acquisitions().settings().imagingCameraOrder()) {
+            final CameraBase camera = model_.devices().device(data.name());
+            if (data.isActive() && camera != null) {
+                cameras.put(data.name(), camera);
+            }
+        }
+        return cameras;
+    }
+
+    /**
+     * Shows the binning state one line per camera, in red when the cameras differ.
+     */
+    private void showBinningState(final String text, final boolean differ) {
+        lblBinningState_.setText("<html>" + text + "</html>");
+        lblBinningState_.setForeground(differ ? Color.RED : UIManager.getColor("Label.foreground"));
+    }
+
+    /**
+     * Returns the camera's binning factor, or -1 if it cannot be read.
+     */
+    private static int binningOf(final CameraBase camera) {
+        try {
+            return camera.getBinning();
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     /**
@@ -237,7 +406,8 @@ public class CameraTab extends Panel implements ListeningPanel {
 
     @Override
     public void selected() {
-
+        // the main window and the Device Property Browser can change the binning
+        refreshBinning();
     }
 
     @Override
