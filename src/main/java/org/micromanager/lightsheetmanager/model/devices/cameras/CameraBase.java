@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BooleanSupplier;
-import java.util.stream.Collectors;
 
 /**
  * This is the base camera class.
@@ -257,8 +256,10 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
     public static int[] commonAllowedBinnings(final CameraBase[] cameras) {
         Set<Integer> common = null;
         for (final CameraBase camera : cameras) {
-            final Set<Integer> offered = Arrays.stream(camera.getAllowedBinnings()).boxed()
-                    .collect(Collectors.toCollection(TreeSet::new));
+            final Set<Integer> offered = new TreeSet<>();
+            for (final int factor : camera.getAllowedBinnings()) {
+                offered.add(factor);
+            }
             if (common == null) {
                 common = offered;
             } else {
