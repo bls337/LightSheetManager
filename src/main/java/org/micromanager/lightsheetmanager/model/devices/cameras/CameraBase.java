@@ -8,6 +8,7 @@ import org.micromanager.lightsheetmanager.model.devices.DeviceBase;
 import java.awt.Rectangle;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BooleanSupplier;
@@ -126,7 +127,7 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
      *
      * <p>Reports the outcome rather than showing it: callers apply ROIs to several cameras and must
      * be able to tell a partial apply from a clean one, because a partial apply leaves the cameras
-     * disagreeing on frame size; see {@link #describeFrameSizeMismatch(CameraBase[])}. Showing a
+     * disagreeing on frame size; see {@link #describeFrameSizeMismatch(Map)}. Showing a
      * dialog here also blocked the EDT once per camera.
      *
      * @param roi the ROI in binned pixels
@@ -189,20 +190,22 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
      * their binning differs, so a user who just pressed a preset needs to be told to look at
      * binning instead of pressing another one.
      *
-     * @param cameras the cameras that will image together
+     * @param cameras the cameras that will image together, by logical name
      * @return a description of the disagreement with no trailing punctuation, so callers can embed
      *     it in a sentence, or null if every camera reports the same frame size
      */
-    public static String describeFrameSizeMismatch(final CameraBase[] cameras) {
-        if (cameras == null || cameras.length < 2) {
+    public static String describeFrameSizeMismatch(final Map<String, CameraBase> cameras) {
+        if (cameras == null || cameras.size() < 2) {
             return null; // a single camera cannot disagree with itself
         }
-        final Rectangle first = cameras[0].getROI();
-        final int firstBinning = binningOrUnknown(cameras[0]);
+        final CameraBase firstCamera = cameras.values().iterator().next();
+        final Rectangle first = firstCamera.getROI();
+        final int firstBinning = binningOrUnknown(firstCamera);
         boolean disagree = false;
         boolean binningDiffers = false;
         final StringBuilder sizes = new StringBuilder();
-        for (final CameraBase camera : cameras) {
+        for (final Map.Entry<String, CameraBase> entry : cameras.entrySet()) {
+            final CameraBase camera = entry.getValue();
             final Rectangle roi = camera.getROI();
             final int binning = binningOrUnknown(camera);
             if (roi.width <= 0 || roi.height <= 0
@@ -216,7 +219,7 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
             if (sizes.length() > 0) {
                 sizes.append(", ");
             }
-            sizes.append(camera.getDeviceName())
+            sizes.append(entry.getKey())
                     .append(" = ").append(roi.width).append("x").append(roi.height);
             if (binning != UNKNOWN_BINNING) {
                 sizes.append(" at binning ").append(binning);

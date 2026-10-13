@@ -1,7 +1,6 @@
 package org.micromanager.lightsheetmanager.gui.tabs;
 
 import org.micromanager.lightsheetmanager.LightSheetManager;
-import org.micromanager.lightsheetmanager.api.data.CameraData;
 import org.micromanager.lightsheetmanager.gui.components.Button;
 import org.micromanager.lightsheetmanager.gui.components.ComboBox;
 import org.micromanager.lightsheetmanager.gui.components.ListeningPanel;
@@ -15,7 +14,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Rectangle;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -178,9 +176,8 @@ public class CameraTab extends Panel implements ListeningPanel {
             refreshBinning();
             return;
         }
-        final Map<String, CameraBase> active = activeImagingCameras();
-        final CameraBase[] cameras = active.values().toArray(new CameraBase[0]);
-        if (cameras.length == 0) {
+        final Map<String, CameraBase> active = model_.devices().activeImagingCameras();
+        if (active.isEmpty()) {
             model_.studio().logs().showError("No imaging camera available; check that a camera is "
                     + "assigned in the hardware configuration and set as Active on the "
                     + "Acquisition tab.");
@@ -203,7 +200,7 @@ public class CameraTab extends Panel implements ListeningPanel {
             }
         }
 
-        final String mismatch = CameraBase.describeFrameSizeMismatch(cameras);
+        final String mismatch = CameraBase.describeFrameSizeMismatch(active);
         // the slice timing depends on the camera ROI, which a binning change can reset
         model_.acquisitions().updateDurationLabels();
         refreshBinning();
@@ -233,7 +230,7 @@ public class CameraTab extends Panel implements ListeningPanel {
         refreshingBinning_ = true;
         try {
             cmbBinning_.removeAllItems();
-            final Map<String, CameraBase> active = activeImagingCameras();
+            final Map<String, CameraBase> active = model_.devices().activeImagingCameras();
             final CameraBase[] cameras = active.values().toArray(new CameraBase[0]);
             binningFactors_ = CameraBase.commonAllowedBinnings(cameras);
             for (final int factor : binningFactors_) {
@@ -284,21 +281,6 @@ public class CameraTab extends Panel implements ListeningPanel {
     }
 
     /**
-     * Returns the active imaging cameras by their logical names, such as "ImagingCamera1", in
-     * the order of the Acquisition tab.
-     */
-    private Map<String, CameraBase> activeImagingCameras() {
-        final Map<String, CameraBase> cameras = new LinkedHashMap<>();
-        for (final CameraData data : model_.acquisitions().settings().imagingCameraOrder()) {
-            final CameraBase camera = model_.devices().device(data.name());
-            if (data.isActive() && camera != null) {
-                cameras.put(data.name(), camera);
-            }
-        }
-        return cameras;
-    }
-
-    /**
      * Shows the binning state one line per camera, in red when the cameras differ.
      */
     private void showBinningState(final String text, final boolean differ) {
@@ -329,8 +311,8 @@ public class CameraTab extends Panel implements ListeningPanel {
      * @param target computes the ROI to apply to a given camera, in binned pixels
      */
     private void applyROI(final Function<CameraBase, Rectangle> target) {
-        final CameraBase[] cameras = model_.devices().imagingCameras();
-        if (cameras.length == 0) {
+        final Map<String, CameraBase> cameras = model_.devices().activeImagingCameras();
+        if (cameras.isEmpty()) {
             model_.studio().logs().showError("No imaging camera available; check that a camera is "
                     + "assigned in the hardware configuration and set as Active on the "
                     + "Acquisition tab.");
@@ -338,9 +320,9 @@ public class CameraTab extends Panel implements ListeningPanel {
         }
 
         final List<String> rejected = new ArrayList<>();
-        for (final CameraBase camera : cameras) {
-            if (!camera.setROI(target.apply(camera))) {
-                rejected.add(camera.getDeviceName());
+        for (final Map.Entry<String, CameraBase> entry : cameras.entrySet()) {
+            if (!entry.getValue().setROI(target.apply(entry.getValue()))) {
+                rejected.add(entry.getKey());
             }
         }
 
