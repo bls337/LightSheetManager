@@ -163,8 +163,8 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
      * @return true if the cameras agree, or there is only one; false to abort setup
      */
     protected boolean validateCameraFrameSizes() {
-        final CameraBase[] cameras = model_.devices().imagingCameras();
-        final String mismatch = CameraBase.describeFrameSizeMismatch(cameras);
+        final String mismatch = CameraBase.describeFrameSizeMismatch(
+                model_.devices().activeImagingCameras());
         if (mismatch == null) {
             return true;
         }

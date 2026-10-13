@@ -32,6 +32,7 @@ import javax.swing.JFrame;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -346,18 +347,22 @@ public class DeviceManager {
     }
 
     public CameraBase[] imagingCameras() {
-        final List<String> names = new ArrayList<>();
-        final CameraData[] cameras = model_.acquisitions().settings().imagingCameraOrder();
-        for (CameraData camera : cameras) {
-            if (camera.isActive()) {
-                names.add(camera.name());
+        return activeImagingCameras().values().toArray(new CameraBase[0]);
+    }
+
+    /**
+     * Returns the active imaging cameras by their logical names, such as "ImagingCamera1", in
+     * the order of the Acquisition tab.
+     */
+    public Map<String, CameraBase> activeImagingCameras() {
+        final Map<String, CameraBase> cameras = new LinkedHashMap<>();
+        for (final CameraData camera : model_.acquisitions().settings().imagingCameraOrder()) {
+            final CameraBase device = (CameraBase) deviceMap_.get(camera.name());
+            if (camera.isActive() && device != null) {
+                cameras.put(camera.name(), device);
             }
         }
-        final String[] cameraNames = names.toArray(String[]::new);
-        return Arrays.stream(cameraNames)
-                .map(name -> (CameraBase)deviceMap_.get(name))
-                .filter(Objects::nonNull)
-                .toArray(CameraBase[]::new);
+        return cameras;
     }
 
     /**
