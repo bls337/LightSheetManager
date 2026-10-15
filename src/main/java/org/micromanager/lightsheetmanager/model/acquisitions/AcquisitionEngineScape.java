@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Manages the acquisition for SCAPE microscopes.
@@ -1027,8 +1028,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * <p>Time point t is due at start + t * interval on a monotonic clock, so a late time point
      * does not delay the later ones: they run back to back until the schedule catches up.
      *
-     * <p>Any abort or failure ends the series. There is no camera timeout, so a starved time
-     * point hangs the series.
+     * <p>A time point that fails is marked incomplete and the series goes on; the time points
+     * that failed are reported once, when the series ends. A stop, or an abort without a
+     * failure, ends the series. There is no camera timeout, so a starved time point hangs the
+     * series.
      *
      * @return true if at least one dataset was completed
      */
@@ -1047,6 +1050,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         final long seriesStartNs = System.nanoTime();
         // directory names of the completed datasets
         final List<String> datasetNames = new ArrayList<>();
+        // the time points that failed, reported together when the series ends
+        final List<Integer> failedTimePoints = new ArrayList<>();
 
         // the last dataset's window stays open until the next time point starts, so a series
         // that stops in the wait still shows it
@@ -1078,8 +1083,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
                 final String datasetDir = datastore_.getSavePath();
                 previousStore = datastore_;
-                final boolean keepGoing =
-                        finishTimePoint(settings, timeIndex, datasetDir, datasetNames);
+                final boolean keepGoing = finishTimePoint(settings, timeIndex, datasetDir,
+                        datasetNames, failedTimePoints);
                 inFlightIndex = -1; // accounted for by finishTimePoint
                 if (!keepGoing) {
                     break;
@@ -1090,10 +1095,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             final String inFlightDir = datastore_ == null ? null : datastore_.getSavePath();
             if (inFlightIndex >= 0 && inFlightDir != null) {
                 writeIncompleteMarker(inFlightDir, inFlightIndex, "failed");
+                failedTimePoints.add(inFlightIndex);
             }
             final int completed = datasetNames.size();
             studio_.logs().logMessage("separate time points: " + completed + " of " + numTimePoints
                     + " datasets complete in " + seriesDir);
+            reportFailedTimePoints(failedTimePoints, completed, numTimePoints, seriesDir);
         }
         return !datasetNames.isEmpty();
     }
@@ -1203,14 +1210,19 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * should go on. Records the dataset as complete or marks it incomplete, and leaves its window
      * for the caller to close.
      *
+     * <p>A failed time point is logged and marked incomplete, any camera it left running is
+     * stopped, and the series goes on unless a stop was requested.
+     *
      * @param settings the run snapshot
      * @param timeIndex the time point that just ended
      * @param datasetDir where this time point was written
-     * @param datasetNames the completed datasets, appended to when this one is whole
+     * @param datasetNames the completed datasets, appended to if this one is whole
+     * @param failedTimePoints the time points that failed, appended to if this one fails
      * @return true if the next time point should run
      */
     private boolean finishTimePoint(final ScapeAcquisitionSettings settings, final int timeIndex,
-            final String datasetDir, final List<String> datasetNames) {
+            final String datasetDir, final List<String> datasetNames,
+            final List<Integer> failedTimePoints) {
 
         Exception failure = null;
         try {
@@ -1230,7 +1242,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
         // check both: some aborts set only the flag, others reach only this Acquisition. A stop
         // ends the series whatever became of this time point, and leaves a whole dataset whole.
-        final boolean keepGoing = result == TimePointResult.COMPLETE && !isStopRequested();
+        final boolean keepGoing = result != TimePointResult.ABORTED && !isStopRequested();
         if (!keepGoing) {
             studio_.logs().logMessage("separate time points: the series stopped at time point "
                     + timeIndex);
@@ -1242,10 +1254,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 datasetNames.add(new File(datasetDir).getName());
                 break;
             case FAILED:
-                // shown, not only logged, so a long series that stops unattended says why
-                model_.logging().reportError(failure, "The acquisition failed at time point "
-                        + timeIndex + " and the series stopped there. Earlier time points are "
-                        + "complete on disk.");
+                failedTimePoints.add(timeIndex);
+                // logged, not shown: the time points that failed are reported together at the end
+                studio_.logs().logError(failure, "separate time points: time point " + timeIndex
+                        + " failed and is marked incomplete"
+                        + (keepGoing ? "; the series goes on" : ""));
+                stopCamerasLeftRunning(timeIndex);
                 writeIncompleteMarker(datasetDir, timeIndex, "failed");
                 break;
             case ABORTED:
@@ -1255,10 +1269,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 break;
         }
 
-        // stage scan only: let the stage finish retracing before the next time point moves it.
-        // finish() does this after the last one.
-        if (keepGoing && settings.stageScan().enabled() && model_.devices().isUsingPLogic()
-                && controller_ != null) {
+        // stage scan: let the stage finish retracing before the next time point moves it. After a
+        // failure, in any mode: the volume may still be running. finish() does this after the last.
+        if (keepGoing && (settings.stageScan().enabled() || result == TimePointResult.FAILED)
+                && model_.devices().isUsingPLogic() && controller_ != null) {
             controller_.stopSPIMStateMachines();
         }
 
@@ -1266,6 +1280,45 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // live store and ask to abort
         datastore_ = null;
         return keepGoing;
+    }
+
+    /**
+     * Stops any camera a failed time point left running, since the next time point cannot start
+     * a camera that is still running, and logs what each camera was doing.
+     *
+     * @param timeIndex the time point that failed
+     */
+    private void stopCamerasLeftRunning(final int timeIndex) {
+        // which cameras were still running, and what is left in the buffer, tell a frame that
+        // never came from one that came late
+        final int imagesLeft = core_.getRemainingImageCount();
+        final List<String> cameras = stopCameraSequences(model_.devices().imagingCameras());
+        studio_.logs().logMessage("separate time points: after the failure at time point "
+                + timeIndex + ": " + String.join(", ", cameras)
+                + "; images left in the buffer: " + imagesLeft);
+    }
+
+    /**
+     * Reports the time points of the series that failed, once, so a series that ran unattended
+     * does not look whole.
+     *
+     * @param failedTimePoints the time points that failed
+     * @param completed the number of complete datasets
+     * @param numTimePoints the number of time points the series asked for
+     * @param seriesDir the folder holding the series
+     */
+    private void reportFailedTimePoints(final List<Integer> failedTimePoints,
+            final int completed, final int numTimePoints, final String seriesDir) {
+        if (failedTimePoints.isEmpty()) {
+            return;
+        }
+        final String which = failedTimePoints.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(", "));
+        model_.logging().reportError("Time points that failed: " + which + ". Each is marked "
+                + "incomplete in its folder.\n\n" + completed + " of " + numTimePoints
+                + " datasets are complete in " + seriesDir
+                + ". The CoreLog has the error for each.");
     }
 
     /**
