@@ -1297,15 +1297,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // --- Job A ---
 
         // Stop all cameras sequences
-        try {
-            for (CameraBase camera : cameras) {
-                if (core_.isSequenceRunning(camera.getDeviceName())) {
-                    core_.stopSequenceAcquisition(camera.getDeviceName());
-                }
-            }
-        } catch (Exception e) {
-            studio_.logs().logError("Could not stop camera sequences: " + e.getMessage());
-        }
+        stopCameraSequences(cameras);
 
         // clean up controller settings after acquisition
         // want to do this, even with demo cameras, so we can test everything else
