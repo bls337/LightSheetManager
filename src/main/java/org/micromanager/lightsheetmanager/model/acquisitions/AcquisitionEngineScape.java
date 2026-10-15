@@ -1188,6 +1188,16 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         return seriesDir;
     }
 
+    /** What became of one time point of a series. */
+    private enum TimePointResult {
+        /** Every image arrived and the dataset is whole. */
+        COMPLETE,
+        /** The acquisition failed: AcqEngJ aborted it and kept the exception. */
+        FAILED,
+        /** A stop or a closed window aborted it, without an exception. */
+        ABORTED
+    }
+
     /**
      * Ends one time point of a series, after waitForCompletion(), and says whether the series
      * should go on. Records the dataset as complete or marks it incomplete, and leaves its window
@@ -1202,31 +1212,47 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     private boolean finishTimePoint(final ScapeAcquisitionSettings settings, final int timeIndex,
             final String datasetDir, final List<String> datasetNames) {
 
-        // check both: some aborts set only the flag, others reach only this Acquisition
-        final boolean aborted = currentAcquisition_.isAbortRequested();
-        boolean keepGoing = !aborted && !isStopRequested();
+        Exception failure = null;
+        try {
+            currentAcquisition_.checkForExceptions();
+        } catch (Exception e) {
+            failure = e;
+        }
+        // AcqEngJ aborts a failing acquisition too, so the exception is what tells a failure from
+        // a stop or a closed window
+        final TimePointResult result;
+        if (failure != null) {
+            result = TimePointResult.FAILED;
+        } else if (currentAcquisition_.isAbortRequested()) {
+            result = TimePointResult.ABORTED;
+        } else {
+            result = TimePointResult.COMPLETE;
+        }
+        // check both: some aborts set only the flag, others reach only this Acquisition. A stop
+        // ends the series whatever became of this time point, and leaves a whole dataset whole.
+        final boolean keepGoing = result == TimePointResult.COMPLETE && !isStopRequested();
         if (!keepGoing) {
             studio_.logs().logMessage("separate time points: the series stopped at time point "
                     + timeIndex);
         }
-        // null while the dataset is whole; a stop after it finished ends the series but does not
-        // make it incomplete
-        String incompleteReason = aborted ? "aborted" : null;
-        try {
-            currentAcquisition_.checkForExceptions();
-        } catch (Exception e) {
-            // shown, not only logged, so a long series that stops unattended says why
-            model_.logging().reportError(e, "The acquisition failed at time point " + timeIndex
-                    + " and the series stopped there. Earlier time points are complete on disk.");
-            incompleteReason = "failed";
-            keepGoing = false;
-        }
 
         // an incomplete dataset is marked inside its folder, so it is not mistaken for a whole one
-        if (incompleteReason == null) {
-            datasetNames.add(new File(datasetDir).getName());
-        } else {
-            writeIncompleteMarker(datasetDir, timeIndex, incompleteReason);
+        switch (result) {
+            case COMPLETE:
+                datasetNames.add(new File(datasetDir).getName());
+                break;
+            case FAILED:
+                // shown, not only logged, so a long series that stops unattended says why
+                model_.logging().reportError(failure, "The acquisition failed at time point "
+                        + timeIndex + " and the series stopped there. Earlier time points are "
+                        + "complete on disk.");
+                writeIncompleteMarker(datasetDir, timeIndex, "failed");
+                break;
+            case ABORTED:
+                writeIncompleteMarker(datasetDir, timeIndex, "aborted");
+                break;
+            default:
+                break;
         }
 
         // stage scan only: let the stage finish retracing before the next time point moves it.
