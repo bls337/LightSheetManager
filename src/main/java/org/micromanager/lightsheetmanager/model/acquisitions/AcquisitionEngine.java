@@ -294,6 +294,31 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     }
 
     /**
+     * Stops the sequence of every camera that is still running one.
+     *
+     * @param cameras the cameras to check
+     * @return one entry per camera checked: "name was still running" if it was stopped, or
+     *     "name had finished"
+     */
+    protected List<String> stopCameraSequences(final CameraBase[] cameras) {
+        final List<String> states = new ArrayList<>();
+        try {
+            for (CameraBase camera : cameras) {
+                final String name = camera.getDeviceName();
+                if (core_.isSequenceRunning(name)) {
+                    core_.stopSequenceAcquisition(name);
+                    states.add(name + " was still running");
+                } else {
+                    states.add(name + " had finished");
+                }
+            }
+        } catch (Exception e) {
+            studio_.logs().logError("Could not stop camera sequences: " + e.getMessage());
+        }
+        return states;
+    }
+
+    /**
      * Names the stage the run is in, for a log line reading "... during &lt;stage&gt;".
      */
     private String runPhase() {
