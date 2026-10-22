@@ -155,7 +155,7 @@ public class DefaultChannelSettings implements ChannelSettings {
         }
         DefaultChannelSettings other = (DefaultChannelSettings) obj;
         return enabled == other.enabled
-                && group.equals(other.group)
+                && Objects.equals(group, other.group)
                 && mode == other.mode;
     }
 
