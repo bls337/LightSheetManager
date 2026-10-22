@@ -471,10 +471,6 @@ public class PLogicScape {
             piezoCenter += settings.volume().sliceStepSize() / 2;
         }
 
-        // HACK(Brandon): used this to get a single camera to work with 2 simultaneous cameras
-        // increase number of trigger pulses for multiple simultaneous cameras
-        // numSlicesHW *= model_.devices().getDeviceAdapter().getNumSimultaneousCameras();
-
         // FIXME: more light sheet setup
         //final double slope1 = settings.sliceCalibration(1).sliceSlope();
         //final double slope2 = settings.sliceCalibration(2).sliceSlope();
