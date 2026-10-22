@@ -1561,10 +1561,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     return false; // early exit
             }
         }
-//        // TODO: add code to check if cameras are active
-//        if (model_.devices().getDeviceAdapter().getNumSimultaneousCameras() > 1) {
-//            nrSlicesSoftware *= 2;
-//        }
 
         // 1.4 adjusts nrSlicesSoftware at this point when hardware timepoints are in use: one
         // controller trigger covers every timepoint, so the camera sequence has to be sized for
