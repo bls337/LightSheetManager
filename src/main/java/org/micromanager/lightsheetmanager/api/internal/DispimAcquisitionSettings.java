@@ -118,8 +118,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 Objects.equals(slice, other.slice) &&
                 Objects.equals(sliceLS, other.sliceLS) &&
                 Objects.equals(stageScan, other.stageScan) &&
-                // Objects.equals(sheetCalibration_, other.sheetCalibration_) &&
-                // Objects.equals(sliceCalibration_, other.sliceCalibration_) &&
+                Arrays.equals(sheetCalibrations, other.sheetCalibrations) &&
+                Arrays.equals(sliceCalibrations, other.sliceCalibrations) &&
                 acquisitionMode() == other.acquisitionMode() &&
                 cameraMode() == other.cameraMode() &&
                 Arrays.equals(imagingCameraOrder(), other.imagingCameraOrder()) &&
@@ -144,8 +144,8 @@ public class DispimAcquisitionSettings extends BaseAcquisitionSettings implement
                 slice,
                 sliceLS,
                 stageScan,
-                // sheetCalibration_,
-                // sliceCalibration_,
+                Arrays.hashCode(sheetCalibrations),
+                Arrays.hashCode(sliceCalibrations),
                 acquisitionMode(),
                 cameraMode(),
                 Arrays.hashCode(imagingCameraOrder()),
