@@ -361,9 +361,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         final String[] cameraNames = resolveCameraNames(settings, demoMode);
 
-        // read once, before the acquisition starts, so every channel's offset has the same origin
-        final Double baseFocusUm = readBaseFocusPosition(settings);
-
         // Last chance to honor a Stop clicked while everything above was being armed. Checked
         // before the shutter is touched, so giving up here cannot leave it open.
         if (isStopRequested()) {
@@ -376,7 +373,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         captureShutterStateAndOpen();
 
         if (!isSeparatingTimePoints(settings)) {
-            if (!startTimePointAcquisition(settings, cameraNames, baseFocusUm, settingsJson,
+            if (!startTimePointAcquisition(settings, cameraNames, settingsJson,
                     saveDir, saveName, -1)) {
                 // never wait on an Acquisition that was not finished: the wait is unbounded
                 return false;
@@ -385,7 +382,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             return true;
         }
 
-        return runSeparateTimePoints(settings, cameraNames, baseFocusUm, settingsJson,
+        return runSeparateTimePoints(settings, cameraNames, settingsJson,
                 saveDir, saveName);
     }
 
@@ -448,35 +445,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     }
 
     /**
-     * Reads the focus position the channel offsets are applied to, or null when the events do not
-     * apply them.
-     *
-     * <p>Read once, before the acquisition starts. An event factory that reads the stage itself
-     * can find it already moved by the events submitted before it, and adds its channel's offset
-     * on top of another channel's.
-     *
-     * @param settings the run snapshot
-     * @return the focus position in micrometers, or null
-     */
-    private Double readBaseFocusPosition(final ScapeAcquisitionSettings settings) {
-        if (!settings.channels().enabled() || core_.getFocusDevice().isEmpty()) {
-            return null;
-        }
-        // the same cases as the factories: software channels always read it, hardware channel
-        // switching only when a single channel is baked onto the base event
-        final boolean readsFocus = settings.channels().mode() == ChannelMode.VOLUME
-                || settings.channels().used().length == 1;
-        if (!readsFocus) {
-            return null;
-        }
-        try {
-            return core_.getPosition();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * Captures the shutter and autoshutter state for finish() to restore, then opens the shutter
      * for the run.
      */
@@ -511,7 +479,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      *
      * @param settings the run snapshot
      * @param cameraNames the camera device names, resolved once for the run
-     * @param baseFocusUm the focus position channel offsets are applied to, or null
      * @param settingsJson the run settings, written into the dataset directory
      * @param root the directory MMAcquisition creates the dataset in
      * @param prefix the dataset name, which MMAcquisition suffixes with a counter of its own
@@ -520,7 +487,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * @return true if the acquisition started and every event was submitted
      */
     private boolean startTimePointAcquisition(final ScapeAcquisitionSettings settings,
-            final String[] cameraNames, final Double baseFocusUm, final String settingsJson,
+            final String[] cameraNames, final String settingsJson,
             final String root, final String prefix, final int datasetTimeIndex) {
 
         // used to detect if the plugin is using ASI hardware
@@ -854,7 +821,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         try {
             currentAcquisition_.start();
 
-            submitEvents(settings, cameraNames, baseFocusUm, separate, numTimePoints);
+            submitEvents(settings, cameraNames, separate, numTimePoints);
 
             // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
             // once everything finishes
@@ -910,12 +877,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      *
      * @param settings the run snapshot
      * @param cameraNames the camera device names, in slot order
-     * @param baseFocusUm the focus position channel offsets are applied to, or null
      * @param separate true if this dataset is one time point of a separate time point series
      * @param numTimePoints the time points this dataset holds
      */
     private void submitEvents(final ScapeAcquisitionSettings settings, final String[] cameraNames,
-            final Double baseFocusUm, final boolean separate, final int numTimePoints) {
+            final boolean separate, final int numTimePoints) {
 
         ////////////  Create and submit acquisition events ////////////////////
         // Create iterators of acquisition events and submit them to the engine for execution
@@ -951,9 +917,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
                 //System.out.println("time index: " + timeIndex);
                 AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
-                if (baseFocusUm != null) {
-                    baseEvent.setZ(null, baseFocusUm);
-                }
                 // in separate mode each dataset holds time index 0 and the series loop keeps the
                 // schedule, so no time axis and no minimum start time
                 if (!separate && settings.isUsingTimePoints()) {
@@ -1036,7 +999,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * @return true if at least one dataset was completed
      */
     private boolean runSeparateTimePoints(final ScapeAcquisitionSettings settings,
-            final String[] cameraNames, final Double baseFocusUm, final String settingsJson,
+            final String[] cameraNames, final String settingsJson,
             final String saveDir, final String saveName) {
 
         final int numTimePoints = settings.numTimePoints();
@@ -1069,7 +1032,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 // set before the start, which can throw after its dataset directory exists
                 inFlightIndex = timeIndex;
                 // Locale.ROOT: a locale with its own digits would put them in the directory name
-                if (!startTimePointAcquisition(settings, cameraNames, baseFocusUm, settingsJson,
+                if (!startTimePointAcquisition(settings, cameraNames, settingsJson,
                         seriesDir, String.format(Locale.ROOT, "%s_%04d", saveName, timeIndex),
                         timeIndex)) {
                     break; // nothing started, so nothing to wait for

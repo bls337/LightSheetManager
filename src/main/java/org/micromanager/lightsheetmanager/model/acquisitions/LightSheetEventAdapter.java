@@ -56,8 +56,8 @@ public final class LightSheetEventAdapter {
      * filed against the wrong channel and slice.
      * <p>
      * A single channel takes the same exception as that factory: hardware channel switching is not
-     * set up for one channel, so its own preset and offset apply and are baked onto the base event,
-     * where they cannot split the merge.
+     * set up for one channel, so its own preset applies and is baked onto the base event, where it
+     * cannot split the merge.
      *
      * @param usedChannels the channels the controller was programmed for
      */
@@ -181,19 +181,6 @@ public final class LightSheetEventAdapter {
         baseEvent.setConfigPreset(channel.getName());
         baseEvent.setChannelName(Integer.toString(channelIndex));
 
-        // Channel z-offset: apply the offset to the current stage/z position.
-        double zPos;
-        if (baseEvent.getZPosition() == null) {
-            try {
-                zPos = Engine.getCore().getPosition() + channel.getOffset();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            zPos = baseEvent.getZPosition() + channel.getOffset();
-        }
-        baseEvent.setZ(baseEvent.getZIndex(), zPos);
-
         // No channel stage follows here, so cameras() writes the finished slot: this channel's index
         // as the base, stepping a whole channel count per camera. cameras() would otherwise derive
         // the base from CAMERA_AXIS (setChannelName above put the channel index there); passing it
@@ -233,9 +220,9 @@ public final class LightSheetEventAdapter {
      * event order per camera has to match the order the camera delivers frames.
      * <p>
      * A single channel is the exception. Hardware channel switching is not set up at all for one
-     * channel, so that channel's own preset and offset apply, as they do on the software path.
-     * Baking them into the base event leaves every event carrying the same preset, which cannot
-     * split the merge, since a sequence only breaks where consecutive presets differ.
+     * channel, so that channel's own preset applies, as it does on the software path. Baking it into
+     * the base event leaves every event carrying the same preset, which cannot split the merge,
+     * since a sequence only breaks where consecutive presets differ.
      *
      * @param usedChannels the channels the controller was programmed for
      */
@@ -265,25 +252,12 @@ public final class LightSheetEventAdapter {
     }
 
     /**
-     * Bake one channel's preset and z-offset onto the base event, for a run with a single channel
-     * in use.
+     * Bake one channel's preset onto the base event, for a run with a single channel in use.
+     * The channel's offset moves nothing.
      */
     private static void applySingleChannel(AcquisitionEvent baseEvent, ChannelSpec channel) {
         baseEvent.setConfigGroup(channel.getGroup());
         baseEvent.setConfigPreset(channel.getName());
-
-        // Channel z-offset: apply the offset to the current stage/z position.
-        double zPos;
-        if (baseEvent.getZPosition() == null) {
-            try {
-                zPos = Engine.getCore().getPosition() + channel.getOffset();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            zPos = baseEvent.getZPosition() + channel.getOffset();
-        }
-        baseEvent.setZ(baseEvent.getZIndex(), zPos);
     }
 
     /**
