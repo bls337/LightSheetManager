@@ -266,9 +266,11 @@ public class PLogicScape {
         return settings.volume().sliceStepSize() * speedFactor / sliceDurationMs / channelsPerPass;
     }
 
-    // compute how many channels we do in each one-way scan
+    // compute how many channels we do in each one-way scan, at least 1 so the speed and the scan
+    // line count never divide by 0 when channels are enabled but none is used
     private int computeScanChannelsPerPass(ScapeAcquisitionSettings settings) {
-        return settings.channels().mode() == ChannelMode.SLICE_HW ? settings.channels().count() : 1;
+        return settings.channels().mode() == ChannelMode.SLICE_HW
+                ? Math.max(1, settings.channels().count()) : 1;
     }
 
     /**

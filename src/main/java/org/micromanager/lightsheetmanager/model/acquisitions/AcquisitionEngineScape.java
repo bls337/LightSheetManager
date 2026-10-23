@@ -159,7 +159,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         // checked here so demo and NIDAQ runs, which skip doHardwareCalculations, refuse too
-        if (acqSettings_.channels().enabled() && acqSettings_.channels().count() == 0) {
+        if (channelsEnabledButNoneUsed()) {
             model_.logging().reportError("\"Channels\" is checked, but no channels are selected");
             return false;
         }
@@ -2141,7 +2141,19 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         label.setText(NumberUtils.doubleToDisplayString(acqSettings_.timing().sliceDurationMs()) + " ms");
     }
 
+    /**
+     * Returns true when channels are enabled but none is used. The run refuses that setup, so
+     * the volume and total duration labels show a dash instead of an estimate.
+     */
+    private boolean channelsEnabledButNoneUsed() {
+        return acqSettings_.channels().enabled() && acqSettings_.channels().count() == 0;
+    }
+
     private void updateVolumeDurationLabel(final JLabel label) {
+        if (channelsEnabledButNoneUsed()) {
+            label.setText("-");
+            return;
+        }
         final double duration = computeVolumeDuration();
         if (duration > 1000) {
             // round to ms
@@ -2158,6 +2170,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * Update the displayed total time duration.
      */
     private void updateTotalTimeDurationLabel(final JLabel label) {
+        if (channelsEnabledButNoneUsed()) {
+            label.setText("-");
+            return;
+        }
         final double duration = computeTotalTimeDuration();
         if (duration < 60) {  // less than 1 min
             label.setText(NumberUtils.doubleToDisplayString(duration) + " s");
