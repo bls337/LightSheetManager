@@ -266,9 +266,11 @@ public class PLogicScape {
         return settings.volume().sliceStepSize() * speedFactor / sliceDurationMs / channelsPerPass;
     }
 
-    // compute how many channels we do in each one-way scan
+    // compute how many channels we do in each one-way scan, at least 1 so the speed and the scan
+    // line count never divide by 0 when channels are enabled but none is used
     private int computeScanChannelsPerPass(ScapeAcquisitionSettings settings) {
-        return settings.channels().mode() == ChannelMode.SLICE_HW ? settings.channels().count() : 1;
+        return settings.channels().mode() == ChannelMode.SLICE_HW
+                ? Math.max(1, settings.channels().count()) : 1;
     }
 
     /**
@@ -470,10 +472,6 @@ public class PLogicScape {
             // was piezoCenter += piezoAmplitude/(2*numSlicesHW) which isn't quite the same but close enough that nobody probably noticed
             piezoCenter += settings.volume().sliceStepSize() / 2;
         }
-
-        // HACK(Brandon): used this to get a single camera to work with 2 simultaneous cameras
-        // increase number of trigger pulses for multiple simultaneous cameras
-        // numSlicesHW *= model_.devices().getDeviceAdapter().getNumSimultaneousCameras();
 
         // FIXME: more light sheet setup
         //final double slope1 = settings.sliceCalibration(1).sliceSlope();

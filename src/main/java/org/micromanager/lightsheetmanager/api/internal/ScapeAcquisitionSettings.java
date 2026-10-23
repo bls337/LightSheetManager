@@ -105,6 +105,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
         }
         ScapeAcquisitionSettings other = (ScapeAcquisitionSettings) obj;
         return Objects.equals(channels(), other.channels()) &&
+                Objects.equals(autofocus(), other.autofocus()) &&
                 Objects.equals(timing, other.timing) &&
                 Objects.equals(volume(), other.volume()) &&
                 Objects.equals(slice, other.slice) &&
@@ -128,6 +129,7 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
     public int hashCode() {
         return Objects.hash(
                 channels(),
+                autofocus(),
                 timing,
                 volume(),
                 slice,

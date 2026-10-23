@@ -136,7 +136,7 @@ public class DefaultAutofocusSettings implements AutofocusSettings {
                 showGraph == other.showGraph &&
                 mode == other.mode &&
                 scoringMethod == other.scoringMethod &&
-                channel.equals(other.channel);
+                Objects.equals(channel, other.channel);
     }
 
     @Override
