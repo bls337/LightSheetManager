@@ -16,7 +16,7 @@ public class XYStage extends DeviceBase {
         super(studio, deviceName);
     }
 
-    public void setRelativeXYPosition(final int x, final int y) {
+    public void setRelativeXYPosition(final double x, final double y) {
         try {
             core_.setRelativeXYPosition(deviceName_, x, y);
         } catch (Exception e) {
