@@ -236,6 +236,7 @@ public class PLogicScape {
             if (!settings.isUsingMultiplePositions()) {
                 // use current position as center position for stage scanning
                 // multi-position situation is handled in position-switching code instead
+                // TODO: use xyStage_.getXYPosition() again once a failed read stops returning (0, 0)
                 // the position is read inside the try, so a failed read refuses the run instead
                 // of centering the scan on 0 in place of the unread position
                 final Point2D.Double p;

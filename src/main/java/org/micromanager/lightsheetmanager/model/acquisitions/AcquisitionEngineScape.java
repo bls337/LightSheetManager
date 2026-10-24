@@ -256,6 +256,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     return false;
                 }
                 // second part: initialize stage scanning, so we can restore state later
+                // TODO: wrap the position, speed and acceleration up into a stage scan state object
                 // the position is read inside the try, so a failed read refuses the run instead
                 // of returning the stage to 0 in place of the unread position
                 try {
