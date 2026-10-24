@@ -236,8 +236,17 @@ public class PLogicScape {
             if (!settings.isUsingMultiplePositions()) {
                 // use current position as center position for stage scanning
                 // multi-position situation is handled in position-switching code instead
-                Point2D.Double p = xyStage_.getXYPosition();
-                // TODO: error if getXYPosition fails (return null?)
+                // the position is read inside the try, so a failed read refuses the run instead
+                // of centering the scan on 0 in place of the unread position
+                final Point2D.Double p;
+                try {
+                    p = core_.getXYStagePosition(xyStage_.getDeviceName());
+                } catch (Exception e) {
+                    model_.logging().reportError("could not get the position of "
+                            + xyStage_.getDeviceName() + " to center the stage scan: "
+                            + e.getMessage());
+                    return false;
+                }
                 // TODO: prepareStageScanForAcquisition(p.x, p.y, settings.getSPIMMode())
                 prepareStageScanForAcquisition(p.x, p.y, settings);
             }
