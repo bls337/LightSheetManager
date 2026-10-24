@@ -28,7 +28,8 @@ public class XYStage extends DeviceBase {
         try {
             core_.setXYPosition(deviceName_, x, y);
         } catch (Exception e) {
-            studio_.logs().showError("could not set move for " + deviceName_);
+            studio_.logs().showError("could not move " + deviceName_ + " to (" + x + ", " + y
+                    + "): " + e.getMessage());
         }
     }
 
