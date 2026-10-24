@@ -493,6 +493,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // used to detect if the plugin is using ASI hardware
         final boolean isUsingPLC = model_.devices().isUsingPLogic();
         final boolean separate = datasetTimeIndex >= 0;
+        // Read once per dataset. The labels decide which entry of a position an event carries
+        // as its x, y and z.
+        final String xyStageLabel = core_.getXYStageDevice();
+        final String focusStageLabel = core_.getFocusDevice();
         // one time point per dataset in separate mode, the whole series otherwise
         final int numTimePoints = separate ? 1
                 : numTimePointsToAcquire(settings);
@@ -821,7 +825,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         try {
             currentAcquisition_.start();
 
-            submitEvents(settings, cameraNames, separate, numTimePoints);
+            submitEvents(settings, cameraNames, separate, numTimePoints, xyStageLabel,
+                    focusStageLabel);
 
             // No more instructions (i.e. AcquisitionEvents); tell the acquisition to initiate shutdown
             // once everything finishes
@@ -879,9 +884,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
      * @param cameraNames the camera device names, in slot order
      * @param separate true if this dataset is one time point of a separate time point series
      * @param numTimePoints the time points this dataset holds
+     * @param xyStageLabel the core's XY stage device
+     * @param focusStageLabel the core's focus device
      */
     private void submitEvents(final ScapeAcquisitionSettings settings, final String[] cameraNames,
-            final boolean separate, final int numTimePoints) {
+            final boolean separate, final int numTimePoints, final String xyStageLabel,
+            final String focusStageLabel) {
 
         ////////////  Create and submit acquisition events ////////////////////
         // Create iterators of acquisition events and submit them to the engine for execution
@@ -916,22 +924,26 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             // Loop 1: Multiple time points
             for (int timeIndex = 0; timeIndex < numTimePoints; timeIndex++) {
                 //System.out.println("time index: " + timeIndex);
-                AcquisitionEvent baseEvent = new AcquisitionEvent(currentAcquisition_);
+                AcquisitionEvent timePointEvent = new AcquisitionEvent(currentAcquisition_);
                 // in separate mode each dataset holds time index 0 and the series loop keeps the
                 // schedule, so no time axis and no minimum start time
                 if (!separate && settings.isUsingTimePoints()) {
-                    baseEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
-                    baseEvent.setMinimumStartTime((long) (timeIndex * (settings.timePointIntervalSec() * 1000.0)));
+                    timePointEvent.setAxisPosition(LightSheetEventAdapter.TIME_AXIS, timeIndex);
+                    timePointEvent.setMinimumStartTime((long) (timeIndex * (settings.timePointIntervalSec() * 1000.0)));
                 }
                 // Loop 2: XY positions
                 for (int positionIndex = 0; positionIndex < numPositions; positionIndex++) {
                     //System.out.println("pos index: " + positionIndex);
+                    // A fresh copy per position: a coordinate is only on the event when this
+                    // position stores it, so a stage the position has no entry for stays put.
+                    AcquisitionEvent baseEvent = timePointEvent.copy();
                     if (settings.isUsingMultiplePositions()) {
                         baseEvent.setAxisPosition(LightSheetEventAdapter.POSITION_AXIS, positionIndex);
-                        // is this the best way to do stage movements with new acq engine?
+                        // The position's entries for the XY and focus devices go on the event,
+                        // where the engine moves them.
                         MultiStagePosition position = pl.getPosition(positionIndex);
-                        baseEvent.setX(position.getX());
-                        baseEvent.setY(position.getY());
+                        LightSheetEventAdapter.setEventPosition(baseEvent, position, xyStageLabel,
+                                focusStageLabel);
                     }
                     // TODO: what to do if multiple positions not defined: acquire at current stage position?
                     //  If yes, then nothing more to do here.

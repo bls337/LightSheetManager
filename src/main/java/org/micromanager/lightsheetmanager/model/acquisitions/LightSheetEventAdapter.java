@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.model.acquisitions;
 
 import org.micromanager.MultiStagePosition;
 import org.micromanager.PositionList;
+import org.micromanager.StagePosition;
 import org.micromanager.acqj.internal.Engine;
 import org.micromanager.acqj.main.AcqEngMetadata;
 import org.micromanager.acqj.main.AcquisitionEvent;
@@ -479,13 +480,16 @@ public final class LightSheetEventAdapter {
     /**
      * Iterate over an arbitrary list of positions. Adds in position indices to
      * the axes that assume the order in the list provided correspond to the
-     * desired indices
+     * desired indices. Each position is set on its event as {@link #setEventPosition}
+     * describes, against the core's current XY and focus devices.
      *
-     * @param positionList the list of positions or iterate over
+     * @param positionList the list of positions to iterate over
      * @return
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> positions(
             PositionList positionList) {
+        final String xyStageLabel = Engine.getCore().getXYStageDevice();
+        final String focusStageLabel = Engine.getCore().getFocusDevice();
         return (AcquisitionEvent event) -> new Iterator<>() {
             int index = 0;
 
@@ -496,12 +500,10 @@ public final class LightSheetEventAdapter {
 
             @Override
             public AcquisitionEvent next() {
-                //System.out.println("called! " + index);
                 AcquisitionEvent posEvent = event.copy();
                 MultiStagePosition msp = positionList.getPosition(index);
                 if (msp != null) {
-                    posEvent.setX(msp.getX());
-                    posEvent.setY(msp.getY());
+                    setEventPosition(posEvent, msp, xyStageLabel, focusStageLabel);
                 }
                 posEvent.setAxisPosition(POSITION_AXIS, index);
 
@@ -509,6 +511,50 @@ public final class LightSheetEventAdapter {
                 return posEvent;
             }
         };
+    }
+
+    /**
+     * Sets the event's x and y from the position's entry for the XY stage, and its z from the
+     * entry for the focus stage. A stage the position has no entry for is left off the event,
+     * so it stays where the previous position left it. Entries are matched by device label, not
+     * by the position's default stage names, which a grid or script position may not set.
+     *
+     * @param event the event to set the position on
+     * @param position the position
+     * @param xyStageLabel the core's XY stage device
+     * @param focusStageLabel the core's focus device
+     */
+    public static void setEventPosition(final AcquisitionEvent event,
+            final MultiStagePosition position, final String xyStageLabel,
+            final String focusStageLabel) {
+        final StagePosition xy = findStagePosition(position, xyStageLabel, 2);
+        if (xy != null) {
+            event.setX(xy.get2DPositionX());
+            event.setY(xy.get2DPositionY());
+        }
+        final StagePosition focus = findStagePosition(position, focusStageLabel, 1);
+        if (focus != null) {
+            event.setZ(null, focus.get1DPosition());
+        }
+    }
+
+    /**
+     * The position's entry for the given device with the given axis count, or null. An empty
+     * label matches nothing, so an unset core device never claims an entry.
+     */
+    private static StagePosition findStagePosition(final MultiStagePosition position,
+            final String label, final int numAxes) {
+        if (label == null || label.isEmpty()) {
+            return null;
+        }
+        for (int i = 0; i < position.size(); i++) {
+            final StagePosition stage = position.get(i);
+            if (stage.getNumberOfStageAxes() == numAxes
+                    && label.equals(stage.getStageDeviceLabel())) {
+                return stage;
+            }
+        }
+        return null;
     }
 
 //   /**
