@@ -32,7 +32,8 @@ public class ASIXYStage extends ASITigerBase {
         try {
             core_.setXYPosition(deviceName_, x, y);
         } catch (Exception e) {
-            studio_.logs().showError("could not set relative move for " + deviceName_);
+            studio_.logs().showError("could not move " + deviceName_ + " to (" + x + ", " + y
+                    + "): " + e.getMessage());
         }
     }
 
