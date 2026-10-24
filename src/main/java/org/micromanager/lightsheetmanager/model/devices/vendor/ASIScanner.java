@@ -38,6 +38,19 @@ public class ASIScanner extends ASITigerBase {
         }
     }
 
+    /**
+     * Moves y and keeps x where it is. x is read inside the try, so a failed read skips the move
+     * instead of moving with 0 in place of the unread position.
+     */
+    public void setPositionY(final double y) {
+        try {
+            core_.setGalvoPosition(deviceName_, core_.getGalvoPosition(deviceName_).x, y);
+        } catch (Exception e) {
+            studio_.logs().showError("could not move " + deviceName_ + " y to " + y + ": "
+                    + e.getMessage());
+        }
+    }
+
     public Point2D.Double getPosition() {
         try {
             return core_.getGalvoPosition(deviceName_);

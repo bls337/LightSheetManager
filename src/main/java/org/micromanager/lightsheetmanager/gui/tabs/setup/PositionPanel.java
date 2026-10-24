@@ -208,8 +208,7 @@ public class PositionPanel extends Panel implements Subscriber, ListeningPanel {
             });
 
             btnSliceZero_.registerListener(() -> {
-                final double xValue = scanner.getPosition().x;
-                scanner.setPosition(xValue, 0.0);
+                scanner.setPositionY(0.0);
                 lblSlicePositionValue_.setText(String.format("%.3f °", scanner.getPosition().y));
             });
 
@@ -219,8 +218,7 @@ public class PositionPanel extends Panel implements Subscriber, ListeningPanel {
             });
 
             txtSlicePosition_.registerListener(() -> {
-                final double xValue = scanner.getPosition().x;
-                scanner.setPosition(xValue, Double.parseDouble(txtSlicePosition_.getText()));
+                scanner.setPositionY(Double.parseDouble(txtSlicePosition_.getText()));
                 lblSlicePositionValue_.setText(String.format("%.3f °", scanner.getPosition().y));
             });
         }
@@ -265,7 +263,7 @@ public class PositionPanel extends Panel implements Subscriber, ListeningPanel {
         if (scanner != null && !NumberUtils.doublesEqual(sliceSlope, 0.0)) {
             final double sliceCenter =
                     (imagingCenter - settings.sliceCalibration().offset()) / sliceSlope;
-            scanner.setPosition(scanner.getPosition().x, sliceCenter);
+            scanner.setPositionY(sliceCenter);
         }
     }
 
