@@ -278,9 +278,11 @@ public class ControlPanel extends Panel implements Subscriber {
         }
     }
 
+    // the other axis is read inside the try, so a failed read skips the move instead of
+    // moving with 0 in place of the unread position
     private void setXPosition(final double dx) {
         try {
-            core_.setXYPosition(deviceName_, dx, getYPosition());
+            core_.setXYPosition(deviceName_, dx, core_.getYPosition(deviceName_));
         } catch (Exception e) {
             model_.studio().logs().showError("failed!");
         }
@@ -288,7 +290,7 @@ public class ControlPanel extends Panel implements Subscriber {
 
     private void setYPosition(final double dy) {
         try {
-            core_.setXYPosition(deviceName_, getXPosition(), dy);
+            core_.setXYPosition(deviceName_, core_.getXPosition(deviceName_), dy);
         } catch (Exception e) {
             model_.studio().logs().showError("failed!");
         }
@@ -307,28 +309,6 @@ public class ControlPanel extends Panel implements Subscriber {
             core_.setPosition(deviceName_, d);
         } catch (Exception e) {
             model_.studio().logs().showError("failed to set position!");
-        }
-    }
-
-    //////////////////////////////
-
-    // TODO: return 0.0 on failure?
-
-    private double getXPosition() {
-        try {
-            return core_.getXPosition(deviceName_);
-        } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
-            return 0.0;
-        }
-    }
-
-    private double getYPosition() {
-        try {
-            return core_.getYPosition(deviceName_);
-        } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
-            return 0.0;
         }
     }
 
@@ -389,21 +369,21 @@ public class ControlPanel extends Panel implements Subscriber {
         }
     }
 
+    // the galvo position is read inside the try, so a failed read skips the move instead of
+    // moving with 0 in place of the unread position
     private void setRelativeGalvoPositionX(final double dx) {
-        final double x = getGalvoPositionX();
-        final double y = getGalvoPositionY();
         try {
-            core_.setGalvoPosition(deviceName_, x + dx, y);
+            final Point2D.Double position = core_.getGalvoPosition(deviceName_);
+            core_.setGalvoPosition(deviceName_, position.x + dx, position.y);
         } catch (Exception e) {
             model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
         }
     }
 
     private void setRelativeGalvoPositionY(final double dy) {
-       final double x = getGalvoPositionX();
-       final double y = getGalvoPositionY();
         try {
-            core_.setGalvoPosition(deviceName_, x, y + dy);
+            final Point2D.Double position = core_.getGalvoPosition(deviceName_);
+            core_.setGalvoPosition(deviceName_, position.x, position.y + dy);
         } catch (Exception e) {
             model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
         }
@@ -411,7 +391,7 @@ public class ControlPanel extends Panel implements Subscriber {
 
     private void setPositionGalvoX(final double dx) {
         try {
-            core_.setGalvoPosition(deviceName_, dx, getGalvoPositionY());
+            core_.setGalvoPosition(deviceName_, dx, core_.getGalvoPosition(deviceName_).y);
         } catch (Exception e) {
            model_.studio().logs().showError("failed!");
         }
@@ -419,40 +399,10 @@ public class ControlPanel extends Panel implements Subscriber {
 
     private void setPositionGalvoY(final double dy) {
         try {
-            core_.setGalvoPosition(deviceName_, getGalvoPositionX(), dy);
+            core_.setGalvoPosition(deviceName_, core_.getGalvoPosition(deviceName_).x, dy);
         } catch (Exception e) {
             model_.studio().logs().showError("failed!");
         }
-    }
-
-    private Point2D.Double getGalvoPosition() {
-        Point2D.Double result = new Point2D.Double();
-        try {
-            result = core_.getGalvoPosition(deviceName_);
-        } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
-        }
-        return result;
-    }
-
-    private double getGalvoPositionX() {
-        double result = 0.0;
-        try {
-            result = core_.getGalvoPosition(deviceName_).x;
-        } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
-        }
-        return result;
-    }
-
-    private double getGalvoPositionY() {
-        double result = 0.0;
-        try {
-            result = core_.getGalvoPosition(deviceName_).y;
-        } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
-        }
-        return result;
     }
 
     @Override

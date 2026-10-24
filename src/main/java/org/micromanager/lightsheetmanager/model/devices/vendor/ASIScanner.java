@@ -33,7 +33,21 @@ public class ASIScanner extends ASITigerBase {
         try {
             core_.setGalvoPosition(deviceName_, x, y);
         } catch (Exception e) {
-            studio_.logs().showError("Could not move the scanner!");
+            studio_.logs().showError("could not move " + deviceName_ + " to (" + x + ", " + y
+                    + "): " + e.getMessage());
+        }
+    }
+
+    /**
+     * Moves y and keeps x where it is. x is read inside the try, so a failed read skips the move
+     * instead of moving with 0 in place of the unread position.
+     */
+    public void setPositionY(final double y) {
+        try {
+            core_.setGalvoPosition(deviceName_, core_.getGalvoPosition(deviceName_).x, y);
+        } catch (Exception e) {
+            studio_.logs().showError("could not move " + deviceName_ + " y to " + y + ": "
+                    + e.getMessage());
         }
     }
 
@@ -41,7 +55,8 @@ public class ASIScanner extends ASITigerBase {
         try {
             return core_.getGalvoPosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("Could not get the scanner position!");
+            studio_.logs().showError("could not get the position of " + deviceName_
+                    + ": " + e.getMessage());
             return new Point2D.Double(0.0, 0.0);
         }
     }

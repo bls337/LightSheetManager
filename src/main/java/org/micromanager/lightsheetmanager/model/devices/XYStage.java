@@ -16,11 +16,12 @@ public class XYStage extends DeviceBase {
         super(studio, deviceName);
     }
 
-    public void setRelativeXYPosition(final int x, final int y) {
+    public void setRelativeXYPosition(final double x, final double y) {
         try {
             core_.setRelativeXYPosition(deviceName_, x, y);
         } catch (Exception e) {
-            studio_.logs().showError("could not set relative move for " + deviceName_);
+            studio_.logs().showError("could not move " + deviceName_ + " by (" + x + ", " + y
+                    + "): " + e.getMessage());
         }
     }
 
@@ -28,7 +29,8 @@ public class XYStage extends DeviceBase {
         try {
             core_.setXYPosition(deviceName_, x, y);
         } catch (Exception e) {
-            studio_.logs().showError("could not set move for " + deviceName_);
+            studio_.logs().showError("could not move " + deviceName_ + " to (" + x + ", " + y
+                    + "): " + e.getMessage());
         }
     }
 

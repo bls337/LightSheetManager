@@ -29,7 +29,8 @@ public class ASIPiezo extends ASITigerBase {
         try {
             core_.setPosition(deviceName_, position);
         } catch (Exception e) {
-            studio_.logs().showError("Could not move piezo!");
+            studio_.logs().showError("could not move " + deviceName_ + " to " + position
+                    + ": " + e.getMessage());
         }
     }
 
@@ -37,7 +38,8 @@ public class ASIPiezo extends ASITigerBase {
         try {
             return core_.getPosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("Could get the piezo position!");
+            studio_.logs().showError("could not get the position of " + deviceName_
+                    + ": " + e.getMessage());
             return 0.0;
         }
     }
@@ -46,7 +48,8 @@ public class ASIPiezo extends ASITigerBase {
         try {
             core_.home(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("Could not move piezo to home!");
+            studio_.logs().showError("could not move " + deviceName_ + " to its home position: "
+                    + e.getMessage());
         }
     }
 
