@@ -2,6 +2,7 @@ package org.micromanager.lightsheetmanager.model.acquisitions;
 
 import org.micromanager.MultiStagePosition;
 import org.micromanager.PositionList;
+import org.micromanager.StagePosition;
 import org.micromanager.acqj.internal.Engine;
 import org.micromanager.acqj.main.AcqEngMetadata;
 import org.micromanager.acqj.main.AcquisitionEvent;
@@ -56,8 +57,8 @@ public final class LightSheetEventAdapter {
      * filed against the wrong channel and slice.
      * <p>
      * A single channel takes the same exception as that factory: hardware channel switching is not
-     * set up for one channel, so its own preset and offset apply and are baked onto the base event,
-     * where they cannot split the merge.
+     * set up for one channel, so its own preset applies and is baked onto the base event, where it
+     * cannot split the merge.
      *
      * @param usedChannels the channels the controller was programmed for
      */
@@ -181,19 +182,6 @@ public final class LightSheetEventAdapter {
         baseEvent.setConfigPreset(channel.getName());
         baseEvent.setChannelName(Integer.toString(channelIndex));
 
-        // Channel z-offset: apply the offset to the current stage/z position.
-        double zPos;
-        if (baseEvent.getZPosition() == null) {
-            try {
-                zPos = Engine.getCore().getPosition() + channel.getOffset();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            zPos = baseEvent.getZPosition() + channel.getOffset();
-        }
-        baseEvent.setZ(baseEvent.getZIndex(), zPos);
-
         // No channel stage follows here, so cameras() writes the finished slot: this channel's index
         // as the base, stepping a whole channel count per camera. cameras() would otherwise derive
         // the base from CAMERA_AXIS (setChannelName above put the channel index there); passing it
@@ -233,9 +221,9 @@ public final class LightSheetEventAdapter {
      * event order per camera has to match the order the camera delivers frames.
      * <p>
      * A single channel is the exception. Hardware channel switching is not set up at all for one
-     * channel, so that channel's own preset and offset apply, as they do on the software path.
-     * Baking them into the base event leaves every event carrying the same preset, which cannot
-     * split the merge, since a sequence only breaks where consecutive presets differ.
+     * channel, so that channel's own preset applies, as it does on the software path. Baking it into
+     * the base event leaves every event carrying the same preset, which cannot split the merge,
+     * since a sequence only breaks where consecutive presets differ.
      *
      * @param usedChannels the channels the controller was programmed for
      */
@@ -265,25 +253,12 @@ public final class LightSheetEventAdapter {
     }
 
     /**
-     * Bake one channel's preset and z-offset onto the base event, for a run with a single channel
-     * in use.
+     * Bake one channel's preset onto the base event, for a run with a single channel in use.
+     * The channel's offset moves nothing.
      */
     private static void applySingleChannel(AcquisitionEvent baseEvent, ChannelSpec channel) {
         baseEvent.setConfigGroup(channel.getGroup());
         baseEvent.setConfigPreset(channel.getName());
-
-        // Channel z-offset: apply the offset to the current stage/z position.
-        double zPos;
-        if (baseEvent.getZPosition() == null) {
-            try {
-                zPos = Engine.getCore().getPosition() + channel.getOffset();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            zPos = baseEvent.getZPosition() + channel.getOffset();
-        }
-        baseEvent.setZ(baseEvent.getZIndex(), zPos);
     }
 
     /**
@@ -505,13 +480,16 @@ public final class LightSheetEventAdapter {
     /**
      * Iterate over an arbitrary list of positions. Adds in position indices to
      * the axes that assume the order in the list provided correspond to the
-     * desired indices
+     * desired indices. Each position is set on its event as {@link #setEventPosition}
+     * describes, against the core's current XY and focus devices.
      *
-     * @param positionList the list of positions or iterate over
+     * @param positionList the list of positions to iterate over
      * @return
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> positions(
             PositionList positionList) {
+        final String xyStageLabel = Engine.getCore().getXYStageDevice();
+        final String focusStageLabel = Engine.getCore().getFocusDevice();
         return (AcquisitionEvent event) -> new Iterator<>() {
             int index = 0;
 
@@ -522,12 +500,10 @@ public final class LightSheetEventAdapter {
 
             @Override
             public AcquisitionEvent next() {
-                //System.out.println("called! " + index);
                 AcquisitionEvent posEvent = event.copy();
                 MultiStagePosition msp = positionList.getPosition(index);
                 if (msp != null) {
-                    posEvent.setX(msp.getX());
-                    posEvent.setY(msp.getY());
+                    setEventPosition(posEvent, msp, xyStageLabel, focusStageLabel);
                 }
                 posEvent.setAxisPosition(POSITION_AXIS, index);
 
@@ -535,6 +511,50 @@ public final class LightSheetEventAdapter {
                 return posEvent;
             }
         };
+    }
+
+    /**
+     * Sets the event's x and y from the position's entry for the XY stage, and its z from the
+     * entry for the focus stage. A stage the position has no entry for is left off the event,
+     * so it stays where the previous position left it. Entries are matched by device label, not
+     * by the position's default stage names, which a grid or script position may not set.
+     *
+     * @param event the event to set the position on
+     * @param position the position
+     * @param xyStageLabel the core's XY stage device
+     * @param focusStageLabel the core's focus device
+     */
+    public static void setEventPosition(final AcquisitionEvent event,
+            final MultiStagePosition position, final String xyStageLabel,
+            final String focusStageLabel) {
+        final StagePosition xy = findStagePosition(position, xyStageLabel, 2);
+        if (xy != null) {
+            event.setX(xy.get2DPositionX());
+            event.setY(xy.get2DPositionY());
+        }
+        final StagePosition focus = findStagePosition(position, focusStageLabel, 1);
+        if (focus != null) {
+            event.setZ(null, focus.get1DPosition());
+        }
+    }
+
+    /**
+     * The position's entry for the given device with the given axis count, or null. An empty
+     * label matches nothing, so an unset core device never claims an entry.
+     */
+    private static StagePosition findStagePosition(final MultiStagePosition position,
+            final String label, final int numAxes) {
+        if (label == null || label.isEmpty()) {
+            return null;
+        }
+        for (int i = 0; i < position.size(); i++) {
+            final StagePosition stage = position.get(i);
+            if (stage.getNumberOfStageAxes() == numAxes
+                    && label.equals(stage.getStageDeviceLabel())) {
+                return stage;
+            }
+        }
+        return null;
     }
 
 //   /**
