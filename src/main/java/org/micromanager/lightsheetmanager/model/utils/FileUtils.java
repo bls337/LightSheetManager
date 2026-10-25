@@ -26,7 +26,8 @@ public final class FileUtils {
         try {
             result = org.apache.commons.io.FileUtils.readFileToString(new File(filePath), "UTF-8");
         } catch (IOException e) {
-            MMStudio.getInstance().logs().logError("FileUtils: readFileToString error");
+            MMStudio.getInstance().logs().logError("Could not read " + filePath + ": "
+                    + e.getMessage());
         }
         return result;
     }
@@ -41,7 +42,8 @@ public final class FileUtils {
         try {
             org.apache.commons.io.FileUtils.writeStringToFile(new File(filePath), contents, "UTF-8");
         } catch (IOException e) {
-            MMStudio.getInstance().logs().logError("FileUtils: writeStringToFile error");
+            MMStudio.getInstance().logs().logError("Could not write " + filePath + ": "
+                    + e.getMessage());
         }
     }
 
