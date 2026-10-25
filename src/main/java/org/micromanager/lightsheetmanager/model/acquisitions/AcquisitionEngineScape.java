@@ -2217,7 +2217,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // stackDuration is per-view, per-channel, per-position
         final double stackDuration = numCameraTriggers * acqSettings_.timing().sliceDurationMs();
 
-        if (acqSettings_.stageScan().enabled()) {
+        // estimate a stage scan only if stage scanning is available, otherwise a galvo scan
+        if (acqSettings_.stageScan().enabled() && model_.devices().hasStageScanning()) {
             final double rampDuration = getStageRampDuration(acqSettings_);
             final double retraceTime = getStageRetraceDuration(acqSettings_);
             // TODO(Jon): double-check these calculations below, at least they are better than before ;-)
