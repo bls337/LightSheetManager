@@ -256,7 +256,16 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     return false;
                 }
                 // second part: initialize stage scanning, so we can restore state later
-                xyPosUm_ = xyStage.getXYPosition();
+                // TODO: wrap the position, speed and acceleration up into a stage scan state object
+                // the position is read inside the try, so a failed read refuses the run instead
+                // of returning the stage to 0 in place of the unread position
+                try {
+                    xyPosUm_ = core_.getXYStagePosition(xyStage.getDeviceName());
+                } catch (Exception e) {
+                    model_.logging().reportError("could not get the start position of "
+                            + xyStage.getDeviceName() + ": " + e.getMessage());
+                    return false;
+                }
                 origSpeedX_ = xyStage.getSpeedX();
                 origAccelX_ = xyStage.getAccelerationX();
 
