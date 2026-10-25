@@ -354,7 +354,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
             try {
                 acqFinished.get();
             } catch (Exception e) {
-                model_.studio().logs().logError("error in runAcquisition");
+                // the run task reports its own exceptions, so this is an Error that escaped it
+                model_.logging().reportError(e, "The acquisition ended with an error");
             }
             // update the GUI when acquisition complete
             acqFinishedCallback();
