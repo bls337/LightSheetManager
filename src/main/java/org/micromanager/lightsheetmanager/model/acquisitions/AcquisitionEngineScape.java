@@ -156,6 +156,12 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 model_.logging().reportError("XY positions expected but the position list is empty");
                 return false;
             }
+            // this is needed for LSMAcquisitionEvents to work with multiple positions
+            if (core_.getFocusDevice().isEmpty()) {
+                model_.logging().reportError(
+                        "The default focus device \"Core-Focus\" needs to be set to use multiple positions.");
+                return false;
+            }
         }
 
         // checked here so demo and NIDAQ runs, which skip doHardwareCalculations, refuse too
@@ -221,15 +227,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 studio_.logs().logError("Could not read the current preset of channel group " + group);
             }
         }
-
-        // this is needed for LSMAcquisitionEvents to work with multiple positions
-        if (core_.getFocusDevice().isEmpty()
-                && acqSettings_.isUsingMultiplePositions()) {
-            model_.logging().reportError(
-                    "The default focus device \"Core-Focus\" needs to be set to use multiple positions.");
-            return false;
-        }
-
 
         return true;
     }

@@ -140,7 +140,9 @@ public class CameraPanel extends Panel {
                             model_.studio().core().setCameraDevice(camera.getDeviceName());
                             camera.setTriggerMode(CameraMode.INTERNAL);
                         } catch (Exception ex) {
-                            model_.studio().logs().showError("could not set camera to " + camera.getDeviceName());
+                            btnInvertedPath_.setState(false);
+                            model_.studio().logs().showError("could not set camera to "
+                                    + camera.getDeviceName() + ": " + ex.getMessage());
                             return; // early exit
                         }
                         isPreviewPressed = true;
@@ -165,12 +167,15 @@ public class CameraPanel extends Panel {
                             model_.studio().core().setCameraDevice(camera.getDeviceName());
                             camera.setTriggerMode(CameraMode.INTERNAL);
                         } catch (Exception ex) {
-                            model_.studio().logs().showError("could not set camera to " + camera.getDeviceName());
+                            btnLiveMode_.setState(false);
+                            model_.studio().logs().showError("could not set camera to "
+                                    + camera.getDeviceName() + ": " + ex.getMessage());
                             return; // early exit
                         }
                         isLivePressed = true;
                         model_.studio().live().setLiveModeOn(true);
                     } else {
+                        btnLiveMode_.setState(false);
                         // TODO: use correct name for camera, ImagingCamera1, etc
                         model_.studio().logs().showError(
                                 "No device for \"ImagingCamera\" set in the device adapter.");

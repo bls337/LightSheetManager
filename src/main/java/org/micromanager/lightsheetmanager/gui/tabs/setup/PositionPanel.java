@@ -230,10 +230,11 @@ public class PositionPanel extends Panel implements Subscriber, ListeningPanel {
 
     @Override
     public void update(String topic, Object value) {
+        // until a device is first read, the poller holds 0.0 for it, even for a galvo
         SwingUtilities.invokeLater(() -> {
-            if (topic.equals("ImagingFocus")) {
+            if (topic.equals("ImagingFocus") && value instanceof Double) {
                 lblImagingPositionValue_.setText(String.format("%.3f μm", (double)value));
-            } else if (topic.equals("IllumSlice")) {
+            } else if (topic.equals("IllumSlice") && value instanceof Point2D.Double) {
                 final Point2D.Double point = (Point2D.Double)value;
                 lblSlicePositionValue_.setText(String.format("%.3f °", point.y));
             }
