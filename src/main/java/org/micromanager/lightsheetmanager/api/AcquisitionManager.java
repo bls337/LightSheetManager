@@ -22,11 +22,20 @@ public interface AcquisitionManager {
      * an exception, or refused before it started. It tells when the request is over, not how
      * it went, and waiting on it blocks until then.
      *
-     * @param speedTest true to run Micro-Manager's speed test, which streams the camera to the
-     *                  save directory, instead of the acquisition
      * @return a future that completes when the request is over
      */
-    Future<?> requestRun(boolean speedTest);
+    Future<?> requestRun();
+
+    /**
+     * Request that Micro-Manager's speed test is run, which streams the camera to the save
+     * directory.
+     *
+     * <p>It is not an acquisition, so a stop request does not end it. The future completes
+     * normally however it ends.
+     *
+     * @return a future that completes when the request is over
+     */
+    Future<?> requestSpeedTest();
 
     /**
      * Request that a test acquisition is run.
