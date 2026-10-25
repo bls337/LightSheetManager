@@ -551,14 +551,15 @@ public class DeviceManager {
                 studio_.logs().logError("could not create the \"" + groupName + "\" configuration group.");
                 return; // early exit
             }
-            // create config
-            if (!core_.isConfigDefined(groupName, configName)) {
-                try {
-                    core_.defineConfig(groupName, configName);
-                } catch (Exception e) {
-                    studio_.logs().logError("could not create the \"" + configName + "\" configuration preset.");
-                    return; // early exit
-                }
+        }
+
+        // create config, also when the group exists without it
+        if (!core_.isConfigDefined(groupName, configName)) {
+            try {
+                core_.defineConfig(groupName, configName);
+            } catch (Exception e) {
+                studio_.logs().logError("could not create the \"" + configName + "\" configuration preset.");
+                return; // early exit
             }
         }
 
