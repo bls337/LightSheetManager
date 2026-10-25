@@ -375,21 +375,32 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         acqSettings_ = settings;
     }
 
+    @Override
     public Future<?> requestRun() {
         return requestRun(false);
     }
 
     @Override
-    public Future<?> requestRun(boolean speedTest) {
-        return requestRun(speedTest, false);
+    public Future<?> requestSpeedTest() {
+        // on the acquisition executor, so a speed test never overlaps a run
+        return acquisitionExecutor_.submit(() -> {
+            try {
+                updateSettings(); // make sure settings are current
+                SpeedTest.runSpeedTest(acqSettings_.saveDirectory(),
+                      acqSettings_.saveNamePrefix(),
+                      core_, acqSettings_.numTimePoints(), true);
+            } catch (Exception e) {
+                model_.logging().reportError(e);
+            }
+        });
     }
 
     @Override
     public Future<?> requestTestAcquisition() {
-        return requestRun(false, true);
+        return requestRun(true);
     }
 
-    private Future<?> requestRun(boolean speedTest, boolean testAcquisition) {
+    private Future<?> requestRun(boolean testAcquisition) {
         // set here and not inside the task: a Stop clicked while the task is still queued, or
         // anywhere inside setup(), must find a run in flight
         acquisitionRequested_ = true;
@@ -404,7 +415,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
             }
 
             // marker data
-            long runId = -1; // set at START; guards STOP so the speed-test path emits no marker
+            long runId = -1; // set at START, so STOP is logged only after a START
             long startNs = 0; // set alongside runId at START
 
             try {
@@ -415,17 +426,6 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
                 testAcquisition_ = testAcquisition;
 
                 updateSettings(); // make sure settings are current
-
-                if (speedTest) {
-                    try {
-                        SpeedTest.runSpeedTest(acqSettings_.saveDirectory(),
-                              acqSettings_.saveNamePrefix(),
-                              core_, acqSettings_.numTimePoints(), true);
-                    } catch (Exception e) {
-                        model_.logging().reportError(e);
-                    }
-                    return; // early exit => do speed test
-                }
 
                 // LSM-ACQ-START/STOP bracket the acquisition window for CoreLog diffing
                 runId = runIdCounter_.incrementAndGet();
@@ -756,7 +756,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     /**
      * Shutter state as it was before a run changed it.
      *
-     * <p>finish() runs on paths that never reach the capture (setup failure, speed test), so the
+     * <p>finish() runs on paths that never reach the capture (a setup failure), so the
      * reference is null until a run has captured it and is cleared again once restored. Assigning
      * it is the same statement as capturing it, so the two cannot disagree.
      */

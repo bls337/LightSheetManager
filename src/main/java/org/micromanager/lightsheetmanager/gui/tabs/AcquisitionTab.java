@@ -334,7 +334,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
     private void runAcquisition(boolean speedTest) {
         btnSpeedTest_.setEnabled(false);
         btnTestAcquisition_.setEnabled(false);
-        waitForAcquisition(model_.acquisitions().requestRun(speedTest));
+        waitForAcquisition(speedTest
+                ? model_.acquisitions().requestSpeedTest()
+                : model_.acquisitions().requestRun());
     }
 
     private void runTestAcquisition() {
