@@ -44,7 +44,8 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
         try {
             core_.setExposure(deviceName_, milliseconds);
         } catch (Exception e) {
-            studio_.logs().logError("could not set camera exposure");
+            studio_.logs().logError("could not set the exposure of camera " + deviceName_ + " to "
+                    + milliseconds + " ms: " + e.getMessage());
         }
     }
 
@@ -56,7 +57,8 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
         try {
             exposure = core_.getExposure(deviceName_);
         } catch (Exception e) {
-            studio_.logs().logError("could not get camera exposure");
+            studio_.logs().logError("could not get the exposure of camera " + deviceName_ + ": "
+                    + e.getMessage());
         }
         return exposure;
     }
@@ -73,7 +75,8 @@ public abstract class CameraBase extends DeviceBase implements LightSheetCamera 
         try {
             roi = core_.getROI(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("could not get camera roi");
+            studio_.logs().showError("could not get the ROI of camera " + deviceName_ + ": "
+                    + e.getMessage());
         }
         return roi;
     }
