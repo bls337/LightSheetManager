@@ -50,7 +50,8 @@ public class DeviceBase {
         try {
             result = core_.getProperty(deviceName_, propertyName);
         } catch (Exception e) {
-            studio_.logs().logError("Could not get the \"" + propertyName + "\" property.");
+            studio_.logs().logError("Could not get the \"" + propertyName + "\" property of "
+                    + deviceName_ + ": " + e.getMessage());
         }
         return result;
     }
@@ -59,7 +60,8 @@ public class DeviceBase {
         try {
             core_.setProperty(deviceName_, propertyName, propertyValue);
         } catch (Exception e) {
-            studio_.logs().logError("Could not set the \"" + propertyName + "\" property to " + propertyValue + ".");
+            studio_.logs().logError("Could not set the \"" + propertyName + "\" property of "
+                    + deviceName_ + " to " + propertyValue + ": " + e.getMessage());
         }
     }
 
@@ -68,7 +70,8 @@ public class DeviceBase {
         try {
             result = Integer.parseInt(core_.getProperty(deviceName_, propertyName));
         } catch (Exception e) {
-            studio_.logs().logError("Could not get the \"" + propertyName + "\" property as an integer.");
+            studio_.logs().logError("Could not get the \"" + propertyName + "\" property of "
+                    + deviceName_ + " as an integer: " + e.getMessage());
         }
         return result;
     }
@@ -77,7 +80,8 @@ public class DeviceBase {
         try {
             core_.setProperty(deviceName_, propertyName, propertyValue);
         } catch (Exception e) {
-            studio_.logs().logError("Could not set the \"" + propertyName + "\" property to " + propertyValue + ".");
+            studio_.logs().logError("Could not set the \"" + propertyName + "\" property of "
+                    + deviceName_ + " to " + propertyValue + ": " + e.getMessage());
         }
     }
 
@@ -88,7 +92,8 @@ public class DeviceBase {
         try {
             result = Double.parseDouble(core_.getProperty(deviceName_, propertyName));
         } catch (Exception e) {
-            studio_.logs().logError("could not get the \"" + propertyName + "\" property as a double.");
+            studio_.logs().logError("Could not get the \"" + propertyName + "\" property of "
+                    + deviceName_ + " as a double: " + e.getMessage());
         }
         return result;
     }
@@ -97,7 +102,8 @@ public class DeviceBase {
         try {
             core_.setProperty(deviceName_, propertyName, propertyValue);
         } catch (Exception e) {
-            studio_.logs().logError("could not set the \"" + propertyName + "\" property to " + propertyValue + ".");
+            studio_.logs().logError("Could not set the \"" + propertyName + "\" property of "
+                    + deviceName_ + " to " + propertyValue + ": " + e.getMessage());
         }
     }
 
@@ -173,7 +179,8 @@ public class DeviceBase {
         try {
             return core_.getAllowedPropertyValues(deviceName_, propertyName).toArray();
         } catch (Exception e) {
-            studio_.logs().logError("Could not get the allowed values of the \"" + propertyName + "\" property.");
+            studio_.logs().logError("Could not get the allowed values of the \"" + propertyName
+                    + "\" property of " + deviceName_ + ": " + e.getMessage());
             return new String[0];
         }
     }
@@ -197,7 +204,8 @@ public class DeviceBase {
         try {
             core_.waitForDevice(deviceName_);
         } catch (Exception e) {
-            studio_.logs().logError("Error waiting for device: " + deviceName_);
+            studio_.logs().logError("Error waiting for device " + deviceName_ + ": "
+                    + e.getMessage());
         }
     }
 

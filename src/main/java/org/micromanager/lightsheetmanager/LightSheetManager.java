@@ -63,10 +63,8 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
 
         // first we check to see if the device adapter is present
         if (!deviceManager_.hasDeviceAdapter()) {
-            final String message = "Could not find the Light Sheet Manager " +
-                    "device adapter in the hardware configuration.";
-            studio_.logs().logError(message);
-            errorText_ = message;
+            // hasDeviceAdapter() sets the error text: no adapter, or more than one
+            studio_.logs().logError(errorText_);
             return false;
         }
 
