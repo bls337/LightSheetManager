@@ -19,7 +19,8 @@ public class ASIZStage extends ASITigerBase {
         try {
             core_.setPosition(deviceName_, position);
         } catch (Exception e) {
-            studio_.logs().showError("could not set position for " + deviceName_);
+            studio_.logs().showError("could not move " + deviceName_ + " to " + position
+                    + ": " + e.getMessage());
         }
     }
 
@@ -27,7 +28,8 @@ public class ASIZStage extends ASITigerBase {
         try {
             core_.setRelativePosition(deviceName_, position);
         } catch (Exception e) {
-            studio_.logs().showError("could not set relative position for " + deviceName_);
+            studio_.logs().showError("could not move " + deviceName_ + " by " + position
+                    + ": " + e.getMessage());
         }
     }
 
@@ -35,7 +37,8 @@ public class ASIZStage extends ASITigerBase {
         try {
             return core_.getPosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("could not get position for " + deviceName_);
+            studio_.logs().showError("could not get position for " + deviceName_ + ": "
+                    + e.getMessage());
             return 0.0;
         }
     }
