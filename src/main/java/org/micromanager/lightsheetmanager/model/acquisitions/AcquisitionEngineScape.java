@@ -156,7 +156,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                 model_.logging().reportError("XY positions expected but the position list is empty");
                 return false;
             }
-            // this is needed for LSMAcquisitionEvents to work with multiple positions
+            // a position's z is taken from its entry for the Core-Focus device,
+            // so without one a stored z would be skipped
             if (core_.getFocusDevice().isEmpty()) {
                 model_.logging().reportError(
                         "The default focus device \"Core-Focus\" needs to be set to use multiple positions.");
