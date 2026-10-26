@@ -40,7 +40,8 @@ public class DeviceBase {
         try {
             result = core_.hasProperty(deviceName_, propertyName);
         } catch (Exception e) {
-            studio_.logs().showError("Error: could not determine if " + propertyName + " exists.");
+            studio_.logs().showError("Error: could not determine if " + propertyName + " of "
+                    + deviceName_ + " exists: " + e.getMessage());
         }
         return result;
     }
@@ -196,7 +197,7 @@ public class DeviceBase {
        try {
           core_.stop(deviceName_);
        } catch (Exception e) {
-          studio_.logs().logError("Error halting device: " + deviceName_);
+          studio_.logs().logError("Error halting device " + deviceName_ + ": " + e.getMessage());
        }
     }
 
