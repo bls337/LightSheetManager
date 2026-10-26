@@ -47,6 +47,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 import org.micromanager.lightsheetmanager.model.utils.FileUtils;
 import org.micromanager.lightsheetmanager.model.utils.GeometryUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
+import org.micromanager.lightsheetmanager.model.utils.StageScanUtils;
 
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
@@ -2230,12 +2231,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
     }
 
     private double getScanStageAcceleration(final ScapeAcquisitionSettings settings) {
-        // TODO: remove this and find a better way
-        if (controller_ == null) {
-            controller_ = new PLogicScape(model_);
-        }
+        final ASIXYStage stage = model_.devices().device("SampleXY");
         // extra 1 for rounding up that often happens in controller
-        return controller_.computeScanAcceleration(controller_.computeScanSpeed(settings), settings) + 1;
+        return StageScanUtils.computeScanAcceleration(StageScanUtils.computeScanSpeed(settings),
+                stage.getMaxSpeedX(), settings.stageScan().accelerationFactor()) + 1;
     }
 
     private double getStageRetraceDuration(final ScapeAcquisitionSettings settings) {

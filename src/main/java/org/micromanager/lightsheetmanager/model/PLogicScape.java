@@ -19,6 +19,7 @@ import org.micromanager.lightsheetmanager.model.devices.vendor.ASIZStage;
 import org.micromanager.lightsheetmanager.model.devices.vendor.SingleAxis;
 import org.micromanager.lightsheetmanager.model.utils.GeometryUtils;
 import org.micromanager.lightsheetmanager.model.utils.NumberUtils;
+import org.micromanager.lightsheetmanager.model.utils.StageScanUtils;
 
 import java.awt.geom.Point2D;
 import java.util.Objects;
@@ -201,7 +202,7 @@ public class PLogicScape {
             final double actualMotorSpeed = xyStage_.getSpeedXUm() / 1000;
 
             // set the acceleration to a reasonable value for the (usually very slow) scan speed
-            xyStage_.setAccelerationX(computeScanAcceleration(actualMotorSpeed,
+            xyStage_.setAccelerationX(StageScanUtils.computeScanAcceleration(actualMotorSpeed,
                     xyStage_.getMaxSpeedX(), settings.stageScan().accelerationFactor()));
 
             // set the scan pattern and number of scans appropriately
@@ -210,7 +211,7 @@ public class PLogicScape {
                 numLines = 1;  // assure in acquisition code that we can't have single-sided interleaved
             }
             if (settings.channels().enabled()) {
-                numLines = numLines * (settings.channels().count() / computeScanChannelsPerPass(settings));
+                numLines = numLines * (settings.channels().count() / StageScanUtils.computeScanChannelsPerPass(settings));
             }
             xyStage_.setScanNumLines(numLines);
 
@@ -264,47 +265,7 @@ public class PLogicScape {
 
     // Compute appropriate motor speed in mm/s for the given stage scanning settings
     public double computeScanSpeed(final ScapeAcquisitionSettings settings) {
-        double sliceDurationMs = settings.timing().sliceDurationMs();
-        if (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED) {
-            // pretend like our slice takes twice as long so that we move the correct speed
-            // this has the effect of halving the motor speed, but keeping the scan distance the same
-            sliceDurationMs *= 2;
-        }
-        final int channelsPerPass = computeScanChannelsPerPass(settings);
-        final double speedFactor = GeometryUtils.getStageGeometricSpeedFactor(
-                settings.stageScan().firstViewAngle(), settings.volume().firstView() == 1);
-        return settings.volume().sliceStepSize() * speedFactor / sliceDurationMs / channelsPerPass;
-    }
-
-    // compute how many channels we do in each one-way scan, at least 1 so the speed and the scan
-    // line count never divide by 0 when channels are enabled but none is used
-    private int computeScanChannelsPerPass(ScapeAcquisitionSettings settings) {
-        return settings.channels().mode() == ChannelMode.SLICE_HW
-                ? Math.max(1, settings.channels().count()) : 1;
-    }
-
-    /**
-     * Compute appropriate acceleration time in ms for the specified motor speed.
-     * Set to be 10ms + 0-100ms depending on relative speed to max, all scaled by factor specified on the settings panel
-     * @param motorSpeed
-     * @return
-     */
-    public double computeScanAcceleration(final double motorSpeed, final ScapeAcquisitionSettings settings) {
-        return (10 + 100 * (motorSpeed / xyStage_.getMaxSpeedX())) * settings.stageScan().accelerationFactor();
-    }
-
-    /**
-     * Compute appropriate acceleration time in ms for the specified motor speed.
-     * Set to be 10ms + 0-100ms depending on relative speed to max, all scaled by factor specified on the settings panel
-     *
-     * @param motorSpeed
-     * @return
-     */
-    public double computeScanAcceleration(final double motorSpeed, final double maxMotorSpeed, final double stageScanAccelFactor) {
-//        final double maxMotorSpeed = props_.getPropValueFloat(Devices.Keys.XYSTAGE, Properties.Keys.STAGESCAN_MAX_MOTOR_SPEED_X);
-//        final double accelFactor = props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_STAGESCAN_ACCEL_FACTOR);
-//        return (10 + 100 * (motorSpeed / maxMotorSpeed) ) * accelFactor;
-        return (10 + 100 * (motorSpeed / maxMotorSpeed)) * stageScanAccelFactor;
+        return StageScanUtils.computeScanSpeed(settings);
     }
 
     public boolean prepareStageScanForAcquisition(final double x, final double y, ScapeAcquisitionSettings settings) {
