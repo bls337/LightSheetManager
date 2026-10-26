@@ -13,44 +13,44 @@ public interface AcquisitionSettingsDispim extends AcquisitionSettings {
     Builder copyBuilder();
 
     /**
-     * Returns the immutable DefaultTimingSettings instance.
+     * Returns the immutable TimingSettings instance.
      *
-     * @return immutable DefaultTimingSettings instance.
+     * @return immutable TimingSettings instance.
      */
     TimingSettings timing();
 
     /**
-     * Returns the immutable DefaultSliceSettings instance.
+     * Returns the immutable SliceSettings instance.
      *
-     * @return immutable DefaultSliceSettings instance.
+     * @return immutable SliceSettings instance.
      */
     SliceSettings slice();
 
     /**
-     * Returns the immutable DefaultSliceSettingsLS instance.
+     * Returns the immutable SliceSettingsLightSheet instance.
      *
-     * @return immutable DefaultSliceSettingsLS instance.
+     * @return immutable SliceSettingsLightSheet instance.
      */
     SliceSettingsLightSheet sliceLS();
 
     /**
-     * Returns the immutable DefaultScanSettings instance.
+     * Returns the immutable StageScanSettings instance.
      *
-     * @return immutable DefaultScanSettings instance.
+     * @return immutable StageScanSettings instance.
      */
     StageScanSettings stageScan();
 
     /**
-     * Returns the immutable DefaultSheetCalibration instance.
+     * Returns the immutable SheetCalibration instance.
      *
-     * @return immutable DefaultSheetCalibration instance.
+     * @return immutable SheetCalibration instance.
      */
     SheetCalibration sheetCalibration(final int view);
 
     /**
-     * Returns the immutable DefaultSliceCalibration instance.
+     * Returns the immutable SliceCalibration instance.
      *
-     * @return immutable DefaultSliceCalibration instance.
+     * @return immutable SliceCalibration instance.
      */
     SliceCalibration sliceCalibration(final int view);
 

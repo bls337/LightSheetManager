@@ -107,9 +107,9 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         }
 
         /**
-         * Sets the folder name.
+         * Sets the save name prefix, used for the acquisition folder name.
          *
-         * @param name the name of the folder
+         * @param name the save name prefix
          * @throws IllegalArgumentException if the name cannot be used as a Windows file name
          */
         @Override

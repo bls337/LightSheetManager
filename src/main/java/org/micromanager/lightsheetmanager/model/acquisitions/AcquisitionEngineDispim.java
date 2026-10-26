@@ -581,7 +581,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
             final String savePath = FileUtils.createUniquePath(
                     acqSettings_.saveDirectory(), acqSettings_.saveNamePrefix());
             try {
-                // convert from DataStorage.SaveMode to Datastore.SaveMode
+                // convert from SaveMode to Datastore.SaveMode
                 final Datastore.SaveMode saveMode = SaveMode.convert(acqSettings_.saveMode());
                 datastore_.save(saveMode, savePath);
             } catch (Exception e) {

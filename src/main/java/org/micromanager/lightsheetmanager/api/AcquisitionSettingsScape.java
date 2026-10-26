@@ -13,9 +13,9 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
     Builder copyBuilder();
 
     /**
-     * Returns the immutable DefaultTimingSettings instance.
+     * Returns the immutable TimingSettings instance.
      *
-     * @return immutable DefaultTimingSettings instance.
+     * @return immutable TimingSettings instance.
      */
     TimingSettings timing();
 
@@ -27,23 +27,23 @@ public interface AcquisitionSettingsScape extends AcquisitionSettings {
     SliceSettings slice();
 
     /**
-     * Returns the immutable DefaultScanSettings instance.
+     * Returns the immutable StageScanSettings instance.
      *
-     * @return immutable DefaultScanSettings instance.
+     * @return immutable StageScanSettings instance.
      */
     StageScanSettings stageScan();
 
     /**
-     * Returns the immutable DefaultSheetCalibration instance.
+     * Returns the immutable SheetCalibration instance.
      *
-     * @return immutable DefaultSheetCalibration instance.
+     * @return immutable SheetCalibration instance.
      */
     SheetCalibration sheetCalibration();
 
     /**
-     * Returns the immutable DefaultSliceCalibration instance.
+     * Returns the immutable SliceCalibration instance.
      *
-     * @return immutable DefaultSliceCalibration instance.
+     * @return immutable SliceCalibration instance.
      */
     SliceCalibration sliceCalibration();
 
