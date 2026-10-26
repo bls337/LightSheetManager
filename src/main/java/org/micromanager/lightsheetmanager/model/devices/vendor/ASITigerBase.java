@@ -35,7 +35,8 @@ public abstract class ASITigerBase extends DeviceBase {
         try {
             result = core_.getProperty(deviceName_, Properties.NAME);
         } catch (Exception e) {
-            studio_.logs().logError("could not get the name property");
+            studio_.logs().logError("could not get the name property of "
+                    + deviceName_ + ": " + e.getMessage());
         }
         return result;
     }
@@ -45,7 +46,8 @@ public abstract class ASITigerBase extends DeviceBase {
         try {
             result = core_.getProperty(deviceName_, Properties.DESCRIPTION);
         } catch (Exception e) {
-            studio_.logs().logError("could not get the description property");
+            studio_.logs().logError("could not get the description property of "
+                    + deviceName_ + ": " + e.getMessage());
         }
         return result;
     }
@@ -54,7 +56,8 @@ public abstract class ASITigerBase extends DeviceBase {
         try {
             return core_.getProperty(deviceName_, Properties.FIRMWARE_BUILD);
         } catch (Exception e) {
-            studio_.logs().logError("could not get the firmware build property");
+            studio_.logs().logError("could not get the firmware build property of "
+                    + deviceName_ + ": " + e.getMessage());
         }
         return "";
     }
@@ -63,7 +66,8 @@ public abstract class ASITigerBase extends DeviceBase {
         try {
             return core_.getProperty(deviceName_, Properties.FIRMWARE_DATE);
         } catch (Exception e) {
-            studio_.logs().logError("could not get the firmware date property");
+            studio_.logs().logError("could not get the firmware date property of "
+                    + deviceName_ + ": " + e.getMessage());
         }
         return "";
     }
@@ -72,7 +76,8 @@ public abstract class ASITigerBase extends DeviceBase {
         try {
             return Double.parseDouble(core_.getProperty(deviceName_, Properties.FIRMWARE_VERSION));
         } catch (Exception e) {
-            studio_.logs().logError("could not get the firmware version property");
+            studio_.logs().logError("could not get the firmware version property of "
+                    + deviceName_ + ": " + e.getMessage());
         }
         return 0.0;
     }
@@ -81,7 +86,8 @@ public abstract class ASITigerBase extends DeviceBase {
         try {
             return core_.getProperty(deviceName_, Properties.TIGER_HEX_ADDRESS);
         } catch (Exception e) {
-            studio_.logs().logError("could not get the Tiger hex address property");
+            studio_.logs().logError("could not get the Tiger hex address property of "
+                    + deviceName_ + ": " + e.getMessage());
         }
         return "";
     }
@@ -90,7 +96,8 @@ public abstract class ASITigerBase extends DeviceBase {
         try {
             core_.setProperty(deviceName_, Properties.REFRESH_PROPERTY_VALUES, state ? Values.YES : Values.NO);
         } catch (Exception e) {
-            studio_.logs().logError("setRefreshPropertyValues failed.");
+            studio_.logs().logError("setRefreshPropertyValues failed for "
+                    + deviceName_ + ": " + e.getMessage());
         }
     }
 
@@ -98,7 +105,8 @@ public abstract class ASITigerBase extends DeviceBase {
         try {
             return core_.getProperty(deviceName_, Properties.REFRESH_PROPERTY_VALUES).equals(Values.YES);
         } catch (Exception e) {
-            studio_.logs().logError("getRefreshPropertyValues failed.");
+            studio_.logs().logError("isRefreshPropertyValuesOn failed for "
+                    + deviceName_ + ": " + e.getMessage());
         }
         return false;
     }
