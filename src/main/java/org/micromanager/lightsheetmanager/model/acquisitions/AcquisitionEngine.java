@@ -285,6 +285,18 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
     }
 
     /**
+     * Returns true from the moment a run is requested until its cleanup has finished. Unlike
+     * {@link #isAcquisitionRunning()}, this includes setup, the wait between separate time points
+     * and the cleanup. {@link #requestStop()} acts only while this is true. A speed test does not
+     * count.
+     *
+     * @return true while a run is in progress
+     */
+    public boolean isRunning() {
+        return acquisitionRequested_;
+    }
+
+    /**
      * Records whether a series is waiting between time points, for the stop and abort log lines.
      *
      * @param awaiting true while waiting for the next time point
