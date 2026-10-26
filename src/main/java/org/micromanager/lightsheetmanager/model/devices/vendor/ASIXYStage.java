@@ -42,7 +42,8 @@ public class ASIXYStage extends ASITigerBase {
         try {
             return core_.getXYStagePosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("could not get the position for " + deviceName_);
+            studio_.logs().showError("could not get the position for " + deviceName_ + ": "
+                    + e.getMessage());
             return new Point2D.Double(0.0, 0.0);
         }
     }

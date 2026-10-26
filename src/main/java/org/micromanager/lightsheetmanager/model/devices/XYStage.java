@@ -38,7 +38,8 @@ public class XYStage extends DeviceBase {
         try {
             return core_.getXYStagePosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("could not get the xy position for " + deviceName_);
+            studio_.logs().showError("could not get the xy position for " + deviceName_ + ": "
+                    + e.getMessage());
             return new Point2D.Double(0.0, 0.0);
         }
     }
@@ -47,7 +48,8 @@ public class XYStage extends DeviceBase {
         try {
             return core_.getXYStagePosition(deviceName_).x;
         } catch (Exception e) {
-            studio_.logs().showError("could not get the x position for " + deviceName_);
+            studio_.logs().showError("could not get the x position for " + deviceName_ + ": "
+                    + e.getMessage());
             return 0.0;
         }
     }
@@ -56,7 +58,8 @@ public class XYStage extends DeviceBase {
         try {
             return core_.getXYStagePosition(deviceName_).y;
         } catch (Exception e) {
-            studio_.logs().showError("could not get the y position for " + deviceName_);
+            studio_.logs().showError("could not get the y position for " + deviceName_ + ": "
+                    + e.getMessage());
             return 0.0;
         }
     }
