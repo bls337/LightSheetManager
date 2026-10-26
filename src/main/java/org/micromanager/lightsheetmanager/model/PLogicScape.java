@@ -182,7 +182,7 @@ public class PLogicScape {
             final boolean isInterleaved = (settings.acquisitionMode() == AcquisitionMode.STAGE_SCAN_INTERLEAVED);
 
             // figure out the speed we should be going according to slice period, slice spacing, geometry, etc.
-            final double requestedMotorSpeed = computeScanSpeed(settings);  // in mm/sec
+            final double requestedMotorSpeed = StageScanUtils.computeScanSpeed(settings);  // in mm/sec
 
             final double maxSpeed = xyStage_.getMaxSpeedX();
             if (requestedMotorSpeed > (maxSpeed * 0.8)) {
@@ -261,11 +261,6 @@ public class PLogicScape {
         studio_.logs().logMessage("Finished preparing controller for acquisition with offset " + channelOffset +
                 " with mode " + settings.acquisitionMode() + " and settings:\n" + settings.toPrettyJson());
         return true;
-    }
-
-    // Compute appropriate motor speed in mm/s for the given stage scanning settings
-    public double computeScanSpeed(final ScapeAcquisitionSettings settings) {
-        return StageScanUtils.computeScanSpeed(settings);
     }
 
     public boolean prepareStageScanForAcquisition(final double x, final double y, ScapeAcquisitionSettings settings) {
