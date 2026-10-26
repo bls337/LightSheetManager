@@ -457,7 +457,7 @@ public class DeviceManager {
     /**
      * Returns true if the hardware configuration has the LightSheetManager device adapter. The user can
      * change the device name of the adapter, but not the device library so that's what we detect. Also,
-     * the name of the device adapter is cached for later usage. This also set the error text on the model
+     * the name of the device adapter is cached for later usage. This also sets the error text on the model
      * when an error is encountered, this is used in the error user interface.
      *
      * @return true if the hardware configuration has the device adapter
@@ -474,7 +474,7 @@ public class DeviceManager {
                     if (count > 1) {
                         model_.setupErrorMessage("You have multiple instances of the LightSheetManager " +
                                 "device adapter in your hardware configuration.");
-                        break; // exit loop because this a failure condition
+                        break; // exit loop because this is a failure condition
                     }
                 }
             } catch (Exception e) {
@@ -537,7 +537,7 @@ public class DeviceManager {
 
     /**
      * Creates a configuration group named "System" that includes all device properties
-     * the Light Sheet Manager device adapter.
+     * of the Light Sheet Manager device adapter.
      */
     public void createConfigGroup() {
         final String groupName = "System";
@@ -583,7 +583,7 @@ public class DeviceManager {
      * Returns a list of new properties added to the configuration group.
      *
      * @param groupName the group name to check
-     * @param configName the configuration group to check
+     * @param configName the configuration preset to check
      * @return an ArrayList of new properties
      */
     private ArrayList<String> updateConfig(final String groupName, final String configName) {

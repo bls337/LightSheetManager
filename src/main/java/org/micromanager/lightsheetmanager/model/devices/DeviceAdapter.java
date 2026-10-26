@@ -88,7 +88,7 @@ public class DeviceAdapter extends DeviceBase {
             return Integer.parseInt(getProperty(propertyName));
         } catch (NumberFormatException e) {
             studio_.logs().logError("Error parsing " + propertyName
-                    + " from the device adapter, use default value " + defaultValue);
+                    + " from the device adapter, using default value " + defaultValue);
             return defaultValue;
         }
     }
@@ -161,7 +161,7 @@ public class DeviceAdapter extends DeviceBase {
      * <p>
      * A "Position Device" is a StageDevice, XYStageDevice, or GalvoDevice.
      *
-     * @return an array of internal devices names for all position devices
+     * @return an array of internal device names for all position devices
      */
     public String[] positionDevices() {
         return deviceMap().entrySet().stream()
