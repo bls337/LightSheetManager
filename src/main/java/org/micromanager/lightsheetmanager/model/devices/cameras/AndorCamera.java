@@ -63,7 +63,7 @@ public class AndorCamera extends CameraBase {
                 setProperty(Properties.OVERLAP, Values.OFF);
 
                 // Note: the following applies to single view mode, the issue is not present in dual view mode:
-                // only shutter speeds < 4 work with the 200 Mhz slow scan mode, shutter speeds >= 5 will miss 1 image
+                // only shutter speeds < 4 work with the 200 MHz slow scan mode, shutter speeds >= 5 will miss 1 image
 
                 double maxLineScanSpeed = 104166.6667;
                 if (isSlowReadout()) {
@@ -192,7 +192,7 @@ public class AndorCamera extends CameraBase {
         return cameraReadoutTime + (numRowsOverhead * rowReadoutTime);
     }
 
-    // Note: at some point the Andor Zyla 4.2 camera changed it's PixelReadoutRate property value
+    // Note: at some point the Andor Zyla 4.2 camera changed its PixelReadoutRate property value
     // for the slow scan speed to start with "200 MHz" instead of "216 MHz".
     private boolean isSlowReadout() {
         if (isZyla55()) {
