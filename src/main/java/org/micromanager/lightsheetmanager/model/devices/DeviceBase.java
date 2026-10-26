@@ -135,7 +135,8 @@ public class DeviceBase {
         try {
             result = core_.isPropertyPreInit(deviceName_, propertyName);
         } catch (Exception e) {
-            studio_.logs().logError(e.getMessage());
+            studio_.logs().logError("Could not tell whether the \"" + propertyName
+                    + "\" property of " + deviceName_ + " is pre-init: " + e.getMessage());
         }
         return result;
     }
@@ -145,7 +146,8 @@ public class DeviceBase {
         try {
             result = core_.isPropertyReadOnly(deviceName_, propertyName);
         } catch (Exception e) {
-            studio_.logs().logError(e.getMessage());
+            studio_.logs().logError("Could not tell whether the \"" + propertyName
+                    + "\" property of " + deviceName_ + " is read-only: " + e.getMessage());
         }
         return result;
     }
@@ -171,7 +173,8 @@ public class DeviceBase {
         try {
             devices = core_.getDevicePropertyNames(deviceName_);
         } catch (Exception e) {
-            studio_.logs().logError(e.getMessage());
+            studio_.logs().logError("Could not get the property names of " + deviceName_ + ": "
+                    + e.getMessage());
         }
         return devices.toArray();
     }
