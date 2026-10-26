@@ -191,7 +191,7 @@ public class UserSettings {
             loadedJson = new JSONObject(loadedSettings);
             defaultJson = new JSONObject(defaultSettings);
         } catch (JSONException e) {
-            model_.studio().logs().showError("could not validate the JSON data.");
+            model_.studio().logs().showError("could not validate the JSON data: " + e.getMessage());
             return Optional.empty();
         }
         // add every default setting the loaded settings lack, including any whose key was renamed
@@ -199,7 +199,8 @@ public class UserSettings {
             JsonUtils.addMissingKeys(defaultJson, loadedJson, MAX_RECURSION_DEPTH_JSON,
                     message -> model_.studio().logs().logMessage("UserSettings: " + message));
         } catch (JSONException e) {
-            model_.studio().logs().showError("could not merge new default settings into loaded settings.");
+            model_.studio().logs().showError("could not merge new default settings into loaded settings: "
+                    + e.getMessage());
             return Optional.empty();
         }
         return Optional.of(loadedJson);
