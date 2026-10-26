@@ -115,8 +115,6 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
             final ChannelSpec[] channels = table_.getData().getChannels();
             model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
             model_.acquisitions().updateDurationLabels();
-            //System.out.println("add channel");
-            //table_.getData().printChannelData();
         });
 
         // remove channel
@@ -127,7 +125,6 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
                 final ChannelSpec[] channels = table_.getData().getChannels();
                 model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
                 model_.acquisitions().updateDurationLabels();
-                //System.out.println("remove row index: " + row);
             }
         });
 

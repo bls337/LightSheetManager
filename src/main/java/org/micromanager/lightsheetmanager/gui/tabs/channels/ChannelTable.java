@@ -132,9 +132,6 @@ public class ChannelTable extends JScrollPane {
             if (model_.studio().core().getAvailableConfigs(group).size() > 1) {
                 groups.add(group);
             }
-//            StrVector st = model_.studio().core().getAvailableConfigGroups();
-//            for (String s : st)
-//                System.out.println(s);
         }
         return groups.toArray(String[]::new);
     }
