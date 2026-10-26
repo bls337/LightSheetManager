@@ -40,7 +40,8 @@ public class DeviceBase {
         try {
             result = core_.hasProperty(deviceName_, propertyName);
         } catch (Exception e) {
-            studio_.logs().showError("Error: could not determine if " + propertyName + " exists.");
+            studio_.logs().showError("Error: could not determine if " + propertyName + " of "
+                    + deviceName_ + " exists: " + e.getMessage());
         }
         return result;
     }
@@ -134,7 +135,8 @@ public class DeviceBase {
         try {
             result = core_.isPropertyPreInit(deviceName_, propertyName);
         } catch (Exception e) {
-            studio_.logs().logError(e.getMessage());
+            studio_.logs().logError("Could not tell whether the \"" + propertyName
+                    + "\" property of " + deviceName_ + " is pre-init: " + e.getMessage());
         }
         return result;
     }
@@ -144,7 +146,8 @@ public class DeviceBase {
         try {
             result = core_.isPropertyReadOnly(deviceName_, propertyName);
         } catch (Exception e) {
-            studio_.logs().logError(e.getMessage());
+            studio_.logs().logError("Could not tell whether the \"" + propertyName
+                    + "\" property of " + deviceName_ + " is read-only: " + e.getMessage());
         }
         return result;
     }
@@ -170,7 +173,8 @@ public class DeviceBase {
         try {
             devices = core_.getDevicePropertyNames(deviceName_);
         } catch (Exception e) {
-            studio_.logs().logError(e.getMessage());
+            studio_.logs().logError("Could not get the property names of " + deviceName_ + ": "
+                    + e.getMessage());
         }
         return devices.toArray();
     }
@@ -196,7 +200,7 @@ public class DeviceBase {
        try {
           core_.stop(deviceName_);
        } catch (Exception e) {
-          studio_.logs().logError("Error halting device: " + deviceName_);
+          studio_.logs().logError("Error halting device " + deviceName_ + ": " + e.getMessage());
        }
     }
 

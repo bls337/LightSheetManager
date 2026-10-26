@@ -508,6 +508,8 @@ public class PLogicScape {
         // round to nearest 0.0001 degrees, which is approximately the DAC resolution
         sliceAmplitude = NumberUtils.roundToPlace(sliceAmplitude, 4);
         sliceCenter = NumberUtils.roundToPlace(sliceCenter, 4);
+        studio_.logs().logMessage("Preparing the slices with slope " + sliceRate + ", offset "
+                + sliceOffset + ", piezo center " + piezoCenter + " and slice center " + sliceCenter);
 
         // Refuse a sweep that would drive the galvo past its travel limits. This has to run here,
         // after the rounding and before either branch below writes to the card. The piezo check

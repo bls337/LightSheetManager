@@ -12,7 +12,8 @@ public class Stage extends DeviceBase {
         try {
             core_.setPosition(deviceName_, position);
         } catch (Exception e) {
-            studio_.logs().showError("could not set position for " + deviceName_);
+            studio_.logs().showError("could not move " + deviceName_ + " to " + position
+                    + ": " + e.getMessage());
         }
     }
 
@@ -20,7 +21,8 @@ public class Stage extends DeviceBase {
         try {
             return core_.getPosition(deviceName_);
         } catch (Exception e) {
-            studio_.logs().showError("could not get position for " + deviceName_);
+            studio_.logs().showError("could not get position for " + deviceName_ + ": "
+                    + e.getMessage());
             return 0.0;
         }
     }

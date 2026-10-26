@@ -291,16 +291,6 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
         public VolumeSettings.Builder volumeBuilder() {
             return volumeBuilder_;
         }
-
-        /**
-         * Creates an immutable instance of DefaultAcquisitionSettings
-         *
-         * @return Immutable version of DefaultAcquisitionSettings
-         */
-        //@Override
-        //public abstract AcquisitionSettings build();
-
-        //public abstract T self();
     }
 
     /**
@@ -333,12 +323,6 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
     private final DefaultAutofocusSettings autofocus;
     private final ChannelSettings channels;
     private final VolumeSettings volume;
-
-//    public DefaultAcquisitionSettings() {
-//        saveNamePrefix_ = "";
-//        saveDirectory_ = "";
-//        demoMode_ = false;
-//    }
 
     protected BaseAcquisitionSettings(Builder<?> builder) {
         saveDirectory = builder.saveDirectory;
@@ -591,9 +575,5 @@ public abstract class BaseAcquisitionSettings implements AcquisitionSettings {
                 .create();
         return gson.fromJson(json, cls);
     }
-
-//    public static DefaultAcquisitionSettingsDISPIM fromJson(final String json) {
-//        return new Gson().fromJson(json, DefaultAcquisitionSettingsDISPIM.class);
-//    }
 
 }

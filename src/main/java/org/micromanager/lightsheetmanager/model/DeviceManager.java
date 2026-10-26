@@ -530,7 +530,8 @@ public class DeviceManager {
             try {
                 core_.defineConfigGroup(groupName);
             } catch (Exception e) {
-                studio_.logs().logError("could not create the \"" + groupName + "\" configuration group.");
+                studio_.logs().logError("could not create the \"" + groupName + "\" configuration group: "
+                        + e.getMessage());
                 return; // early exit
             }
         }
@@ -540,7 +541,8 @@ public class DeviceManager {
             try {
                 core_.defineConfig(groupName, configName);
             } catch (Exception e) {
-                studio_.logs().logError("could not create the \"" + configName + "\" configuration preset.");
+                studio_.logs().logError("could not create the \"" + configName + "\" configuration preset: "
+                        + e.getMessage());
                 return; // early exit
             }
         }
@@ -577,7 +579,8 @@ public class DeviceManager {
         try {
             config = core_.getConfigData(groupName, configName);
         } catch (Exception e) {
-            studio_.logs().showError("could not get configuration data!");
+            studio_.logs().showError("could not get the configuration data of " + groupName + "::"
+                    + configName + ": " + e.getMessage());
             return newProperties; // early exit => could not get config data to compare
         }
 
@@ -589,7 +592,8 @@ public class DeviceManager {
                     newProperties.add(propertyName);
                 } catch (Exception e) {
                     studio_.logs().logError("Could not create the \"" + propertyName
-                            + "\" property for the \"" + groupName + "\" configuration group.");
+                            + "\" property for the \"" + groupName + "\" configuration group: "
+                            + e.getMessage());
                 }
             }
         }

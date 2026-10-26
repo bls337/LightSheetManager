@@ -242,22 +242,6 @@ public class ControlPanel extends Panel implements Subscriber {
         return deviceType_ == DeviceType.XYStageDevice || deviceType_ == DeviceType.StageDevice;
     }
 
-    private void setRelativeXYPosition(final double dx, final double dy) {
-        try {
-            core_.setRelativeXYPosition(deviceName_, dx, dy);
-        } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
-        }
-    }
-
-    private void setXYPosition(final double dx, final double dy) {
-        try {
-            core_.setXYPosition(deviceName_, dx, dy);
-        } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
-        }
-    }
-
     /////////////////////////
 
     private void setRelativeXPosition(final double dx) {
@@ -314,7 +298,6 @@ public class ControlPanel extends Panel implements Subscriber {
 
     private void setOriginY() {
         try {
-            //System.out.println("deviceName_: " + deviceName_);
             core_.setOriginY(deviceName_);
         } catch (Exception e) {
             model_.studio().logs().showError("failed to set y origin!");
@@ -323,7 +306,6 @@ public class ControlPanel extends Panel implements Subscriber {
 
     private void setOriginX() {
         try {
-            //System.out.println("deviceName_: " + deviceName_);
             core_.setOriginX(deviceName_);
         } catch (Exception e) {
             model_.studio().logs().showError("failed to set x origin!");
@@ -358,14 +340,6 @@ public class ControlPanel extends Panel implements Subscriber {
 //    }
 
     //// Galvo
-
-    private void setGalvoPosition(final double dx, final double dy) {
-        try {
-            core_.setGalvoPosition(deviceName_, dx, dy);
-        } catch (Exception e) {
-            model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
-        }
-    }
 
     // the galvo position is read inside the try, so a failed read skips the move instead of
     // moving with 0 in place of the unread position
