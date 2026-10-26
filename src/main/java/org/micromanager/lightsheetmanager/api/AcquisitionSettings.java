@@ -21,7 +21,7 @@ public interface AcquisitionSettings {
         T saveDirectory(final String directory);
 
         /**
-         * Sets the save name prefix.
+         * Sets the save name prefix, used for the acquisition folder name.
          *
          * @param name the save name prefix
          * @throws IllegalArgumentException if the name cannot be used as a Windows file name
