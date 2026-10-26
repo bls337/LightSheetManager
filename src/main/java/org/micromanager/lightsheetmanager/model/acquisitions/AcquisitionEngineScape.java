@@ -306,36 +306,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             }
         }
 
-
-            // --- testing code below ---
-//            StrVector deviceNames = core_.getLoadedDevices();
-//            for (String deviceName : deviceNames) {
-//                System.out.println("deviceName: " + deviceName);
-//                StrVector propertyNames;
-//                try {
-//                    propertyNames = core_.getDevicePropertyNames(deviceName);
-//                } catch (Exception e) {
-//                    propertyNames = null;
-//                }
-//
-//                Gson gsonObj = new Gson();
-//                HashMap<String, String> deviceProps = new HashMap<>();
-//                for (String propName : propertyNames) {
-//                    String propValue;
-//                    try {
-//                        propValue = core_.getProperty(deviceName, propName);
-//                    } catch (Exception e) {
-//                        propValue = "";
-//                        System.out.println("failed!");
-//                    }
-//                    deviceProps.put(propName, propValue);
-//                    //System.out.println(propName);
-//                }
-//
-//                String jsonStr = gsonObj.toJson(deviceProps);
-//                System.out.println(jsonStr);
-//            }
-
         updateSettings();
 
         // The run snapshot: everything below reads this, never acqSettings_, so an edit made while
