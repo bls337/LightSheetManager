@@ -195,12 +195,7 @@ public class DeviceManager {
                 createCameraDevice(propertyName, deviceName,
                         CameraLibrary.fromString(deviceLibrary));
             }
-            //deviceMap_.put(propertyName, "");
         }
-        //System.out.println("----------------");
-
-        // we don't need this array anymore
-        //devicesAdded_.clear();
 
         studio_.logs().logMessage("DeviceManager: [End Setup]");
     }
@@ -241,19 +236,6 @@ public class DeviceManager {
                 break;
         }
     }
-
-    private void createShutterDevice() {
-
-    }
-
-    private void createXYStageDevice() {
-
-    }
-
-    // Note: clients should use var when we support Java 11
-//    public DeviceBase getDevice(final String deviceName) {
-//        return deviceMap_.get(deviceName);
-//    }
 
     // TODO: consider using Optional to improve the API
     /**
