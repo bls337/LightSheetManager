@@ -30,7 +30,7 @@ public class AutofocusTab extends Panel implements ListeningPanel {
     private ComboBox<AutofocusType> cmbScoringMethod_;
     private Button btnRunAutofocus_;
 
-    // autofocus options during setup
+    // autofocus options during acquisition
     private CheckBox cbxAutofocusEveryPass_;
     private CheckBox cbxAutofocusBeforeAcq_;
     private ComboBox<String> cmbAutofocusChannel_; // TODO: impl

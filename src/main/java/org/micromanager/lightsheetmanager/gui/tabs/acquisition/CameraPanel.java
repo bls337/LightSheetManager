@@ -56,7 +56,6 @@ public class CameraPanel extends Panel implements SettingsListener {
         cmbCameraMode_ = new ComboBox<>(modes,
                 model_.acquisitions().settings().cameraMode(), 140, 20);
 
-        // validate that the logical device name exists
         final String[] cameraNames = model_.devices().imagingCameraNames();
         cbxCameras_ = new ArrayList<>(cameraNames.length);
 

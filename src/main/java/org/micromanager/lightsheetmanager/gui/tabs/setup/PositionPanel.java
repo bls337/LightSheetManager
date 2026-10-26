@@ -106,7 +106,7 @@ public class PositionPanel extends Panel implements Subscriber, ListeningPanel {
         txtImagingPosition_.setToolTipText(
                 "Type an imaging piezo position in μm and press Enter to move there.");
         //btnImagingCenterSet_.setToolTipText("Set \"Imaging Center\" value to \"Imaging Piezo\" position. ");
-        btnSliceZero_.setToolTipText("Move \"Slice Position\" position to 0 degrees.");
+        btnSliceZero_.setToolTipText("Move \"Slice Position\" to 0 degrees.");
         btnImagingZero_.setToolTipText("Move \"Imaging Piezo\" position to 0 μm.");
         //btnTestAcq_.setToolTipText("Run a test acquisition.");
 

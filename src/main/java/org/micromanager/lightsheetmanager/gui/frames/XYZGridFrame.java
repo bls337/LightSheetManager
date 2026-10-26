@@ -201,7 +201,6 @@ public class XYZGridFrame extends JFrame {
         add(pnlButtons, "");
 
         pack(); // fit window size to layout
-        setIconImage(Icons.MICROSCOPE.getImage());
     }
 
     private void createEventHandlers() {

@@ -83,11 +83,4 @@ public class ChannelTableData {
         }
         return 0.0;
     }
-
-    public void printChannelData() {
-        System.out.println("[ChannelTableData]");
-        for (ChannelSpec channel : channels_) {
-            System.out.println(channel);
-        }
-    }
 }

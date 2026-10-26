@@ -15,8 +15,6 @@ import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.util.Objects;
 
-// TODO: add tooltips for the buttons!
-
 public class ControlPanel extends Panel implements Subscriber {
 
     public enum Axis {

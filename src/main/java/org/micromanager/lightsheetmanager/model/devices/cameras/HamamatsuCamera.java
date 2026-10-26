@@ -68,11 +68,10 @@ public class HamamatsuCamera extends CameraBase {
                 try {
                     lowerLimit = core_.getPropertyLowerLimit(deviceName_, Properties.INTERNAL_LINE_INTERVAL);
                 } catch (Exception ignore) {
-                    // ignore => will set the HAMAMATSU_LINE_INTERVAL property
+                    // ignore => will set the INTERNAL_LINE_INTERVAL property
                     // to the rowTime without considering the lower limit
                 }
                 setProperty(Properties.INTERNAL_LINE_INTERVAL, String.valueOf((Math.max(rowTime, lowerLimit))));
-                //props_.setPropValue(devKey, Properties.Keys.HAMAMATSU_LINE_INTERVAL, Math.max(rowTime, lowerLimit));
                 break;
             case EDGE:
                 setProperty(Properties.TRIGGER_ACTIVE, Values.EDGE);
@@ -193,7 +192,7 @@ public class HamamatsuCamera extends CameraBase {
             final double resetTimeMs = camReadoutTime + (numRowsOverhead * rowReadoutTime);
             studio_.logs().logDebugMessage("camera reset time computed as "
                     + resetTimeMs + " for camera " + deviceName_);
-            return resetTimeMs; // assume 10ms readout if not otherwise possible to calculate
+            return resetTimeMs;
         }
     }
 

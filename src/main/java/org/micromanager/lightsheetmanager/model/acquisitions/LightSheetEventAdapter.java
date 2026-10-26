@@ -484,7 +484,7 @@ public final class LightSheetEventAdapter {
      * describes, against the core's current XY and focus devices.
      *
      * @param positionList the list of positions to iterate over
-     * @return
+     * @return a function that makes one event per position from the event it is given
      */
     public static Function<AcquisitionEvent, Iterator<AcquisitionEvent>> positions(
             PositionList positionList) {

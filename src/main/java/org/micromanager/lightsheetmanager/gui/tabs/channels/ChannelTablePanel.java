@@ -68,7 +68,7 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
 
         btnAddChannel_.setToolTipText("Add a new channel to the table.");
         btnRemoveChannel_.setToolTipText("Remove the currently selected channel from the table.");
-        btnRefresh_.setToolTipText("Refresh the channel panel with the latest configuration groups settings.");
+        btnRefresh_.setToolTipText("Refresh the channel panel with the latest configuration group settings.");
 
         final String[] groupLabels = table_.getChannelGroups();
         cmbChannelGroup_ = new ComboBox<>(groupLabels,
@@ -115,8 +115,6 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
             final ChannelSpec[] channels = table_.getData().getChannels();
             model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
             model_.acquisitions().updateDurationLabels();
-            //System.out.println("add channel");
-            //table_.getData().printChannelData();
         });
 
         // remove channel
@@ -127,7 +125,6 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
                 final ChannelSpec[] channels = table_.getData().getChannels();
                 model_.acquisitions().settingsBuilder().channelBuilder().data(channels);
                 model_.acquisitions().updateDurationLabels();
-                //System.out.println("remove row index: " + row);
             }
         });
 

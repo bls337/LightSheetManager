@@ -6,10 +6,10 @@ import org.micromanager.lightsheetmanager.api.data.CameraMode;
 import java.awt.Rectangle;
 
 /**
- * Support for the DemoCamera in DHub.
+ * Support for the DemoCamera device adapter.
  * <p>Note: this is for demo configurations.
- * <p>Device Adapter: DHub
- * <p>Camera Support: DemoCamera
+ * <p>Device Adapter: DemoCamera
+ * <p>Camera Support: DCam
  */
 public class DemoCamera extends CameraBase {
 

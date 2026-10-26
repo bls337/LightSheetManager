@@ -147,9 +147,9 @@ public interface AcquisitionSettings {
         T self();
 
         /**
-         * Creates an immutable instance of DefaultAcquisitionSettings
+         * Creates an immutable instance of AcquisitionSettings
          *
-         * @return Immutable version of DefaultAcquisitionSettings
+         * @return Immutable version of AcquisitionSettings
          */
         AcquisitionSettings build();
     }
