@@ -68,7 +68,7 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
 
         btnAddChannel_.setToolTipText("Add a new channel to the table.");
         btnRemoveChannel_.setToolTipText("Remove the currently selected channel from the table.");
-        btnRefresh_.setToolTipText("Refresh the channel panel with the latest configuration groups settings.");
+        btnRefresh_.setToolTipText("Refresh the channel panel with the latest configuration group settings.");
 
         final String[] groupLabels = table_.getChannelGroups();
         cmbChannelGroup_ = new ComboBox<>(groupLabels,

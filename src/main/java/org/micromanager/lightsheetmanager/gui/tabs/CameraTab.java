@@ -372,7 +372,7 @@ public class CameraTab extends Panel implements ListeningPanel {
     // Computes the ROI based on a scaling factor.
     private Rectangle computeCenterRectangle(final Rectangle rect, final int scale) {
         if (scale < 1) {
-            model_.studio().logs().showError("scale must be > 1; could not compute ROI!");
+            model_.studio().logs().showError("scale must be >= 1; could not compute ROI!");
             return rect;
         }
         if (rect.x != 0 || rect.y != 0) {
