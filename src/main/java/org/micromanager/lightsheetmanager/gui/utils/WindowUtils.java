@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import javax.swing.JFrame;
 
 /**
- * Utilities for
+ * Utilities for checking, closing and listening to {@link JFrame} windows.
  */
 public final class WindowUtils {
 

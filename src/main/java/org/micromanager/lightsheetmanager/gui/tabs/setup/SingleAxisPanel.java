@@ -13,7 +13,7 @@ import java.util.Objects;
 
 /**
  * A SCAPE panel
- * This is only ever build in SCAPE mode...
+ * This is only ever built in SCAPE mode...
  */
 public class SingleAxisPanel extends Panel {
 
