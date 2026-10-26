@@ -236,11 +236,14 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
                 // confirm first: one stray click discards a run in progress
                 if (DialogUtils.showYesNoDialog(this, "Stop Acquisition",
                         "Stop the current acquisition?")) {
-                    model_.acquisitions().requestStop();
+                    // the run can end while the dialog is open
+                    if (model_.acquisitions().isRunning()) {
+                        model_.acquisitions().requestStop();
+                    }
                 } else {
                     // the press already flipped the toggle, so put it back or the button
                     // reads "Start Acquisition" while the run is still going
-                    btnRunAcquisition_.setState(true);
+                    btnRunAcquisition_.setState(model_.acquisitions().isRunning());
                 }
             }
         });
