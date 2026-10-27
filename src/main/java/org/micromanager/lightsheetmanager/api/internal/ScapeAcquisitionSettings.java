@@ -7,6 +7,7 @@ import org.micromanager.lightsheetmanager.api.SliceSettings;
 import org.micromanager.lightsheetmanager.api.StageScanSettings;
 import org.micromanager.lightsheetmanager.api.TimingSettings;
 import org.micromanager.lightsheetmanager.api.data.CameraMode;
+import org.micromanager.lightsheetmanager.api.data.GeometryType;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -163,7 +164,9 @@ public class ScapeAcquisitionSettings extends BaseAcquisitionSettings implements
 
         private TimingSettings.Builder timingBuilder = DefaultTimingSettings.builder();
         private SliceSettings.Builder sliceBuilder = DefaultSliceSettings.builder();
-        private StageScanSettings.Builder stageScanBuilder = DefaultStageScanSettings.builder();
+        // TODO: a diSPIM profile missing its stage angle loads SCAPE's until profiles load per geometry
+        private StageScanSettings.Builder stageScanBuilder = DefaultStageScanSettings.builder()
+                .firstViewAngle(GeometryType.SCAPE.defaultFirstViewAngle());
         private SheetCalibration.Builder sheetCalibBuilder = DefaultSheetCalibration.builder();
         private SliceCalibration.Builder sliceCalibBuilder = DefaultSliceCalibration.builder();
 
