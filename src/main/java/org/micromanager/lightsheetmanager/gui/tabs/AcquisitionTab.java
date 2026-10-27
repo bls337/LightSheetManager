@@ -311,9 +311,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
     }
 
     /**
-     * Switch between slice timing panel and advanced timing panel.
+     * Enables the slice timing panel or the advanced timing panel, and disables the other.
      *
-     * @param useAdvancedTiming {@code true} to swap to the advanced timing panel
+     * @param useAdvancedTiming {@code true} to enable the advanced timing panel
      */
     private void swapTimingSettingsPanels(final boolean useAdvancedTiming) {
         pnlAdvancedTiming_.setPanelEnabled(useAdvancedTiming);

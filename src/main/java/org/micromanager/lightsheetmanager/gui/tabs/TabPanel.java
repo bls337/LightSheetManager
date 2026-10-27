@@ -107,7 +107,8 @@ public class TabPanel extends Panel {
         index = tabbedPane_.getTabCount();
         tabbedPane_.addTab(tabName, cameraTab_);
         tabbedPane_.setTabComponentAt(index, createTabTitle(tabName));
-        tabbedPane_.setToolTipTextAt(index, "Set the ROI of the active imaging cameras.");
+        tabbedPane_.setToolTipTextAt(index,
+                "Set the binning and the ROI of the active imaging cameras.");
 
         tabName = "Settings";
         index = tabbedPane_.getTabCount();

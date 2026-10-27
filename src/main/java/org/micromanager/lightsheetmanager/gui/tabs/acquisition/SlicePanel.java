@@ -69,7 +69,7 @@ public class SlicePanel extends Panel implements SettingsListener {
 
         setSpinnerEnabled(!periodMinimized);
 
-        // TODO: this should added back in for diSPIM
+        // TODO: this should be added back in for diSPIM
 //        if (model_.devices().adapter().geometry() == GeometryType.DISPIM) {
 //            final DefaultSliceSettingsLS sliceSettingsLS = model_.acquisitions().settings().sliceLS();
 //
