@@ -173,7 +173,6 @@ public class ASIPLogic extends ASITigerBase {
         public static final String YES = "Yes";
 
         public static final String DO_IT = "Do it";
-        //public static final String NO_PRESET = "no preset";
     }
 
     public enum Preset {
