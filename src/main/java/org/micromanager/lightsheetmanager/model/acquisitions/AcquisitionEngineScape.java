@@ -678,32 +678,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }, Acquisition.BEFORE_HARDWARE_HOOK);
 
 
-//        final PLogicSCAPE finalController = controller;
-//        currentAcquisition_.addHook(new AcquisitionHook() {
-//            @Override
-//            public AcquisitionEvent run(AcquisitionEvent event) {
-//                System.out.println("After hardware hook");
-//                // for stage scanning: restore speed and set up scan at new position
-//                // non-multi-position situation is handled in prepareControllerForAcquisition instead
-////                if (acqSettings_.stageScan().enabled() && acqSettings_.isUsingMultiplePositions()) {
-////                    final ASIXYStage xyStage = model_.devices().getDevice("SampleXY");
-////                    final Point2D.Double pos = xyStage.getXYPosition();
-////                    xyStage.setSpeedX(scanSpeedX_);
-////                    xyStage.setAccelerationX(scanAccelX_);
-////                    System.out.println("AFTER_HARDWARE_HOOK trigger");
-////                    finalController.prepareStageScanForAcquisition(pos.x, pos.y, acqSettings_);
-/////                   finalController.triggerControllerStartAcquisition(acqSettings_.acquisitionMode(),
-////                           acqSettings_.volumeSettings().firstView());
-////                }
-//                return event;
-//            }
-//
-//            @Override
-//            public void close() {
-//
-//            }
-//        }, Acquisition.AFTER_HARDWARE_HOOK);
-
         final PLogicScape controllerInstance = controller_;
         // TODO This after camera hook is called after the camera has been readied to acquire a
         //  sequence. I assume we want to tell the Tiger to start sending TTLs etc here
@@ -1707,9 +1681,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             asb_.timingBuilder(getTimingFromExposure());
         }
         // Note: sliceDurationMs is computed automatically when build() is called
-        //final double sliceDurationMs = getSliceDuration(asb_.timingSettingsBuilder().build());
-        //asb_.timingSettingsBuilder().sliceDurationMs(sliceDurationMs);
-        //System.out.println(asb_.timingSettingsBuilder());
     }
 
     /**
