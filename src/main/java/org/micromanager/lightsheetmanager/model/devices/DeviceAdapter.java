@@ -88,7 +88,8 @@ public class DeviceAdapter extends DeviceBase {
             return Integer.parseInt(getProperty(propertyName));
         } catch (NumberFormatException e) {
             studio_.logs().logError("Error parsing " + propertyName
-                    + " from the device adapter, using default value " + defaultValue);
+                    + " from the device adapter, using default value " + defaultValue
+                    + ": " + e.getMessage());
             return defaultValue;
         }
     }
