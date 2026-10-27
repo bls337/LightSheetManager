@@ -163,6 +163,11 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
 
         btnRunOverviewAcq_ = new Button("Overview Acquisition", 140, 30);
 
+        btnRunAcquisition_.setToolTipText("Start an acquisition with the current settings, "
+                + "or stop the running one.");
+        btnTestAcquisition_.setToolTipText(
+                "Run one time point with the current settings, without saving the images.");
+
         final boolean channelsEnabled = settings.channels().enabled();
         cbxUseChannels_ = new CheckBox("Channels", channelsEnabled);
         pnlChannelTable_ = new ChannelTablePanel(model_, cbxUseChannels_);
