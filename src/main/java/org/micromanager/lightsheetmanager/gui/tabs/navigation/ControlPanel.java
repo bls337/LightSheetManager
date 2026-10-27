@@ -320,25 +320,6 @@ public class ControlPanel extends Panel implements Subscriber {
         }
     }
 
-    // Home and Stop
-
-//    public void stop() {
-//        try {
-//            core_.stop(deviceName_);
-//        } catch (Exception e) {
-//            model_.studio().logs().showError(deviceName_  + " stop() failed!");
-//        }
-//    }
-
-//    // TODO: needed?
-//    private void home() {
-//        try {
-//            core_.home(deviceName_);
-//        } catch (Exception e) {
-//            model_.studio().logs().showError("failed!");
-//        }
-//    }
-
     //// Galvo
 
     // the galvo position is read inside the try, so a failed read skips the move instead of

@@ -252,7 +252,6 @@ public class SavePanel extends Panel implements SettingsListener {
                 final String json = FileUtils.readFileToString(file.toString());
                 SettingsAdapter adapter = new SettingsAdapter(model_);
                 adapter.convert(json);
-                //System.out.println(json);
             }
         });
     }
