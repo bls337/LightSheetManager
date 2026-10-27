@@ -825,7 +825,7 @@ public class PLogicScape {
                 scanner_.setSPIMState(ASIScanner.SPIMState.RUNNING);
                 break;
             default:
-                model_.logging().reportError("Unknown acquisition mode");
+                model_.logging().reportError("Unknown acquisition mode: " + acqMode);
                 return false;
         }
         return true;

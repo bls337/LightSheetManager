@@ -165,7 +165,7 @@ public class ControlPanel extends Panel implements Subscriber {
                             () -> setRelativeXPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnMoveToZero_.registerListener(() -> setXPosition(0.0));
                     btnSetZero_.registerListener(() -> {
-                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
+                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "Set 0",
                              "This will change the coordinate system. Are you sure you would like to proceed?");
                        if (result) {
                           setOriginX();
@@ -181,7 +181,7 @@ public class ControlPanel extends Panel implements Subscriber {
                             () -> setRelativeYPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnMoveToZero_.registerListener(() -> setYPosition(0.0));
                     btnSetZero_.registerListener(() -> {
-                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
+                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "Set 0",
                              "This will change the coordinate system. Are you sure you would like to proceed?");
                        if (result) {
                           setOriginY();
@@ -202,7 +202,7 @@ public class ControlPanel extends Panel implements Subscriber {
                     () -> setRelativePosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
             btnMoveToZero_.registerListener(() -> setPosition(0.0));
             btnSetZero_.registerListener(() -> {
-               final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
+               final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "Set 0",
                      "This will change the coordinate system. Are you sure you would like to proceed?");
                if (result) {
                   setOrigin();
@@ -248,7 +248,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setRelativeXYPosition(deviceName_, dx, 0.0);
         } catch (Exception e) {
-            model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
+            model_.studio().logs().showError("failed to set relative x position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -256,7 +257,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setRelativeXYPosition(deviceName_, 0.0, dy);
         } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
+            model_.studio().logs().showError("failed to set relative y position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -266,7 +268,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setXYPosition(deviceName_, dx, core_.getYPosition(deviceName_));
         } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
+            model_.studio().logs().showError("failed to set x position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -274,7 +277,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setXYPosition(deviceName_, core_.getXPosition(deviceName_), dy);
         } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
+            model_.studio().logs().showError("failed to set y position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -282,7 +286,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setRelativePosition(deviceName_, d);
         } catch (Exception e) {
-            model_.studio().logs().showError("failed to set relative position!");
+            model_.studio().logs().showError("failed to set relative position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -290,7 +295,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setPosition(deviceName_, d);
         } catch (Exception e) {
-            model_.studio().logs().showError("failed to set position!");
+            model_.studio().logs().showError("failed to set position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -300,7 +306,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setOriginY(deviceName_);
         } catch (Exception e) {
-            model_.studio().logs().showError("failed to set y origin!");
+            model_.studio().logs().showError("failed to set y origin of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -308,7 +315,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setOriginX(deviceName_);
         } catch (Exception e) {
-            model_.studio().logs().showError("failed to set x origin!");
+            model_.studio().logs().showError("failed to set x origin of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -316,7 +324,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setOrigin(deviceName_);
         } catch (Exception e) {
-            model_.studio().logs().showError("failed to set origin!");
+            model_.studio().logs().showError("failed to set origin of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -329,7 +338,8 @@ public class ControlPanel extends Panel implements Subscriber {
             final Point2D.Double position = core_.getGalvoPosition(deviceName_);
             core_.setGalvoPosition(deviceName_, position.x + dx, position.y);
         } catch (Exception e) {
-            model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
+            model_.studio().logs().showError("failed to set relative x position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -338,7 +348,8 @@ public class ControlPanel extends Panel implements Subscriber {
             final Point2D.Double position = core_.getGalvoPosition(deviceName_);
             core_.setGalvoPosition(deviceName_, position.x, position.y + dy);
         } catch (Exception e) {
-            model_.studio().logs().showError(propertyName_ + " " + deviceName_ + " failed!");
+            model_.studio().logs().showError("failed to set relative y position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -346,7 +357,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setGalvoPosition(deviceName_, dx, core_.getGalvoPosition(deviceName_).y);
         } catch (Exception e) {
-           model_.studio().logs().showError("failed!");
+            model_.studio().logs().showError("failed to set x position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 
@@ -354,7 +366,8 @@ public class ControlPanel extends Panel implements Subscriber {
         try {
             core_.setGalvoPosition(deviceName_, core_.getGalvoPosition(deviceName_).x, dy);
         } catch (Exception e) {
-            model_.studio().logs().showError("failed!");
+            model_.studio().logs().showError("failed to set y position of " + deviceName_
+                    + ": " + e.getMessage());
         }
     }
 

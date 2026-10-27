@@ -193,7 +193,8 @@ public class CameraPanel extends Panel {
                 model_.core().setConfig(CONFIG_GROUP, selected);
                 model_.studio().app().refreshGUI();
             } catch (Exception e) {
-                model_.studio().logs().showError("Failed to set configuration: " + e.getMessage());
+                model_.studio().logs().showError("Failed to set configuration " + CONFIG_GROUP + "::"
+                        + selected + ": " + e.getMessage());
             }
         });
 
