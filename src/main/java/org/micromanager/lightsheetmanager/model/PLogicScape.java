@@ -157,7 +157,8 @@ public class PLogicScape {
         try {
             core_.setShutterDevice(plcLaser_.getDeviceName());
         } catch (Exception e) {
-            model_.logging().reportError("could not set shutter to " + plcLaser_.getDeviceName());
+            model_.logging().reportError("could not set shutter to " + plcLaser_.getDeviceName()
+                    + ": " + e.getMessage());
         }
 
         if (!acqSettings_.stageScan().enabled()) {
