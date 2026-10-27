@@ -205,7 +205,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         try {
             core_.setCameraDevice(cameraName);
         } catch (Exception e) {
-            model_.logging().reportError("Could not set \"Core-Camera\" to the first logical camera device.");
+            model_.logging().reportError("Could not set \"Core-Camera\" to the first logical camera device "
+                    + cameraName + ": " + e.getMessage());
             return false;
         }
 
@@ -1354,7 +1355,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             try {
                 core_.setCameraDevice(originalCoreCamera_);
             } catch (Exception e) {
-                studio_.logs().logError("Could not restore Core-Camera to " + originalCoreCamera_);
+                studio_.logs().logError("Could not restore Core-Camera to " + originalCoreCamera_
+                        + ": " + e.getMessage());
             } finally {
                 originalCoreCamera_ = null;
             }
