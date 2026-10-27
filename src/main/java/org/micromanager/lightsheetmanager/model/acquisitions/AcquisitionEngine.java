@@ -264,11 +264,6 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         acqSettings_ = asb_.build();
     }
 
-
-    //public abstract DefaultAcquisitionSettingsDISPIM settings();
-
-    //public abstract <T extends DefaultAcquisitionSettings.Builder<Builder>> T settingsBuilder();
-
     abstract boolean setup();
 
     abstract boolean run();

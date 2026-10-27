@@ -9,6 +9,7 @@ import org.micromanager.lightsheetmanager.api.data.GeometryType;
 import org.micromanager.lightsheetmanager.model.DeviceManager;
 import org.micromanager.lightsheetmanager.model.PluginSettings;
 import org.micromanager.lightsheetmanager.model.acquisitions.LightSheetEventAdapter;
+import org.micromanager.lightsheetmanager.model.playlist.AcquisitionTableData;
 import org.micromanager.lightsheetmanager.model.positions.PositionUpdater;
 import org.micromanager.lightsheetmanager.model.UserSettings;
 import org.micromanager.lightsheetmanager.model.acquisitions.AcquisitionEngine;
@@ -36,7 +37,7 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
     private final PositionUpdater positionUpdater_;
 
     private AcquisitionEngine acqEngine_;
-    //private final AcquisitionTableData acqTableData_;
+    private final AcquisitionTableData acqTableData_;
 
     public LightSheetManager(final Studio studio) {
         studio_ = Objects.requireNonNull(studio,
@@ -49,6 +50,7 @@ public class LightSheetManager implements LightSheetManagerApi, AutoCloseable {
 
         deviceManager_ = new DeviceManager(studio_, this);
         positionUpdater_ = new PositionUpdater(this);
+        acqTableData_ = new AcquisitionTableData();
 
         // set during setup if there is an error
         errorText_ = "";

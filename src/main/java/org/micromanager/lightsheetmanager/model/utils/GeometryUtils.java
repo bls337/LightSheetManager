@@ -8,6 +8,7 @@ public final class GeometryUtils {
         throw new AssertionError("Utility class; do not instantiate.");
     }
 
+    // TODO: unused until overview acquisitions are implemented
     /***
      * Compute how far we need to shift each image for deskew relative to Z-step size (orthogonal to image) based on user-specified angle
      * e.g. with diSPIM, angle is 45 degrees so factor is 1.0, for oSPIM the factor is tan(60 degrees) = sqrt(3), etc.

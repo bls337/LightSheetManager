@@ -445,7 +445,6 @@ public final class LightSheetEventAdapter {
             public AcquisitionEvent next() {
                 AcquisitionEvent sliceEvent = event.copy();
                 sliceEvent.setAxisPosition(AcqEngMetadata.Z_AXIS, zIndex_);
-                // System.out.println("Final Event Axes: " + sliceEvent.getAxesAsJSONString());
                 // The tiger controller handles Z axis, so no need to add the actual Z position
                 zIndex_++;
                 return sliceEvent;
