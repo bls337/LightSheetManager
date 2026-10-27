@@ -140,7 +140,7 @@ public class SavePanel extends Panel implements SettingsListener {
         btnBrowse_.setToolTipText("Select the save directory with the file browser.");
         btnOpen_.setToolTipText("Open the file explorer to the save directory.");
         btnSaveSettings_.setToolTipText("Save the current acquisition settings to JSON.");
-        btnLoadSettings_.setToolTipText("Load acquisitions settings from a JSON file.");
+        btnLoadSettings_.setToolTipText("Load acquisition settings from a JSON file.");
         btnConvertSettings_.setToolTipText("Convert \"AcqSettings.txt\" from the " +
                 "Micro-Manager 1.4 plugin into Light Sheet Manager settings.");
 
