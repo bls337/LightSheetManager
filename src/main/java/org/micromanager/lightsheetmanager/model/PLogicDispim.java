@@ -198,7 +198,8 @@ public class PLogicDispim {
         try {
             core_.setShutterDevice(plcLaser_.getDeviceName());
         } catch (Exception e) {
-            model_.logging().reportError("could not set shutter to " + plcLaser_.getDeviceName());
+            model_.logging().reportError("could not set shutter to " + plcLaser_.getDeviceName()
+                    + ": " + e.getMessage());
         }
 
         if (settings.stageScan().enabled()) {
@@ -323,7 +324,8 @@ public class PLogicDispim {
         try {
             core_.setShutterDevice(plcLaser_.getDeviceName());
         } catch (Exception e) {
-            model_.logging().reportError("could not set shutter to " + plcLaser_.getDeviceName());
+            model_.logging().reportError("could not set shutter to " + plcLaser_.getDeviceName()
+                    + ": " + e.getMessage());
         }
 
         scanDistance_ = 0;
@@ -1131,7 +1133,8 @@ public class PLogicDispim {
                 core_.waitForConfig(group, preset);
             }
         } catch (Exception e) {
-            model_.logging().reportError("Couldn't set the path config " + preset + " of group " + group);
+            model_.logging().reportError("Couldn't set the path config " + preset + " of group " + group
+                    + ": " + e.getMessage());
         }
     }
 

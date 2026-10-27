@@ -181,6 +181,8 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
         final boolean isUsingAdvancedTiming = settings.isUsingAdvancedTiming();
         cbxUseAdvancedTiming_ = new CheckBox("Use advanced timing settings",
                 12, isUsingAdvancedTiming, CheckBox.RIGHT);
+        cbxUseAdvancedTiming_.setToolTipText("Use the advanced timing values above "
+                + "instead of the ones computed from the slice settings.");
         // initial enabled or disabled state
         swapTimingSettingsPanels(isUsingAdvancedTiming);
 
