@@ -85,9 +85,12 @@ public class VolumePanel extends Panel implements SettingsListener {
         spnNumSlices_ = Spinner.createIntegerSpinner(
                 volumeSettings.slicesPerView(),
                 1, 65000, 1);
+        spnSliceStepSize_.setToolTipText("Distance between slices.");
 
         switch (geometryType_) {
             case DISPIM:
+                spnViewDelay_.setToolTipText("Time to wait before the first slice of each view.");
+                spnNumSlices_.setToolTipText("Number of slices in each view.");
                 add(lblNumViews, "");
                 add(cmbNumViews_, "wrap");
                 add(lblFirstView, "");
@@ -100,6 +103,8 @@ public class VolumePanel extends Panel implements SettingsListener {
                 add(spnSliceStepSize_, "");
                 break;
             case SCAPE:
+                spnViewDelay_.setToolTipText("Time to wait before the first slice of each volume.");
+                spnNumSlices_.setToolTipText("Number of slices in each volume.");
                 add(lblViewDelay, "");
                 add(spnViewDelay_, "wrap");
                 add(new JLabel("Number of slices:"), "");
