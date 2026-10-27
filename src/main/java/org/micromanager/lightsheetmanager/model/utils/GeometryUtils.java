@@ -17,7 +17,6 @@ public final class GeometryUtils {
      * @return factor, e.g. 1.0 for 45 degrees, sqrt(3) for 60 degrees, etc.
      */
     public static double getStageGeometricShiftFactor(double angle, final boolean pathA) {
-        //double angle = 1.0; // TODO: props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_STAGESCAN_ANGLE_PATHA);
         if (!pathA) {
             angle = 90.0 - angle;
         }
@@ -32,7 +31,6 @@ public final class GeometryUtils {
      * @return factor, e.g. 1/sqrt(2) for 45 degrees, 0.5 for 60 degrees, etc.
      */
     public static double getStageTopViewCompressFactor(double angle, final boolean pathA) {
-        //double angle = 1.0; // TODO: props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_STAGESCAN_ANGLE_PATHA);
         if (!pathA) {
             angle = 90.0 - angle;
         }
