@@ -74,13 +74,10 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
     PLogicScape controller_;
     ArrayList<Double> savedExposures_ = new ArrayList<>();
-    Point2D.Double xyPosUm_;
     // Snapshot taken when the run is armed. The position list is user-editable at any time, so
     // a live read can give different answers to different parts of one run: the saved
     // position_list.pos, the generated events, and the per-arm stage scan setup must agree.
     private volatile PositionList positionList_;
-    private double origSpeedX_;
-    private double origAccelX_;
     private double scanSpeedX_;
     private double scanAccelX_;
     private boolean isPolling_; // true if polling was enabled at the start of an acquisition
@@ -119,16 +116,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // make settings current
         updateSettings();
 
-        // initialize stage scanning so we can restore state
-        // set before any validation below can return early: finish() runs on every exit from setup(),
-        // including the refusals, and restores these unconditionally. Initialized further down they
-        // are still at their field defaults on those paths, so finish() writes 0.0. The stage rejects
-        // that for speed but ACCEPTS it for acceleration, leaving it unable to move properly.
-        // null means this run never captured a position, so finish() leaves the stage alone.
-        // (0,0) cannot say that because it is a position the stage can actually be at.
-        xyPosUm_ = null;
-        origSpeedX_ = 1.0; // don't want 0 in case something goes wrong
-        origAccelX_ = 1.0; // don't want 0 in case something goes wrong
+        // set before any validation below can return early: finish() runs on every exit from setup()
+        stageScanState_ = null;
         originalCoreCamera_ = null;
         originalChannelPreset_ = null;
 
@@ -255,21 +244,25 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     return false;
                 }
                 // second part: initialize stage scanning, so we can restore state later
-                // TODO: wrap the position, speed and acceleration up into a stage scan state object
-                // the position is read inside the try, so a failed read refuses the run instead
-                // of returning the stage to 0 in place of the unread position
+                // a failed read refuses the run rather than restoring a value that was never read
+                final String xyStageName = xyStage.getDeviceName();
+                final Point2D.Double position;
+                double speedX;
+                final double accelerationX;
                 try {
-                    xyPosUm_ = core_.getXYStagePosition(xyStage.getDeviceName());
+                    position = core_.getXYStagePosition(xyStageName);
+                    speedX = Double.parseDouble(
+                            core_.getProperty(xyStageName, ASIXYStage.Properties.SPEED_X_MM));
+                    accelerationX = Double.parseDouble(
+                            core_.getProperty(xyStageName, ASIXYStage.Properties.ACCELERATION_X));
                 } catch (Exception e) {
-                    model_.logging().reportError("could not get the start position of "
-                            + xyStage.getDeviceName() + ": " + e.getMessage());
+                    model_.logging().reportError("could not get the start position, speed or "
+                            + "acceleration of " + xyStageName + ": " + e.getMessage());
                     return false;
                 }
-                origSpeedX_ = xyStage.getSpeedX();
-                origAccelX_ = xyStage.getAccelerationX();
 
                 // if X speed is less than 0.2 mm/s then it probably wasn't restored to correct speed some other time
-                if (origSpeedX_ < 0.2) {
+                if (speedX < 0.2) {
                     // quiet answer is "Yes": the small speed is residue of an interrupted scan, and
                     // an unattended run should take the recovery path rather than hang on a dialog
                     final boolean result = model_.logging().confirmOrDefault("Change Speed",
@@ -277,11 +270,13 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                                     "stage scanning previously. Do you want to set it to 1 mm/s now?", true);
                     if (result) {
                         xyStage.setSpeedX(1.0);
-                        // origSpeedX_ is the value finish() restores, so it has to track the change we
+                        // speedX is the value finish() restores, so it has to track the change we
                         // just made; otherwise we put the small speed straight back at the end of the run
-                        origSpeedX_ = 1.0;
+                        speedX = 1.0;
                     }
                 }
+                stageScanState_ = new StageScanState(xyStage, position, speedX, accelerationX,
+                        acqSettings_.stageScan().returnToStart());
                 // TODO: add more checks from original plugin here... Z speed?
             }
         }
@@ -584,6 +579,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // TODO add any code that needs to be executed on the acquisition thread (i.e. the one
         //  that controls hardware)
 
+        // taken before the hook is added, so the hook reads this run's stage state on the engine thread
+        final StageScanState stageScan = stageScanState_;
+
         // TODO: autofocus
         currentAcquisition_.addHook(new AcquisitionHook() {
             @Override
@@ -663,12 +661,11 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
                     // move between positions fast
                     scanSpeedX_ = 1.0;
                     scanAccelX_ = 1.0;
-                    if (settings.stageScan().enabled() && settings.isUsingMultiplePositions()) {
-                        final ASIXYStage xyStage = model_.devices().device("SampleXY");
-                        scanSpeedX_ = xyStage.getSpeedX();
-                        scanAccelX_ = xyStage.getAccelerationX();
-                        xyStage.setSpeedX(origSpeedX_);
-                        xyStage.setAccelerationX(origAccelX_);
+                    if (stageScan != null && settings.isUsingMultiplePositions()) {
+                        scanSpeedX_ = stageScan.stage.getSpeedX();
+                        scanAccelX_ = stageScan.stage.getAccelerationX();
+                        stageScan.stage.setSpeedX(stageScan.speedX);
+                        stageScan.stage.setAccelerationX(stageScan.accelerationX);
                     }
                 }
                 return event;
@@ -1345,26 +1342,17 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         }
 
         // if we did stage scanning restore the original position and speed
-        if (acqSettings_.stageScan().enabled()) {
-            final ASIXYStage xyStage = model_.devices().device("SampleXY");
-            if (xyStage == null) {
-                // setup() can return before its own stage checks, such as a save location refusal
-                studio_.logs().logError("Could not restore the stage: no SampleXY device");
-            } else {
-                final boolean returnToOriginalPosition =
-                        acqSettings_.stageScan().returnToStart();
-
-                // make sure stage scanning state machine is stopped,
-                // otherwise setting speed/position won't take
-                xyStage.setScanState(ASIXYStage.ScanState.IDLE);
-                xyStage.setSpeedX(origSpeedX_);
-                xyStage.setAccelerationX(origAccelX_);
-
-                // xyPosUm_ is null when setup() returned before it captured a position
-                if (returnToOriginalPosition && xyPosUm_ != null) {
-                    xyStage.setXYPosition(xyPosUm_.x, xyPosUm_.y);
-                }
+        if (stageScanState_ != null) {
+            final ASIXYStage xyStage = stageScanState_.stage;
+            // make sure stage scanning state machine is stopped,
+            // otherwise setting speed/position won't take
+            xyStage.setScanState(ASIXYStage.ScanState.IDLE);
+            xyStage.setSpeedX(stageScanState_.speedX);
+            xyStage.setAccelerationX(stageScanState_.accelerationX);
+            if (stageScanState_.returnToStart) {
+                xyStage.setXYPosition(stageScanState_.position.x, stageScanState_.position.y);
             }
+            stageScanState_ = null;
         }
 
         // Restore shutter/autoshutter to original state; null means this run never captured it

@@ -27,7 +27,9 @@ import org.micromanager.lightsheetmanager.gui.tabs.acquisition.DurationPanel;
 import org.micromanager.lightsheetmanager.model.autofocus.AutofocusAdapter;
 import org.micromanager.lightsheetmanager.model.channels.ChannelSpec;
 import org.micromanager.lightsheetmanager.model.devices.cameras.CameraBase;
+import org.micromanager.lightsheetmanager.model.devices.vendor.ASIXYStage;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +83,9 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
 
     // null until a run captures it, cleared by finish()
     protected ShutterState shutterState_;
+
+    // null until a stage scan captures the stage, cleared by finish()
+    protected StageScanState stageScanState_;
 
     protected DurationPanel pnlDuration_;
 
@@ -779,6 +784,26 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         ShutterState(final boolean isOpen, final boolean autoShutter) {
             this.isOpen = isOpen;
             this.autoShutter = autoShutter;
+        }
+    }
+
+    /**
+     * The XY stage as it was before a stage scan changed it.
+     */
+    protected static final class StageScanState {
+        final ASIXYStage stage;
+        final Point2D.Double position;
+        final double speedX;
+        final double accelerationX;
+        final boolean returnToStart;
+
+        StageScanState(final ASIXYStage stage, final Point2D.Double position, final double speedX,
+                       final double accelerationX, final boolean returnToStart) {
+            this.stage = stage;
+            this.position = position;
+            this.speedX = speedX;
+            this.accelerationX = accelerationX;
+            this.returnToStart = returnToStart;
         }
     }
 
