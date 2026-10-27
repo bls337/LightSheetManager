@@ -165,7 +165,7 @@ public class ControlPanel extends Panel implements Subscriber {
                             () -> setRelativeXPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnMoveToZero_.registerListener(() -> setXPosition(0.0));
                     btnSetZero_.registerListener(() -> {
-                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
+                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "Set 0",
                              "This will change the coordinate system. Are you sure you would like to proceed?");
                        if (result) {
                           setOriginX();
@@ -181,7 +181,7 @@ public class ControlPanel extends Panel implements Subscriber {
                             () -> setRelativeYPosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
                     btnMoveToZero_.registerListener(() -> setYPosition(0.0));
                     btnSetZero_.registerListener(() -> {
-                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
+                       final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "Set 0",
                              "This will change the coordinate system. Are you sure you would like to proceed?");
                        if (result) {
                           setOriginY();
@@ -202,7 +202,7 @@ public class ControlPanel extends Panel implements Subscriber {
                     () -> setRelativePosition(-Double.parseDouble(txtRelMoveStepSize_.getText())));
             btnMoveToZero_.registerListener(() -> setPosition(0.0));
             btnSetZero_.registerListener(() -> {
-               final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "",
+               final boolean result = DialogUtils.showYesNoDialog(btnSetZero_, "Set 0",
                      "This will change the coordinate system. Are you sure you would like to proceed?");
                if (result) {
                   setOrigin();
