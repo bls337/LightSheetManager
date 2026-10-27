@@ -148,7 +148,7 @@ public class GaussianCurveFitter extends AbstractCurveFitter {
     }
 
     /**
-     * Guesses the parameters {@code norm}, {@code mean}, and {@code sigma}
+     * Guesses the parameters {@code norm}, {@code mean}, {@code sigma}, and {@code offset}
      * of a {@link org.apache.commons.math3.analysis.function.Gaussian.Parametric}
      * based on the specified observed points.
      */
@@ -194,6 +194,7 @@ public class GaussianCurveFitter extends AbstractCurveFitter {
          *  <li>Normalization factor</li>
          *  <li>Mean</li>
          *  <li>Standard deviation</li>
+         *  <li>Offset</li>
          * </ul>
          */
         public double[] guess() {
@@ -248,8 +249,8 @@ public class GaussianCurveFitter extends AbstractCurveFitter {
          * Guesses the parameters based on the specified observed points.
          *
          * @param points Observed points, sorted.
-         * @return the guessed parameters (normalization factor, mean and
-         * sigma).
+         * @return the guessed parameters (normalization factor, mean,
+         * sigma and offset).
          */
         private double[] basicGuess(WeightedObservedPoint[] points) {
             final int maxYIdx = findMaxY(points);
