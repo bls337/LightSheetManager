@@ -120,7 +120,7 @@ public class NavigationPanel extends Panel {
                               model_, propertyName, deviceName, deviceType, ControlPanel.Axis.X, ControlPanel.Units.DEGREES);
                         ControlPanel controlPanelY = new ControlPanel(
                               model_, propertyName, deviceName, deviceType, ControlPanel.Axis.Y, ControlPanel.Units.DEGREES);
-                        // TODO: check for ASI hardware when settings units
+                        // TODO: check for ASI hardware when setting units
                         illumProperties.get(pathNum - 1).add(controlPanelX);
                         illumProperties.get(pathNum - 1).add(controlPanelY);
                     }
