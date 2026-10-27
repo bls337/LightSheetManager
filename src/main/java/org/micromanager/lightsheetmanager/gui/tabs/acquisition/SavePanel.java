@@ -122,9 +122,12 @@ public class SavePanel extends Panel implements SettingsListener {
 
         cbxSaveMode_ = new ComboBox<>(SaveMode.values(),
                 acqSettings.saveMode(), 110, 20);
+        cbxSaveMode_.setToolTipText("File format for the saved images.");
 
         cbxSaveWhileAcquiring_ = new CheckBox("Save images during acquisition",
                 acqSettings.isSavingImagesDuringAcquisition());
+        cbxSaveWhileAcquiring_.setToolTipText("Write images to disk as they arrive. "
+                + "Unchecked, they stay in memory until you save them.");
 
         cbxSeparateTimePoints_ = new CheckBox("Separate file for each time point",
                 acqSettings.isUsingSeparateTimePoints());
