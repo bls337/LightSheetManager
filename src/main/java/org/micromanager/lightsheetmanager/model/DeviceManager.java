@@ -548,8 +548,17 @@ public class DeviceManager {
             }
         }
 
-        ArrayList<String> updatedProperties = updateConfig(groupName, configName);
+        // read the preset to compare against
+        final Configuration config;
+        try {
+            config = core_.getConfigData(groupName, configName);
+        } catch (Exception e) {
+            studio_.logs().showError("could not get the configuration data of " + groupName + "::"
+                    + configName + ": " + e.getMessage());
+            return; // early exit
+        }
 
+        ArrayList<String> updatedProperties = updateConfig(groupName, configName, config);
         if (updatedProperties.isEmpty()) {
             studio_.logs().showMessage("All device adapter properties are present in the "
                     + groupName + "::" + configName + " configuration group.");
@@ -569,21 +578,14 @@ public class DeviceManager {
      *
      * @param groupName the group name to check
      * @param configName the configuration preset to check
+     * @param config the current data of the configuration preset
      * @return an ArrayList of new properties
      */
-    private ArrayList<String> updateConfig(final String groupName, final String configName) {
+    private ArrayList<String> updateConfig(final String groupName, final String configName,
+                                           final Configuration config) {
         ArrayList<String> newProperties = new ArrayList<>();
         final String[] props = adapter().getDevicePropertyNames();
         final String[] properties = adapter().getEditableProperties(props);
-
-        Configuration config;
-        try {
-            config = core_.getConfigData(groupName, configName);
-        } catch (Exception e) {
-            studio_.logs().showError("could not get the configuration data of " + groupName + "::"
-                    + configName + ": " + e.getMessage());
-            return newProperties; // early exit => could not get config data to compare
-        }
 
         for (String propertyName : properties) {
             if (!config.isPropertyIncluded(deviceAdapterName_, propertyName)) {
