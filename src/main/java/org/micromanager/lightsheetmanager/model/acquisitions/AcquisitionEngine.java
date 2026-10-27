@@ -144,7 +144,7 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         }
         // canWrite() is advisory on Windows (it reports the read-only attribute, not the ACL), so it
         // catches the common cases without being authoritative; a real write failure still surfaces
-        // at finish(). Cheap enough to be worth keeping.
+        // when the images are written. Cheap enough to be worth keeping.
         if (!directory.canWrite()) {
             model_.logging().reportError("The save directory is not writable:\n\n" + saveDirectory);
             return false;

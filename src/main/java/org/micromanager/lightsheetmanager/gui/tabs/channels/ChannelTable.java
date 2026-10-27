@@ -122,7 +122,7 @@ public class ChannelTable extends JScrollPane {
             channelGroups = model_.studio().core()
                   .getAllowedPropertyValues("Core", "ChannelGroup");
         } catch (Exception e) {
-            model_.studio().logs().logError(e);
+            model_.studio().logs().logError(e, "could not get the channel groups");
             return new String[0];
         }
         // filter channel groups

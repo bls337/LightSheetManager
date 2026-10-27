@@ -122,9 +122,12 @@ public class SavePanel extends Panel implements SettingsListener {
 
         cbxSaveMode_ = new ComboBox<>(SaveMode.values(),
                 acqSettings.saveMode(), 110, 20);
+        cbxSaveMode_.setToolTipText("File format for the saved images.");
 
         cbxSaveWhileAcquiring_ = new CheckBox("Save images during acquisition",
                 acqSettings.isSavingImagesDuringAcquisition());
+        cbxSaveWhileAcquiring_.setToolTipText("Write images to disk as they arrive. "
+                + "Unchecked, they stay in memory until you save them.");
 
         cbxSeparateTimePoints_ = new CheckBox("Separate file for each time point",
                 acqSettings.isUsingSeparateTimePoints());
@@ -140,7 +143,7 @@ public class SavePanel extends Panel implements SettingsListener {
         btnBrowse_.setToolTipText("Select the save directory with the file browser.");
         btnOpen_.setToolTipText("Open the file explorer to the save directory.");
         btnSaveSettings_.setToolTipText("Save the current acquisition settings to JSON.");
-        btnLoadSettings_.setToolTipText("Load acquisitions settings from a JSON file.");
+        btnLoadSettings_.setToolTipText("Load acquisition settings from a JSON file.");
         btnConvertSettings_.setToolTipText("Convert \"AcqSettings.txt\" from the " +
                 "Micro-Manager 1.4 plugin into Light Sheet Manager settings.");
 

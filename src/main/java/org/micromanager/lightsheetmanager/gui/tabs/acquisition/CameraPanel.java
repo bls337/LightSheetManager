@@ -55,6 +55,7 @@ public class CameraPanel extends Panel implements SettingsListener {
 
         cmbCameraMode_ = new ComboBox<>(modes,
                 model_.acquisitions().settings().cameraMode(), 140, 20);
+        cmbCameraMode_.setToolTipText("Camera trigger mode for the acquisition.");
 
         final String[] cameraNames = model_.devices().imagingCameraNames();
         cbxCameras_ = new ArrayList<>(cameraNames.length);
@@ -84,6 +85,7 @@ public class CameraPanel extends Panel implements SettingsListener {
         for (String cameraName : cameraNames) {
             final boolean isActive = CameraData.isCameraActive(cameraOrder, cameraName);
             final CheckBox checkBox = new CheckBox("Active", isActive);
+            checkBox.setToolTipText("Include this camera in the acquisition.");
             pnlCheckboxes.add(checkBox, "wrap");
             cbxCameras_.add(checkBox);
         }
