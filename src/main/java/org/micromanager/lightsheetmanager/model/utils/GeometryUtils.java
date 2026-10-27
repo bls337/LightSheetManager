@@ -18,10 +18,6 @@ public final class GeometryUtils {
      */
     public static double getStageGeometricShiftFactor(double angle, final boolean pathA) {
         //double angle = 1.0; // TODO: props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_STAGESCAN_ANGLE_PATHA);
-        if (angle < 1) {  // case when property not defined
-            angle = 45.0;
-            //angle = ASIdiSPIM.oSPIM ? 60.0 : 45.0;
-        }
         if (!pathA) {
             angle = 90.0 - angle;
         }
@@ -37,10 +33,6 @@ public final class GeometryUtils {
      */
     public static double getStageTopViewCompressFactor(double angle, final boolean pathA) {
         //double angle = 1.0; // TODO: props_.getPropValueFloat(Devices.Keys.PLUGIN, Properties.Keys.PLUGIN_STAGESCAN_ANGLE_PATHA);
-        if (angle < 1) {  // case when property not defined
-            angle = 45.0;
-            //angle = ASIdiSPIM.oSPIM ? 60.0 : 45.0;
-        }
         if (!pathA) {
             angle = 90.0 - angle;
         }
