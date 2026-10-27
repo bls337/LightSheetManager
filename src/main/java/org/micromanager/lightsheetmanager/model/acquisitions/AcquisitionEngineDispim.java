@@ -585,7 +585,7 @@ public class AcquisitionEngineDispim extends AcquisitionEngine {
                 final Datastore.SaveMode saveMode = SaveMode.convert(acqSettings_.saveMode());
                 datastore_.save(saveMode, savePath);
             } catch (Exception e) {
-                model_.logging().reportError("could not save the acquisition data to: \n" + savePath);
+                model_.logging().reportError(e, "could not save the acquisition data to: \n" + savePath);
             }
         }
     }
