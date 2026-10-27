@@ -43,6 +43,7 @@ public class PositionPanel extends Panel implements SettingsListener {
         // XYZ grid
         btnEditPositionList_ = new Button("Edit Position List...", 130, 24);
         btnOpenXYZGrid_ = new Button("XYZ Grid...", 90, 24);
+        btnEditPositionList_.setToolTipText("Open the Micro-Manager position list editor.");
 
         add(btnEditPositionList_, "");
         add(btnOpenXYZGrid_, "wrap");

@@ -62,6 +62,10 @@ public class SlicePanel extends Panel implements SettingsListener {
                 sliceSettings.period(), 0.0, Double.MAX_VALUE, 0.25);
         spnSampleExposure_ = Spinner.createDoubleSpinner(
                 sliceSettings.sampleExposure(), 0.0, Double.MAX_VALUE, 0.25);
+        cbxMinimizePeriod_.setToolTipText(
+                "Use the shortest slice period the camera and the sample exposure allow.");
+        spnSlicePeriod_.setToolTipText("Time from the start of one slice to the start of the next.");
+        spnSampleExposure_.setToolTipText("Time the sample is illuminated in each slice.");
 
         setSpinnerEnabled(!periodMinimized);
 

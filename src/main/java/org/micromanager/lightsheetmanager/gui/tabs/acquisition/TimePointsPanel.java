@@ -44,6 +44,9 @@ public class TimePointsPanel extends Panel implements SettingsListener {
                 acqSettings.numTimePoints(), 1, Integer.MAX_VALUE, 1, 6);
         spnTimePointInterval_ = Spinner.createDoubleSpinner(
                 acqSettings.timePointIntervalSec(), 0.1, Double.MAX_VALUE, 0.1, 6);
+        spnNumTimePoints_.setToolTipText("Number of time points to acquire.");
+        spnTimePointInterval_.setToolTipText(
+                "Time from the start of one time point to the start of the next.");
 
         add(lblNumTimePoints_, "");
         add(spnNumTimePoints_, "wrap");
