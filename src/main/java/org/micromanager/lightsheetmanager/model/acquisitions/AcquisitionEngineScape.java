@@ -205,7 +205,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         try {
             core_.setCameraDevice(cameraName);
         } catch (Exception e) {
-            model_.logging().reportError("Could not set \"Core-Camera\" to the first logical camera device.");
+            model_.logging().reportError("Could not set \"Core-Camera\" to the first logical camera device "
+                    + cameraName + ": " + e.getMessage());
             return false;
         }
 
@@ -848,7 +849,6 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // TODO: execute any start-acquisition runnables
 
-        // Loop 1: XY positions
         PositionList pl = positionList_;
 
         // never in separate mode: without a controller the hardware flag is not recomputed, so
@@ -1355,7 +1355,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
             try {
                 core_.setCameraDevice(originalCoreCamera_);
             } catch (Exception e) {
-                studio_.logs().logError("Could not restore Core-Camera to " + originalCoreCamera_);
+                studio_.logs().logError("Could not restore Core-Camera to " + originalCoreCamera_
+                        + ": " + e.getMessage());
             } finally {
                 originalCoreCamera_ = null;
             }
@@ -1835,9 +1836,9 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // 3. camera reset time
         // 4. start scan 0.25ms before camera global exposure and shifted up in time to account for delay introduced by Bessel filter
         // 5. turn on laser as soon as camera global exposure, leave laser on for desired light exposure time
-        // 7. end camera exposure in final 0.25ms, post-filter scan waveform also ends now
+        // 6. end camera exposure in final 0.25ms, post-filter scan waveform also ends now
 
-        CameraBase camera = model_.devices().firstImagingCamera(); //.getDevice("ImagingCamera");
+        CameraBase camera = model_.devices().firstImagingCamera();
         if (camera == null) {
             // just a dummy to test demo mode
             return DefaultTimingSettings.builder();
@@ -1901,7 +1902,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
 
         // figure out desired time for camera to be exposing (including reset time)
         // because both camera trigger and laser on occur on 0.25ms intervals (i.e. we may not
-        //    trigger the laser until 0.24ms after global exposure) use cameraReset_max
+        //    trigger the laser until 0.24ms after global exposure) use cameraResetMax
         // special adjustment for Photometrics cameras that possibly has extra clear time which is counted in reset time
         //    but not in the camera exposure time
         // TODO: skipped PVCAM case, this should already be handled by camera.getResetTime(camMode); but there may be differences

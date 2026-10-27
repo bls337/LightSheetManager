@@ -413,7 +413,8 @@ public class DeviceManager {
         try {
             result = core_.getDeviceLibrary(deviceName);
         } catch (Exception e) {
-            studio_.logs().logError(e.getMessage());
+            studio_.logs().logError("could not get the device library of " + deviceName + ": "
+                    + e.getMessage());
         }
         return result;
     }
@@ -431,7 +432,7 @@ public class DeviceManager {
         try {
             loadedDevices = core_.getLoadedDevices();
         } catch (Exception e) {
-            studio_.logs().logError(e.getMessage());
+            studio_.logs().logError("could not get the loaded devices: " + e.getMessage());
         }
         return loadedDevices.toArray();
     }
@@ -461,7 +462,7 @@ public class DeviceManager {
                 }
             } catch (Exception e) {
                 studio_.logs().logError("could not get the device " +
-                        "library for the device \"" + device + "\".");
+                        "library for the device \"" + device + "\": " + e.getMessage());
             }
         }
         // no device adapters found

@@ -304,7 +304,7 @@ public class SavePanel extends Panel implements SettingsListener {
                 try {
                     desktop.open(directory);
                 } catch (IOException e) {
-                    model_.studio().logs().showError(
+                    model_.studio().logs().showError(e,
                             "Could not open the save directory:\n\n" + path);
                 }
             } else {

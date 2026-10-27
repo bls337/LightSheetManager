@@ -74,8 +74,8 @@ public class PcoCamera extends CameraBase {
             return Double.parseDouble(getProperty(Properties.LINE_TIME))/1000.0;
         } else {
             if (isPanda()) {
-                // documentation not clear but suggests line time < 13ms
-                // empirically observed 12.5us + 0.0056us*ROI height (centered), e.g. 24ms at full frame in one set of measurements
+                // documentation not clear but suggests line time < 13us
+                // empirically observed 12.5us + 0.0056us*ROI height (centered), e.g. 24us at full frame in one set of measurements
                 // another set of measurements it seemed approximately linear in log(height)
                 // for now just use pessimistic but safe 24us
                 // TODO get more accurate value

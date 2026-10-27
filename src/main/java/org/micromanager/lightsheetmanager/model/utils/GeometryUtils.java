@@ -20,7 +20,7 @@ public final class GeometryUtils {
         if (!pathA) {
             angle = 90.0 - angle;
         }
-        return Math.tan(angle/180.0*Math.PI);
+        return Math.tan(Math.toRadians(angle));
     }
 
     /***
@@ -34,7 +34,7 @@ public final class GeometryUtils {
         if (!pathA) {
             angle = 90.0 - angle;
         }
-        return Math.cos(angle/180.0*Math.PI);
+        return Math.cos(Math.toRadians(angle));
     }
 
     /***
