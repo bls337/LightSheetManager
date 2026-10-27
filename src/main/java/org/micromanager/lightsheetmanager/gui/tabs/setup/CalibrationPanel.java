@@ -117,10 +117,7 @@ public class CalibrationPanel extends Panel {
         pnlText.add(txtSlope_, "wrap");
         pnlText.add(lblOffset, "");
         pnlText.add(lblOffsetValue_, "");
-
-//        Panel pnlFields = new Panel();
-//        pnlFields.setMinimumSize(new Dimension(20, 30));
-       pnlText.add(txtOffset_, "");
+        pnlText.add(txtOffset_, "");
 
         switch (geometryType) {
             case DISPIM:
@@ -140,7 +137,6 @@ public class CalibrationPanel extends Panel {
                 break;
             case SCAPE:
                 add(pnlText, "wrap");
-               // add(pnlFields, "wrap");
                 add(btnUpdate_, "wrap, span 2, align center");
                 add(btnRunAutofocus_, "span 2, align center");
                 break;
