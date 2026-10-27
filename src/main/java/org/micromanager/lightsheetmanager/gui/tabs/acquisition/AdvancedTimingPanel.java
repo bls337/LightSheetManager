@@ -79,9 +79,21 @@ public class AdvancedTimingPanel extends Panel implements SettingsListener {
                 timingSettings.scansPerSlice(), 1, 1000, 1);
         spnCameraExposure_ = Spinner.createDoubleSpinner(
                 timingSettings.cameraExposureMs(), 0.0, 1000.0, 0.25);
+        spnDelayBeforeScan_.setToolTipText(
+                "Delay from the start of the slice to the start of the scan.");
+        spnScansPerSlice_.setToolTipText("Number of scanner sweeps per slice.");
+        // TODO: add a tooltip to the scan duration, SCAPE sets the sweep from the slice duration
+        spnDelayBeforeLaser_.setToolTipText(
+                "Delay from the start of the slice to the laser trigger.");
+        spnLaserTriggerDuration_.setToolTipText("How long the laser trigger stays high.");
+        spnDelayBeforeCamera_.setToolTipText(
+                "Delay from the start of the slice to the camera trigger.");
+        spnCameraTriggerDuration_.setToolTipText("How long the camera trigger stays high.");
+        spnCameraExposure_.setToolTipText("Exposure set on the camera.");
 
         cbxAlternateScanDirection_ = new CheckBox("Alternate scan direction",
                 timingSettings.useAlternateScanDirection(), CheckBox.LEFT);
+        cbxAlternateScanDirection_.setToolTipText("Alternate the direction of the scanner sweep.");
 
         add(lblDelayBeforeScan_, "");
         add(spnDelayBeforeScan_, "wrap");
