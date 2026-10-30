@@ -55,6 +55,7 @@ public class CameraTab extends Panel implements ListeningPanel {
         final Panel pnlBinning = new Panel("Binning");
 
         cmbBinning_ = new ComboBox<>(new String[0], null, 80, 20);
+        cmbBinning_.setToolTipText("Set the binning of every active imaging camera.");
         lblBinningState_ = new JLabel(" ");
 
         pnlBinning.add(new JLabel("Active imaging cameras:"), "wrap");
