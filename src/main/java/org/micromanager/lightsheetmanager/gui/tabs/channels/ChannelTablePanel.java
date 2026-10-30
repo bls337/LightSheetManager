@@ -81,6 +81,10 @@ public class ChannelTablePanel extends Panel implements SettingsListener {
             lastChannelMode_ = ChannelMode.VOLUME;
         }
         cmbChannelMode_ = new ComboBox<>(ChannelMode.values(), lastChannelMode_, 140, 22);
+        cmbChannelGroup_.setToolTipText(
+                "Micro-Manager configuration group the channel presets come from.");
+        cmbChannelMode_.setToolTipText("How often the channel changes, and whether the "
+                + "software or the controller switches it.");
 
         add(lblChannelGroup_, "split 2");
         add(cmbChannelGroup_, "wrap");
