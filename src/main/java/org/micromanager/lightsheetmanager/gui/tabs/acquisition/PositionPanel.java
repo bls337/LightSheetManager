@@ -44,6 +44,8 @@ public class PositionPanel extends Panel implements SettingsListener {
         btnEditPositionList_ = new Button("Edit Position List...", 130, 24);
         btnOpenXYZGrid_ = new Button("XYZ Grid...", 90, 24);
         btnEditPositionList_.setToolTipText("Open the Micro-Manager position list editor.");
+        spnPostMoveDelay_.setToolTipText(
+                "Time to wait after moving to each position before acquiring there.");
 
         add(btnEditPositionList_, "");
         add(btnOpenXYZGrid_, "wrap");
