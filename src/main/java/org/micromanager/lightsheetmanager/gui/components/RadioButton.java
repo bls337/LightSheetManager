@@ -49,6 +49,12 @@ public class RadioButton extends JPanel {
             button.setEnabled(state);
         }
     }
+
+    public void setToolTipText(final String text) {
+        for (final JRadioButton button : buttons) {
+            button.setToolTipText(text);
+        }
+    }
     private void addRadioButton(final String text) {
         final JRadioButton button = new JRadioButton(text);
         final Font font = new Font(Font.SANS_SERIF, Font.PLAIN, 12);

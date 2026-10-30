@@ -577,7 +577,7 @@ public class AcquisitionTableFrame extends JFrame {
 //                final List<AcquisitionMetadata> metadata =
 //                        acqTable_.getTableData().getMetadataList();
 //
-//                // run each aquisition in sequence
+//                // run each acquisition in sequence
 //                int acqIndex = 0;
 //                boolean allAcqsDone = false;
 //                while (!allAcqsDone) {

@@ -167,6 +167,9 @@ public class AcquisitionTab extends Panel implements ListeningPanel, SettingsLis
                 + "or stop the running one.");
         btnTestAcquisition_.setToolTipText(
                 "Run one time point with the current settings, without saving the images.");
+        btnPauseAcquisition_.setToolTipText("Pause or resume the running acquisition.");
+        btnOpenPlaylist_.setToolTipText(
+                "Open the playlist to run a sequence of acquisitions.");
 
         final boolean channelsEnabled = settings.channels().enabled();
         cbxUseChannels_ = new CheckBox("Channels", channelsEnabled);

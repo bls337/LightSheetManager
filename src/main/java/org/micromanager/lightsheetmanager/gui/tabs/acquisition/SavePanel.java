@@ -202,7 +202,8 @@ public class SavePanel extends Panel implements SettingsListener {
 
         txtSaveFileName_.registerValidationListener(BaseAcquisitionSettings::saveNamePrefixProblem,
                 problem -> {
-                    txtSaveFileName_.setToolTipText(problem);
+                    txtSaveFileName_.setToolTipText(
+                            problem == null ? "Name for the saved images." : problem);
                     if (problem == null) {
                         model_.acquisitions().settingsBuilder()
                                 .saveNamePrefix(txtSaveFileName_.getText());

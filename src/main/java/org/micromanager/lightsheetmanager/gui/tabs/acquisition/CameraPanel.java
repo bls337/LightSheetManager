@@ -72,6 +72,8 @@ public class CameraPanel extends Panel implements SettingsListener {
 
         // simultaneous camera settings
         radPrimaryCamera_ = new RadioButton(cameraNames, primaryCamera, RadioButton.VERTICAL);
+        radPrimaryCamera_.setToolTipText("The first camera in the acquisition. "
+                + "Live mode shows this camera and the slice timing is computed from it.");
 
         // active check boxes
         final Panel pnlCheckboxes = new Panel();

@@ -166,9 +166,9 @@ public class AcquisitionTableData {
     }
 
     /**
-     * Returns an unordered array of all position list names.
+     * Returns an unordered array of all acquisition settings names.
      *
-     * @return an unordered array of all position list names
+     * @return an unordered array of all acquisition settings names
      */
     public String[] getAcquisitionNames() {
         final Set<String> keys = settings_.keySet();
@@ -185,9 +185,9 @@ public class AcquisitionTableData {
 //    }
 
     /**
-     * Returns array of all acquisition settings names.
+     * Returns array of all position list names.
      *
-     * @return an array of all acquisition settings names.
+     * @return an array of all position list names.
      */
     public String[] getPositionListNames() {
         final Set<String> keys = positions_.keySet();
@@ -272,7 +272,7 @@ public class AcquisitionTableData {
 
     /**
      * Sets the positionListName in the metadata, used when selecting values
-     * with the AcquistionTablePositionList.
+     * with the AcquisitionTablePositionList.
      *
      * @param row the selected row
      * @param name the new name
