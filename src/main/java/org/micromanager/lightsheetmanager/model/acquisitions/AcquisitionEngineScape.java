@@ -116,6 +116,7 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         updateSettings();
 
         // set before any validation below can return early: finish() runs on every exit from setup()
+        controller_ = null;
         stageScanState_ = null;
         originalCoreCamera_ = null;
         originalChannelPreset_ = null;
@@ -1306,10 +1307,8 @@ public class AcquisitionEngineScape extends AcquisitionEngine {
         // TODO: figure out if we really want to return piezos to 0 position (maybe center position,
         //   maybe not at all since we move when we switch to setup tab, something else??)
         if (model_.devices().isUsingPLogic() && controller_ != null) {
-            // SCAPE: leave the imaging piezo where it is instead of driving it to 0. diSPIM 1.4
-            // passes centerPiezos=false for SCOPE (AcquisitionPanel line 4979). Parking at 0
-            // defocuses the live view and re-introduces the first-frame jump on the next run
-            // (issues #404 symptom 3 / #407).
+            // SCAPE: leave the imaging piezo where it is instead of driving it to 0. Parking at 0
+            // defocuses the live view and re-introduces the first-frame jump on the next run.
             controller_.cleanUpControllerAfterAcquisition(acqSettings_, false);
             controller_.stopSPIMStateMachines();
         }
