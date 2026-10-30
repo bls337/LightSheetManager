@@ -36,8 +36,10 @@ public final class StageScanUtils {
      * Compute appropriate acceleration time in ms for the specified motor speed.
      * Set to be 10ms + 0-100ms depending on relative speed to max, all scaled by factor specified on the settings panel
      *
-     * @param motorSpeed
-     * @return
+     * @param motorSpeed the scan speed in mm/s
+     * @param maxMotorSpeed the maximum speed of the stage in mm/s
+     * @param stageScanAccelFactor the factor specified on the settings panel
+     * @return the acceleration time in ms
      */
     public static double computeScanAcceleration(final double motorSpeed, final double maxMotorSpeed, final double stageScanAccelFactor) {
         return (10 + 100 * (motorSpeed / maxMotorSpeed)) * stageScanAccelFactor;
