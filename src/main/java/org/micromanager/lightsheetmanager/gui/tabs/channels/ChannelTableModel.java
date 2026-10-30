@@ -5,7 +5,6 @@ import org.micromanager.lightsheetmanager.model.channels.ChannelTableData;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 public class ChannelTableModel extends AbstractTableModel {
 

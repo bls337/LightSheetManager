@@ -17,7 +17,6 @@ import org.micromanager.acquisition.internal.acqengjcompat.AcqEngJMDADataSink;
 import org.micromanager.data.Datastore;
 import org.micromanager.data.SummaryMetadata;
 import org.micromanager.data.internal.DefaultDatastore;
-import org.micromanager.data.internal.DefaultSummaryMetadata;
 import org.micromanager.data.internal.PropertyKey;
 import org.micromanager.display.DataViewer;
 import org.micromanager.display.DataViewerListener;
