@@ -743,6 +743,11 @@ public abstract class AcquisitionEngine implements AcquisitionManager, MMAcquist
         if (acq == null) {
             return true; // nothing is running, so there is nothing to protect
         }
+        // the data is written and finish() is only restoring the hardware, so it is safe to
+        // close the window
+        if (cleaningUp_ && acq.getDataSink().isFinished()) {
+            return true;
+        }
         // always refuse while a run is live: closing the live window would close the datastore
         // the run is still writing. answering yes only aborts, so the close succeeds on the next
         // attempt.
