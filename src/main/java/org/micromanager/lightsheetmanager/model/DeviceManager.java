@@ -348,6 +348,22 @@ public class DeviceManager {
     }
 
     /**
+     * Returns every imaging camera assigned in the hardware configuration by its logical name,
+     * such as "ImagingCamera1", whether or not it is active; {@link #activeImagingCameras()}
+     * returns only the active ones.
+     */
+    public Map<String, CameraBase> allImagingCameras() {
+        final Map<String, CameraBase> cameras = new LinkedHashMap<>();
+        for (final String name : imagingCameraNames()) {
+            final CameraBase device = device(name);
+            if (device != null) {
+                cameras.put(name, device);
+            }
+        }
+        return cameras;
+    }
+
+    /**
      * Returns {@code true} if all cameras in the settings are valid.
      * This is used to detect changes in pre-init properties.
      *
