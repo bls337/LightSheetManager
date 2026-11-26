@@ -3,6 +3,7 @@ package org.micromanager.lightsheetmanager.model.devices.vendor;
 import org.micromanager.Studio;
 
 import java.awt.geom.Point2D;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,14 +40,27 @@ public class ASIScanner extends ASITigerBase {
     }
 
     /**
-     * Moves y and keeps x where it is. x is read inside the try, so a failed read skips the move
+     * Moves Y and keeps X where it is. X is read inside the try, so a failed read skips the move
      * instead of moving with 0 in place of the unread position.
      */
     public void setPositionY(final double y) {
         try {
             core_.setGalvoPosition(deviceName_, core_.getGalvoPosition(deviceName_).x, y);
         } catch (Exception e) {
-            studio_.logs().showError("could not move " + deviceName_ + " y to " + y + ": "
+            studio_.logs().showError("could not move " + deviceName_ + " Y to " + y + ": "
+                    + e.getMessage());
+        }
+    }
+
+    /**
+     * Moves X and keeps Y where it is. Y is read inside the try, so a failed read skips the move
+     * instead of moving with 0 in place of the unread position.
+     */
+    public void setPositionX(final double x) {
+        try {
+            core_.setGalvoPosition(deviceName_, x, core_.getGalvoPosition(deviceName_).y);
+        } catch (Exception e) {
+            studio_.logs().showError("could not move " + deviceName_ + " X to " + x + ": "
                     + e.getMessage());
         }
     }
@@ -58,6 +72,49 @@ public class ASIScanner extends ASITigerBase {
             studio_.logs().showError("could not get the position of " + deviceName_
                     + ": " + e.getMessage());
             return new Point2D.Double(0.0, 0.0);
+        }
+    }
+
+    /**
+     * Sets the home of the X axis on the card. The card parks the axis at home whenever it
+     * homes the scanner, turning the beam off for example, so a static sheet offset has to be
+     * the home as well or the sheet lands somewhere else the next time that happens.
+     *
+     * @param degrees the home position in degrees
+     * @return true when the command was sent
+     */
+    public boolean setHomeX(final double degrees) {
+        return setHome("X", getAxisLetterX(), degrees);
+    }
+
+    /**
+     * Sets the home of the Y axis on the card. The card parks the axis at home whenever it
+     * homes the scanner, which it does when the beam is turned off and when a run ends.
+     *
+     * @param degrees the home position in degrees
+     * @return true when the command was sent
+     */
+    public boolean setHomeY(final double degrees) {
+        return setHome("Y", getAxisLetterY(), degrees);
+    }
+
+    private boolean setHome(final String axis, final String axisLetter, final double degrees) {
+        if (axisLetter.isEmpty()) {
+            studio_.logs().logError("could not set the " + axis + " axis home of " + deviceName_
+                    + ": the axis letter is unknown.");
+            return false;
+        }
+        try {
+            // the adapter has no property for the home, so the command goes through the hub
+            final String hub = core_.getParentLabel(deviceName_);
+            core_.setProperty(hub, Properties.HUB_SERIAL_COMMAND,
+                    "HM " + axisLetter + "=" + String.format(Locale.ROOT, "%.6f", degrees));
+            return true;
+        } catch (Exception e) {
+            studio_.logs().logError("could not set the " + axis + " axis (" + axisLetter
+                    + ") home of " + deviceName_ + " to " + degrees + " degrees: "
+                    + e.getMessage());
+            return false;
         }
     }
 
@@ -392,6 +449,9 @@ public class ASIScanner extends ASITigerBase {
         public static final String SPIM_STATE = "SPIMState";
         public static final String VECTOR_MOVE_X = "VectorMoveX-VE(mm/s)";
         public static final String VECTOR_MOVE_Y = "VectorMoveY-VE(mm/s)";
+
+        // a property of the scanner's hub, not of the scanner
+        public static final String HUB_SERIAL_COMMAND = "SerialCommand";
 
         public static class ReadOnly {
             public static final String AXIS_LETTER_X = "AxisLetterX";
