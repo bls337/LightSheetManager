@@ -81,7 +81,7 @@ public class ASIScanner extends ASITigerBase {
      * the home as well or the sheet lands somewhere else the next time that happens.
      *
      * @param degrees the home position in degrees
-     * @return true when the command was sent
+     * @return true when the command was handed to the hub
      */
     public boolean setHomeX(final double degrees) {
         return setHome("X", getAxisLetterX(), degrees);
@@ -92,7 +92,7 @@ public class ASIScanner extends ASITigerBase {
      * homes the scanner, which it does when the beam is turned off and when a run ends.
      *
      * @param degrees the home position in degrees
-     * @return true when the command was sent
+     * @return true when the command was handed to the hub
      */
     public boolean setHomeY(final double degrees) {
         return setHome("Y", getAxisLetterY(), degrees);
