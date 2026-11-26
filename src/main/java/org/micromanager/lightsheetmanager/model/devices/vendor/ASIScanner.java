@@ -89,7 +89,8 @@ public class ASIScanner extends ASITigerBase {
 
     /**
      * Sets the home of the Y axis on the card. The card parks the axis at home whenever it
-     * homes the scanner, which it does when the beam is turned off and when a run ends.
+     * homes the scanner, which it does when the beam is turned off and when the device starts.
+     * Setting the home moves nothing, so the axis stays where it is until it is homed again.
      *
      * @param degrees the home position in degrees
      * @return true when the command was handed to the hub
